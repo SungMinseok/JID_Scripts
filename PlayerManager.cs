@@ -74,6 +74,7 @@ public class PlayerManager : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(new Vector2(transform.position.x,(circleCollider2D.bounds.min.y)), 0.05f);
     }
+
     void Update(){
         wInput = Input.GetAxisRaw("Horizontal");
         hInput = Input.GetAxisRaw("Vertical");
