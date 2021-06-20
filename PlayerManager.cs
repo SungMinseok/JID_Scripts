@@ -36,6 +36,7 @@ public class PlayerManager : MonoBehaviour
 
     
     public DebugManager d;
+    Animator animator;
 
     void Awake()
     {
@@ -59,21 +60,13 @@ public class PlayerManager : MonoBehaviour
 
         //boxCollider2D = GetComponent<BoxCollider2D>();
         //circleCollider2D = GetComponent<CircleCollider2D>();
-        
+        animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         
         d= DebugManager.instance;
 
-
-        // playerLayer = LayerMask.NameToLayer("Player");
-        // groundLayer = LayerMask.NameToLayer("Ground");
     }
 
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(new Vector2(transform.position.x,(circleCollider2D.bounds.min.y)), 0.05f);
-    }
 
     void Update(){
         wInput = Input.GetAxisRaw("Horizontal");
@@ -85,22 +78,31 @@ public class PlayerManager : MonoBehaviour
         //if(checkGroundCol!=null && (checkGroundCol.CompareTag("MainGround")||checkGroundCol.CompareTag("Ground")||checkGroundCol.CompareTag("Box"))){
         if(isGrounded){
             isJumping = false;
+            animator.SetBool("jump", false);
             
             if(nowPlatform!=checkGroundCol){
                 lastPlatform = nowPlatform;
                 nowPlatform = checkGroundCol;
             }
         }
+        else{
+
+            animator.SetBool("jump", true);
+        }
         // else{
         //     if(!onLadder) isJumping = true;
         // }
-
-        if(wInput>0){
-            spriteRenderer.flipX = false;
+        if(wInput!=0){
+            animator.SetBool("run", true);
+            if(wInput>0){
+                spriteRenderer.flipX = false;
+            }
+            else if(wInput<0){
+                spriteRenderer.flipX = true;
+            }
         }
-        else if(wInput<0){
-            spriteRenderer.flipX = true;
-
+        else{
+            animator.SetBool("run",false);
         }
     }
 
@@ -222,7 +224,7 @@ public class PlayerManager : MonoBehaviour
             Physics2D.IgnoreCollision(circleCollider2D, temp, true);
             Jump(0.35f);
             //yield return new WaitUntil(()=> !Physics2D.OverlapCircle((Vector2)transform.position + new Vector2(0, -0.4f), 0.01f, 1<< LayerMask.NameToLayer("Ground")));
-Debug.Log("RB");
+//Debug.Log("RB");
             yield return new WaitUntil(()=> nowPlatform!=temp);
             //temp.GetComponent<Collider2D>().enabled = true;
             Physics2D.IgnoreCollision(boxCollider2D, temp, false);
@@ -272,22 +274,23 @@ Debug.Log("RB");
     }
 
 
-    // void OnCollisionStay2D(Collision2D other){
-    //     // foreach(ContactPoint2D contact in other.contacts){
-    //     //     var colName = contact.collider.name;
+    void OnCollisionStay2D(Collision2D other){
+        // // foreach(ContactPoint2D contact in other.contacts){
+        // //     var colName = contact.collider.name;
 
-    //     //     if(colName!="BodyCol"){
+        // //     if(colName!="BodyCol"){
                 
-    //             if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
-    //                 checkGroundCol = other.gameObject.GetComponent<Collider2D>();
-    //             }
-    //     //     }
-    //     // }
-    // }
-    // void OnCollisionExit2D(Collision2D other){
+        //         if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
+        //             checkGroundCol = other.gameObject.GetComponent<Collider2D>();
+        //         }
+        // //     }
+        // // }
+
+    }
+    void OnCollisionExit2D(Collision2D other){
                 
-    //         if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
-    //             checkGroundCol = null;
-    //         }
-    // }
+            // if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
+            //     checkGroundCol = null;
+            // }
+    }
 }
