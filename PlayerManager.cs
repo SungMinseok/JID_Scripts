@@ -9,6 +9,8 @@ public class PlayerManager : MonoBehaviour
     public Collider2D lastPlatform;
     public Collider2D nowPlatform;
     public Collider2D checkGroundCol;
+    public Transform onTriggerCol;//onTrigger 콜라이더
+    public bool canMove;
     public bool isGrounded;
     public bool isJumping;
     public bool jumpDelay;
@@ -65,13 +67,18 @@ public class PlayerManager : MonoBehaviour
         
         d= DebugManager.instance;
 
+
+        canMove = true;
     }
 
 
     void Update(){
-        wInput = Input.GetAxisRaw("Horizontal");
-        hInput = Input.GetAxisRaw("Vertical");
-        jumpInput = Input.GetButton("Jump") ? true : false;
+        if(canMove){
+            wInput = Input.GetAxisRaw("Horizontal");
+            hInput = Input.GetAxisRaw("Vertical");
+            jumpInput = Input.GetButton("Jump") ? true : false;
+
+        }
         // downInput = Input.GetKey(KeyCode.DownArrow) ? true : false;
 
         //checkGroundCol = Physics2D.OverlapCircle((Vector2)transform.position + new Vector2(0, -0.4f), 0.01f);
@@ -134,7 +141,7 @@ public class PlayerManager : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
         nowPlatform = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
 
-
+        //if(canMove){
         if(wInput!=0){
             rb.velocity = new Vector2(speed * wInput  , rb.velocity.y);
 
@@ -155,34 +162,36 @@ public class PlayerManager : MonoBehaviour
             
 
         }
+        //}
 
 
-        if(getLadder){
-            if(hInput!=0){
-                onLadder = true;
-            }
-        }
-        else{
-            onLadder = false;
-        }
 
-        if(onLadder){
+        // if(getLadder){
+        //     if(hInput!=0){
+        //         onLadder = true;
+        //     }
+        // }
+        // else{
+        //     onLadder = false;
+        // }
+
+        // if(onLadder){
             
-            if(jumpInput && wInput!=0){
-                onLadder = false;
-                StartCoroutine(GetLadderDelay());
-                if(!jumpDelay) Jump(0.7f);
-            }
-            else{   
-                isJumping = false;
-                rb.gravityScale = 0f;
-                rb.velocity = new Vector2(0, (speed*0.7f) * hInput  );
-            }
-        }
-        else{
+        //     if(jumpInput && wInput!=0){
+        //         onLadder = false;
+        //         StartCoroutine(GetLadderDelay());
+        //         if(!jumpDelay) Jump(0.7f);
+        //     }
+        //     else{   
+        //         isJumping = false;
+        //         rb.gravityScale = 0f;
+        //         rb.velocity = new Vector2(0, (speed*0.7f) * hInput  );
+        //     }
+        // }
+        // else{
             
-            rb.gravityScale = 10f;
-        }
+        //     rb.gravityScale = 10f;
+        // }
         
     }
     void Jump(float multiple = 1){
@@ -247,16 +256,20 @@ public class PlayerManager : MonoBehaviour
             if(!ladderDelay) getLadder = true;
         }
         
-        if(other.CompareTag("Item")){
+        else if(other.CompareTag("Item")){
             UIManager.instance.clearPanel.SetActive(true);
         }
         
-        if(other.CompareTag("Cover")){
+        else if(other.CompareTag("Cover")){
             Debug.Log(other.gameObject.name);
             //var coverColor = other.gameObject.GetComponent<SpriteRenderer>().color;
             //coverColor = new Color(coverColor.r,coverColor.g,coverColor.b,coverColor.a*0.5f);
             other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1,1,1,0.5f);
         }
+
+        // else{
+        //     onTriggerCol = other.transform;
+        // }
     }
 
     void OnTriggerExit2D(Collider2D other) {
@@ -265,12 +278,15 @@ public class PlayerManager : MonoBehaviour
             //rb.gravityScale = 10f;
         }
         
-        if(other.CompareTag("Cover")){
+        else if(other.CompareTag("Cover")){
             //Color coverColor = other.GetComponent<SpriteRenderer>().color;
             //other.GetComponent<SpriteRenderer>().color = new Color(1,coverColor.g,coverColor.b,1);
             
             other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1,1,1,1);
         }
+        // else{
+        //     onTriggerCol = null;
+        // }
     }
 
 

@@ -37,5 +37,17 @@ public class PlayerBodyScript : MonoBehaviour
             // if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
             //     checkGroundCol = null;
             // }
+    }    
+    
+    void OnTriggerEnter2D(Collider2D other) {
+
+        PlayerManager.instance.onTriggerCol = other.transform;
+ 
+    }
+
+    void OnTriggerExit2D(Collider2D other) {
+
+        PlayerManager.instance.onTriggerCol = null;
+
     }
 }
