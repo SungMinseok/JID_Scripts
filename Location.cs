@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class Location : MonoBehaviour
 {
-    public Transform destination;
+    //public int desMapNum;
+    public Transform desLoc;
 
     void OnTriggerEnter2D(Collider2D other) {
         if(other.CompareTag("Player")){
-            if(destination!=null){
-                other.transform.position = destination.position;
+            if(desLoc!=null){
+                other.transform.position = desLoc.position;
+                MapManager.instance.SetConfiner(desLoc.parent.transform.GetSiblingIndex());
             }
             else{
 

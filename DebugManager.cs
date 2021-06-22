@@ -18,16 +18,16 @@ public class DebugManager : MonoBehaviour
     public GameObject alertPanel, textObject;
 
     void Awake(){
-        Application.targetFrameRate = 60;
-        if (null == instance)
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        //Application.targetFrameRate = 60;
+        // if (null == instance)
+        // {
+        //     instance = this;
+        //     DontDestroyOnLoad(this.gameObject);
+        // }
+        // else
+        // {
+        //     Destroy(this.gameObject);
+        // }
     }
 
     void Start()
