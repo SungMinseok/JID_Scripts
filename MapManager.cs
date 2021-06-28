@@ -7,6 +7,7 @@ public class MapManager : MonoBehaviour
 {
     public static MapManager instance;
     public PolygonCollider2D[] mapBounds;
+    public CinemachineVirtualCamera virtualCamera;
     public CinemachineConfiner2D confiner2D;
     // Start is called before the first frame update
     void Awake()

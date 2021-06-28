@@ -15,53 +15,58 @@ public class LoadManager : MonoBehaviour
     void Start()
     {
         //StartCoroutine(Load());
-// #if !DEV_MODE
-//         inputText.gameObject.SetActive(false);
-//         StartCoroutine(Load());
-// #else
-//         inputText.gameObject.SetActive(true);
-//         inputText.onEndEdit.AddListener(delegate{SetSaveNum();});
-        
+        // #if !DEV_MODE
+        //         inputText.gameObject.SetActive(false);
+        //         StartCoroutine(Load());
+        // #else
+        //         inputText.gameObject.SetActive(true);
+        //         inputText.onEndEdit.AddListener(delegate{SetSaveNum();});
 
-// #endif
+
+        // #endif
     }
-// #if DEV_MODE
-//     void SetSaveNum(){
-//         if(inputText.text != ""){
-//             SettingManager.instance.saveNum = int.Parse(inputText.text);
-//             StartCoroutine(Load());
-//         }
-//     }
-// #endif
+    // #if DEV_MODE
+    //     void SetSaveNum(){
+    //         if(inputText.text != ""){
+    //             SettingManager.instance.saveNum = int.Parse(inputText.text);
+    //             StartCoroutine(Load());
+    //         }
+    //     }
+    // #endif
 
-    public void StartBtn(){
-        
+    public void StartBtn()
+    {
+
         StartCoroutine(Load());
     }
 
-    IEnumerator Load(){
+    IEnumerator Load()
+    {
         AsyncOperation asyncScene = SceneManager.LoadSceneAsync("warehouse");
         asyncScene.allowSceneActivation = false;
         float timeC = 0;
-            //yield return new WaitForSeconds(0.5f);
-        while(!asyncScene.isDone){
+        //yield return new WaitForSeconds(0.5f);
+        while (!asyncScene.isDone)
+        {
             yield return null;
             //Debug.Log(asyncScene.progress);
             timeC += Time.deltaTime;
-            if (asyncScene.progress >=0.9f)
+            if (asyncScene.progress >= 0.9f)
             {
                 // slider.value = Mathf.Lerp(slider.value, 1, timeC);
                 // if (slider.value == 1.0f)
                 // {
                 //while()
-                while(fogsNoiseTexPE.Density <= 4){
+                while (fogsNoiseTexPE.Density <= 4)
+                {
                     fogsNoiseTexPE.Density += 0.01f;
                     yield return null;
                 }
 
                 asyncScene.allowSceneActivation = true;
 
-                while(fogsNoiseTexPE.Density >= 0){
+                while (fogsNoiseTexPE.Density >= 0)
+                {
                     fogsNoiseTexPE.Density -= 0.04f;
                     yield return null;
                 }
