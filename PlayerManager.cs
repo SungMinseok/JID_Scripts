@@ -8,6 +8,7 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager instance;
     public Transform dialogueHolder;
     public bool isTalking;
+    public bool isActing;
     public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
     public bool canMove;
@@ -25,10 +26,11 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
 
     Rigidbody2D rb;
-    //[SerializeField] BoxCollider2D boxCollider2D;
-    [SerializeField] CircleCollider2D circleCollider2D;
+    [SerializeField] public BoxCollider2D boxCollider2D;
+    [SerializeField] public CircleCollider2D circleCollider2D;
     SpriteRenderer spriteRenderer;
     public float wInput, hInput;
+    public float wSet;
     public bool jumpInput, downInput;
 
     [SerializeField] LayerMask groundLayer;
@@ -66,6 +68,9 @@ public class PlayerManager : MonoBehaviour
 
 
         canMove = true;
+
+        // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
+        // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
     }
 
 
@@ -73,10 +78,20 @@ public class PlayerManager : MonoBehaviour
     {
         if (canMove)
         {
+            wSet = 0;
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
             jumpInput = Input.GetButton("Jump") ? true : false;
 
+
+
+
+
+        }
+        else{
+
+            wInput = 0;
+            jumpInput = false;
         }
 
         if (isGrounded)
@@ -91,14 +106,14 @@ public class PlayerManager : MonoBehaviour
             animator.SetBool("jump", true);
         }
 
-        if (wInput != 0)
+        if (wInput != 0 || wSet != 0)
         {
             animator.SetBool("run", true);
-            if (wInput > 0)
+            if (wInput > 0|| wSet > 0)
             {
                 spriteRenderer.flipX = false;
             }
-            else if (wInput < 0)
+            else if (wInput < 0|| wSet < 0)
             {
                 spriteRenderer.flipX = true;
             }
@@ -122,6 +137,11 @@ public class PlayerManager : MonoBehaviour
         if (wInput != 0)
         {
             rb.velocity = new Vector2(speed * wInput, rb.velocity.y);
+
+        }
+        else if (wSet != 0)
+        {
+            rb.velocity = new Vector2(speed * wSet, rb.velocity.y);
 
         }
 
@@ -201,8 +221,13 @@ public class PlayerManager : MonoBehaviour
             other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
         }
     }
-
-
+    void OnCollisionEnter2D(Collision2D other){
+        
+        // if(other.gameObject.CompareTag("NPC")){
+        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
+        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
+        // }
+    }
     // void OnCollisionStay2D(Collision2D other)
     // {
     // }
@@ -210,4 +235,15 @@ public class PlayerManager : MonoBehaviour
     // {
 
     // }
+
+    public void Look(string direction){
+        switch(direction){
+            case "left" : 
+                spriteRenderer.flipX = true;
+                break;
+            case "right" : 
+                spriteRenderer.flipX = false;
+                break;
+        }
+    }
 }

@@ -4,8 +4,13 @@ using UnityEngine;
 
 public class NPCScript : MonoBehaviour
 {
-    //public bool onPatrol;
     [Header("자동 이동")]
+    public bool onPatrol;
+    [Header("flip 사용 안함")]
+    public bool noFlip;
+    [Header("플레이어와 충돌 무시")]
+    public bool noCollision;
+    
     public float patrolCoolDown;
     bool patrolFlag;
     public int patrolInput;
@@ -19,7 +24,7 @@ public class NPCScript : MonoBehaviour
     Rigidbody2D rb;
     CircleCollider2D circleCollider2D;
     SpriteRenderer spriteRenderer;
-    public float wInput, hInput;
+    public float wSet, hInput;
     public bool jumpInput, downInput;
     PlayerManager thePlayer;
     public Animator animator;
@@ -32,17 +37,23 @@ public class NPCScript : MonoBehaviour
         animator = GetComponent<Animator>();
 
 
-        
-        Physics2D.IgnoreCollision(thePlayer.GetComponent<BoxCollider2D>(), circleCollider2D, true);
-        Physics2D.IgnoreCollision(thePlayer.GetComponent<CircleCollider2D>(), circleCollider2D, true);
+        if(noCollision){
+                
+            Physics2D.IgnoreCollision(thePlayer.boxCollider2D, circleCollider2D, true);
+            Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
+        }
         
     }
 
     void Update(){
 
-        if(!patrolFlag) StartCoroutine(SetPatrol());
+        if(onPatrol){
+            wSet = patrolInput;
+            if(!patrolFlag){
+                StartCoroutine(SetPatrol());
+            }
+        } 
 
-        wInput = patrolInput;
         //jumpInput = Input.GetButton("Jump") ? true : false;
         //downInput = Input.GetKey(KeyCode.DownArrow) ? true : false;
 
@@ -59,19 +70,20 @@ public class NPCScript : MonoBehaviour
 
             animator.SetBool("jump", true);
         }
+        if(!noFlip){
 
-        if(wInput>0){
-            spriteRenderer.flipX = false;
-        }
-        else if(wInput<0){
-            spriteRenderer.flipX = true;
-
+            if(wSet>0){
+                spriteRenderer.flipX = false;
+            }
+            else if(wSet<0){
+                spriteRenderer.flipX = true;
+            }
         }
     }
 
     void FixedUpdate(){
-        if(wInput!=0){
-            rb.velocity = new Vector2(speed * wInput  , rb.velocity.y);
+        if(wSet!=0){
+            rb.velocity = new Vector2(speed * wSet  , rb.velocity.y);
 
         }
 
@@ -79,9 +91,6 @@ public class NPCScript : MonoBehaviour
             if(!isJumping && !jumpDelay){
                 Jump();
             }
-
-            
-
         }
 
         
@@ -123,6 +132,9 @@ public class NPCScript : MonoBehaviour
         if(other.gameObject.CompareTag("NPC")){
             Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         }
+        // if(other.gameObject.CompareTag("Player")){
+        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
+        // }
     }
  
 }

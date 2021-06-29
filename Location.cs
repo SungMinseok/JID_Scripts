@@ -11,6 +11,7 @@ public enum LocationType{
 }
 public class Location : MonoBehaviour
 {
+    [SerializeField]BoxCollider2D boxCollider2D;
     [SerializeField]
     LocationType type;
     //[Header("Teleport")]
@@ -24,8 +25,10 @@ public class Location : MonoBehaviour
     public Dialogue[] dialogues_T;
 
     TriggerScript triggerScript;
+    
     void Start(){
         triggerScript = TriggerScript.instance;
+        //boxCollider2D = GetComponent<BoxCollider2D>();
     }
     void OnTriggerEnter2D(Collider2D other) {
 
@@ -74,14 +77,17 @@ public class Location : MonoBehaviour
 
                 if(other.CompareTag("Player")){
                     if(trigNum>=0){
+                        if(!PlayerManager.instance.isActing){
+                            PlayerManager.instance.isActing = true;
+                            if(dialogues_T!=null){
+                                Debug.Log("22");
+                                triggerScript.Action(trigNum, dialogues_T);
+                            }
+                            else{
+                                triggerScript.Action(trigNum);
+                            }
+                        }
                             
-                        if(dialogues_T!=null){
-                            Debug.Log("22");
-                            triggerScript.Action(trigNum, dialogues_T);
-                        }
-                        else{
-                            triggerScript.Action(trigNum);
-                        }
                     }
                     else{
                         DebugManager.instance.PrintDebug("트리거 설정 안됨");
@@ -99,25 +105,20 @@ public class Location : MonoBehaviour
 
     IEnumerator OrderCoroutine(Transform objCol,Transform desCol){                        
         PlayerManager.instance.canMove = false;
-        PlayerManager.instance.wInput = 0;
-        PlayerManager.instance.hInput = 0;
+        // PlayerManager.instance.wInput = 0;
+        // PlayerManager.instance.hInput = 0;
         if(desCol.position.x > objCol.position.x){
-            PlayerManager.instance.wInput = 1;
+            PlayerManager.instance.wSet = 1;
         }
         else{
-            PlayerManager.instance.wInput = -1;
+            PlayerManager.instance.wSet = -1;
         }
         yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
         PlayerManager.instance.canMove = true;
 
     }
     public void SetTalk(){
-        // for(int i=0;i<dialouges.Length;i++){
-        //     DialogueManager.instance.SetDialogue(dialouges[i]);
-        // }
-        //Debug.Log("SETTALK");
-                        //DebugManager.instance.PrintDebug("토크시작");
-        DialogueManager.instance.SetDialogue(dialogues);
+        DialogueManager.instance.SetFullDialogue(dialogues);
     }
 
     void OnDrawGizmos()
@@ -127,7 +128,7 @@ public class Location : MonoBehaviour
                 //Gizmos.color = new Color(Color.red.r,Color.red.g,Color.red.b,0.3f); 
 
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireCube(transform.position, Vector3.one);
+                Gizmos.DrawWireCube(transform.position, transform.localScale);
                 if(desLoc!=null){
                     Gizmos.color = Color.blue;   
                     Gizmos.DrawWireCube(desLoc.transform.position, Vector3.one);
@@ -138,19 +139,33 @@ public class Location : MonoBehaviour
             case LocationType.Order :
                 //Gizmos.color = new Color(Color.red.r,Color.red.g,Color.red.b,0.3f);
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(transform.position, 0.5f);
+                Gizmos.DrawWireCube(transform.position, transform.localScale);
                 if(desLoc!=null){
                     Gizmos.color = Color.blue;   
-                    Gizmos.DrawWireSphere(desLoc.transform.position, 0.5f);
-                    Gizmos.color = Color.black;   
+                    Gizmos.DrawWireCube(desLoc.transform.position, Vector3.one);
+                    Gizmos.color = Color.white;   
                     Gizmos.DrawLine(transform.position,desLoc.transform.position);
                 }
                 break;
             case LocationType.Dialogue :
-                Gizmos.color = Color.cyan;   
-                Gizmos.DrawWireCube(transform.position,  Vector3.one);
+                Gizmos.color = Color.yellow;   
+                Gizmos.DrawWireCube(transform.position,  transform.localScale);
                 break;
+            case LocationType.Trigger :
+                Gizmos.color = Color.cyan;   
+                Gizmos.DrawWireCube(transform.position, transform.localScale);
 
+                GUIStyle style = new GUIStyle();
+                style.fontSize = 20;
+                style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = Color.cyan;
+                Vector3 namePos = transform.position;
+                namePos.x -= 0.5f;
+                namePos.y += 0.7f;
+                Handles.Label(namePos, trigNum.ToString(),style);
+                break;
+    //Handles.Label(transform.position, "Text");
+ 
         }
 
 
