@@ -6,6 +6,7 @@ using Cinemachine;
 public class TriggerScript : MonoBehaviour
 {    
     public static TriggerScript instance;
+    
     void Awake()
     {
         if (null == instance)
@@ -21,16 +22,17 @@ public class TriggerScript : MonoBehaviour
     void Start(){
     }
 
-    public void Action(int trigNum, Dialogue[] dialogues = null){
+    public void Action(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
         Debug.Log("a");
-        StartCoroutine(ActionCoroutine(trigNum, dialogues));
+        StartCoroutine(ActionCoroutine(trigNum, dialogues, poses));
 
     }
 
-    IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues = null){
+    IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
         PlayerManager.instance.canMove =false;
 
         switch(trigNum){
+#region 1
             case 1 :
                 SetDialogue(dialogues[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
@@ -41,29 +43,45 @@ public class TriggerScript : MonoBehaviour
                 //MapManager.instance.virtualCamera.Follow = null;
                 //ObjectController.instance.npcs[0].animator.SetTrigger("wakeUp");
                 break;
+#endregion
+
+#region 2
             case 2 :
-                ObjectController.instance.npcs[0].animator.SetTrigger("wakeUp");
+                var nerd_ant = ObjectController.instance.npcs[0];
+
+                CameraView(nerd_ant.transform);
+                yield return new WaitForSeconds(1f);
+                nerd_ant.animator.SetTrigger("wakeUp");
                 yield return new WaitForSeconds(2f);
+                //MapManager.instance.virtualCamera.Follow = ObjectController.instance.npcs[0].transform;
                 SetDialogue(dialogues[0]);
                 yield return new WaitForSeconds(2f);
-                ObjectController.instance.npcs[0].animator.SetTrigger("standUp");
+                nerd_ant.animator.SetTrigger("standUp");
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[1]);
-                ObjectController.instance.npcs[0].animator.SetTrigger("count");
+                nerd_ant.animator.SetTrigger("count");
+                CameraView(poses[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[2]);
-                ObjectController.instance.npcs[0].animator.SetTrigger("sweat");
+                nerd_ant.animator.SetTrigger("sweat");
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[3]);
-                ObjectController.instance.npcs[0].animator.SetTrigger("turn");
+                nerd_ant.animator.SetTrigger("turn");
+                CameraView(nerd_ant.transform);
                 yield return new WaitForSeconds(1.417f);
-                ObjectController.instance.npcs[0].wSet = -1;
+                nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return new WaitForSeconds(1f);
+                nerd_ant.gameObject.SetActive(false);
+                PlayerManager.instance.transform.position = poses[1].position;
+                MapManager.instance.SetConfiner(poses[1].parent.transform.GetSiblingIndex());
+                yield return new WaitForSeconds(0.1f);
+                CameraView(PlayerManager.instance.transform);
                 //MapManager.instance.virtualCamera.Follow = null;
                 //ObjectController.instance.npcs[0].animator.SetTrigger("wakeUp");
 
                 break;
-
+#endregion
 
             default : 
                 break;
@@ -78,17 +96,20 @@ public class TriggerScript : MonoBehaviour
     public void SetDialogue(Dialogue dialogue){
         DialogueManager.instance.SetDialogue(dialogue);
     }
-    public void Wait(float time = 0) => StartCoroutine(WaitCoroutine(time));
-    IEnumerator WaitCoroutine(float time = 0){
-        if(time == 0){
-            Debug.Log("c");
-            yield return new WaitForSeconds(2f);
-            yield return new WaitUntil(()=>!PlayerManager.instance.isActing);
-        }
-        else{
-            Debug.Log("d");
-            yield return new WaitForSeconds(time);
-        }
+    public void CameraView(Transform target, float speed=2){
+        MapManager.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
     }
+    // public void Wait(float time = 0) => StartCoroutine(WaitCoroutine(time));
+    // IEnumerator WaitCoroutine(float time = 0){
+    //     if(time == 0){
+    //         Debug.Log("c");
+    //         yield return new WaitForSeconds(2f);
+    //         yield return new WaitUntil(()=>!PlayerManager.instance.isActing);
+    //     }
+    //     else{
+    //         Debug.Log("d");
+    //         yield return new WaitForSeconds(time);
+    //     }
+    // }
 
 }

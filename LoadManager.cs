@@ -81,4 +81,21 @@ public class LoadManager : MonoBehaviour
             // }
         }
     }
+
+    public IEnumerator FadeOut(){
+
+        while (fogsNoiseTexPE.Density <= 4)
+        {
+            fogsNoiseTexPE.Density += 0.01f;
+            yield return null;
+        }
+    }
+    public IEnumerator FadeIn(){
+
+        while (fogsNoiseTexPE.Density >= 0)
+        {
+            fogsNoiseTexPE.Density -= 0.04f;
+            yield return null;
+        }
+    }
 }

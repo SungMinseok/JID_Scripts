@@ -22,6 +22,7 @@ public class Location : MonoBehaviour
     public Dialogue[] dialogues;
     [Header("Trigger")]
     public int trigNum;
+    public Transform[] poses;
     public Dialogue[] dialogues_T;
 
     TriggerScript triggerScript;
@@ -80,8 +81,14 @@ public class Location : MonoBehaviour
                         if(!PlayerManager.instance.isActing){
                             PlayerManager.instance.isActing = true;
                             if(dialogues_T!=null){
-                                Debug.Log("22");
-                                triggerScript.Action(trigNum, dialogues_T);
+                                if(poses!=null){
+                                
+                                    triggerScript.Action(trigNum, dialogues_T, poses);
+                                }
+                                else{
+                                    triggerScript.Action(trigNum, dialogues_T);
+
+                                }
                             }
                             else{
                                 triggerScript.Action(trigNum);

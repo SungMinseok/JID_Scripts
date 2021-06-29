@@ -68,13 +68,15 @@ public class DebugManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        // if(Input.GetKeyDown(KeyCode.Space)){
-        //     PrintDebug("test");
-        // }
-    }
+    // void Update()
+    // {
+    //     if(Input.GetKeyDown(KeyCode.Space)){
+    //         PrintDebug("test");
+    //     }
+    // }
 }
+
+
 
 [System.Serializable]
 public class AlertDebug{
