@@ -127,7 +127,7 @@ public class Location : MonoBehaviour
     public void SetTalk(){
         DialogueManager.instance.SetFullDialogue(dialogues);
     }
-
+#if UNITY_EDITOR
     void OnDrawGizmos()
     {
         switch(type){
@@ -177,6 +177,6 @@ public class Location : MonoBehaviour
 
 
     }
-
+#endif
 
 }

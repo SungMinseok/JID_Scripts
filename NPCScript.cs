@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class NPCScript : MonoBehaviour
 {
-    [Header("자동 이동")]
+    [Header("자동 이동 모드")]
+    public bool onJYD;
+    [Header("정찰 모드")]
     public bool onPatrol;
-    [Header("flip 사용 안함")]
-    public bool noFlip;
+    public Transform pos0, pos1;
+    public float waitTime;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision;
+    [Header("flip 사용 안함")]
+    public bool noFlip;
     
     public float patrolCoolDown;
     bool patrolFlag;
@@ -28,6 +32,7 @@ public class NPCScript : MonoBehaviour
     public bool jumpInput, downInput;
     PlayerManager thePlayer;
     public Animator animator;
+    float defaultScaleX;
     void Start()
     {
         thePlayer = PlayerManager.instance;
@@ -35,6 +40,7 @@ public class NPCScript : MonoBehaviour
         circleCollider2D = GetComponent<CircleCollider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        defaultScaleX = transform.localScale.x;
 
 
         if(noCollision){
@@ -47,12 +53,15 @@ public class NPCScript : MonoBehaviour
 
     void Update(){
 
-        if(onPatrol){
+        if(onJYD){
             wSet = patrolInput;
             if(!patrolFlag){
                 StartCoroutine(SetPatrol());
             }
         } 
+        else if(onPatrol){
+            
+        }
 
         //jumpInput = Input.GetButton("Jump") ? true : false;
         //downInput = Input.GetKey(KeyCode.DownArrow) ? true : false;
@@ -73,10 +82,10 @@ public class NPCScript : MonoBehaviour
         if(!noFlip){
 
             if(wSet>0){
-                spriteRenderer.flipX = false;
+                transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
             }
             else if(wSet<0){
-                spriteRenderer.flipX = true;
+                transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
             }
         }
     }
