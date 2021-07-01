@@ -14,6 +14,7 @@ public class Location : MonoBehaviour
     [SerializeField]BoxCollider2D boxCollider2D;
     [SerializeField]
     LocationType type;
+    public bool preserveTrigger;
     //[Header("Teleport")]
     [Header("Teleport & Order")]
     public Transform desLoc;
@@ -32,80 +33,87 @@ public class Location : MonoBehaviour
         //boxCollider2D = GetComponent<BoxCollider2D>();
     }
     void OnTriggerEnter2D(Collider2D other) {
+        if(!DBManager.instance.CheckTrigOver(trigNum)){
 
-        switch(type){
-            case LocationType.Teleport :
+            switch(type){
+                case LocationType.Teleport :
 
-                if(other.CompareTag("Player")){
-                    if(desLoc!=null){
-                        other.transform.position = desLoc.position;
-                        MapManager.instance.SetConfiner(desLoc.parent.transform.GetSiblingIndex());
-                    }
-                    else{
-
-                        DebugManager.instance.PrintDebug("목적지 없음");
-                    }
-                }
-                break;
-
-            case LocationType.Order :
-
-                if(other.CompareTag("Player")){
-                    if(desLoc!=null){
-                        StartCoroutine(OrderCoroutine(other.transform,desLoc));
-                    }
-                    else{
-                        DebugManager.instance.PrintDebug("목적지 없음");
-                    }
-                }
-                break;
-            case LocationType.Dialogue :
-
-                if(other.CompareTag("Player")){
-                    if(dialogues!=null){
-                        if(!PlayerManager.instance.isTalking){
-                            PlayerManager.instance.isTalking = true;
-                            SetTalk();
+                    if(other.CompareTag("Player")){
+                        if(desLoc!=null){
+                            other.transform.position = desLoc.position;
+                            MapManager.instance.SetConfiner(desLoc.parent.transform.GetSiblingIndex());
                         }
+                        else{
 
+                            DM("목적지 없음");
+                        }
                     }
-                    else{
-                        DebugManager.instance.PrintDebug("대화 설정 안됨");
-                    }
-                }
-                break;
-            case LocationType.Trigger :
+                    break;
 
-                if(other.CompareTag("Player")){
-                    if(trigNum>=0){
-                        if(!PlayerManager.instance.isActing){
-                            PlayerManager.instance.isActing = true;
-                            if(dialogues_T!=null){
-                                if(poses!=null){
-                                
-                                    triggerScript.Action(trigNum, dialogues_T, poses);
+                case LocationType.Order :
+
+                    if(other.CompareTag("Player")){
+                        if(desLoc!=null){
+                            StartCoroutine(OrderCoroutine(other.transform,desLoc));
+                        }
+                        else{
+                            DM("목적지 없음");
+                        }
+                    }
+                    break;
+                case LocationType.Dialogue :
+
+                    if(other.CompareTag("Player")){
+                        if(dialogues!=null){
+                            if(!PlayerManager.instance.isTalking){
+                                PlayerManager.instance.isTalking = true;
+                                SetTalk();
+                            }
+
+                        }
+                        else{
+                            DebugManager.instance.PrintDebug("대화 설정 안됨");
+                        }
+                    }
+                    break;
+                case LocationType.Trigger :
+
+                    if(other.CompareTag("Player")){
+                        if(trigNum>=0){
+                            if(!PlayerManager.instance.isActing){
+                                PlayerManager.instance.isActing = true;
+                                if(dialogues_T!=null){
+                                    if(poses!=null){
+                                    
+                                        triggerScript.Action(trigNum, dialogues_T, poses);
+                                    }
+                                    else{
+                                        triggerScript.Action(trigNum, dialogues_T);
+
+                                    }
                                 }
                                 else{
-                                    triggerScript.Action(trigNum, dialogues_T);
-
+                                    triggerScript.Action(trigNum);
                                 }
                             }
-                            else{
-                                triggerScript.Action(trigNum);
-                            }
+                                
                         }
-                            
+                        else{
+                            DebugManager.instance.PrintDebug("트리거 설정 안됨");
+                        }
                     }
-                    else{
-                        DebugManager.instance.PrintDebug("트리거 설정 안됨");
-                    }
-                }
-                break;
+                    break;
 
-            default :
-                DebugManager.instance.PrintDebug("로케이션 오류");
-                break;
+                default :
+                    DebugManager.instance.PrintDebug("로케이션 오류");
+                    break;
+            }
+
+            if(!preserveTrigger){
+                DBManager.instance.TrigOver(trigNum);
+            }
         }
+
 
 
     }
@@ -127,6 +135,40 @@ public class Location : MonoBehaviour
     public void SetTalk(){
         DialogueManager.instance.SetFullDialogue(dialogues);
     }
+    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {

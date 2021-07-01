@@ -32,8 +32,10 @@ public class DebugManager : MonoBehaviour
 
     void Start()
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR || alpha
  		isDebugMode = true;
+#else
+        isDebugMode = false;
 #endif
         if(isDebugMode){
             debugPanel.SetActive(true);
@@ -50,21 +52,25 @@ public class DebugManager : MonoBehaviour
     }
 
     public void PrintDebug(string text){
+        if(isDebugMode){    
 
-        if(alertDebugList.Count>3){
-            Destroy(alertDebugList[0].textObject.gameObject);
-            alertDebugList.Remove(alertDebugList[0]);
+            if(alertDebugList.Count>3){
+                Destroy(alertDebugList[0].textObject.gameObject);
+                alertDebugList.Remove(alertDebugList[0]);
+            }
+
+            AlertDebug newAlertDebug = new AlertDebug();
+            newAlertDebug.text= "[" + DateTime.Now.ToString(("mm:ss:ff")) + "] " + text;
+
+            GameObject newText = Instantiate(textObject,alertPanel.transform);
+            newAlertDebug.textObject = newText.GetComponent<Text>();
+            newAlertDebug.textObject.text = newAlertDebug.text;
+
+
+            alertDebugList.Add(newAlertDebug);
+
         }
-
-        AlertDebug newAlertDebug = new AlertDebug();
-        newAlertDebug.text= "[" + DateTime.Now.ToString(("mm:ss:ff")) + "] " + text;
-
-        GameObject newText = Instantiate(textObject,alertPanel.transform);
-        newAlertDebug.textObject = newText.GetComponent<Text>();
-        newAlertDebug.textObject.text = newAlertDebug.text;
-
-
-        alertDebugList.Add(newAlertDebug);
+        
     }
 
     // Update is called once per frame

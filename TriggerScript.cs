@@ -23,7 +23,8 @@ public class TriggerScript : MonoBehaviour
     }
 
     public void Action(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
-        Debug.Log("a");
+        //Debug.Log("a");
+        
         StartCoroutine(ActionCoroutine(trigNum, dialogues, poses));
 
     }
@@ -60,15 +61,15 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[1]);
                 nerd_ant.animator.SetTrigger("count");
-                CameraView(poses[0]);
+                //CameraView(poses[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[2]);
                 nerd_ant.animator.SetTrigger("sweat");
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[3]);
                 nerd_ant.animator.SetTrigger("turn");
-                CameraView(nerd_ant.transform);
-                yield return new WaitForSeconds(1.417f);
+                //CameraView(nerd_ant.transform);
+                yield return new WaitForSeconds(1.5f);
                 nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 yield return new WaitForSeconds(1f);

@@ -1,10 +1,11 @@
 ﻿
+
+#if alpha
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System; 
-#if alpha
 public class CheatManager : MonoBehaviour
 {
     public InputField cheat;
