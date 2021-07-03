@@ -7,6 +7,7 @@ using UB.Simple2dWeatherEffects.Standard;
 
 public class LoadManager : MonoBehaviour
 {
+    
     public Slider slider;
     public InputField inputText;
     public D2FogsNoiseTexPE fogsNoiseTexPE;

@@ -6,17 +6,17 @@ public class NPCScript : MonoBehaviour
 {
     [Header("자동 이동 모드")]
     public bool onJYD;
+    public float JYDCoolDown;
+    bool JYDFlag;
     [Header("정찰 모드")]
     public bool onPatrol;
-    public Transform pos0, pos1;
+    public Transform startPos,desPos;
     public float waitTime;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision;
     [Header("flip 사용 안함")]
     public bool noFlip;
     
-    public float patrolCoolDown;
-    bool patrolFlag;
     public int patrolInput;
     public Collider2D lastPlatform;
     public bool isGrounded;
@@ -24,6 +24,7 @@ public class NPCScript : MonoBehaviour
     public bool jumpDelay;
     [SerializeField][Range(2f,10f)] public float speed;
     [SerializeField][Range(10f,50f)] public float jumpPower;
+    public Transform onTriggerCol;
 
     Rigidbody2D rb;
     CircleCollider2D circleCollider2D;
@@ -55,8 +56,8 @@ public class NPCScript : MonoBehaviour
 
         if(onJYD){
             wSet = patrolInput;
-            if(!patrolFlag){
-                StartCoroutine(SetPatrol());
+            if(!JYDFlag){
+                StartCoroutine(SetJYD());
             }
         } 
         else if(onPatrol){
@@ -105,12 +106,12 @@ public class NPCScript : MonoBehaviour
         
     }
 
-    IEnumerator SetPatrol(){
+    IEnumerator SetJYD(){
         //if(!patrolFlag){
-            patrolFlag = true;  
+            JYDFlag = true;  
             patrolInput = Random.Range(0,3) - 1;//0 좌 1 정지 2 우
-            yield return new WaitForSeconds(patrolCoolDown);
-            patrolFlag = false;  
+            yield return new WaitForSeconds(JYDCoolDown);
+            JYDFlag = false;  
 
         //}
     }
@@ -144,6 +145,36 @@ public class NPCScript : MonoBehaviour
         // if(other.gameObject.CompareTag("Player")){
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         // }
+    }    
+    void OnTriggerEnter2D(Collider2D other) {
+        if(onPatrol){
+            
+            if(other.transform==startPos || other.transform==desPos){
+                
+                onTriggerCol = other.transform;
+            }
+
+            if(other.CompareTag("Player")){
+                DM("검거완료");
+            }
+
+        }
+        else{
+                
+            if(!(other.CompareTag("MainGround")||other.CompareTag("Ground"))){
+                
+                onTriggerCol = other.transform;
+            }
+ 
+        }
+
+    }
+
+    void OnTriggerExit2D(Collider2D other) {
+
+        onTriggerCol = null;
+
     }
  
+    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 }

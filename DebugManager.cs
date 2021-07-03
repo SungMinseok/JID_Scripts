@@ -28,6 +28,7 @@ public class DebugManager : MonoBehaviour
         // {
         //     Destroy(this.gameObject);
         // }
+        instance = this;
     }
 
     void Start()
@@ -54,7 +55,7 @@ public class DebugManager : MonoBehaviour
     public void PrintDebug(string text){
         if(isDebugMode){    
 
-            if(alertDebugList.Count>3){
+            if(alertDebugList.Count>50){
                 Destroy(alertDebugList[0].textObject.gameObject);
                 alertDebugList.Remove(alertDebugList[0]);
             }

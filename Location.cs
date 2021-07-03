@@ -8,6 +8,7 @@ public enum LocationType{
     Order,   //캐릭터 걸어서 이동
     Dialogue,
     Trigger,
+    Patrol_NPC,
 }
 public class Location : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class Location : MonoBehaviour
     public bool preserveTrigger;
     //[Header("Teleport")]
     [Header("Teleport & Order")]
+    public int doorNum;
     public Transform desLoc;
     bool orderFlag;
     [Header("Dialogue")]
@@ -25,16 +27,25 @@ public class Location : MonoBehaviour
     public int trigNum;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
+    [Header("Patrol_NPC")]
+    public Transform desLoc_Patrol_NPC;
+    public bool patrolFlag;
+    public float patrolWaitTime;
+
 
     TriggerScript triggerScript;
     
     void Start(){
         triggerScript = TriggerScript.instance;
-        //boxCollider2D = GetComponent<BoxCollider2D>();
+        boxCollider2D = GetComponent<BoxCollider2D>();
     }
-    void OnTriggerEnter2D(Collider2D other) {
-        if(!DBManager.instance.CheckTrigOver(trigNum)){
+    void OnTriggerStay2D(Collider2D other) {
+            // if(other.CompareTag("Rader")){
+                
+            //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<PolygonCollider2D>(), boxCollider2D, true);
+            // }
 
+    
             switch(type){
                 case LocationType.Teleport :
 
@@ -78,40 +89,59 @@ public class Location : MonoBehaviour
                     break;
                 case LocationType.Trigger :
 
-                    if(other.CompareTag("Player")){
-                        if(trigNum>=0){
-                            if(!PlayerManager.instance.isActing){
-                                PlayerManager.instance.isActing = true;
-                                if(dialogues_T!=null){
-                                    if(poses!=null){
-                                    
-                                        triggerScript.Action(trigNum, dialogues_T, poses);
+                    if(!DBManager.instance.CheckTrigOver(trigNum)){
+                        if(other.CompareTag("Player")){
+                            if(trigNum>=0){
+                                if(!PlayerManager.instance.isActing){
+                                    PlayerManager.instance.isActing = true;
+                                    if(dialogues_T!=null){
+                                        if(poses!=null){
+                                        
+                                            triggerScript.Action(trigNum, dialogues_T, poses);
+                                        }
+                                        else{
+                                            triggerScript.Action(trigNum, dialogues_T);
+
+                                        }
                                     }
                                     else{
-                                        triggerScript.Action(trigNum, dialogues_T);
-
+                                        triggerScript.Action(trigNum);
                                     }
                                 }
-                                else{
-                                    triggerScript.Action(trigNum);
-                                }
+                                    
                             }
-                                
+                            else{
+                                DebugManager.instance.PrintDebug("트리거 설정 안됨");
+                            }
+
+                                            
+                            if(!preserveTrigger){
+                                DBManager.instance.TrigOver(trigNum);
+                            }
                         }
-                        else{
-                            DebugManager.instance.PrintDebug("트리거 설정 안됨");
-                        }
+
                     }
                     break;
 
+                case LocationType.Patrol_NPC :
+
+                    if(other.CompareTag("NPC")){
+                        if(desLoc_Patrol_NPC!=null){
+                            if(!patrolFlag){
+                                //DM("gogo");
+                                StartCoroutine(NPCPatrolCoroutineToStart(other.GetComponent<NPCScript>()));
+                            }   
+                        }
+                        else{
+                            DM("목적지 없음");
+                        }
+                    }
+                    break;
                 default :
                     DebugManager.instance.PrintDebug("로케이션 오류");
                     break;
-            }
+            
 
-            if(!preserveTrigger){
-                DBManager.instance.TrigOver(trigNum);
-            }
         }
 
 
@@ -131,6 +161,39 @@ public class Location : MonoBehaviour
         yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
         PlayerManager.instance.canMove = true;
 
+    }
+    
+    IEnumerator NPCPatrolCoroutineToStart(NPCScript npc){ 
+        while(npc.onPatrol && !patrolFlag){
+
+            patrolFlag = true;  
+            //DM("도착지로 이동");         
+            if(npc.desPos.position.x > npc.transform.position.x){
+                npc.wSet = 1;
+            }
+            else{
+                npc.wSet = -1;
+            }
+            yield return new WaitUntil(()=>npc.onTriggerCol == npc.desPos);
+            
+            //DM("대기");         
+            npc.wSet = 0;
+            yield return new WaitForSeconds(patrolWaitTime); 
+            
+            //DM("출발지로 이동");                 
+            if(npc.startPos.position.x > npc.transform.position.x){
+                npc.wSet = 1;
+            }
+            else{
+                npc.wSet = -1;
+            }
+            yield return new WaitUntil(()=>npc.onTriggerCol == npc.startPos);
+            //DM("대기");         
+            npc.wSet = 0;
+            yield return new WaitForSeconds(patrolWaitTime); 
+
+            patrolFlag = false;
+        }
     }
     public void SetTalk(){
         DialogueManager.instance.SetFullDialogue(dialogues);
@@ -172,7 +235,11 @@ public class Location : MonoBehaviour
 #if UNITY_EDITOR
     void OnDrawGizmos()
     {
+        GUIStyle style = new GUIStyle();
+        Vector3 namePos = Vector3.zero;
         switch(type){
+            
+            
             case LocationType.Teleport :
                 //Gizmos.color = new Color(Color.red.r,Color.red.g,Color.red.b,0.3f); 
 
@@ -184,6 +251,14 @@ public class Location : MonoBehaviour
                     Gizmos.color = Color.black;   
                     Gizmos.DrawLine(transform.position,desLoc.transform.position);
                 }
+                
+                style.fontSize = 20;
+                style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = Color.red;
+                namePos = transform.position;
+                namePos.x -= 0.5f;
+                namePos.y += 0.7f;
+                Handles.Label(namePos, trigNum.ToString(),style);
                 break;
             case LocationType.Order :
                 //Gizmos.color = new Color(Color.red.r,Color.red.g,Color.red.b,0.3f);
@@ -204,14 +279,24 @@ public class Location : MonoBehaviour
                 Gizmos.color = Color.cyan;   
                 Gizmos.DrawWireCube(transform.position, transform.localScale);
 
-                GUIStyle style = new GUIStyle();
+                //GUIStyle style = new GUIStyle();
                 style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
                 style.normal.textColor = Color.cyan;
-                Vector3 namePos = transform.position;
+                namePos = transform.position;
                 namePos.x -= 0.5f;
                 namePos.y += 0.7f;
                 Handles.Label(namePos, trigNum.ToString(),style);
+                break;
+            case LocationType.Patrol_NPC :
+                Gizmos.color = Color.black;   
+                Gizmos.DrawWireCube(transform.position,  transform.localScale);                
+                if(desLoc_Patrol_NPC!=null){
+                    Gizmos.color = Color.white;   
+                    Gizmos.DrawWireCube(desLoc_Patrol_NPC.transform.position, Vector3.one);
+                    Gizmos.color = Color.black;   
+                    Gizmos.DrawLine(transform.position,desLoc_Patrol_NPC.transform.position);
+                }
                 break;
     //Handles.Label(transform.position, "Text");
  
