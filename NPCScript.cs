@@ -83,10 +83,12 @@ public class NPCScript : MonoBehaviour
         if(!noFlip){
 
             if(wSet>0){
-                transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
+                spriteRenderer.flipX = false;
+                //transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
             }
             else if(wSet<0){
-                transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
+                spriteRenderer.flipX = true;
+                //transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
             }
         }
     }
