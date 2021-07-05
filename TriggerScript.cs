@@ -100,17 +100,5 @@ public class TriggerScript : MonoBehaviour
     public void CameraView(Transform target, float speed=2){
         MapManager.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
     }
-    // public void Wait(float time = 0) => StartCoroutine(WaitCoroutine(time));
-    // IEnumerator WaitCoroutine(float time = 0){
-    //     if(time == 0){
-    //         Debug.Log("c");
-    //         yield return new WaitForSeconds(2f);
-    //         yield return new WaitUntil(()=>!PlayerManager.instance.isActing);
-    //     }
-    //     else{
-    //         Debug.Log("d");
-    //         yield return new WaitForSeconds(time);
-    //     }
-    // }
 
 }

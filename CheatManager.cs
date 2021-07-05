@@ -10,6 +10,8 @@ public class CheatManager : MonoBehaviour
 {
     public InputField cheat;
 
+    public Transform[] checkPoints;
+
     void Start()
 
     {
@@ -30,21 +32,20 @@ public class CheatManager : MonoBehaviour
 
             string[] temp = cheat.text.Split('\x020');
             
-            DebugManager.instance.PrintDebug(temp[0].ToString());
             switch(temp[0]){
                 case "teleport":
-                    switch(temp[1]){
-                        case "0" :
-                            Debug.Log("00");
-                            //DebugManager.instance.PrintDebug("0번이동");
-                            break;
-                        case "1" :
-                            Debug.Log("11");
-                            //DebugManager.instance.PrintDebug("1번이동");
-                            break;
+                    if(temp[1]!=null){
+                        PlayerManager.instance.transform.position = checkPoints[int.Parse(temp[1])].position;
+                        DM("Activate teleport to location "+temp[1].ToString());
+                    }
+                    else{
+                        DM("Error : Empty location "+temp[1].ToString());
+
                     }
                     break;
             }
+
+
             cheat.text = "";
 
         }
@@ -53,6 +54,7 @@ public class CheatManager : MonoBehaviour
 
 
 
+    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 
     // public void GetCheat22(){
     //     string[] temp = cheat.text.Split('\x020');
