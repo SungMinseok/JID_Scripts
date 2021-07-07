@@ -20,28 +20,36 @@ public class DoodadsScript : MonoBehaviour
 
             if(other.CompareTag("Player")){
 
-                if(other.GetComponent<PlayerManager>().hInput !=0){
+                if(PlayerManager.instance.hInput !=0){
                     for(int i=0;i<platformCollider.Length;i++){
                             
-                        Physics2D.IgnoreCollision(other.GetComponent<BoxCollider2D>(), platformCollider[i], true);
-                        Physics2D.IgnoreCollision(other.GetComponent<CircleCollider2D>(), platformCollider[i], true);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], true);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], true);
                     }
                 // Debug.Log("무시중");
                 }
                 
-                if(other.GetComponent<PlayerManager>().onLadder){
+                if(PlayerManager.instance.onLadder){
                     other.transform.position = new Vector2(transform.position.x,other.transform.position.y);
                 }
                 else{
-                    if(!other.GetComponent<PlayerManager>().isFalling){
+                    if(!PlayerManager.instance.isFalling){
                             
                         for(int i=0;i<platformCollider.Length;i++){
                                 
-                            Physics2D.IgnoreCollision(other.GetComponent<BoxCollider2D>(), platformCollider[i], false);
-                            Physics2D.IgnoreCollision(other.GetComponent<CircleCollider2D>(), platformCollider[i], false);
+                            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], false);
+                            Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
                         }
                     }
                 }
+            }
+        }
+        else if(type == DoodadsType.Cover){
+            
+            if(other.CompareTag("Player")){
+
+                PlayerManager.instance.isHiding = true;
+
             }
         }
         
@@ -52,9 +60,17 @@ public class DoodadsScript : MonoBehaviour
             if(other.CompareTag("Player")){
                 for(int i=0;i<platformCollider.Length;i++){
                         
-                    Physics2D.IgnoreCollision(other.GetComponent<BoxCollider2D>(), platformCollider[i], false);
-                    Physics2D.IgnoreCollision(other.GetComponent<CircleCollider2D>(), platformCollider[i], false);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], false);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
                 }
+
+            }
+        }        
+        else if(type == DoodadsType.Cover){
+            
+            if(other.CompareTag("Player")){
+
+                PlayerManager.instance.isHiding = false;
 
             }
         }

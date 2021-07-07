@@ -51,8 +51,9 @@ public class Location : MonoBehaviour
 
                     if(other.CompareTag("Player")){
                         if(desLoc!=null){
-                            other.transform.position = desLoc.position;
-                            MapManager.instance.SetConfiner(desLoc.parent.transform.GetSiblingIndex());
+                            PlayerManager.instance.transform.position = desLoc.position;
+                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
+                            MapManager.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                         }
                         else{
 
@@ -65,7 +66,7 @@ public class Location : MonoBehaviour
 
                     if(other.CompareTag("Player")){
                         if(desLoc!=null){
-                            StartCoroutine(OrderCoroutine(other.transform,desLoc));
+                            StartCoroutine(OrderCoroutine(PlayerManager.instance.transform,desLoc));
                         }
                         else{
                             DM("목적지 없음");
@@ -174,10 +175,12 @@ public class Location : MonoBehaviour
             else{
                 npc.wSet = -1;
             }
+            npc.animator.SetBool("walk",true);
             yield return new WaitUntil(()=>npc.onTriggerCol == npc.desPos);
             
             //DM("대기");         
             npc.wSet = 0;
+            npc.animator.SetBool("walk",false);
             yield return new WaitForSeconds(patrolWaitTime); 
             
             //DM("출발지로 이동");                 
@@ -187,9 +190,11 @@ public class Location : MonoBehaviour
             else{
                 npc.wSet = -1;
             }
+            npc.animator.SetBool("walk",true);
             yield return new WaitUntil(()=>npc.onTriggerCol == npc.startPos);
             //DM("대기");         
             npc.wSet = 0;
+            npc.animator.SetBool("walk",false);
             yield return new WaitForSeconds(patrolWaitTime); 
 
             patrolFlag = false;
@@ -258,7 +263,7 @@ public class Location : MonoBehaviour
                 namePos = transform.position;
                 namePos.x -= 0.5f;
                 namePos.y += 0.7f;
-                Handles.Label(namePos, trigNum.ToString(),style);
+                Handles.Label(namePos, doorNum.ToString(),style);
                 break;
             case LocationType.Order :
                 //Gizmos.color = new Color(Color.red.r,Color.red.g,Color.red.b,0.3f);

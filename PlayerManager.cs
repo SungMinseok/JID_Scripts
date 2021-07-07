@@ -155,6 +155,31 @@ public class PlayerManager : MonoBehaviour
 
         }
 
+        if(getLadder){
+            if(hInput!=0){
+                onLadder = true;
+            }
+        }
+        else{
+            onLadder = false;
+        }
+        if(onLadder){
+            
+            if(jumpInput && wInput!=0){
+                onLadder = false;
+                StartCoroutine(GetLadderDelay());
+                if(!jumpDelay) Jump(0.7f);
+            }
+            else{   
+                isJumping = false;
+                rb.gravityScale = 0f;
+                rb.velocity = new Vector2(0, (speed*0.7f) * hInput  );
+            }
+        }
+        else{
+            
+            rb.gravityScale = 10f;
+        }
 
 
     }

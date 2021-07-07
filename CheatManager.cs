@@ -8,10 +8,12 @@ using UnityEngine.UI;
 using System; 
 public class CheatManager : MonoBehaviour
 {
+    public static CheatManager instance;
     public InputField cheat;
-
     public Transform[] checkPoints;
-
+    void Awake(){
+        instance = this;
+    }
     void Start()
 
     {
@@ -35,18 +37,21 @@ public class CheatManager : MonoBehaviour
             switch(temp[0]){
                 case "teleport":
                     if(temp[1]!=null){
-                        PlayerManager.instance.transform.position = checkPoints[int.Parse(temp[1])].position;
-                        DM("Activate teleport to location "+temp[1].ToString());
-                    }
-                    else{
-                        DM("Error : Empty location "+temp[1].ToString());
+                        if(checkPoints[int.Parse(temp[1])]!=null){
+                            
+                            PlayerManager.instance.transform.position = checkPoints[int.Parse(temp[1])].position;
+                            DM("Activate teleport to location "+temp[1].ToString());
+                        }   
+                        else{
+                            DM("Error : Empty location "+temp[1].ToString());
 
+                        }
                     }
                     break;
             }
 
-
             cheat.text = "";
+            //DebugManager.instance.cheatPanel.SetActive(false);
 
         }
 

@@ -11,7 +11,9 @@ public class NPCScript : MonoBehaviour
     [Header("정찰 모드")]
     public bool onPatrol;
     public Transform startPos,desPos;
-    public float waitTime;
+    //public float waitTime;
+    public Transform rader;
+    float raderFlipX;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision;
     [Header("flip 사용 안함")]
@@ -50,6 +52,9 @@ public class NPCScript : MonoBehaviour
             Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
         }
         
+        if(rader!=null){
+            raderFlipX = rader.transform.localScale.x;
+        }
     }
 
     void Update(){
@@ -84,10 +89,16 @@ public class NPCScript : MonoBehaviour
 
             if(wSet>0){
                 spriteRenderer.flipX = false;
+                if(rader!=null){
+                    rader.transform.localScale = new Vector2(raderFlipX , rader.transform.localScale.y);
+                }
                 //transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
             }
             else if(wSet<0){
                 spriteRenderer.flipX = true;
+                if(rader!=null){
+                    rader.transform.localScale = new Vector2(raderFlipX * -1 , rader.transform.localScale.y);
+                }
                 //transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
             }
         }
@@ -157,7 +168,17 @@ public class NPCScript : MonoBehaviour
             }
 
             if(other.CompareTag("Player")){
-                DM("검거완료");
+                if(PlayerManager.instance.isHiding){
+                    DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
+
+                }
+                else{
+                    
+                    DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
+                    animator.SetTrigger("found");
+                    wSet = 0;
+                    
+                }
             }
 
         }
