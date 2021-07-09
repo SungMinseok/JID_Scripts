@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
+
+[System.Serializable]
 public enum LocationType{
     Teleport,   //캐릭터 순간이동
     Order,   //캐릭터 걸어서 이동
@@ -10,6 +14,7 @@ public enum LocationType{
     Trigger,
     Patrol_NPC,
 }
+[System.Serializable]
 public class Location : MonoBehaviour
 {
     [SerializeField]BoxCollider2D boxCollider2D;
@@ -17,20 +22,21 @@ public class Location : MonoBehaviour
     LocationType type;
     public bool preserveTrigger;
     //[Header("Teleport")]
-    [Header("Teleport & Order")]
-    public int doorNum;
-    public Transform desLoc;
+    //[Header("Teleport & Order")]
+    [HideInInspector] public int doorNum;
+    [HideInInspector] public Transform desLoc;
     bool orderFlag;
     [Header("Dialogue")]
-    public Dialogue[] dialogues;
+    [HideInInspector] public int dialogueNum;
+    [HideInInspector] public Dialogue[] dialogues;
     [Header("Trigger")]
-    public int trigNum;
-    public Transform[] poses;
-    public Dialogue[] dialogues_T;
+    [HideInInspector] public int trigNum;
+    [HideInInspector] public Transform[] poses;
+    [HideInInspector] public Dialogue[] dialogues_T;
     [Header("Patrol_NPC")]
-    public Transform desLoc_Patrol_NPC;
-    public bool patrolFlag;
-    public float patrolWaitTime;
+    [HideInInspector] public Transform desLoc_Patrol_NPC;
+    [HideInInspector] public bool patrolFlag;
+    [HideInInspector] public float patrolWaitTime;
 
 
     TriggerScript triggerScript;
@@ -279,6 +285,13 @@ public class Location : MonoBehaviour
             case LocationType.Dialogue :
                 Gizmos.color = Color.yellow;   
                 Gizmos.DrawWireCube(transform.position,  transform.localScale);
+                style.fontSize = 20;
+                style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = Color.yellow;
+                namePos = transform.position;
+                namePos.x -= 0.5f;
+                namePos.y += 0.7f;
+                Handles.Label(namePos, dialogueNum.ToString(),style);
                 break;
             case LocationType.Trigger :
                 Gizmos.color = Color.cyan;   
@@ -308,6 +321,51 @@ public class Location : MonoBehaviour
         }
 
 
+    }
+
+    [CustomEditor(typeof(Location)), CanEditMultipleObjects]
+    public class LocationEditor : Editor{
+        // private void OnEnable(){
+        //     if(AssetDatabase.Contains(target)){
+        //         selected = null;
+        //     }
+        //     else{
+        //         selected = (Location)target;
+        //     }
+        // }
+    //         [Header("Teleport & Order")]
+    // public int doorNum;
+    // public Transform desLoc;
+    // bool orderFlag;
+    //     [Header("Dialogue")]
+    // [HideInInspector] public int dialogueNum;
+    // [HideInInspector] public Dialogue[] dialogues;
+    // [Header("Trigger")]
+    // [HideInInspector] public int trigNum;
+    // [HideInInspector] public Transform[] poses;
+    // [HideInInspector] public Dialogue[] dialogues_T;
+    // [Header("Patrol_NPC")]
+    // [HideInInspector] public Transform desLoc_Patrol_NPC;
+    // [HideInInspector] public bool patrolFlag;
+    // [HideInInspector] public float patrolWaitTime;
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+            Location selected =(Location)target;
+            //selected.type = (LocationType)EditorGUILayout.EnumPopup("로케이션 타입", selected.type);
+
+            if(selected.type == LocationType.Teleport){
+                // selected.doorNum=EditorGUILayout.ObjectField("doorNum",selected.doorNum,typeof(int),true) as int;
+                selected.doorNum=EditorGUILayout.IntField("문 번호",selected.doorNum);
+                selected.desLoc=EditorGUILayout.ObjectField("도착지",selected.desLoc,typeof(Transform),true) as Transform;
+            }
+            else if(selected.type == LocationType.Dialogue){
+                // selected.doorNum=EditorGUILayout.ObjectField("doorNum",selected.doorNum,typeof(int),true) as int;
+                selected.dialogueNum=EditorGUILayout.IntField("문 번호",selected.dialogueNum);
+                //selected.dialogues=EditorGUILayout.ObjectField(selected.dialogues,typeof(Dialogue[]),true) as Dialogue[];
+            }
+
+        }
     }
 #endif
 

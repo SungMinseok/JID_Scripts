@@ -10,14 +10,13 @@ public class CheatManager : MonoBehaviour
 {
     public static CheatManager instance;
     public InputField cheat;
-    public Transform[] checkPoints;
+    public Transform checkPoint;
     void Awake(){
         instance = this;
     }
     void Start()
 
     {
-
         cheat.onEndEdit.AddListener(delegate { GetCheat(); });
 
     }
@@ -35,11 +34,12 @@ public class CheatManager : MonoBehaviour
             string[] temp = cheat.text.Split('\x020');
             
             switch(temp[0]){
-                case "teleport":
+                case "t":
                     if(temp[1]!=null){
-                        if(checkPoints[int.Parse(temp[1])]!=null){
+                        if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
                             
-                            PlayerManager.instance.transform.position = checkPoints[int.Parse(temp[1])].position;
+                            PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
+                            MapManager.instance.SetConfiner(int.Parse(temp[1])/2);
                             DM("Activate teleport to location "+temp[1].ToString());
                         }   
                         else{

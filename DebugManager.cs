@@ -59,7 +59,9 @@ public class DebugManager : MonoBehaviour
         if(isDebugMode){
             if(Input.GetKeyDown(KeyCode.Return)){
                 cheatPanel.SetActive(!cheatPanel.activeSelf);
+                CheatManager.instance.cheat.Select();
                 CheatManager.instance.cheat.ActivateInputField();
+                
             }
             if(Input.GetKeyDown(KeyCode.F10)){
                 SceneManager.LoadScene("warehouse");

@@ -7,7 +7,8 @@ using TMPro;
 public class Dialogue
 {
     public string comment;
-    public Transform talker;//holder 넣자.
+    [Header("화자 설정 : 설정하지 않으면 주인공")]
+    public Transform talker;
     [TextArea(2,2)]
     public string[] sentences;
     
