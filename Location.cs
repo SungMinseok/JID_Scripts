@@ -17,26 +17,28 @@ public enum LocationType{
 [System.Serializable]
 public class Location : MonoBehaviour
 {
-    [SerializeField]BoxCollider2D boxCollider2D;
-    [SerializeField]
-    LocationType type;
+    BoxCollider2D boxCollider2D;
+    
+    public LocationType type;
     public bool preserveTrigger;
     //[Header("Teleport")]
-    //[Header("Teleport & Order")]
-    [HideInInspector] public int doorNum;
-    [HideInInspector] public Transform desLoc;
+    [Header("Teleport & Order")]
+    public int doorNum;
+     public Transform desLoc;
     bool orderFlag;
     [Header("Dialogue")]
-    [HideInInspector] public int dialogueNum;
-    [HideInInspector] public Dialogue[] dialogues;
+    public int dialogueNum;
+    public bool stopCheck;
+    public string direction;
+    public Dialogue[] dialogues;
     [Header("Trigger")]
-    [HideInInspector] public int trigNum;
-    [HideInInspector] public Transform[] poses;
-    [HideInInspector] public Dialogue[] dialogues_T;
+    public int trigNum;
+    public Transform[] poses;
+    public Dialogue[] dialogues_T;
     [Header("Patrol_NPC")]
-    [HideInInspector] public Transform desLoc_Patrol_NPC;
-    [HideInInspector] public bool patrolFlag;
-    [HideInInspector] public float patrolWaitTime;
+     public Transform desLoc_Patrol_NPC;
+    public bool patrolFlag;
+    public float patrolWaitTime;
 
 
     TriggerScript triggerScript;
@@ -81,16 +83,32 @@ public class Location : MonoBehaviour
                     break;
                 case LocationType.Dialogue :
 
-                    if(other.CompareTag("Player")){
-                        if(dialogues!=null){
-                            if(!PlayerManager.instance.isTalking){
-                                PlayerManager.instance.isTalking = true;
-                                SetTalk();
-                            }
+                    if(!DBManager.instance.CheckTrigOver(dialogueNum))
+                    {
+                        if (other.CompareTag("Player"))
+                        {
+                            if (dialogues != null)
+                            {
+                                if (!PlayerManager.instance.isTalking)
+                                {
+                                    PlayerManager.instance.isTalking = true;
+                                    if (direction != "")
+                                    {
+                                        PlayerManager.instance.Look(direction);
+                                    }
+                                    SetTalk();
+                                }
 
+                            }
+                            else
+                            {
+                                DebugManager.instance.PrintDebug("대화 설정 안됨");
+                            }
                         }
-                        else{
-                            DebugManager.instance.PrintDebug("대화 설정 안됨");
+
+                        if (!preserveTrigger)
+                        {
+                            DBManager.instance.TrigOver(dialogueNum);
                         }
                     }
                     break;
@@ -322,51 +340,81 @@ public class Location : MonoBehaviour
 
 
     }
+[CustomEditor(typeof(Location)), CanEditMultipleObjects]
+public class LocationEditor : Editor
+{
+    // [MenuItem("Window/Location")]
+    // public static void ShowWindow(){
+    //     EditorWindow.GetWindow(typeof(LocationEditor));
+    // }
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        //DrawDefaultInspector();
+        Location selected = (Location)target;
+        //EditorGUILayout.BeginHorizontal();
+        selected.type = (LocationType)EditorGUILayout.EnumPopup("로케이션 타입 설정", selected.type);
+        //selected.type = EditorGUILayout.Foldout(selected.type == LocationType.Teleport,"type");
+        EditorGUILayout.Space();
+        
 
-    [CustomEditor(typeof(Location)), CanEditMultipleObjects]
-    public class LocationEditor : Editor{
-        // private void OnEnable(){
-        //     if(AssetDatabase.Contains(target)){
-        //         selected = null;
-        //     }
-        //     else{
-        //         selected = (Location)target;
-        //     }
-        // }
-    //         [Header("Teleport & Order")]
-    // public int doorNum;
-    // public Transform desLoc;
-    // bool orderFlag;
-    //     [Header("Dialogue")]
-    // [HideInInspector] public int dialogueNum;
-    // [HideInInspector] public Dialogue[] dialogues;
-    // [Header("Trigger")]
-    // [HideInInspector] public int trigNum;
-    // [HideInInspector] public Transform[] poses;
-    // [HideInInspector] public Dialogue[] dialogues_T;
-    // [Header("Patrol_NPC")]
-    // [HideInInspector] public Transform desLoc_Patrol_NPC;
-    // [HideInInspector] public bool patrolFlag;
-    // [HideInInspector] public float patrolWaitTime;
-        public override void OnInspectorGUI()
+        if (selected.type == LocationType.Teleport)
         {
-            DrawDefaultInspector();
-            Location selected =(Location)target;
-            //selected.type = (LocationType)EditorGUILayout.EnumPopup("로케이션 타입", selected.type);
-
-            if(selected.type == LocationType.Teleport){
-                // selected.doorNum=EditorGUILayout.ObjectField("doorNum",selected.doorNum,typeof(int),true) as int;
-                selected.doorNum=EditorGUILayout.IntField("문 번호",selected.doorNum);
-                selected.desLoc=EditorGUILayout.ObjectField("도착지",selected.desLoc,typeof(Transform),true) as Transform;
-            }
-            else if(selected.type == LocationType.Dialogue){
-                // selected.doorNum=EditorGUILayout.ObjectField("doorNum",selected.doorNum,typeof(int),true) as int;
-                selected.dialogueNum=EditorGUILayout.IntField("문 번호",selected.dialogueNum);
-                //selected.dialogues=EditorGUILayout.ObjectField(selected.dialogues,typeof(Dialogue[]),true) as Dialogue[];
-            }
-
+            //EditorGUILayout.LabelField("문 번호", EditorStyles.boldLabel);
+            selected.doorNum = EditorGUILayout.IntField("문 번호",selected.doorNum,EditorStyles.toolbarTextField);
+            EditorGUILayout.Space();
+            selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
         }
-    }
+        else if (selected.type == LocationType.Order)
+        {
+            selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
+        }
+        else if (selected.type == LocationType.Dialogue)
+        {
+            //selected.dialogueNum = EditorGUILayout.IntField("대화 번호", selected.dialogueNum,EditorStyles.toolbarTextField);
+            selected.dialogueNum = EditorGUILayout.IntField("대화 번호", selected.dialogueNum,EditorStyles.toolbarTextField);
+            EditorGUILayout.Space();
+            //EditorGUILayout.LabelField("대화 시 방향 설정");
+            
+            //EditorGUIUtility.labelWidth = 0;
+           //EditorGUILayout.LabelField("대화 시 방향 설정" );
+            //GUILayout.Label( "대화 시 방향 설정"  );
+            //GUILayout.FlexibleSpace();
+            //EditorGUILayout.PropertyField(serializedObject.FindProperty("direction"),GUIContent.none, true);
+            selected.direction = EditorGUILayout.TextField("대화 시 방향 설정", selected.direction);
+            //GUILayout.EndHorizontal();
+
+            EditorGUILayout.LabelField("대화");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues"),GUIContent.none, true);
+
+            
+            selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가 시 체크", selected.stopCheck);
+        }
+        else if (selected.type == LocationType.Trigger)
+        {
+            selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
+            EditorGUILayout.Space();
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"), true);
+        }
+        else if (selected.type == LocationType.Patrol_NPC)
+        {
+            EditorGUILayout.LabelField("이 로케이션 위에 NPC가 놓여야 함.");
+            selected.desLoc_Patrol_NPC = EditorGUILayout.ObjectField("도착지", selected.desLoc_Patrol_NPC, typeof(Transform), true) as Transform;
+            selected.patrolWaitTime = EditorGUILayout.FloatField("이동 대기시간", selected.patrolWaitTime);
+        }
+        //EditorGUILayout.EndHorizontal();
+
+
+
+        selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용 시 체크", selected.preserveTrigger);
+
+        serializedObject.ApplyModifiedProperties();
+    }    
+    
+}
+
+
 #endif
 
 }

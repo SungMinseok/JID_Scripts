@@ -46,8 +46,8 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region 2
-            case 2 :
+#region 3
+            case 3 :
                 var nerd_ant = ObjectController.instance.npcs[0];
 
                 CameraView(nerd_ant.transform);

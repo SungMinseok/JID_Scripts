@@ -6,9 +6,12 @@ using TMPro;
 [System.Serializable]
 public class Dialogue
 {
+    [SerializeField]
     public string comment;
+    [SerializeField]
     [Header("화자 설정 : 설정하지 않으면 주인공")]
     public Transform talker;
+    [SerializeField]
     [TextArea(2,2)]
     public string[] sentences;
     
@@ -38,17 +41,18 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    public void SetFullDialogue(Dialogue[] dialogues)
+    public void SetFullDialogue(Dialogue[] dialogues,bool stopCheck = false)
     {
-        StartCoroutine(DialogueCoroutine0(dialogues));
+        StartCoroutine(DialogueCoroutine0(dialogues,stopCheck));
     }
     public void SetDialogue(Dialogue dialogue)
     {
-        StartCoroutine(DialogueCoroutine2(dialogue));
+        StartCoroutine(DialogueCoroutine1(dialogue));
     }
 
-    IEnumerator DialogueCoroutine0(Dialogue[] dialogues)
+    IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
     {
+        PlayerManager.instance.canMove = false;
         for(int i=0;i<dialogues.Length;i++){
             
             StartCoroutine(DialogueCoroutine1(dialogues[i]));
@@ -57,13 +61,17 @@ public class DialogueManager : MonoBehaviour
         }
 
         PlayerManager.instance.isTalking = false;
+        PlayerManager.instance.canMove = true;
     }
 
     IEnumerator DialogueCoroutine1(Dialogue dialogue, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
+        PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
+        if(dialogue.talker==null) dialogue.talker = PlayerManager.instance.transform;
+            
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
-        
+
         for(int i=0; i<dialogue.sentences.Length;i++){
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
@@ -76,6 +84,7 @@ public class DialogueManager : MonoBehaviour
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
         
         dialogueFlag= false;
+        PlayerManager.instance.isTalking = false;
 #region 
         // while (sentQue.Count > 0)
         // {
@@ -119,7 +128,7 @@ public class DialogueManager : MonoBehaviour
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;
-        Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
+        //Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
 
         tmp.text = curSentence;
         tmp.maxVisibleCharacters = 0;
@@ -130,7 +139,7 @@ public class DialogueManager : MonoBehaviour
 
         }
         yield return new WaitForSeconds(1.5f);
-        Debug.Log("문장종료");
+        //Debug.Log("문장종료");
         revealTextFlag = false;
 #region 
         // while(revealTextFlag){
