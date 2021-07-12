@@ -27,7 +27,7 @@ public class Location : MonoBehaviour
      public Transform desLoc;
     bool orderFlag;
     [Header("Dialogue")]
-    public int dialogueNum;
+    //public int dialogueNum;
     public bool stopCheck;
     public string direction;
     public Dialogue[] dialogues;
@@ -83,7 +83,7 @@ public class Location : MonoBehaviour
                     break;
                 case LocationType.Dialogue :
 
-                    if(!DBManager.instance.CheckTrigOver(dialogueNum))
+                    if(!DBManager.instance.CheckTrigOver(trigNum))
                     {
                         if (other.CompareTag("Player"))
                         {
@@ -108,7 +108,7 @@ public class Location : MonoBehaviour
 
                         if (!preserveTrigger)
                         {
-                            DBManager.instance.TrigOver(dialogueNum);
+                            DBManager.instance.TrigOver(trigNum);
                         }
                     }
                     break;
@@ -301,7 +301,7 @@ public class Location : MonoBehaviour
                 }
                 break;
             case LocationType.Dialogue :
-                Gizmos.color = Color.yellow;   
+                Gizmos.color = Color.cyan;   
                 Gizmos.DrawWireCube(transform.position,  transform.localScale);
                 style.fontSize = 20;
                 style.fontStyle = FontStyle.Bold;
@@ -309,7 +309,7 @@ public class Location : MonoBehaviour
                 namePos = transform.position;
                 namePos.x -= 0.5f;
                 namePos.y += 0.7f;
-                Handles.Label(namePos, dialogueNum.ToString(),style);
+                Handles.Label(namePos, trigNum.ToString(),style);
                 break;
             case LocationType.Trigger :
                 Gizmos.color = Color.cyan;   
@@ -372,7 +372,7 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.Dialogue)
         {
             //selected.dialogueNum = EditorGUILayout.IntField("대화 번호", selected.dialogueNum,EditorStyles.toolbarTextField);
-            selected.dialogueNum = EditorGUILayout.IntField("대화 번호", selected.dialogueNum,EditorStyles.toolbarTextField);
+            selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             //EditorGUILayout.LabelField("대화 시 방향 설정");
             
@@ -388,14 +388,16 @@ public class LocationEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues"),GUIContent.none, true);
 
             
-            selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가 시 체크", selected.stopCheck);
+            selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가", selected.stopCheck);
         }
         else if (selected.type == LocationType.Trigger)
         {
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"), true);
+            EditorGUILayout.LabelField("장소");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
+            EditorGUILayout.LabelField("대화");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"),GUIContent.none, true);
         }
         else if (selected.type == LocationType.Patrol_NPC)
         {
@@ -407,7 +409,7 @@ public class LocationEditor : Editor
 
 
 
-        selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용 시 체크", selected.preserveTrigger);
+        selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 
         serializedObject.ApplyModifiedProperties();
     }    

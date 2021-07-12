@@ -12,15 +12,7 @@ public class MapManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        if (null == instance)
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        instance = this;
     }
 
     public void SetConfiner(int num){

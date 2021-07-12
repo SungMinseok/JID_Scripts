@@ -29,15 +29,7 @@ public class DialogueManager : MonoBehaviour
     
     void Awake()
     {
-        if (null == instance)
-        {
-            instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        instance = this;
     }
 
 
@@ -47,6 +39,7 @@ public class DialogueManager : MonoBehaviour
     }
     public void SetDialogue(Dialogue dialogue)
     {
+        PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine1(dialogue));
     }
 
@@ -128,6 +121,8 @@ public class DialogueManager : MonoBehaviour
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;
+        WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
+        WaitForSeconds _typingInterval = new WaitForSeconds(typingInterval);
         //Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
 
         tmp.text = curSentence;
@@ -135,10 +130,10 @@ public class DialogueManager : MonoBehaviour
         for(int i=0; i<totalVisibleCharacters+1; i++){
             tmp.maxVisibleCharacters = i;
             
-            yield return new WaitForSeconds(0.05f);
+            yield return _typingSpeed;
 
         }
-        yield return new WaitForSeconds(1.5f);
+        yield return _typingInterval;
         //Debug.Log("문장종료");
         revealTextFlag = false;
 #region 

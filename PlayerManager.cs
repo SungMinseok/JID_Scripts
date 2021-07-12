@@ -31,7 +31,7 @@ public class PlayerManager : MonoBehaviour
     SpriteRenderer spriteRenderer;
     public float wInput, hInput;
     public float wSet;
-    public bool jumpInput, downInput;
+    public bool jumpInput, downInput, interactInput;
 
     [SerializeField] LayerMask groundLayer;
     Vector2 footPos;
@@ -82,6 +82,7 @@ public class PlayerManager : MonoBehaviour
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
             jumpInput = Input.GetButton("Jump") ? true : false;
+            interactInput = Input.GetButton("Interact") ? true : false;
 
 
 
@@ -223,7 +224,7 @@ public class PlayerManager : MonoBehaviour
 
         else if (other.CompareTag("Item"))
         {
-            UIManager.instance.clearPanel.SetActive(true);
+            //UIManager.instance.clearPanel.SetActive(true);
         }
 
         else if (other.CompareTag("Cover"))

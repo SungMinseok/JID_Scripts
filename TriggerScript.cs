@@ -9,15 +9,7 @@ public class TriggerScript : MonoBehaviour
     
     void Awake()
     {
-        if (null == instance)
-        {
             instance = this;
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
     }
     void Start(){
     }
@@ -84,6 +76,15 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+#region 4
+            case 4 :
+                ActivateEffect(1,3);
+                yield return new WaitUntil(()=>!UIManager.instance.onEffect);
+                SetDialogue(dialogues[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                PlayerManager.instance.Look("left");
+                break;
+#endregion
             default : 
                 break;
         }
@@ -95,10 +96,13 @@ public class TriggerScript : MonoBehaviour
     }
 
     public void SetDialogue(Dialogue dialogue){
+        
         DialogueManager.instance.SetDialogue(dialogue);
     }
     public void CameraView(Transform target, float speed=2){
         MapManager.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
     }
-
+    public void ActivateEffect(int num,float timer,bool bgOn = true){
+        UIManager.instance.ActivateEffect(num,timer,bgOn);
+    }
 }
