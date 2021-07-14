@@ -42,6 +42,10 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine1(dialogue));
     }
+    public void SetNPCDialogue(string dialogueText,Transform talker,float duration, int interval){
+        StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
+        
+    }
 
     IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
     {
@@ -95,9 +99,9 @@ public class DialogueManager : MonoBehaviour
         // dialogue.talker.gameObject.SetActive(false);
         #endregion
     }
-    IEnumerator DialogueCoroutine2(Dialogue dialogue, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    IEnumerator DialogueCoroutine2(Dialogue dialogue, bool atOnce=true, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
-        PlayerManager.instance.isTalking = true;
+        //PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
         
@@ -157,4 +161,16 @@ public class DialogueManager : MonoBehaviour
 #endregion
 
     }
+
+    IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
+        talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
+        talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(duration);
+
+        talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
+
+
+    }
+
 }

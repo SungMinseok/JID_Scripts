@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class NPCScript : MonoBehaviour
 {
@@ -16,6 +17,14 @@ public class NPCScript : MonoBehaviour
     float raderFlipX;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision;
+    [Header("랜덤 대화 설정")]
+    public bool onRanDlg;
+    bool ranDlgFlag;
+    public float dlgDuration;
+    public int dlgInterval;
+    WaitForSeconds waitTime0, waitTime1, waitTime2;
+    public Dialogue[] dialogues;
+
     [Header("flip 사용 안함")]
     public bool noFlip;
     
@@ -55,6 +64,11 @@ public class NPCScript : MonoBehaviour
         if(rader!=null){
             raderFlipX = rader.transform.localScale.x;
         }
+
+        waitTime0 = new WaitForSeconds(dlgInterval-0.5f);
+        waitTime1 = new WaitForSeconds(dlgInterval);
+        waitTime2 = new WaitForSeconds(dlgInterval+0.5f);
+        // waitTime3 = new WaitForSeconds(ranDlgDuration);
     }
 
     void Update(){
@@ -102,6 +116,14 @@ public class NPCScript : MonoBehaviour
                 //transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
             }
         }
+
+        if(onRanDlg){
+            if(!ranDlgFlag){
+                ranDlgFlag = true;
+                StartCoroutine(SetRandomDialogueCoroutine());
+            }
+
+        }
     }
 
     void FixedUpdate(){
@@ -148,6 +170,19 @@ public class NPCScript : MonoBehaviour
             yield return new WaitUntil(() => isGrounded);
             jumpDelay = false;
         }
+    }
+
+    IEnumerator SetRandomDialogueCoroutine(){
+
+        DialogueManager.instance.SetNPCDialogue(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
+        
+        int temp = Random.Range(0,3);
+        if(temp==0) yield return waitTime0;
+        else if(temp==1) yield return waitTime1;
+        else yield return waitTime2;
+
+        ranDlgFlag = false;
+
     }
 
     void OnCollisionEnter2D(Collision2D other){
