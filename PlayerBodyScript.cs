@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerBodyScript : MonoBehaviour
 {
+    [Header ("push 애니메이션 용, 본체 애니메이터 연결")]
     public Animator animator;
     void OnCollisionStay2D(Collision2D other){
         // // foreach(ContactPoint2D contact in other.contacts){

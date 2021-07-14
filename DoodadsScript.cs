@@ -30,7 +30,7 @@ public class DoodadsScript : MonoBehaviour
                 }
                 
                 if(PlayerManager.instance.onLadder){
-                    other.transform.position = new Vector2(transform.position.x,other.transform.position.y);
+                    other.transform.parent.position = new Vector2(transform.position.x,other.transform.parent.position.y);
                 }
                 else{
                     if(!PlayerManager.instance.isFalling){

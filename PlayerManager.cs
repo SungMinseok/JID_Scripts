@@ -6,11 +6,15 @@ public class PlayerManager : MonoBehaviour
 {
 
     public static PlayerManager instance;
-    public Transform dialogueHolder;
+    [Header("Input Check")]
+    public float wInput;
+    public float hInput;
+    public bool jumpInput, downInput, interactInput;
+    [Space]
+    public float wSet;
+    [Header("Status")]
     public bool isTalking;
     public bool isActing;
-    public Collider2D lastPlatform;
-    public Transform onTriggerCol;//onTrigger 콜라이더
     public bool canMove;
     public bool isGrounded;
     public bool isJumping;
@@ -24,14 +28,12 @@ public class PlayerManager : MonoBehaviour
     public bool isHiding;
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
-
-    Rigidbody2D rb;
-    [SerializeField] public BoxCollider2D boxCollider2D;
-    [SerializeField] public CircleCollider2D circleCollider2D;
-    SpriteRenderer spriteRenderer;
-    public float wInput, hInput;
-    public float wSet;
-    public bool jumpInput, downInput, interactInput;
+    public Transform playerBody;
+    Vector2 defaultScale;
+    public Rigidbody2D rb;
+    public BoxCollider2D boxCollider2D;
+    public CircleCollider2D circleCollider2D;
+    //SpriteRenderer spriteRenderer;
 
     [SerializeField] LayerMask groundLayer;
     Vector2 footPos;
@@ -40,8 +42,12 @@ public class PlayerManager : MonoBehaviour
 
 
     public DebugManager d;
-    Animator animator;
+    public Animator animator;
 
+    public Transform dialogueHolder;
+    [Header("Debugging")]
+    public Collider2D lastPlatform;
+    public Transform onTriggerCol;//onTrigger 콜라이더
     void Awake()
     {
         Application.targetFrameRate = 60;
@@ -59,13 +65,13 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
 
-        rb = GetComponent<Rigidbody2D>();
+        //rb = GetComponent<Rigidbody2D>();
 
-        animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        //animator = GetComponent<Animator>();
+        //spriteRenderer = GetComponent<SpriteRenderer>();
 
         d = DebugManager.instance;
-
+        defaultScale = playerBody.transform.localScale;
 
         canMove = true;
 
@@ -100,6 +106,15 @@ public class PlayerManager : MonoBehaviour
             isJumping = false;
             animator.SetBool("jump", false);
 
+            if(hInput<0){
+                
+                animator.SetBool("down", true);
+            }
+            else{
+                animator.SetBool("down", false);
+
+            }
+
         }
         else
         {
@@ -112,11 +127,13 @@ public class PlayerManager : MonoBehaviour
             animator.SetBool("run", true);
             if (wInput > 0|| wSet > 0)
             {
-                spriteRenderer.flipX = false;
+                //spriteRenderer.flipX = false;
+                playerBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
             }
             else if (wInput < 0|| wSet < 0)
             {
-                spriteRenderer.flipX = true;
+                //spriteRenderer.flipX = true;
+                playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
             }
         }
         else
@@ -265,10 +282,12 @@ public class PlayerManager : MonoBehaviour
     public void Look(string direction){
         switch(direction){
             case "left" : 
-                spriteRenderer.flipX = true;
+                //spriteRenderer.flipX = true;
+                playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
                 break;
             case "right" : 
-                spriteRenderer.flipX = false;
+                //spriteRenderer.flipX = false;
+                playerBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
                 break;
         }
     }
