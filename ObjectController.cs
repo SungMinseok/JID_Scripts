@@ -6,7 +6,6 @@ using Cinemachine;
 public class ObjectController : MonoBehaviour
 {
     public static ObjectController instance;
-    public List<NPCScript> npcs;
 
     void Awake(){
         instance = this;

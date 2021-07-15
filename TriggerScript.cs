@@ -6,6 +6,10 @@ using Cinemachine;
 public class TriggerScript : MonoBehaviour
 {    
     public static TriggerScript instance;
+
+    WaitForSeconds wait1s = new WaitForSeconds(1);
+    WaitForSeconds wait2s = new WaitForSeconds(2);
+    WaitForSeconds wait3s = new WaitForSeconds(3);
     
     void Awake()
     {
@@ -40,7 +44,7 @@ public class TriggerScript : MonoBehaviour
 
 #region 3
             case 3 :
-                var nerd_ant = ObjectController.instance.npcs[0];
+                var nerd_ant = SceneController.instance.npcs[0];
 
                 CameraView(nerd_ant.transform);
                 yield return new WaitForSeconds(1f);
@@ -67,7 +71,7 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 nerd_ant.gameObject.SetActive(false);
                 PlayerManager.instance.transform.position = poses[1].position;
-                MapManager.instance.SetConfiner(poses[1].parent.transform.GetSiblingIndex());
+                SceneController.instance.SetConfiner(poses[1].parent.transform.GetSiblingIndex());
                 yield return new WaitForSeconds(0.1f);
                 CameraView(PlayerManager.instance.transform);
                 //MapManager.instance.virtualCamera.Follow = null;
@@ -85,6 +89,24 @@ public class TriggerScript : MonoBehaviour
                 PlayerManager.instance.Look("left");
                 break;
 #endregion
+#region 5
+            case 5 :
+            
+                CameraView(poses[0]);
+                SceneController.instance.npcs[1].gameObject.SetActive(true);
+                SceneController.instance.npcs[2].gameObject.SetActive(true);
+                yield return wait3s;
+                CameraView(PlayerManager.instance.transform);
+                SceneController.instance.npcs[1].onPatrol = true;
+                SceneController.instance.npcs[2].onPatrol = true;
+                SceneController.instance.npcs[1].onRanDlg = true;
+
+                ForceToPatrol(SceneController.instance.npcs[1]);
+                ForceToPatrol(SceneController.instance.npcs[2]);
+
+
+                break;
+#endregion
             default : 
                 break;
         }
@@ -100,9 +122,67 @@ public class TriggerScript : MonoBehaviour
         DialogueManager.instance.SetDialogue(dialogue);
     }
     public void CameraView(Transform target, float speed=2){
-        MapManager.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
+        SceneController.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
     }
     public void ActivateEffect(int num,float timer,bool bgOn = true){
         UIManager.instance.ActivateEffect(num,timer,bgOn);
     }
+
+    
+    public IEnumerator OrderCoroutine(Location location,Transform objCol,Transform desCol){                        
+        PlayerManager.instance.canMove = false;
+        if(desCol.position.x > objCol.position.x){
+            PlayerManager.instance.wSet = 1;
+        }
+        else{
+            PlayerManager.instance.wSet = -1;
+        }
+        yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
+        
+        PlayerManager.instance.canMove = true;
+
+        if(location.preserveTrigger) location.locFlag = false;
+    }
+    public void ForceToPatrol(NPCScript npc){
+        StartCoroutine(NPCPatrolCoroutineToStart(npc));
+    }
+    
+    public IEnumerator NPCPatrolCoroutineToStart(NPCScript npc){ 
+        WaitForSeconds _patrolInterval = new WaitForSeconds(npc.patrolInterval);
+        while(npc.onPatrol && !npc.patrolFlag){
+            Debug.Log("NPCPatrolCoroutineToStart");
+            npc.patrolFlag = true;  
+            //DM("도착지로 이동");         
+            if(npc.desPos.position.x > npc.transform.position.x){
+                npc.wSet = 1;
+            }
+            else{
+                npc.wSet = -1;
+            }
+            npc.animator.SetBool("walk",true);
+            yield return new WaitUntil(()=>npc.onTriggerCol == npc.desPos);
+            
+            //DM("대기");         
+            npc.wSet = 0;
+            npc.animator.SetBool("walk",false);
+            yield return _patrolInterval; 
+            
+            //DM("출발지로 이동");                 
+            if(npc.startPos.position.x > npc.transform.position.x){
+                npc.wSet = 1;
+            }
+            else{
+                npc.wSet = -1;
+            }
+            npc.animator.SetBool("walk",true);
+            yield return new WaitUntil(()=>npc.onTriggerCol == npc.startPos);
+            //DM("대기");         
+            npc.wSet = 0;
+            npc.animator.SetBool("walk",false);
+            yield return _patrolInterval; 
+
+            npc.patrolFlag = false;
+        }
+    }
+
 }

@@ -39,7 +39,7 @@ public class CheatManager : MonoBehaviour
                         if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
                             
                             PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
-                            MapManager.instance.SetConfiner(int.Parse(temp[1])/2);
+                            SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
                             DM("Activate teleport to location "+temp[1].ToString());
                         }   
                         else{

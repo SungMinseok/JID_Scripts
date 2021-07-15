@@ -11,6 +11,8 @@ public class NPCScript : MonoBehaviour
     bool JYDFlag;
     [Header("정찰 모드")]
     public bool onPatrol;
+    public bool patrolFlag;
+    public float patrolInterval;
     public Transform startPos,desPos;
     //public float waitTime;
     public Transform rader;

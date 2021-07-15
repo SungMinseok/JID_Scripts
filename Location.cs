@@ -35,25 +35,35 @@ public class Location : MonoBehaviour
     public int trigNum;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
+    public bool waitKey;
     [Header("Patrol_NPC")]
      public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
     public float patrolWaitTime;
-
-
+    [HideInInspector] public bool locFlag;
     TriggerScript triggerScript;
-    
     void Start(){
         triggerScript = TriggerScript.instance;
         boxCollider2D = GetComponent<BoxCollider2D>();
     }
     void OnTriggerStay2D(Collider2D other) {
-            // if(other.CompareTag("Rader")){
-                
-            //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<PolygonCollider2D>(), boxCollider2D, true);
-            // }
+            if(waitKey){
+                if(Input.GetButton("Interact")&&!locFlag){
+                    locFlag = true;
+                    LocationScript(other);
+                }
+            }
+            else if(!locFlag){
+                locFlag = true;
+                LocationScript(other);
+            }
 
     
+
+    }
+    void LocationScript(Collider2D other){
+        
+                    //Debug.Log("3");
             switch(type){
                 case LocationType.Teleport :
 
@@ -61,20 +71,22 @@ public class Location : MonoBehaviour
                         if(desLoc!=null){
                             PlayerManager.instance.transform.position = desLoc.position;
                             Debug.Log(desLoc.parent.transform.GetSiblingIndex());
-                            MapManager.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
+                            SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                         }
                         else{
 
                             DM("목적지 없음");
                         }
                     }
+
+                    if(preserveTrigger) locFlag = false;
                     break;
 
                 case LocationType.Order :
 
                     if(other.CompareTag("Player")){
                         if(desLoc!=null){
-                            StartCoroutine(OrderCoroutine(PlayerManager.instance.transform,desLoc));
+                            StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
                         }
                         else{
                             DM("목적지 없음");
@@ -113,7 +125,6 @@ public class Location : MonoBehaviour
                     }
                     break;
                 case LocationType.Trigger :
-
                     if(!DBManager.instance.CheckTrigOver(trigNum)){
                         if(other.CompareTag("Player")){
                             if(trigNum>=0){
@@ -146,15 +157,17 @@ public class Location : MonoBehaviour
                         }
 
                     }
+                
                     break;
 
                 case LocationType.Patrol_NPC :
 
                     if(other.CompareTag("NPC")){
                         if(desLoc_Patrol_NPC!=null){
-                            if(!patrolFlag){
-                                //DM("gogo");
-                                StartCoroutine(NPCPatrolCoroutineToStart(other.GetComponent<NPCScript>()));
+                            if(!other.GetComponent<NPCScript>().patrolFlag){
+                                DM("gogo");
+                                Debug.Log("1");
+                                StartCoroutine(TriggerScript.instance.NPCPatrolCoroutineToStart(other.GetComponent<NPCScript>()));
                             }   
                         }
                         else{
@@ -168,62 +181,9 @@ public class Location : MonoBehaviour
             
 
         }
-
-
-
+        
     }
 
-    IEnumerator OrderCoroutine(Transform objCol,Transform desCol){                        
-        PlayerManager.instance.canMove = false;
-        // PlayerManager.instance.wInput = 0;
-        // PlayerManager.instance.hInput = 0;
-        if(desCol.position.x > objCol.position.x){
-            PlayerManager.instance.wSet = 1;
-        }
-        else{
-            PlayerManager.instance.wSet = -1;
-        }
-        yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
-        PlayerManager.instance.canMove = true;
-
-    }
-    
-    IEnumerator NPCPatrolCoroutineToStart(NPCScript npc){ 
-        while(npc.onPatrol && !patrolFlag){
-
-            patrolFlag = true;  
-            //DM("도착지로 이동");         
-            if(npc.desPos.position.x > npc.transform.position.x){
-                npc.wSet = 1;
-            }
-            else{
-                npc.wSet = -1;
-            }
-            npc.animator.SetBool("walk",true);
-            yield return new WaitUntil(()=>npc.onTriggerCol == npc.desPos);
-            
-            //DM("대기");         
-            npc.wSet = 0;
-            npc.animator.SetBool("walk",false);
-            yield return new WaitForSeconds(patrolWaitTime); 
-            
-            //DM("출발지로 이동");                 
-            if(npc.startPos.position.x > npc.transform.position.x){
-                npc.wSet = 1;
-            }
-            else{
-                npc.wSet = -1;
-            }
-            npc.animator.SetBool("walk",true);
-            yield return new WaitUntil(()=>npc.onTriggerCol == npc.startPos);
-            //DM("대기");         
-            npc.wSet = 0;
-            npc.animator.SetBool("walk",false);
-            yield return new WaitForSeconds(patrolWaitTime); 
-
-            patrolFlag = false;
-        }
-    }
     public void SetTalk(){
         DialogueManager.instance.SetFullDialogue(dialogues);
     }
@@ -389,6 +349,8 @@ public class LocationEditor : Editor
 
             
             selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가", selected.stopCheck);
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
+
         }
         else if (selected.type == LocationType.Trigger)
         {
@@ -398,6 +360,9 @@ public class LocationEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
             EditorGUILayout.LabelField("대화");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"),GUIContent.none, true);
+            selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
+
         }
         else if (selected.type == LocationType.Patrol_NPC)
         {
@@ -408,8 +373,6 @@ public class LocationEditor : Editor
         //EditorGUILayout.EndHorizontal();
 
 
-
-        selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 
         serializedObject.ApplyModifiedProperties();
     }    

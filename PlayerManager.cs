@@ -122,7 +122,8 @@ public class PlayerManager : MonoBehaviour
             animator.SetBool("jump", true);
         }
 
-        if (wInput != 0 || wSet != 0)
+//좌우 이동 중
+        if (wInput != 0 || wSet != 0)   
         {
             animator.SetBool("run", true);
             if (wInput > 0|| wSet > 0)
@@ -138,8 +139,20 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
+            
             animator.SetBool("run", false);
+            
+            if(interactInput){
+                //animator.SetTrigger("shovelling");
+                animator.SetBool("shovelling1", true);
+            }
+            else{
+                animator.SetBool("shovelling1", false);
+
+            }
         }
+
+        
     }
 
     void FixedUpdate()
