@@ -42,9 +42,10 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine1(dialogue));
     }
-    public void SetNPCDialogue(string dialogueText,Transform talker,float duration, int interval){
-        StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-        
+    public void SetRandomDialogue(string dialogueText,Transform talker,float duration, int interval){
+        Coroutine _randomDialogueCrt;
+        _randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
+        talker.GetComponent<NPCScript>().randomDialogueCrt = _randomDialogueCrt;
     }
 
     IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
@@ -173,4 +174,5 @@ public class DialogueManager : MonoBehaviour
 
     }
 
+    IEnumerator each ;
 }

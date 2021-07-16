@@ -26,6 +26,7 @@ public class NPCScript : MonoBehaviour
     public int dlgInterval;
     WaitForSeconds waitTime0, waitTime1, waitTime2;
     public Dialogue[] dialogues;
+    public Coroutine randomDialogueCrt;
 
     [Header("flip 사용 안함")]
     public bool noFlip;
@@ -93,13 +94,13 @@ public class NPCScript : MonoBehaviour
         if (isGrounded)
         {
             isJumping = false;
-            animator.SetBool("jump", false);
+            //animator.SetBool("jump", false);
 
         }
         else
         {
 
-            animator.SetBool("jump", true);
+            //animator.SetBool("jump", true);
         }
         if(!noFlip){
 
@@ -176,7 +177,7 @@ public class NPCScript : MonoBehaviour
 
     IEnumerator SetRandomDialogueCoroutine(){
 
-        DialogueManager.instance.SetNPCDialogue(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
+        DialogueManager.instance.SetRandomDialogue(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
         
         int temp = Random.Range(0,3);
         if(temp==0) yield return waitTime0;
@@ -196,25 +197,27 @@ public class NPCScript : MonoBehaviour
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         // }
     }    
-    void OnTriggerEnter2D(Collider2D other) {
+    void OnTriggerStay2D(Collider2D other) {
         if(onPatrol){
             
-            if(other.transform==startPos || other.transform==desPos){
+            if((other.transform==startPos || other.transform==desPos)&& onTriggerCol!= other.transform){
                 
                 onTriggerCol = other.transform;
             }
 
             if(other.CompareTag("Player")){
-                if(PlayerManager.instance.isHiding){
-                    DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
+                if(!PlayerManager.instance.isCaught){
 
-                }
-                else{
-                    
-                    DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
-                    animator.SetTrigger("found");
-                    wSet = 0;
-                    
+                    if(PlayerManager.instance.isHiding){
+                        DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
+                    }
+                    else{
+                        PlayerManager.instance.isCaught = true;
+                        GetInRader();
+                        DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
+                        animator.SetTrigger("found");
+                        wSet = 0;
+                    }
                 }
             }
 
@@ -228,6 +231,16 @@ public class NPCScript : MonoBehaviour
  
         }
 
+    }
+    public void GetInRader(){
+        for(int i=0; i<dialogues.Length; i++){
+            if(dialogues[i].comment == "발견"){
+                StopCoroutine(randomDialogueCrt);
+                onRanDlg = false;
+                DialogueManager.instance.SetDialogue(dialogues[i]);
+                break;
+            }
+        }
     }
 
     void OnTriggerExit2D(Collider2D other) {

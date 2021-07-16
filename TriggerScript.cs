@@ -65,7 +65,7 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[3]);
                 nerd_ant.animator.SetTrigger("turn");
                 //CameraView(nerd_ant.transform);
-                yield return new WaitForSeconds(1.5f);
+                yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 yield return new WaitForSeconds(1f);

@@ -26,6 +26,7 @@ public class PlayerManager : MonoBehaviour
     //public string[] fallExceptList;
     //public bool fallDelay;//지형 겹쳐있을 때 내려가지지 않는 현상 방지
     public bool isHiding;
+    public bool isCaught;
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
     public Transform playerBody;
