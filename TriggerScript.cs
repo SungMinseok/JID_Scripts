@@ -19,7 +19,7 @@ public class TriggerScript : MonoBehaviour
     }
 
     public void Action(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
-        //Debug.Log("a");
+        Debug.Log("a");
         
         StartCoroutine(ActionCoroutine(trigNum, dialogues, poses));
 

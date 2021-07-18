@@ -8,10 +8,17 @@ public enum DoodadsType{
 public class DoodadsScript : MonoBehaviour
 {
     public DoodadsType type;
+    SpriteRenderer spriteRenderer;
     
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
 
+    void Start(){
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
+    void Cloak(){
+        
+    }
 
     
     void OnTriggerStay2D(Collider2D other) {
@@ -49,6 +56,7 @@ public class DoodadsScript : MonoBehaviour
             if(other.CompareTag("Player")){
 
                 PlayerManager.instance.isHiding = true;
+                
 
             }
         }
