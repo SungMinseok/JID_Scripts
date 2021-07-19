@@ -9,17 +9,68 @@ public class DoodadsScript : MonoBehaviour
 {
     public DoodadsType type;
     SpriteRenderer spriteRenderer;
+    Color defaultColor = new Color(1,1,1);
+    Color darkColor = new Color(0.3f,0.3f,0.3f);
+    Color color;
+    WaitForSeconds waitTime = new WaitForSeconds(0.01f);
+    //PlayerManager thePlayer;
     
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
 
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
+        //thePlayer = PlayerManager.instance;
     }
 
-    void Cloak(){
+    void Cloak(float _speed = 0.03f){
+        StopAllCoroutines();
+        StartCoroutine(CloakCoroutine(_speed));
+        //spriteRenderer.color = darkColor;
+        //PlayerManager.instance.SetAlpha(0.5f);
+    }
+    IEnumerator CloakCoroutine(float _speed){
+        //SpriteRenderer playerSr = PlayerManager.instance.GetComponent<Sp
+        color = spriteRenderer.color;
+        while(color.a >0.5f){
+            color.r -= _speed;
+            color.g -= _speed;
+            color.b -= _speed;
+            color.a -= _speed;
+            spriteRenderer.color = color;
+            
+            yield return waitTime;
+        }
+    }    
+    void Decloak(float _speed = 0.03f){
+        
+        StopAllCoroutines();
+        StartCoroutine(DecloakCoroutine(_speed));
+        //spriteRenderer.color = defaultColor;
+        //PlayerManager.instance.SetAlpha(1f);
+    }
+    IEnumerator DecloakCoroutine(float _speed){
+        color = spriteRenderer.color;
+        while(color.a <1f){
+            color.r += _speed;
+            color.g += _speed;
+            color.b += _speed;
+            color.a += _speed;
+            spriteRenderer.color = color;
+            yield return waitTime;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other){
+
+        if(type == DoodadsType.Cover){
+            
+            if(other.CompareTag("Player")){
+                Cloak();
+                PlayerManager.instance.isHiding = true;
+            }
+        }
         
     }
-
     
     void OnTriggerStay2D(Collider2D other) {
 
@@ -51,15 +102,15 @@ public class DoodadsScript : MonoBehaviour
                 }
             }
         }
-        else if(type == DoodadsType.Cover){
+        // else if(type == DoodadsType.Cover){
             
-            if(other.CompareTag("Player")){
+        //     if(other.CompareTag("Player")){
 
-                PlayerManager.instance.isHiding = true;
+        //         PlayerManager.instance.isHiding = true;
                 
 
-            }
-        }
+        //     }
+        // }
         
     }
     void OnTriggerExit2D(Collider2D other) {
@@ -79,6 +130,7 @@ public class DoodadsScript : MonoBehaviour
             if(other.CompareTag("Player")){
 
                 PlayerManager.instance.isHiding = false;
+                Decloak();
 
             }
         }

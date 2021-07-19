@@ -6,13 +6,18 @@ public class PlayerManager : MonoBehaviour
 {
 
     public static PlayerManager instance;
+    [Header("Set Status")]
+    [SerializeField] [Range(2f, 10f)] public float speed;
+    [SerializeField] [Range(10f, 50f)] public float jumpPower;
+    [SerializeField] [Range(1f, 20f)] public float gravityScale;
+
     [Header("Input Check")]
     public float wInput;
     public float hInput;
     public bool jumpInput, downInput, interactInput;
     [Space]
     public float wSet;
-    [Header("Status")]
+    [Header("States")]
     public bool isTalking;
     public bool isActing;
     public bool canMove;
@@ -27,9 +32,9 @@ public class PlayerManager : MonoBehaviour
     //public bool fallDelay;//지형 겹쳐있을 때 내려가지지 않는 현상 방지
     public bool isHiding;
     public bool isCaught;
-    [SerializeField] [Range(2f, 10f)] public float speed;
-    [SerializeField] [Range(10f, 50f)] public float jumpPower;
     public Transform playerBody;
+    public SpriteRenderer[] spriteRenderers;
+    Color tempColor = new Color(1,1,1,1);
     Vector2 defaultScale;
     public Rigidbody2D rb;
     public BoxCollider2D boxCollider2D;
@@ -210,7 +215,7 @@ public class PlayerManager : MonoBehaviour
         }
         else{
             
-            rb.gravityScale = 10f;
+            rb.gravityScale = gravityScale;
         }
 
 
@@ -303,6 +308,13 @@ public class PlayerManager : MonoBehaviour
                 //spriteRenderer.flipX = false;
                 playerBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
                 break;
+        }
+    }
+    public void SetAlpha(float amt){
+        
+        tempColor.a = amt;
+        for(int i=0;i<spriteRenderers.Length;i++){
+            spriteRenderers[i].color = tempColor;
         }
     }
 }
