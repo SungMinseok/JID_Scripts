@@ -177,8 +177,9 @@ public class NPCScript : MonoBehaviour
 
     IEnumerator SetRandomDialogueCoroutine(){
 
-        DialogueManager.instance.SetRandomDialogue(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
-        
+        DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
+        //randomDialogueCrt = DialogueManager.instance.StartCoroutine(SetRandomDialogueCoroutine_(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval));
+
         int temp = Random.Range(0,3);
         if(temp==0) yield return waitTime0;
         else if(temp==1) yield return waitTime1;
@@ -235,9 +236,10 @@ public class NPCScript : MonoBehaviour
     public void GetInRader(){
         for(int i=0; i<dialogues.Length; i++){
             if(dialogues[i].comment == "발견"){
-                StopCoroutine(randomDialogueCrt);
+                //StopCoroutine(randomDialogueCrt);
+                DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
                 onRanDlg = false;
-                DialogueManager.instance.SetDialogue(dialogues[i]);
+                DialogueManager.instance.SetDialogue_NPC(dialogues[i]);
                 break;
             }
         }

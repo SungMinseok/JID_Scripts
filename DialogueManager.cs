@@ -24,8 +24,10 @@ public class DialogueManager : MonoBehaviour
     public string curSentence;
     //public TextMeshPro text;
     bool revealTextFlag;
+    bool revealTextFlag_NPC;
     bool dialogueFlag;
     public bool canSkip;
+    public bool goSkip;
     
     void Awake()
     {
@@ -41,11 +43,21 @@ public class DialogueManager : MonoBehaviour
     {
         PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine1(dialogue));
+    }    
+
+    //글자 한번에 나오기.
+    public void SetDialogue_NPC(Dialogue dialogue)
+    {
+        //PlayerManager.instance.isTalking = true;
+        StartCoroutine(DialogueCoroutine_NPC(dialogue));
     }
-    public void SetRandomDialogue(string dialogueText,Transform talker,float duration, int interval){
-        Coroutine _randomDialogueCrt;
-        _randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-        talker.GetComponent<NPCScript>().randomDialogueCrt = _randomDialogueCrt;
+    public void SetRandomDialogue_NPC(string dialogueText,Transform talker,float duration, int interval){
+        //Coroutine _randomDialogueCrt;
+        //_randomDialogueCrt 
+        talker.GetComponent<NPCScript>().randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
+    }
+    public void StopRandomDialogue_NPC(Coroutine coroutine){
+        StopCoroutine(coroutine);
     }
 
     IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
@@ -62,7 +74,7 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.instance.canMove = true;
     }
 
-    IEnumerator DialogueCoroutine1(Dialogue dialogue, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
         PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
@@ -74,7 +86,8 @@ public class DialogueManager : MonoBehaviour
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
             curSentence = dialogue.sentences[i];
-            StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
+            if(!oneTime) StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
+             
             yield return new WaitUntil(()=>!revealTextFlag);
 
         }
@@ -83,46 +96,47 @@ public class DialogueManager : MonoBehaviour
         
         dialogueFlag= false;
         PlayerManager.instance.isTalking = false;
-#region 
-        // while (sentQue.Count > 0)
-        // {
-        //     curSentence = sentQue.Dequeue();
-        //     var tmp = dialogue.talker.GetChild(0).GetComponent<TextMeshProUGUI>();
-        //     tmp.text = curSentence;
-        //     //yield return new WaitForSeconds(0.001f);
-        //     yield return null;
-        //     //Debug.Log(dialogue.talker.GetChild(0).GetComponent<TextMeshProUGUI>().textInfo.characterCount);
-        //     //revealTextFlag = true;
-        //     StartCoroutine(RevealText(dialogue, tmp));
-        //     yield return new WaitUntil(()=>!revealTextFlag);
-        //     //yield return new WaitForSeconds(3f);
-        // }
-        // dialogue.talker.gameObject.SetActive(false);
-        #endregion
     }
-    IEnumerator DialogueCoroutine2(Dialogue dialogue, bool atOnce=true, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    IEnumerator DialogueCoroutine_NPC(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
-        //PlayerManager.instance.isTalking = true;
-        dialogueFlag= true;
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
-        
 
         for(int i=0; i<dialogue.sentences.Length;i++){
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
             curSentence = dialogue.sentences[i];
-            StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
-            yield return new WaitUntil(()=>!revealTextFlag);
+            if(!oneTime) StartCoroutine(RevealText_NPC(dialogue, tmp, typingSpeed, typingInterval));
+             
+            yield return new WaitUntil(()=>!revealTextFlag_NPC);
 
         }
 
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
         
-        dialogueFlag= false;
+    }
+    // IEnumerator DialogueCoroutine2(Dialogue dialogue, bool atOnce=true, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    // {
+    //     //PlayerManager.instance.isTalking = true;
+    //     dialogueFlag= true;
+    //     dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
+        
+
+    //     for(int i=0; i<dialogue.sentences.Length;i++){
+            
+    //         var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
+    //         curSentence = dialogue.sentences[i];
+    //         StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
+    //         yield return new WaitUntil(()=>!revealTextFlag);
+
+    //     }
+
+    //     dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        
+    //     dialogueFlag= false;
 
         
-        PlayerManager.instance.isTalking = false;
-    }
+    //     PlayerManager.instance.isTalking = false;
+    // }
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;
@@ -132,13 +146,21 @@ public class DialogueManager : MonoBehaviour
 
         tmp.text = curSentence;
         tmp.maxVisibleCharacters = 0;
+
+        canSkip = true;
         for(int i=0; i<totalVisibleCharacters+1; i++){
+            if(goSkip){
+                goSkip = false;
+                canSkip = false;
+                i = totalVisibleCharacters;
+            }
             tmp.maxVisibleCharacters = i;
             
             yield return _typingSpeed;
 
         }
         yield return _typingInterval;
+        canSkip =false;
         //Debug.Log("문장종료");
         revealTextFlag = false;
 #region 
@@ -162,6 +184,24 @@ public class DialogueManager : MonoBehaviour
 #endregion
 
     }
+    IEnumerator RevealText_NPC(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
+        revealTextFlag_NPC = true;
+        int totalVisibleCharacters = curSentence.Length;
+        WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
+        WaitForSeconds _typingInterval = new WaitForSeconds(typingInterval);
+        tmp.text = curSentence;
+        tmp.maxVisibleCharacters = 0;
+        for(int i=0; i<totalVisibleCharacters+1; i++){
+
+            tmp.maxVisibleCharacters = i;
+            
+            yield return _typingSpeed;
+
+        }
+        yield return _typingInterval;
+        revealTextFlag_NPC = false;
+
+    }
 
     IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
         talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
@@ -174,5 +214,11 @@ public class DialogueManager : MonoBehaviour
 
     }
 
-    IEnumerator each ;
+    void Update(){
+        if(canSkip){
+            if(Input.GetButtonDown("Interact")){
+                goSkip = true;
+            }
+        }
+    }
 }
