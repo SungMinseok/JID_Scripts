@@ -27,6 +27,7 @@ public class DialogueManager : MonoBehaviour
     bool revealTextFlag_NPC;
     bool dialogueFlag;
     public bool canSkip;
+    public bool canSkip2;
     public bool goSkip;
     
     void Awake()
@@ -159,8 +160,10 @@ public class DialogueManager : MonoBehaviour
             yield return _typingSpeed;
 
         }
-        yield return _typingInterval;
         canSkip =false;
+        canSkip2 = true;
+        yield return _typingInterval;
+        canSkip2 =false;
         //Debug.Log("문장종료");
         revealTextFlag = false;
 #region 
@@ -218,6 +221,12 @@ public class DialogueManager : MonoBehaviour
         if(canSkip){
             if(Input.GetButtonDown("Interact")){
                 goSkip = true;
+            }
+        }
+        else if(canSkip2){
+            
+            if(Input.GetButtonDown("Interact")){
+                revealTextFlag = false;
             }
         }
     }

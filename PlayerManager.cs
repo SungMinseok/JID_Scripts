@@ -11,6 +11,9 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
     [SerializeField] [Range(1f, 20f)] public float gravityScale;
 
+    [Header("Wearable")]
+    public SpriteRenderer helmet;
+    public SpriteRenderer wearables0;
     [Header("Input Check")]
     public float wInput;
     public float hInput;
@@ -151,9 +154,12 @@ public class PlayerManager : MonoBehaviour
             if(interactInput){
                 //animator.SetTrigger("shovelling");
                 animator.SetBool("shovelling1", true);
+                StartCoroutine(CheckAnimationState(0));
+                //wearables0.gameObject.SetActive(true);
             }
             else{
                 animator.SetBool("shovelling1", false);
+                //wearables0.gameObject.SetActive(false);
 
             }
         }
@@ -316,5 +322,24 @@ public class PlayerManager : MonoBehaviour
         for(int i=0;i<spriteRenderers.Length;i++){
             spriteRenderers[i].color = tempColor;
         }
+    }
+    IEnumerator CheckAnimationState(int animNum){
+        SpriteRenderer _spriteRenderer ;
+
+        switch(animNum){
+            case 0 : 
+                _spriteRenderer = wearables0;
+                break;
+            default :
+                _spriteRenderer = null;
+                break;
+        }
+
+        while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.833f){
+
+            if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
+            yield return null;
+        }
+        if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
     }
 }
