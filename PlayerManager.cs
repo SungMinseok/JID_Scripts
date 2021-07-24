@@ -14,6 +14,8 @@ public class PlayerManager : MonoBehaviour
     [Header("Wearable")]
     public SpriteRenderer helmet;
     public SpriteRenderer wearables0;
+    Coroutine animationCoroutine;
+    WaitForSeconds animDelay0 = new WaitForSeconds(0.833f);
     [Header("Input Check")]
     public float wInput;
     public float hInput;
@@ -35,8 +37,11 @@ public class PlayerManager : MonoBehaviour
     //public bool fallDelay;//지형 겹쳐있을 때 내려가지지 않는 현상 방지
     public bool isHiding;
     public bool isCaught;
+    public bool getDirt;
+    public DirtScript dirtTarget;
     public Transform playerBody;
     public SpriteRenderer[] spriteRenderers;
+    public SpriteRenderer[] spriteRenderers_back;
     Color tempColor = new Color(1,1,1,1);
     Vector2 defaultScale;
     public Rigidbody2D rb;
@@ -52,6 +57,7 @@ public class PlayerManager : MonoBehaviour
 
     public DebugManager d;
     public Animator animator;
+    public Animator animator_back;
 
     public Transform dialogueHolder;
     [Header("Debugging")]
@@ -70,10 +76,11 @@ public class PlayerManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
+    public AnimationClip animation0;
+    Color hideColor = new Color(1,1,1,0);
+    Color unhideColor = new Color(1,1,1,1);
     void Start()
     {
-
         //rb = GetComponent<Rigidbody2D>();
 
         //animator = GetComponent<Animator>();
@@ -152,13 +159,21 @@ public class PlayerManager : MonoBehaviour
             animator.SetBool("run", false);
             
             if(interactInput){
-                //animator.SetTrigger("shovelling");
-                animator.SetBool("shovelling1", true);
-                StartCoroutine(CheckAnimationState(0));
+                if(getDirt){
+
+                    //interactInput = false;
+                    animator.SetBool("shoveling1", true);
+                    if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
+                        if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
+                        Debug.Log("진행중이 아니여서 시작");
+                        animationCoroutine = StartCoroutine(CheckAnimationState(0));
+                        dirtTarget.GetDug();
+                    }
+                }
                 //wearables0.gameObject.SetActive(true);
             }
             else{
-                animator.SetBool("shovelling1", false);
+                animator.SetBool("shoveling1", false);
                 //wearables0.gameObject.SetActive(false);
 
             }
@@ -201,6 +216,8 @@ public class PlayerManager : MonoBehaviour
         if(getLadder){
             if(hInput!=0){
                 onLadder = true;
+                jumpDelay = false;
+                
             }
         }
         else{
@@ -217,14 +234,40 @@ public class PlayerManager : MonoBehaviour
                 isJumping = false;
                 rb.gravityScale = 0f;
                 rb.velocity = new Vector2(0, (speed*0.7f) * hInput  );
+                // animator.gameObject.SetActive(false);
+                // animator_back.gameObject.SetActive(true);
+                ToggleBodyMode(0);
             }
         }
         else{
             
             rb.gravityScale = gravityScale;
+            ToggleBodyMode(1);
+            //animator.gameObject.SetActive(true);
+            //animator_back.gameObject.SetActive(false);
         }
 
 
+    }
+    void ToggleBodyMode(int modeNum){
+        //tempColor.a = 0;
+        if(modeNum == 0 ){
+            for(int i=0; i<spriteRenderers.Length;i++){
+                spriteRenderers[i].color = hideColor;
+            }
+            for(int i=0; i<spriteRenderers_back.Length;i++){
+                spriteRenderers_back[i].color = unhideColor;
+            }
+        }
+        else{
+
+            for(int i=0; i<spriteRenderers.Length;i++){
+                spriteRenderers[i].color = unhideColor;
+            }
+            for(int i=0; i<spriteRenderers_back.Length;i++){
+                spriteRenderers_back[i].color = hideColor;
+            }
+        }
     }
     void Jump(float multiple = 1)
     {
@@ -242,7 +285,10 @@ public class PlayerManager : MonoBehaviour
             //yield return new WaitForSeconds(0.5f);
 
             yield return new WaitForSeconds(0.2f);
-            yield return new WaitUntil(() => isGrounded);
+            //if(!onLadder)
+                yield return new WaitUntil(() => isGrounded);
+            //else
+            //    jumpDelay = false;
             jumpDelay = false;
         }
     }
@@ -264,8 +310,10 @@ public class PlayerManager : MonoBehaviour
             if (!ladderDelay) getLadder = true;
         }
 
-        else if (other.CompareTag("Item"))
+        else if (other.CompareTag("Dirt"))
         {
+            getDirt = true;
+            dirtTarget = other.GetComponent<DirtScript>();
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
@@ -282,6 +330,11 @@ public class PlayerManager : MonoBehaviour
         if (other.CompareTag("Ladder"))
         {
             getLadder = false;
+        }
+        else if (other.CompareTag("Dirt"))
+        {
+            getDirt = false;
+            //UIManager.instance.clearPanel.SetActive(true);
         }
 
         else if (other.CompareTag("Cover"))
@@ -334,12 +387,22 @@ public class PlayerManager : MonoBehaviour
                 _spriteRenderer = null;
                 break;
         }
+        if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
 
-        while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.833f){
+        // while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime <= 0.8f){
+        //     yield return null;
+        //     Debug.Log("대기");
+        // }
 
-            if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
-            yield return null;
-        }
+        yield return animDelay0;
+        //진행중
+        // while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.833f){
+
+        //     if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
+        //     yield return null;
+        // }
         if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
+        Debug.Log("종료");
     }
+
 }

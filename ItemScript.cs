@@ -9,34 +9,55 @@ public enum ItemType{
 public class ItemScript : MonoBehaviour
 {
     public ItemType type;
-    [Header("Honey")]
-    public float honeyAmount;
-    [Header("Dirt")]
-    public float dirtAmount;
+    //[Header("Honey")]
+    public float amount;
+    //[Header("Dirt")]
+    //public float dirtAmount;
     Animator animator;
+    public BoxCollider2D itemCol;
+    //Vector2 itemVector;
+    bool getFlag;
 
     void Start(){
-        animator= transform.GetChild(0).GetComponent<Animator>();
+        if(GetComponent<Animator>()!=null)
+            animator= GetComponent<Animator>();
+        itemCol = GetComponent<BoxCollider2D>();
+        //itemVector = transform.GetChild(0).localPosition;
     }
 
     void OnTriggerStay2D(Collider2D other) {
             
+                    //Debug.Log("1");
             if(other.CompareTag("Player")){
-                if(type == ItemType.Honey){
-                    
-                    StartCoroutine(GetItem());
-                    DM("꿀 충전 : "+honeyAmount);
+                if(!getFlag) {
+                    getFlag = true;
+
+                // Debug.Log("2");
+                    if(type == ItemType.Honey){
+                    // Debug.Log("33");
+                        
+                        StartCoroutine(GetItem());
+                        DM("꿀 충전 : "+amount);
+                    }
+                    else if(type == ItemType.Dirt){
+                    // Debug.Log("33");
+                        
+                        StartCoroutine(GetItem());
+                        DM("흙 충전 : "+amount);
+                    }
                 }
             }
 
     }
 
+
     IEnumerator GetItem(){
-        animator.SetTrigger("got");
-        while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.8)
-        {
-            yield return null;
-        }
+        yield return null;
+        // animator.SetTrigger("got");
+        // while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.8)
+        // {
+        //     yield return null;
+        // }
         gameObject.SetActive(false);
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
