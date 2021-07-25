@@ -20,7 +20,11 @@ public class CheatManager : MonoBehaviour
         cheat.onEndEdit.AddListener(delegate { GetCheat(); });
 
     }
-
+    public void InputCheat(string inputCheat){
+        cheat.text = inputCheat;
+        GetCheat();
+        cheat.text = "";
+    }
 
     public void GetCheat()
 

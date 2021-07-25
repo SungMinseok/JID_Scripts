@@ -4,6 +4,7 @@ using UnityEngine;
 public enum DoodadsType{
     Ladder,
     Cover,
+    Trap,
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -67,6 +68,17 @@ public class DoodadsScript : MonoBehaviour
             if(other.CompareTag("Player")){
                 Cloak();
                 PlayerManager.instance.isHiding = true;
+            }
+        }
+        else if(type == DoodadsType.Trap){
+            if(other.CompareTag("Player")){
+                if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isDead){
+
+            Debug.Log("333");
+                    PlayerManager.instance.isDead = true;
+                    PlayerManager.instance.canMove = false;
+                    PlayerManager.instance.animator.SetBool("dead0",true);
+                }
             }
         }
         

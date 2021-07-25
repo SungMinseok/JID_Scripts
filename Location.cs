@@ -14,6 +14,10 @@ public enum LocationType{
     Trigger,
     Patrol_NPC,
 }
+public enum TargetType{
+    Player,
+    NPC,
+}
 [System.Serializable]
 public class Location : MonoBehaviour
 {
@@ -24,8 +28,9 @@ public class Location : MonoBehaviour
     //[Header("Teleport")]
     [Header("Teleport & Order")]
     public int doorNum;
+    public TargetType targetType;
      public Transform desLoc;
-    bool orderFlag;
+    public bool flipCheck;
     [Header("Dialogue")]
     //public int dialogueNum;
     public bool stopCheck;
@@ -70,6 +75,8 @@ public class Location : MonoBehaviour
                     if(other.CompareTag("Player")){
                         if(desLoc!=null){
                             PlayerManager.instance.transform.position = desLoc.position;
+                            PlayerManager.instance.hInput = 1;
+                            PlayerManager.instance.hInput = 0;
                             Debug.Log(desLoc.parent.transform.GetSiblingIndex());
                             SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                         }
@@ -82,16 +89,34 @@ public class Location : MonoBehaviour
                     if(preserveTrigger) locFlag = false;
                     break;
 
-                case LocationType.Order :
+                case LocationType.Order :   
+                    if(targetType == TargetType.Player){
+                        if(other.CompareTag("Player")){
 
-                    if(other.CompareTag("Player")){
-                        if(desLoc!=null){
-                            StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
-                        }
-                        else{
-                            DM("목적지 없음");
+                            //Debug.Log("1");
+                            if(desLoc!=null){
+                                StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
+                            }
+                            else{
+                                DM("목적지 없음");
+                            }
                         }
                     }
+                    else if(targetType == TargetType.NPC){
+                       // Debug.Log("2");
+                        if(other.CompareTag("NPC")){
+                            Debug.Log("2");
+                            if(desLoc!=null){
+                                StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
+                            }
+                            else{
+                                DM("목적지 없음");
+                            }
+                        }
+
+                    }
+                    
+                    
                     break;
                 case LocationType.Dialogue :
 
@@ -324,10 +349,16 @@ public class LocationEditor : Editor
             selected.doorNum = EditorGUILayout.IntField("문 번호",selected.doorNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }
         else if (selected.type == LocationType.Order)
         {
+            EditorGUILayout.LabelField("대상 선택");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("targetType"),GUIContent.none, true);
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
+            selected.stopCheck = EditorGUILayout.ToggleLeft("이동 후 정지", selected.stopCheck);
+            selected.flipCheck = EditorGUILayout.ToggleLeft("스프라이트 좌우 반전", selected.flipCheck);
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }
         else if (selected.type == LocationType.Dialogue)
         {

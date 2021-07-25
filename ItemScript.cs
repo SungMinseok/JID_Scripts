@@ -38,12 +38,18 @@ public class ItemScript : MonoBehaviour
                         
                         StartCoroutine(GetItem());
                         DM("꿀 충전 : "+amount);
+                        PlayerManager.instance.curHoneyAmount+=amount;
                     }
                     else if(type == ItemType.Dirt){
                     // Debug.Log("33");
                         
                         StartCoroutine(GetItem());
                         DM("흙 충전 : "+amount);
+                        
+                        PlayerManager.instance.curDirtAmount+=amount;
+                        if(PlayerManager.instance.curDirtAmount>PlayerManager.instance.maxDirtAmount){
+                            PlayerManager.instance.curDirtAmount=PlayerManager.instance.maxDirtAmount;
+                        }
                     }
                 }
             }

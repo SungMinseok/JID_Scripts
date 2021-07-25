@@ -225,10 +225,10 @@ public class NPCScript : MonoBehaviour
         }
         else{
                 
-            if(!(other.CompareTag("MainGround")||other.CompareTag("Ground"))){
+            // if(!(other.CompareTag("MainGround")||other.CompareTag("Ground"))){
                 
-                onTriggerCol = other.transform;
-            }
+            //     onTriggerCol = other.transform;
+            // }
  
         }
 

@@ -13,6 +13,8 @@ public class DebugManager : MonoBehaviour
     public Text buildInfoText;
     public Text buildDateText;
     public Animator animator;
+    Vector3 playerOriginPos;
+
     
 
 
@@ -36,6 +38,8 @@ public class DebugManager : MonoBehaviour
 
     void Start()
     {
+        
+        // playerOriginPos = PlayerManager.instance.transform.position;
         //animator = GetComponent<Animator>();
 #if UNITY_EDITOR || alpha
  		isDebugMode = true;
@@ -64,10 +68,17 @@ public class DebugManager : MonoBehaviour
                 
             }
             if(Input.GetKeyDown(KeyCode.F10)){
-                SceneManager.LoadScene("warehouse");
+                //SceneManager.LoadScene("warehouse");
+                PlayerManager.instance.RevivePlayer();
+                CheatManager.instance.InputCheat("t 0");
+                //ResetPlayerPos();
             }
         }
     }
+    // public void ResetPlayerPos(){
+    //     PlayerManager.instance.transform.position = playerOriginPos;
+    // }
+
 #endif
 
     public void PrintDebug(string text){

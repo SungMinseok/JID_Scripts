@@ -47,13 +47,14 @@ public class TriggerScript : MonoBehaviour
                 var nerd_ant = SceneController.instance.npcs[0];
 
                 CameraView(nerd_ant.transform);
-                yield return new WaitForSeconds(1f);
+                yield return wait1s;
                 nerd_ant.animator.SetTrigger("wakeUp");
-                yield return new WaitForSeconds(2f);
+                yield return wait2s;
                 //MapManager.instance.virtualCamera.Follow = ObjectController.instance.npcs[0].transform;
-                SetDialogue(dialogues[0]);
-                yield return new WaitForSeconds(2f);
                 nerd_ant.animator.SetTrigger("standUp");
+                SetDialogue(dialogues[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //yield return wait2s;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[1]);
                 nerd_ant.animator.SetTrigger("count");
@@ -68,7 +69,7 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                yield return new WaitForSeconds(1f);
+                yield return wait3s;
                 nerd_ant.gameObject.SetActive(false);
                 PlayerManager.instance.transform.position = poses[1].position;
                 SceneController.instance.SetConfiner(poses[1].parent.transform.GetSiblingIndex());
@@ -129,8 +130,10 @@ public class TriggerScript : MonoBehaviour
     }
 
     
-    public IEnumerator OrderCoroutine(Location location,Transform objCol,Transform desCol){                        
-        PlayerManager.instance.canMove = false;
+    public IEnumerator OrderCoroutine(Location location,Transform objCol,Transform desCol){    
+        
+            PlayerManager.instance.canMove = false;
+        
         if(desCol.position.x > objCol.position.x){
             PlayerManager.instance.wSet = 1;
         }
@@ -139,9 +142,29 @@ public class TriggerScript : MonoBehaviour
         }
         yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
         
-        PlayerManager.instance.canMove = true;
+        if(!location.stopCheck) PlayerManager.instance.canMove = true;
 
         if(location.preserveTrigger) location.locFlag = false;
+    }
+    public IEnumerator OrderCoroutine_NPC(Location location,NPCScript objCol,Transform desCol){    
+        
+        if(desCol.position.x > objCol.transform.position.x){
+            objCol.wSet = 1;
+            
+            //if(location.flipCheck) objCol.GetComponent<SpriteRenderer>().flipX = !objCol.GetComponent<SpriteRenderer>().flipX ;
+        }
+        else{
+            objCol.wSet = -1;
+            //if(location.flipCheck) objCol.GetComponent<SpriteRenderer>().flipX = !objCol.GetComponent<SpriteRenderer>().flipX ;
+        }
+
+        yield return wait1s;
+
+        
+        if(location.preserveTrigger) location.locFlag = false;
+        //yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
+        
+        //if(location.preserveTrigger) location.locFlag = false;
     }
     public void ForceToPatrol(NPCScript npc){
         StartCoroutine(NPCPatrolCoroutineToStart(npc));

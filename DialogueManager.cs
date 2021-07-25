@@ -29,6 +29,8 @@ public class DialogueManager : MonoBehaviour
     public bool canSkip;
     public bool canSkip2;
     public bool goSkip;
+
+    public Coroutine nowDialogueCoroutine;
     
     void Awake()
     {
@@ -75,6 +77,7 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.instance.canMove = true;
     }
 
+    //스킵 가능한 메시지 출력
     IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
         PlayerManager.instance.isTalking = true;
@@ -87,7 +90,7 @@ public class DialogueManager : MonoBehaviour
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
             curSentence = dialogue.sentences[i];
-            if(!oneTime) StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
+            if(!oneTime) nowDialogueCoroutine = StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
              
             yield return new WaitUntil(()=>!revealTextFlag);
 
@@ -98,6 +101,9 @@ public class DialogueManager : MonoBehaviour
         dialogueFlag= false;
         PlayerManager.instance.isTalking = false;
     }
+    
+    
+    //스킵 불가능한 NPC 자체 메시지 출력
     IEnumerator DialogueCoroutine_NPC(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
@@ -138,7 +144,10 @@ public class DialogueManager : MonoBehaviour
         
     //     PlayerManager.instance.isTalking = false;
     // }
+
+    //스킵 가능한 메시지 출력(플레이어 or 스토리 상 NPC)
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
+        goSkip = false;
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;
         WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
@@ -187,6 +196,8 @@ public class DialogueManager : MonoBehaviour
 #endregion
 
     }
+
+    //스킵 불가능한 NPC 자체 메시지 출력
     IEnumerator RevealText_NPC(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
         revealTextFlag_NPC = true;
         int totalVisibleCharacters = curSentence.Length;
@@ -227,6 +238,7 @@ public class DialogueManager : MonoBehaviour
             
             if(Input.GetButtonDown("Interact")){
                 revealTextFlag = false;
+                StopCoroutine(nowDialogueCoroutine);
             }
         }
     }

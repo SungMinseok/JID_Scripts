@@ -10,6 +10,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
     [SerializeField] [Range(1f, 20f)] public float gravityScale;
+    public float maxDirtAmount;
+    public float curDirtAmount;
+    public float maxHoneyAmount;
+    public float curHoneyAmount;
 
     [Header("Wearable")]
     public SpriteRenderer helmet;
@@ -37,7 +41,9 @@ public class PlayerManager : MonoBehaviour
     //public bool fallDelay;//지형 겹쳐있을 때 내려가지지 않는 현상 방지
     public bool isHiding;
     public bool isCaught;
+    public bool isDead;
     public bool getDirt;
+    public bool digFlag;
     public DirtScript dirtTarget;
     public Transform playerBody;
     public SpriteRenderer[] spriteRenderers;
@@ -136,6 +142,7 @@ public class PlayerManager : MonoBehaviour
         {
 
             animator.SetBool("jump", true);
+            animator.SetBool("down", false);
         }
 
 //좌우 이동 중
@@ -163,7 +170,9 @@ public class PlayerManager : MonoBehaviour
 
                     //interactInput = false;
                     animator.SetBool("shoveling1", true);
-                    if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
+                    //if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
+                    if(!digFlag){
+                        digFlag = true;
                         if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
                         Debug.Log("진행중이 아니여서 시작");
                         animationCoroutine = StartCoroutine(CheckAnimationState(0));
@@ -238,6 +247,16 @@ public class PlayerManager : MonoBehaviour
                 // animator_back.gameObject.SetActive(true);
                 ToggleBodyMode(0);
             }
+
+                
+            if(hInput!=0){
+                animator_back.speed = 1;
+            }
+            else{
+
+                animator_back.speed = 0;
+            }
+
         }
         else{
             
@@ -402,7 +421,24 @@ public class PlayerManager : MonoBehaviour
         //     yield return null;
         // }
         if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
+
+        switch(animNum){
+            case 0 : 
+                digFlag = false;
+                break;
+            default :
+                break;
+        }
+
+
+
         Debug.Log("종료");
+    }
+
+
+    public void RevivePlayer(){
+        PlayerManager.instance.canMove = true;
+        PlayerManager.instance.animator.SetBool("dead0", false);
     }
 
 }

@@ -1,15 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
     Vector3 playerOriginPos;
-    PlayerManager player;
+    PlayerManager thePlayer;
     //public GameObject clearPanel;
     public Transform effects;
     public bool onEffect;
+
+    public Image dirtGauge;
+    public TextMeshProUGUI honeyText;
     //WaitForSeconds waitTime = new WaitForSeconds(0.5f);
     void Awake()
     {
@@ -17,12 +22,18 @@ public class UIManager : MonoBehaviour
     }
     void Start()
     {
-        player = PlayerManager.instance;
-        playerOriginPos = player.transform.position;
+        thePlayer = PlayerManager.instance;
+        playerOriginPos = thePlayer.transform.position;
     }
+    void Update(){
 
-    public void ResetPos(){
-        player.transform.position = playerOriginPos;
+        if(dirtGauge.fillAmount != thePlayer.curDirtAmount / thePlayer.maxDirtAmount){
+            dirtGauge.fillAmount = thePlayer.curDirtAmount / thePlayer.maxDirtAmount;
+        }
+
+        if(honeyText.text != thePlayer.curHoneyAmount.ToString()){
+            honeyText.text = thePlayer.curHoneyAmount.ToString();
+        }
     }
 
     public void ActivateEffect(int num,float timer,bool bgOn = true){
