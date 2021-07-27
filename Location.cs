@@ -40,6 +40,7 @@ public class Location : MonoBehaviour
     public int trigNum;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
+    public Select[] selects_T;
     public bool waitKey;
     [Header("Patrol_NPC")]
      public Transform desLoc_Patrol_NPC;
@@ -391,6 +392,8 @@ public class LocationEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
             EditorGUILayout.LabelField("대화");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"),GUIContent.none, true);
+            EditorGUILayout.LabelField("선택");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("selects_T"),GUIContent.none, true);
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 

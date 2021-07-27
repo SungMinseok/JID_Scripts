@@ -4,23 +4,24 @@ using UnityEngine;
 using TMPro;
 
 [System.Serializable]
-public class Dialogue
+public class Select
 {
     [SerializeField]
     public string comment;
-    [SerializeField]
-    [Header("화자 설정 : 설정하지 않으면 주인공")]
-    public Transform talker;
+    //[SerializeField]
+    //[Header("화자 설정 : 설정하지 않으면 주인공")]
+    //public Transform talker;
     [SerializeField]
     [TextArea(2,2)]
-    public string[] sentences;
+    public string[] questions;
     
 }
-public class DialogueManager : MonoBehaviour
+public class SelectManager : MonoBehaviour
 {
-    public static DialogueManager instance;
+    public static SelectManager instance;
     // public Queue<string> sentQue;
     // public Queue<Dialogue> dialogueQue;
+    [Header("대화")]
     public string curSentence;
     //public TextMeshPro text;
     bool revealTextFlag;
@@ -30,6 +31,7 @@ public class DialogueManager : MonoBehaviour
     public bool canSkip2;
     public bool goSkip;
     
+    [Header("선택")]
 
     public Coroutine nowDialogueCoroutine;
     
@@ -37,6 +39,14 @@ public class DialogueManager : MonoBehaviour
     {
         instance = this;
     }
+
+    public void SetQuestion(){
+        
+    }
+
+
+
+
 
 
     public void SetFullDialogue(Dialogue[] dialogues,bool stopCheck = false)
