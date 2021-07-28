@@ -104,19 +104,27 @@ public class NPCScript : MonoBehaviour
         }
         if(!noFlip){
 
-            if(wSet>0){
-                spriteRenderer.flipX = false;
-                if(rader!=null){
-                    rader.transform.localScale = new Vector2(raderFlipX , rader.transform.localScale.y);
+            if (wSet != 0)   
+            {
+                animator.SetBool("walk", true);
+                if(wSet>0){
+                    spriteRenderer.flipX = false;
+                    if(rader!=null){
+                        rader.transform.localScale = new Vector2(raderFlipX , rader.transform.localScale.y);
+                    }
+                    //transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
                 }
-                //transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
+                else if(wSet<0){
+                    spriteRenderer.flipX = true;
+                    if(rader!=null){
+                        rader.transform.localScale = new Vector2(raderFlipX * -1 , rader.transform.localScale.y);
+                    }
+                    //transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
+                }
             }
-            else if(wSet<0){
-                spriteRenderer.flipX = true;
-                if(rader!=null){
-                    rader.transform.localScale = new Vector2(raderFlipX * -1 , rader.transform.localScale.y);
-                }
-                //transform.localScale = new Vector2(defaultScaleX * -1, transform.localScale.y);
+            else{
+                animator.SetBool("walk", false);
+
             }
         }
 

@@ -29,7 +29,8 @@ public class Location : MonoBehaviour
     [Header("Teleport & Order")]
     public int doorNum;
     public TargetType targetType;
-     public Transform desLoc;
+    public Transform desLoc;
+    public string orderDirection;
     public bool flipCheck;
     [Header("Dialogue")]
     //public int dialogueNum;
@@ -111,7 +112,8 @@ public class Location : MonoBehaviour
                                 StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
                             }
                             else{
-                                DM("목적지 없음");
+                                other.GetComponent<NPCScript>().wSet = orderDirection == "R" ? 1 : -1;
+                                //DM("목적지 없음");
                             }
                         }
 
@@ -350,6 +352,7 @@ public class LocationEditor : Editor
             selected.doorNum = EditorGUILayout.IntField("문 번호",selected.doorNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
+            EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }
         else if (selected.type == LocationType.Order)
@@ -358,7 +361,11 @@ public class LocationEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("targetType"),GUIContent.none, true);
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
             selected.stopCheck = EditorGUILayout.ToggleLeft("이동 후 정지", selected.stopCheck);
+            EditorGUILayout.Space();
+            selected.direction = EditorGUILayout.TextField("L/R 방향이동", selected.direction);
+            EditorGUILayout.Space();
             selected.flipCheck = EditorGUILayout.ToggleLeft("스프라이트 좌우 반전", selected.flipCheck);
+            EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }
         else if (selected.type == LocationType.Dialogue)
@@ -381,6 +388,7 @@ public class LocationEditor : Editor
 
             
             selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가", selected.stopCheck);
+            EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 
         }
@@ -395,6 +403,7 @@ public class LocationEditor : Editor
             EditorGUILayout.LabelField("선택");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("selects_T"),GUIContent.none, true);
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+            EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 
         }
