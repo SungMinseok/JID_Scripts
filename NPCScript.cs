@@ -5,6 +5,7 @@ using TMPro;
 
 public class NPCScript : MonoBehaviour
 {
+    
     [Header("자동 이동 모드")]
     public bool onJYD;
     public float JYDCoolDown;
