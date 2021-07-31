@@ -195,7 +195,7 @@ public class PlayerManager : MonoBehaviour
     {
 
         footPos = new Vector2(transform.position.x, (circleCollider2D.bounds.min.y));
-        footRadius = 0.05f;
+        footRadius = 0.075f;
 
         isGrounded = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
         //nowPlatform = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);

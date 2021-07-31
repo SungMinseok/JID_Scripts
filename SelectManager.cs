@@ -6,12 +6,7 @@ using TMPro;
 [System.Serializable]
 public class Select
 {
-    [SerializeField]
     public string comment;
-    //[SerializeField]
-    //[Header("화자 설정 : 설정하지 않으면 주인공")]
-    //public Transform talker;
-    [SerializeField]
     [TextArea(2,2)]
     public string[] questions;
     
@@ -21,8 +16,9 @@ public class SelectManager : MonoBehaviour
     public static SelectManager instance;
     // public Queue<string> sentQue;
     // public Queue<Dialogue> dialogueQue;
-    [Header("대화")]
-    public string curSentence;
+    //[Header("대화")]
+    public int curSelect;
+    //public string curQuestion;
     //public TextMeshPro text;
     bool revealTextFlag;
     bool revealTextFlag_NPC;
@@ -39,9 +35,24 @@ public class SelectManager : MonoBehaviour
     {
         instance = this;
     }
-
-    public void SetQuestion(){
+    void Start(){
         
+    }
+    public void ResetQuestionUI(){
+        for(int i=0;i<UIManager.instance.ui_select_grid.childCount;i++){
+            UIManager.instance.ui_select_grid.GetChild(i).gameObject.SetActive(false);
+        }
+    }
+
+    public void SetQuestion(Select select){
+        ResetQuestionUI();
+
+        for(int i=0;i<select.questions.Length;i++){
+            UIManager.instance.ui_select_grid.GetChild(i).gameObject.SetActive(true);
+        }
+
+        UIManager.instance.ui_select.SetActive(true);
+
     }
 
 
