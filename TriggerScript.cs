@@ -18,17 +18,50 @@ public class TriggerScript : MonoBehaviour
     void Start(){
     }
 
-    public void Action(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
-        Debug.Log("a");
+   //public void Action(Location location, Dialogue[] dialogues = null, Select[] selects = null, Transform[] poses = null){
+    public void Action(Location location){
+        //Debug.Log("트리거 발동" + trigNum);
+        // if(selects != null){
+        //     Debug.Log(selects[0].answers[0]);
+        // }
+        // else{
+        //     Debug.Log("선택지 없음");
+        // }
         
-        StartCoroutine(ActionCoroutine(trigNum, dialogues, poses));
+//StartCoroutine(ActionCoroutine(location, dialogues, selects, poses));
+        StartCoroutine(ActionCoroutine(location));
+        Debug.Log("44");
 
     }
 
-    IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues = null, Transform[] poses = null){
+    //IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues, Select[] selects, Transform[] poses){
+    IEnumerator ActionCoroutine(Location location){
         PlayerManager.instance.canMove =false;
 
-        switch(trigNum){
+        Dialogue[] dialogues = null;
+        Select[] selects = null;
+        Transform[] poses = null;
+
+        if(location.dialogues_T !=null){
+            dialogues = location.dialogues_T;
+        }
+        else{
+            dialogues = null;
+        }
+        if(location.selects_T!=null){
+            selects = location.selects_T;
+        }
+        // else{
+        //     selects = null;
+        // }
+        if(location.poses != null){
+            poses = location.poses;
+        }
+        else{
+            poses = null;
+        }
+
+        switch(location.trigNum){
 #region 1
             case 1 :
                 SetDialogue(dialogues[0]);
@@ -71,8 +104,8 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 yield return wait3s;
                 nerd_ant.gameObject.SetActive(false);
-                PlayerManager.instance.transform.position = poses[1].position;
-                SceneController.instance.SetConfiner(poses[1].parent.transform.GetSiblingIndex());
+                PlayerManager.instance.transform.position = poses[0].position;
+                SceneController.instance.SetConfiner(poses[0].parent.transform.GetSiblingIndex());
                 yield return new WaitForSeconds(0.1f);
                 CameraView(PlayerManager.instance.transform);
                 //MapManager.instance.virtualCamera.Follow = null;
@@ -90,6 +123,7 @@ public class TriggerScript : MonoBehaviour
                 PlayerManager.instance.Look("left");
                 break;
 #endregion
+
 #region 5
             case 5 :
             
@@ -100,10 +134,51 @@ public class TriggerScript : MonoBehaviour
                 CameraView(PlayerManager.instance.transform);
                 SceneController.instance.npcs[1].onPatrol = true;
                 SceneController.instance.npcs[2].onPatrol = true;
-                SceneController.instance.npcs[1].onRanDlg = true;
+                SceneController.instance.npcs[1].onRandomDialogue = true;
 
                 ForceToPatrol(SceneController.instance.npcs[1]);
                 ForceToPatrol(SceneController.instance.npcs[2]);
+
+
+                break;
+#endregion
+
+#region 6
+            case 6 :
+                
+                SetDialogue(dialogues[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[6]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[7]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetSelect(selects[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(GetSelect()==0){
+
+                    SetDialogue(dialogues[1]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    SetSelect(selects[1]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                    }
+                    else if(GetSelect()==1){
+                        
+                        SetDialogue(dialogues[2]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        SetDialogue(dialogues[3]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        SetDialogue(dialogues[4]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    }
+                }
+                else if(GetSelect()==1){
+                    
+                }
+
+
+
+
 
 
                 break;
@@ -113,6 +188,8 @@ public class TriggerScript : MonoBehaviour
         }
         
         yield return null;    
+
+        location.locFlag = false;
         
         PlayerManager.instance.isActing =false;    
         PlayerManager.instance.canMove =true;    
@@ -122,8 +199,25 @@ public class TriggerScript : MonoBehaviour
         
         DialogueManager.instance.SetDialogue(dialogue);
     }
+    public void SetSelect(Select select){
+        if(select!=null){
+            SelectManager.instance.SetSelect(select);
+
+        }
+        else{
+            DM("Error : no selection");
+        }
+    }
+    public int GetSelect(){
+        return SelectManager.instance.GetSelect();
+    }
     public void CameraView(Transform target, float speed=2){
-        SceneController.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
+        if(target!=null){
+            SceneController.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
+        }
+        else{
+            DM("Error : no pos");
+        }
     }
     public void ActivateEffect(int num,float timer,bool bgOn = true){
         UIManager.instance.ActivateEffect(num,timer,bgOn);
@@ -208,4 +302,5 @@ public class TriggerScript : MonoBehaviour
         }
     }
 
+    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 }

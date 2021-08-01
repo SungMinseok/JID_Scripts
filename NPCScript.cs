@@ -21,10 +21,10 @@ public class NPCScript : MonoBehaviour
     [Header("플레이어와 충돌 무시")]
     public bool noCollision;
     [Header("랜덤 대화 설정")]
-    public bool onRanDlg;
-    bool ranDlgFlag;
-    public float dlgDuration;
-    public int dlgInterval;
+    public bool onRandomDialogue;
+    bool randomDialogueFlag;
+    public float dialogueDuration;
+    public int dialogueInterval;
     WaitForSeconds waitTime0, waitTime1, waitTime2;
     public Dialogue[] dialogues;
     public Coroutine randomDialogueCrt;
@@ -69,10 +69,17 @@ public class NPCScript : MonoBehaviour
             raderFlipX = rader.transform.localScale.x;
         }
 
-        waitTime0 = new WaitForSeconds(dlgInterval-0.5f);
-        waitTime1 = new WaitForSeconds(dlgInterval);
-        waitTime2 = new WaitForSeconds(dlgInterval+0.5f);
-        // waitTime3 = new WaitForSeconds(ranDlgDuration);
+        waitTime0 = new WaitForSeconds(dialogueInterval-0.5f);
+        waitTime1 = new WaitForSeconds(dialogueInterval);
+        waitTime2 = new WaitForSeconds(dialogueInterval+0.5f);
+        // waitTime3 = new WaitForSeconds(randialogueDuration);
+
+        if(dialogues !=null){
+
+            if(TextLoader.instance!=null){
+                LoadText();
+            }
+        }
     }
 
     void Update(){
@@ -129,9 +136,9 @@ public class NPCScript : MonoBehaviour
             }
         }
 
-        if(onRanDlg){
-            if(!ranDlgFlag){
-                ranDlgFlag = true;
+        if(onRandomDialogue){
+            if(!randomDialogueFlag){
+                randomDialogueFlag = true;
                 StartCoroutine(SetRandomDialogueCoroutine());
             }
 
@@ -186,15 +193,15 @@ public class NPCScript : MonoBehaviour
 
     IEnumerator SetRandomDialogueCoroutine(){
 
-        DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval);
-        //randomDialogueCrt = DialogueManager.instance.StartCoroutine(SetRandomDialogueCoroutine_(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dlgDuration,dlgInterval));
+        DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval);
+        //randomDialogueCrt = DialogueManager.instance.StartCoroutine(SetRandomDialogueCoroutine_(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval));
 
         int temp = Random.Range(0,3);
         if(temp==0) yield return waitTime0;
         else if(temp==1) yield return waitTime1;
         else yield return waitTime2;
 
-        ranDlgFlag = false;
+        randomDialogueFlag = false;
 
     }
 
@@ -247,7 +254,7 @@ public class NPCScript : MonoBehaviour
             if(dialogues[i].comment == "발견"){
                 //StopCoroutine(randomDialogueCrt);
                 DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
-                onRanDlg = false;
+                onRandomDialogue = false;
                 DialogueManager.instance.SetDialogue_NPC(dialogues[i]);
                 break;
             }
@@ -260,5 +267,16 @@ public class NPCScript : MonoBehaviour
 
     }
  
+    public void LoadText(){
+        
+        if(dialogues!=null){
+            for(int i=0; i<dialogues.Length;i++){
+                for(int j=0; j<dialogues[i].sentences.Length;j++){
+                    int temp = int.Parse(dialogues[i].sentences[j]);
+                    dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                }
+            }
+        }
+    }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 }

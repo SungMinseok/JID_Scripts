@@ -6,13 +6,10 @@ using TMPro;
 [System.Serializable]
 public class Dialogue
 {
-    [SerializeField]
     public string comment;
-    [SerializeField]
     [Header("화자 설정 : 설정하지 않으면 주인공")]
     public Transform talker;
-    [SerializeField]
-    [TextArea(2,2)]
+    //[TextArea(2,2)]
     public string[] sentences;
     
 }
@@ -242,5 +239,16 @@ public class DialogueManager : MonoBehaviour
                 StopCoroutine(nowDialogueCoroutine);
             }
         }
+    }
+
+
+    public class DialogueData{
+        public int index { get; set; }
+        public string sentences { get; set; }
+    }
+
+    public void SetDialogueData(){
+        TextAsset dialogueData= Resources.Load<TextAsset>("Dialogue");
+        string content = dialogueData.text;
     }
 }

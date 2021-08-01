@@ -17,6 +17,10 @@ public class UIManager : MonoBehaviour
     [Header("UI_Select")]
     public GameObject ui_select;
     public Transform ui_select_grid;
+    public Color non_selected_color;
+    public Color selected_color;
+    public Sprite non_selected_sprite;
+    public Sprite selected_sprite;
     [Header("UI_Effects")]
     public Transform effects;
     public bool onEffect;

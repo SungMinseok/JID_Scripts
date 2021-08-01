@@ -28,6 +28,7 @@ public class PlayerManager : MonoBehaviour
     public float wSet;
     [Header("States")]
     public bool isTalking;
+    public bool isSelecting;
     public bool isActing;
     public bool canMove;
     public bool isGrounded;
@@ -439,6 +440,14 @@ public class PlayerManager : MonoBehaviour
     public void RevivePlayer(){
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.animator.SetBool("dead0", false);
+    }
+
+    public static void LockPlayer(){
+        PlayerManager.instance.canMove = false;
+    }
+    public static void UnlockPlayer(){
+        PlayerManager.instance.canMove = true;
+        PlayerManager.instance.isActing = false;
     }
 
 }

@@ -52,6 +52,10 @@ public class Location : MonoBehaviour
     void Start(){
         triggerScript = TriggerScript.instance;
         boxCollider2D = GetComponent<BoxCollider2D>();
+
+        if(TextLoader.instance!=null){
+            LoadText();
+        }
     }
     void OnTriggerStay2D(Collider2D other) {
             if(waitKey){
@@ -60,13 +64,24 @@ public class Location : MonoBehaviour
                     LocationScript(other);
                 }
             }
-            else if(!locFlag){
+            // else 
+            // if(!waitKey && !locFlag){
+            //     locFlag = true;
+            //     LocationScript(other);
+            // }
+    }
+    void OnTriggerEnter2D(Collider2D other) {
+            // if(waitKey){
+            //     if(Input.GetButton("Interact")&&!locFlag){
+            //         locFlag = true;
+            //         LocationScript(other);
+            //     }
+            // }
+            // else 
+            if(!waitKey && !locFlag){
                 locFlag = true;
                 LocationScript(other);
             }
-
-    
-
     }
     void LocationScript(Collider2D other){
         
@@ -158,19 +173,20 @@ public class Location : MonoBehaviour
                             if(trigNum>=0){
                                 if(!PlayerManager.instance.isActing){
                                     PlayerManager.instance.isActing = true;
-                                    if(dialogues_T!=null){
-                                        if(poses!=null){
+                                    triggerScript.Action(this);
+                                    // if(dialogues_T!=null){
+                                    //     if(poses!=null){
                                         
-                                            triggerScript.Action(trigNum, dialogues_T, poses);
-                                        }
-                                        else{
-                                            triggerScript.Action(trigNum, dialogues_T);
+                                    //         triggerScript.Action(trigNum, dialogues_T, poses);
+                                    //     }
+                                    //     else{
+                                    //         triggerScript.Action(trigNum, dialogues_T);
 
-                                        }
-                                    }
-                                    else{
-                                        triggerScript.Action(trigNum);
-                                    }
+                                    //     }
+                                    // }
+                                    // else{
+                                    //     triggerScript.Action(trigNum);
+                                    // }
                                 }
                                     
                             }
@@ -218,7 +234,35 @@ public class Location : MonoBehaviour
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
     
 
+    public void LoadText(){
+        
+        if(dialogues!=null){
+            for(int i=0; i<dialogues.Length;i++){
+                for(int j=0; j<dialogues[i].sentences.Length;j++){
+                    int temp = int.Parse(dialogues[i].sentences[j]);
+                    dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                }
+            }
+        }
 
+        if(dialogues_T!=null){
+            for(int i=0; i<dialogues_T.Length;i++){
+                for(int j=0; j<dialogues_T[i].sentences.Length;j++){
+                    int temp = int.Parse(dialogues_T[i].sentences[j]);
+                    dialogues_T[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                }
+            }
+        }
+        if(selects_T!=null){
+            for(int i=0; i<selects_T.Length;i++){
+                for(int j=0; j<selects_T[i].answers.Length;j++){
+                    int temp = int.Parse(selects_T[i].answers[j]);
+                    selects_T[i].answers[j] = TextLoader.instance.ApplyText(temp);
+                }
+            }
+        }
+
+    }
 
 
 
