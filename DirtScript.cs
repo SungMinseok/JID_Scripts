@@ -30,7 +30,7 @@ public class DirtScript : MonoBehaviour
     }
 
     public void GetDug(){
-        Debug.Log(curHp/maxHp);
+//        Debug.Log(curHp/maxHp);
         if(curHp>0){
             curHp--;
             if(curHp==0){

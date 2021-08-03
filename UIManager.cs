@@ -14,6 +14,10 @@ public class UIManager : MonoBehaviour
     public Image dirtGauge;
     public TextMeshProUGUI honeyText;
     [Header("UI_Inventory")]
+    public Transform itemSlotGrid;
+    public GameObject upArrow, downArrow;
+    public Sprite[] itemSprites;
+    public Sprite nullSprite;
     [Header("UI_Select")]
     public GameObject ui_select;
     public Transform ui_select_grid;

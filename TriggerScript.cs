@@ -30,7 +30,7 @@ public class TriggerScript : MonoBehaviour
         
 //StartCoroutine(ActionCoroutine(location, dialogues, selects, poses));
         StartCoroutine(ActionCoroutine(location));
-        Debug.Log("44");
+//        Debug.Log("44");
 
     }
 
@@ -267,7 +267,7 @@ public class TriggerScript : MonoBehaviour
     public IEnumerator NPCPatrolCoroutineToStart(NPCScript npc){ 
         WaitForSeconds _patrolInterval = new WaitForSeconds(npc.patrolInterval);
         while(npc.onPatrol && !npc.patrolFlag){
-            Debug.Log("NPCPatrolCoroutineToStart");
+//            Debug.Log("NPCPatrolCoroutineToStart");
             npc.patrolFlag = true;  
             //DM("도착지로 이동");         
             if(npc.desPos.position.x > npc.transform.position.x){

@@ -5,23 +5,25 @@ using UnityEngine;
 public enum ItemType{
     Honey,
     Dirt,
+    Item,
 }
 public class ItemScript : MonoBehaviour
 {
     public ItemType type;
     //[Header("Honey")]
     public float amount;
+    public int itemID;
     //[Header("Dirt")]
     //public float dirtAmount;
     Animator animator;
-    public BoxCollider2D itemCol;
+    //public BoxCollider2D itemCol;
     //Vector2 itemVector;
     bool getFlag;
 
     void Start(){
         if(GetComponent<Animator>()!=null)
             animator= GetComponent<Animator>();
-        itemCol = GetComponent<BoxCollider2D>();
+        //itemCol = GetComponent<BoxCollider2D>();
         //itemVector = transform.GetChild(0).localPosition;
     }
 
@@ -36,14 +38,14 @@ public class ItemScript : MonoBehaviour
                     if(type == ItemType.Honey){
                     // Debug.Log("33");
                         
-                        StartCoroutine(GetItem());
+                        StartCoroutine(GetItemAndRemoveCoroutine());
                         DM("꿀 충전 : "+amount);
                         PlayerManager.instance.curHoneyAmount+=amount;
                     }
                     else if(type == ItemType.Dirt){
                     // Debug.Log("33");
                         
-                        StartCoroutine(GetItem());
+                        StartCoroutine(GetItemAndRemoveCoroutine());
                         DM("흙 충전 : "+amount);
                         
                         PlayerManager.instance.curDirtAmount+=amount;
@@ -51,13 +53,21 @@ public class ItemScript : MonoBehaviour
                             PlayerManager.instance.curDirtAmount=PlayerManager.instance.maxDirtAmount;
                         }
                     }
+                    else if(type == ItemType.Item){
+                    // Debug.Log("33");
+                        
+                        StartCoroutine(GetItemAndRemoveCoroutine());
+                        DM(itemID+"번 아이템 "+amount+"개 획득");
+                        
+                        InventoryManager.instance.AddItem(itemID);
+                    }
                 }
             }
 
     }
 
 
-    IEnumerator GetItem(){
+    IEnumerator GetItemAndRemoveCoroutine(){
         yield return null;
         // animator.SetTrigger("got");
         // while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.8)

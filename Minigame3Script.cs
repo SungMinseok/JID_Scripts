@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MinigameManager : MonoBehaviour
+public class Minigame3Script : MonoBehaviour
 {
-    //public bool minigameFlag;
     // Start is called before the first frame update
     void Start()
     {

@@ -226,12 +226,12 @@ public class NPCScript : MonoBehaviour
                 if(!PlayerManager.instance.isCaught){
 
                     if(PlayerManager.instance.isHiding){
-                        DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
+                        //DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
                     }
                     else{
                         PlayerManager.instance.isCaught = true;
                         GetInRader();
-                        DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
+                        //DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
                         animator.SetTrigger("found");
                         wSet = 0;
                     }

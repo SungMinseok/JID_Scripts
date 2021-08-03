@@ -29,6 +29,7 @@ public class PlayerManager : MonoBehaviour
     [Header("States")]
     public bool isTalking;
     public bool isSelecting;
+    public bool isPlayingMinigame;
     public bool isActing;
     public bool canMove;
     public bool isGrounded;
@@ -175,7 +176,7 @@ public class PlayerManager : MonoBehaviour
                     if(!digFlag){
                         digFlag = true;
                         if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
-                        Debug.Log("진행중이 아니여서 시작");
+//                        Debug.Log("진행중이 아니여서 시작");
                         animationCoroutine = StartCoroutine(CheckAnimationState(0));
                         dirtTarget.GetDug();
                     }
@@ -291,7 +292,7 @@ public class PlayerManager : MonoBehaviour
     }
     void Jump(float multiple = 1)
     {
-        Debug.Log(multiple);
+//        Debug.Log(multiple);
         StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
         rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
@@ -316,7 +317,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (!ladderDelay)
         {
-            Debug.Log("33");
+//            Debug.Log("33");
             getLadder = false;
             ladderDelay = true;
             yield return new WaitForSeconds(0.5f);
@@ -433,7 +434,7 @@ public class PlayerManager : MonoBehaviour
 
 
 
-        Debug.Log("종료");
+//        Debug.Log("종료");
     }
 
 
@@ -442,10 +443,10 @@ public class PlayerManager : MonoBehaviour
         PlayerManager.instance.animator.SetBool("dead0", false);
     }
 
-    public static void LockPlayer(){
+    public void LockPlayer(){
         PlayerManager.instance.canMove = false;
     }
-    public static void UnlockPlayer(){
+    public void UnlockPlayer(){
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.isActing = false;
     }

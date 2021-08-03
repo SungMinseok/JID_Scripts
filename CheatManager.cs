@@ -52,6 +52,24 @@ public class CheatManager : MonoBehaviour
                         }
                     }
                     break;
+
+                case "additem":
+                    if(temp[1]!=null){
+                        int itemID = int.Parse(temp[1]);
+                        if(itemID < TextLoader.instance.dictionaryItemText.Count)
+                            InventoryManager.instance.AddItem(int.Parse(temp[1]));
+                        // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
+                            
+                        //     PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
+                        //     SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
+                        //     DM("Activate teleport to location "+temp[1].ToString());
+                        // }   
+                        // else{
+                        //     DM("Error : Empty location "+temp[1].ToString());
+
+                        // }
+                    }
+                    break;
             }
 
             cheat.text = "";

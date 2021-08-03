@@ -45,7 +45,7 @@ public class SelectManager : MonoBehaviour
 
     public void SetSelect(Select select){
 
-        PlayerManager.LockPlayer();
+        PlayerManager.instance.LockPlayer();
 
         ResetSelectUI();
 
@@ -89,7 +89,7 @@ public class SelectManager : MonoBehaviour
         
         UIManager.instance.ui_select.SetActive(false);
         
-        PlayerManager.UnlockPlayer();
+        PlayerManager.instance.UnlockPlayer();
     }
 
     void Update(){

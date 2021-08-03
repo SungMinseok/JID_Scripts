@@ -54,6 +54,7 @@ public class Location : MonoBehaviour
         boxCollider2D = GetComponent<BoxCollider2D>();
 
         if(TextLoader.instance!=null){
+            //Debug.Log(TextLoader.instance.transform.parent.name);
             LoadText();
         }
     }
@@ -94,7 +95,7 @@ public class Location : MonoBehaviour
                             PlayerManager.instance.transform.position = desLoc.position;
                             PlayerManager.instance.hInput = 1;
                             PlayerManager.instance.hInput = 0;
-                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
+//                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
                             SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                         }
                         else{
@@ -209,8 +210,8 @@ public class Location : MonoBehaviour
                     if(other.CompareTag("NPC")){
                         if(desLoc_Patrol_NPC!=null){
                             if(!other.GetComponent<NPCScript>().patrolFlag){
-                                DM("gogo");
-                                Debug.Log("1");
+//                                DM("gogo");
+//                                Debug.Log("1");
                                 StartCoroutine(TriggerScript.instance.NPCPatrolCoroutineToStart(other.GetComponent<NPCScript>()));
                             }   
                         }
@@ -244,7 +245,6 @@ public class Location : MonoBehaviour
                 }
             }
         }
-
         if(dialogues_T!=null){
             for(int i=0; i<dialogues_T.Length;i++){
                 for(int j=0; j<dialogues_T[i].sentences.Length;j++){

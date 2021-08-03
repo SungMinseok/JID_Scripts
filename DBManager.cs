@@ -6,6 +6,16 @@ using System;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
+    public List<Item> itemDataList;
+
+
+
+
+
+
+
+
+
     [System.Serializable]
     public class Data{
         public List<int> trigOverList = new List<int>();
@@ -45,8 +55,19 @@ public class DBManager : MonoBehaviour
 
     void Start()
     {
+        ApplyItemInfo();
+    }
+    
+    void ApplyItemInfo(){
+        var a = TextLoader.instance.dictionaryItemText;
 
+        for(int i=0; i<a.Count; i++){
+            
+            itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
+        }
     }
 
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+
+    
 }
