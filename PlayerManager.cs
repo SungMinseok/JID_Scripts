@@ -30,7 +30,7 @@ public class PlayerManager : MonoBehaviour
     public bool isTalking;
     public bool isSelecting;
     public bool isPlayingMinigame;
-    public bool isActing;
+    public bool isActing;   //트리거 로케이션 onTriggerStay 체크용 bool 값
     public bool canMove;
     public bool isGrounded;
     public bool isJumping;
@@ -168,18 +168,19 @@ public class PlayerManager : MonoBehaviour
             animator.SetBool("run", false);
             
             if(interactInput){
+                //InteractAction();
                 if(getDirt){
-
-                    //interactInput = false;
-                    animator.SetBool("shoveling1", true);
-                    //if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
-                    if(!digFlag){
-                        digFlag = true;
-                        if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
-//                        Debug.Log("진행중이 아니여서 시작");
-                        animationCoroutine = StartCoroutine(CheckAnimationState(0));
-                        dirtTarget.GetDug();
-                    }
+                    //if()
+                        //interactInput = false;
+                        animator.SetBool("shoveling1", true);
+                        //if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
+                        if(!digFlag){
+                            digFlag = true;
+                            if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
+    //                        Debug.Log("진행중이 아니여서 시작");
+                            animationCoroutine = StartCoroutine(CheckAnimationState(0));
+                            dirtTarget.GetDug();
+                        }
                 }
                 //wearables0.gameObject.SetActive(true);
             }

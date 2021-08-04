@@ -11,6 +11,7 @@ public class CheatManager : MonoBehaviour
     public static CheatManager instance;
     public InputField cheat;
     public Transform checkPoint;
+    public Transform MinigameParent;
     void Awake(){
         instance = this;
     }
@@ -18,6 +19,7 @@ public class CheatManager : MonoBehaviour
 
     {
         cheat.onEndEdit.AddListener(delegate { GetCheat(); });
+        
 
     }
     public void InputCheat(string inputCheat){
@@ -58,6 +60,23 @@ public class CheatManager : MonoBehaviour
                         int itemID = int.Parse(temp[1]);
                         if(itemID < TextLoader.instance.dictionaryItemText.Count)
                             InventoryManager.instance.AddItem(int.Parse(temp[1]));
+                        // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
+                            
+                        //     PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
+                        //     SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
+                        //     DM("Activate teleport to location "+temp[1].ToString());
+                        // }   
+                        // else{
+                        //     DM("Error : Empty location "+temp[1].ToString());
+
+                        // }
+                    }
+                    break;
+                case "minigame":
+                    if(temp[1]!=null){
+                        int minigameNum = int.Parse(temp[1]);
+                        if(minigameNum < MinigameParent.childCount && !PlayerManager.instance.isPlayingMinigame)
+                            MinigameParent.GetChild(minigameNum).gameObject.SetActive(true);
                         // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
                             
                         //     PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;

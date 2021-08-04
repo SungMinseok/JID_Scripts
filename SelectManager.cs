@@ -45,7 +45,7 @@ public class SelectManager : MonoBehaviour
 
     public void SetSelect(Select select){
 
-        PlayerManager.instance.LockPlayer();
+        //PlayerManager.instance.LockPlayer();
 
         ResetSelectUI();
 
@@ -89,7 +89,7 @@ public class SelectManager : MonoBehaviour
         
         UIManager.instance.ui_select.SetActive(false);
         
-        PlayerManager.instance.UnlockPlayer();
+        //PlayerManager.instance.UnlockPlayer();
     }
 
     void Update(){
@@ -111,7 +111,7 @@ public class SelectManager : MonoBehaviour
             }
 
 
-            if(Input.GetButtonDown("Interact")){
+            if(Input.GetButtonDown("Interact_OnlyKey")){
                 ExitSelect();
             }
 
