@@ -131,6 +131,7 @@ public class NPCScript : MonoBehaviour
                 }
             }
             else{
+                
                 animator.SetBool("walk", false);
 
             }

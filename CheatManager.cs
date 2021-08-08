@@ -57,6 +57,14 @@ public class CheatManager : MonoBehaviour
 
                 case "additem":
                     if(temp[1]!=null){
+
+                        if(temp[1]=="all"){
+                            for(int i=0;i<TextLoader.instance.dictionaryItemText.Count;i++){
+                                InventoryManager.instance.AddItem(i);
+                            }
+                            break;
+                        }
+
                         int itemID = int.Parse(temp[1]);
                         if(itemID < TextLoader.instance.dictionaryItemText.Count)
                             InventoryManager.instance.AddItem(int.Parse(temp[1]));
@@ -75,8 +83,12 @@ public class CheatManager : MonoBehaviour
                 case "minigame":
                     if(temp[1]!=null){
                         int minigameNum = int.Parse(temp[1]);
-                        if(minigameNum < MinigameParent.childCount && !PlayerManager.instance.isPlayingMinigame)
-                            MinigameParent.GetChild(minigameNum).gameObject.SetActive(true);
+                        if(minigameNum < MinigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
+                            var tempGame = MinigameParent.GetChild(minigameNum).gameObject;
+                            tempGame.SetActive(!tempGame.activeSelf);
+
+                        }
+
                         // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
                             
                         //     PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;

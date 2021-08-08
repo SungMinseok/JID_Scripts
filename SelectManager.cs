@@ -41,6 +41,8 @@ public class SelectManager : MonoBehaviour
             UIManager.instance.ui_select_grid.GetChild(i).gameObject.SetActive(false);
             UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = "";
         }
+        lastSelectedNum = 0;
+        curSelectedNum = 0;
     }
 
     public void SetSelect(Select select){

@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class Minigame2Script : MonoBehaviour
 {
-    [Header("Game Settings")]
+    [Header("게임 최대 시간")]
+    [Header("[Game Settings]")]
     public float maxTimerSet;
+    [Header("정답 맞췄을 때 추가 시간")]
     public float timerBonus;
+    [Header("정답 틀렸을 때 감소 시간")]
     public float timerPanelty;
 
 
