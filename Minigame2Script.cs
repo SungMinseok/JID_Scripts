@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+//Level, Stage  : Level이 상위 개념
 public class Minigame2Script : MonoBehaviour
 {
     [Header("게임 최대 시간")]

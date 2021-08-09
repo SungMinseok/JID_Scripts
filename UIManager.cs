@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     //Vector3 playerOriginPos;
     PlayerManager thePlayer;
     //public GameObject clearPanel;
+    public GameObject bgBlack;
     [Header("UI_States")]
     public Image dirtGauge;
     public TextMeshProUGUI honeyText;
@@ -28,6 +29,8 @@ public class UIManager : MonoBehaviour
     [Header("UI_Effects")]
     public Transform effects;
     public bool onEffect;
+    [Header("UI_GameOver")]
+    public GameObject ui_gameOver;
 
     //WaitForSeconds waitTime = new WaitForSeconds(0.5f);
     void Awake()

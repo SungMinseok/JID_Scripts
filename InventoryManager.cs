@@ -68,18 +68,18 @@ public class InventoryManager : MonoBehaviour
 
         // }
 
-        Debug.Log(pageNum + "번 페이지 출력");
+        //Debug.Log(pageNum + "번 페이지 출력");
 
         for(int i= pageNum * 7 ; i< (pageNum + 1) * 7 ;i++){
             if(i<itemList.Count){
 
                 theUI.itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theDB.itemDataList[itemList[i]].itemIcon;
-                Debug.Log(i+"번 아이템 출력");
+                //Debug.Log(i+"번 아이템 출력");
                 //UIManager.instance.ItemSlotGrid.GetChild(i).GetComponent<Image>().sprite = UIManager.instance.itemSprites[TextLoader.instance.dictionaryItemText[itemList[i]].resourceID];
             }
             else{
                 theUI.itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theUI.nullSprite;
-                Debug.Log(i+"번 스롯 아이템 없음");
+                //Debug.Log(i+"번 스롯 아이템 없음");
 
                 //Debug.Log(i);
             }
