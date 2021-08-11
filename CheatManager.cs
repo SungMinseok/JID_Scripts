@@ -11,6 +11,7 @@ public class CheatManager : MonoBehaviour
     public static CheatManager instance;
     public InputField cheat;
     public Transform checkPoint;
+    public Transform checkPoint_Special;
     public Transform MinigameParent;
     void Awake(){
         instance = this;
@@ -81,7 +82,7 @@ public class CheatManager : MonoBehaviour
                     }
                     break;
                 case "minigame":
-                    if(temp[1]!=null){
+                    if(temp[1]!=null && temp[1]!="2"){
                         int minigameNum = int.Parse(temp[1]);
                         if(minigameNum < MinigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
                             var tempGame = MinigameParent.GetChild(minigameNum).gameObject;
@@ -99,6 +100,10 @@ public class CheatManager : MonoBehaviour
                         //     DM("Error : Empty location "+temp[1].ToString());
 
                         // }
+                    }
+                    else if(temp[1]=="2"){
+                        PlayerManager.instance.MovePlayer(checkPoint_Special.GetChild(0).transform);
+                        SceneController.instance.SetSomeConfiner(MinigameParent.GetChild(2).GetComponent<Minigame4Script>().mapCollider);
                     }
                     break;
             }

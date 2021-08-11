@@ -451,5 +451,8 @@ public class PlayerManager : MonoBehaviour
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.isActing = false;
     }
+    public void MovePlayer(Transform destination){
+        PlayerManager.instance.transform.position = destination.position;
+    }
 
 }

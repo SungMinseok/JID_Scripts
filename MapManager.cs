@@ -18,6 +18,12 @@ public class MapManager : MonoBehaviour
     public void SetConfiner(int num){
         confiner2D.m_BoundingShape2D = mapBounds[num];
     }
+
+    public void SetSomeConfiner(Collider2D boundCollider){
+        
+        confiner2D.m_BoundingShape2D = boundCollider;
+    }
+
     void Start()
     {
     }

@@ -241,7 +241,8 @@ public class Location : MonoBehaviour
             for(int i=0; i<dialogues.Length;i++){
                 for(int j=0; j<dialogues[i].sentences.Length;j++){
                     int temp = int.Parse(dialogues[i].sentences[j]);
-                    dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                    //dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                    dialogues[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
                 }
             }
         }
@@ -250,7 +251,7 @@ public class Location : MonoBehaviour
                 for(int j=0; j<dialogues_T[i].sentences.Length;j++){
                     int temp = int.Parse(dialogues_T[i].sentences[j]);
                     //dialogues_T[i].sentences[j] = TextLoader.instance.ApplyText(temp);
-                    dialogues_T[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"text_kr");
+                    dialogues_T[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
                 }
             }
         }

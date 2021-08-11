@@ -8,7 +8,7 @@ public class CSVReader : MonoBehaviour
 {
     public static CSVReader instance;
     static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
-    static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
+    static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";      //@"\r\n|\n\r|\n|\r"
     static char[] TRIM_CHARS = { '\"' };
  
     List<Dictionary<string,object>> data_dialogue;// = CSVReader.Read ("data_dialogue");
@@ -41,6 +41,7 @@ public class CSVReader : MonoBehaviour
             var entry = new Dictionary<string, object>();
             for(var j=0; j < header.Length && j < values.Length; j++ ) {
                 string value = values[j];
+                value = value.Replace("\\n","\n");
                 value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
                 object finalvalue = value;
                 int n;
@@ -61,17 +62,23 @@ public class CSVReader : MonoBehaviour
         //object temp = index;
         object result = "null_text";
         string curLanguage = "text_kr";
-        
         switch(target){
             case "dialogue" :
-                if(data_dialogue[index].TryGetValue(data_dialogue[index][curLanguage].ToString(), out result)){
-                    result = data_dialogue[index][curLanguage];
+                if(data_dialogue.Count>index){
 
+                    result = data_dialogue[index][curLanguage];
+                    Debug.Log(index+":"+result);
                 }
-                else{
+        //Debug.Log(data_dialogue[index][curLanguage]);
+                //if(data_dialogue[index].TryGetValue(index.ToString(), out result)){
                     
-                Debug.Log("해당 아이디 없음");
-                }
+        //Debug.Log(data_dialogue[index][curLanguage]);
+
+               // }
+                // else{
+                    
+                // Debug.Log("해당 아이디 없음");
+                // }
                 break;
             default : 
                 Debug.Log("해당 아이디 없음");
