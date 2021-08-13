@@ -11,10 +11,12 @@ public class LoadManager : MonoBehaviour
     public Slider slider;
     public InputField inputText;
     public D2FogsNoiseTexPE fogsNoiseTexPE;
+    public GameObject[] mainBtns;
 
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 60;
         //StartCoroutine(Load());
         // #if !DEV_MODE
         //         inputText.gameObject.SetActive(false);
@@ -37,6 +39,10 @@ public class LoadManager : MonoBehaviour
 
     public void StartBtn()
     {
+        for(var i=0; i<mainBtns.Length;i++){
+            mainBtns[i].SetActive(false);
+        }
+
 
         StartCoroutine(Load());
     }
@@ -66,11 +72,11 @@ public class LoadManager : MonoBehaviour
 
                 asyncScene.allowSceneActivation = true;
 
-                while (fogsNoiseTexPE.Density >= 0)
-                {
-                    fogsNoiseTexPE.Density -= 0.04f;
-                    yield return null;
-                }
+                // while (fogsNoiseTexPE.Density >= 0)
+                // {
+                //     fogsNoiseTexPE.Density -= 0.04f;
+                //     yield return null;
+                // }
                 //}         
             }
             // else
