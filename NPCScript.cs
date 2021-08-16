@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 [RequireComponent (typeof (Rigidbody2D))]
+[RequireComponent (typeof (CircleCollider2D))]
 public class NPCScript : MonoBehaviour
 {
     
-    [Header("자동 이동 모드")]
+    [Header("Status")]
+    [SerializeField][Range(2f,10f)] public float speed = 2f;
+    [SerializeField][Range(10f,50f)] public float jumpPower = 10f;
+    
+    [Header("배회 모드")]
     public bool onJYD;
     public float JYDCoolDown;
+    [Tooltip("체크 시 멈추는 경우 제외")]
+    public bool isNonStop;
     bool JYDFlag;
-    [Header("정찰 모드")]
+    [Header("감시 모드")]
     public bool onPatrol;
     public bool patrolFlag;
     public float patrolInterval;
@@ -19,7 +26,7 @@ public class NPCScript : MonoBehaviour
     public Transform rader;
     float raderFlipX;
     [Header("플레이어와 충돌 무시")]
-    public bool noCollision;
+    public bool noCollision = true;
     [Header("랜덤 대화 설정")]
     public bool onRandomDialogue;
     bool randomDialogueFlag;
@@ -31,14 +38,14 @@ public class NPCScript : MonoBehaviour
 
     [Header("flip 사용 안함")]
     public bool noFlip;
+    [Space]
+    [Header("Debug")]
     
     public int patrolInput;
     public Collider2D lastPlatform;
     public bool isGrounded;
     public bool isJumping;
     public bool jumpDelay;
-    [SerializeField][Range(2f,10f)] public float speed;
-    [SerializeField][Range(10f,50f)] public float jumpPower;
     public Transform onTriggerCol;
 
     Rigidbody2D rb;
@@ -80,6 +87,12 @@ public class NPCScript : MonoBehaviour
                 LoadText();
             }
         }
+
+
+        //RigidBody2D 기본 세팅
+        rb.drag = 10;
+        rb.gravityScale = 10;
+        rb.freezeRotation = true;
     }
 
     void Update(){
