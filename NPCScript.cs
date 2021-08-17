@@ -38,6 +38,9 @@ public class NPCScript : MonoBehaviour
 
     [Header("flip 사용 안함")]
     public bool noFlip;
+    [Header("Sub things")]
+    public Transform talkCanvas;
+    public Transform interactiveMark;
     [Space]
     [Header("Debug")]
     
@@ -93,6 +96,10 @@ public class NPCScript : MonoBehaviour
         rb.drag = 10;
         rb.gravityScale = 10;
         rb.freezeRotation = true;
+
+        //Sub things 세팅
+        if(transform.childCount>=1) talkCanvas = transform.GetChild(0).GetChild(0);
+        if(transform.childCount>=2) interactiveMark = transform.GetChild(1).GetChild(0);
     }
 
     void Update(){

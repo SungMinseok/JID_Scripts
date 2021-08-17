@@ -59,12 +59,15 @@ public class Location : MonoBehaviour
         }
     }
     void OnTriggerStay2D(Collider2D other) {
+        if(other.CompareTag("Player")){
+
             if(waitKey){
                 if(Input.GetButton("Interact")&&!locFlag){
                     locFlag = true;
                     LocationScript(other);
                 }
             }
+        }
             // else 
             // if(!waitKey && !locFlag){
             //     locFlag = true;
@@ -79,10 +82,12 @@ public class Location : MonoBehaviour
             //     }
             // }
             // else 
+        if(other.CompareTag("Player")){
             if(!waitKey && !locFlag){
                 locFlag = true;
                 LocationScript(other);
             }
+        }
     }
     void LocationScript(Collider2D other){
         
