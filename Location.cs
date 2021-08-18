@@ -39,6 +39,7 @@ public class Location : MonoBehaviour
     public Dialogue[] dialogues;
     [Header("Trigger")]
     public int trigNum;
+    public Transform target;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
     public Select[] selects_T;
@@ -56,6 +57,13 @@ public class Location : MonoBehaviour
         if(TextLoader.instance!=null){
             //Debug.Log(TextLoader.instance.transform.parent.name);
             LoadText();
+        }
+
+        if(type==LocationType.Trigger){
+            if(target!=null){
+                this.transform.SetParent(target);
+                this.transform.localPosition = Vector3.zero;
+            }
         }
     }
     void OnTriggerStay2D(Collider2D other) {
@@ -446,6 +454,7 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.Trigger)
         {
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
+            selected.target = EditorGUILayout.ObjectField("오브젝트 부착", selected.target, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("장소");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
