@@ -14,13 +14,16 @@ public class CSVReader : MonoBehaviour
     List<Dictionary<string,object>> data_dialogue;// = CSVReader.Read ("data_dialogue");
     List<Dictionary<string,object>> data_select;// = CSVReader.Read ("data_select");
     List<Dictionary<string,object>> data_item;// = CSVReader.Read ("data_select");
+
+    public int itemAmount;
     void Awake() {
         instance = this;
 
         data_dialogue = CSVReader.Read ("data_dialogue");
         data_select = CSVReader.Read ("data_select");
-        data_item = CSVReader.Read ("data_select");
+        data_item = CSVReader.Read ("data_item");
         
+        itemAmount = data_item.Count;
         //print(data_dialogue[0]["text_kr"]);
     }
     public static List<Dictionary<string, object>> Read(string file)
@@ -79,6 +82,13 @@ public class CSVReader : MonoBehaviour
                     
                 // Debug.Log("해당 아이디 없음");
                 // }
+                break;            
+            case "select" :
+                if(data_select.Count>index){
+
+                    result = data_select[index][curLanguage];
+                    Debug.Log(index+":"+result);
+                }
                 break;
             default : 
                 Debug.Log("해당 아이디 없음");

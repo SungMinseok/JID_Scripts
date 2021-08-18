@@ -54,7 +54,7 @@ public class Location : MonoBehaviour
         triggerScript = TriggerScript.instance;
         boxCollider2D = GetComponent<BoxCollider2D>();
 
-        if(TextLoader.instance!=null){
+        if(CSVReader.instance!=null){
             //Debug.Log(TextLoader.instance.transform.parent.name);
             LoadText();
         }
@@ -272,7 +272,8 @@ public class Location : MonoBehaviour
             for(int i=0; i<selects_T.Length;i++){
                 for(int j=0; j<selects_T[i].answers.Length;j++){
                     int temp = int.Parse(selects_T[i].answers[j]);
-                    selects_T[i].answers[j] = TextLoader.instance.ApplyText(temp);
+                    //selects_T[i].answers[j] = TextLoader.instance.ApplyText(temp);
+                    selects_T[i].answers[j] = CSVReader.instance.GetIndexToString(temp,"select");
                 }
             }
         }

@@ -60,14 +60,16 @@ public class CheatManager : MonoBehaviour
                     if(temp[1]!=null){
 
                         if(temp[1]=="all"){
-                            for(int i=0;i<TextLoader.instance.dictionaryItemText.Count;i++){
+                            //for(int i=0;i<TextLoader.instance.dictionaryItemText.Count;i++){
+                            for(int i=0;i<CSVReader.instance.itemAmount;i++){
                                 InventoryManager.instance.AddItem(i);
                             }
                             break;
                         }
 
                         int itemID = int.Parse(temp[1]);
-                        if(itemID < TextLoader.instance.dictionaryItemText.Count)
+                        //if(itemID < TextLoader.instance.dictionaryItemText.Count)
+                        if(itemID <CSVReader.instance.itemAmount)
                             InventoryManager.instance.AddItem(int.Parse(temp[1]));
                         // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
                             

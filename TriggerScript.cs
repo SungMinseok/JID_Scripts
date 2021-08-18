@@ -183,6 +183,64 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion
+
+#region 7
+            case 7 :
+                
+                SetDialogue(dialogues[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[1]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[2]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[3]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[4]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[5]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[6]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[7]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[8]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                SetDialogue(dialogues[9]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+
+                CheatManager.instance.InputCheat("minigame 0");
+
+                // SetSelect(selects[0]);
+                // yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                // if(GetSelect()==0){
+
+                //     SetDialogue(dialogues[1]);
+                //     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //     SetSelect(selects[1]);
+                //     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                //     if(GetSelect()==0){
+                //     }
+                //     else if(GetSelect()==1){
+                        
+                //         SetDialogue(dialogues[2]);
+                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //         SetDialogue(dialogues[3]);
+                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //         SetDialogue(dialogues[4]);
+                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //     }
+                // }
+                // else if(GetSelect()==1){
+                    
+                // }
+
+
+
+
+
+
+                break;
+#endregion
             default : 
                 break;
         }
