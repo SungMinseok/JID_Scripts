@@ -13,7 +13,7 @@ public class CSVReader : MonoBehaviour
  
     List<Dictionary<string,object>> data_dialogue;// = CSVReader.Read ("data_dialogue");
     List<Dictionary<string,object>> data_select;// = CSVReader.Read ("data_select");
-    List<Dictionary<string,object>> data_item;// = CSVReader.Read ("data_select");
+    public List<Dictionary<string,object>> data_item;// = CSVReader.Read ("data_select");
 
     public int itemAmount;
     void Awake() {
@@ -70,7 +70,7 @@ public class CSVReader : MonoBehaviour
                 if(data_dialogue.Count>index){
 
                     result = data_dialogue[index][curLanguage];
-                    Debug.Log(index+":"+result);
+//                    Debug.Log(index+":"+result);
                 }
         //Debug.Log(data_dialogue[index][curLanguage]);
                 //if(data_dialogue[index].TryGetValue(index.ToString(), out result)){
@@ -87,7 +87,7 @@ public class CSVReader : MonoBehaviour
                 if(data_select.Count>index){
 
                     result = data_select[index][curLanguage];
-                    Debug.Log(index+":"+result);
+//                    Debug.Log(index+":"+result);
                 }
                 break;
             default : 

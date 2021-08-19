@@ -146,7 +146,8 @@ public class Minigame2Script : MonoBehaviour
         }
 
         gameObject.SetActive(false);
-
+        
+        MinigameManager.instance.SuccessMinigame();
 
 
 

@@ -10,6 +10,8 @@ public class TriggerScript : MonoBehaviour
     WaitForSeconds wait1s = new WaitForSeconds(1);
     WaitForSeconds wait2s = new WaitForSeconds(2);
     WaitForSeconds wait3s = new WaitForSeconds(3);
+
+    WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     
     void Awake()
     {
@@ -188,27 +190,32 @@ public class TriggerScript : MonoBehaviour
             case 7 :
                 
                 SetDialogue(dialogues[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[1]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[2]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[3]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[4]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[5]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[6]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[7]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[8]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[9]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
 
                 CheatManager.instance.InputCheat("minigame 0");
+                yield return new WaitUntil(()=>MinigameManager.instance.success);
+                SetDialogue(dialogues[10]);
+                yield return waitTalking;
+
+
 
                 // SetSelect(selects[0]);
                 // yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);

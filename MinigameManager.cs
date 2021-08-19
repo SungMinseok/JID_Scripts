@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MinigameManager : MonoBehaviour
-{
+{   
+    public static MinigameManager instance;
     //public bool minigameFlag;
-    // Start is called before the first frame update
+
+    public bool success, fail;
+
+    void Awake(){
+        instance = this;
+    }
     void Start()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public void SuccessMinigame(){
+        success = true;
     }
 }
