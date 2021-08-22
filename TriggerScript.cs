@@ -12,6 +12,7 @@ public class TriggerScript : MonoBehaviour
     WaitForSeconds wait3s = new WaitForSeconds(3);
 
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
+    WaitUntil waitSelecting = new WaitUntil(()=>!PlayerManager.instance.isSelecting);
     
     void Awake()
     {
@@ -214,6 +215,8 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
                 SetDialogue(dialogues[10]);
                 yield return waitTalking;
+                SetDialogue(dialogues[11]);
+                yield return waitTalking;
 
 
 
@@ -240,6 +243,31 @@ public class TriggerScript : MonoBehaviour
                 // else if(GetSelect()==1){
                     
                 // }
+
+
+
+
+
+
+                break;
+#endregion
+
+#region 8
+            case 8 :
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+                if(GetSelect()==0){
+                    SetDialogue(dialogues[2]);
+                    yield return waitTalking;
+                }
+                else if(GetSelect()==1){
+                    
+                }
 
 
 

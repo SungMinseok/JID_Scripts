@@ -44,6 +44,7 @@ public class Location : MonoBehaviour
     public Dialogue[] dialogues_T;
     public Select[] selects_T;
     public bool waitKey;
+    public int[] completedTriggerNums;
     [Header("Patrol_NPC")]
      public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
@@ -183,6 +184,18 @@ public class Location : MonoBehaviour
                     break;
                 case LocationType.Trigger :
                     if(!DBManager.instance.CheckTrigOver(trigNum)){
+
+                        //선행 트리거 실행 여부 확인
+                        if(completedTriggerNums.Length>0){
+                            for(int i=0;i<completedTriggerNums.Length;i++){
+                                if(DBManager.instance.CheckTrigOver(i)){
+                                    break;
+                                }
+                            }
+                            return;
+                        }
+
+
                         if(other.CompareTag("Player")){
                             if(trigNum>=0){
                                 if(!PlayerManager.instance.isActing){
@@ -455,6 +468,8 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.Trigger)
         {
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
+            EditorGUILayout.LabelField("선행 트리거 번호");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
             selected.target = EditorGUILayout.ObjectField("오브젝트 부착", selected.target, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("장소");
