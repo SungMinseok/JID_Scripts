@@ -145,6 +145,8 @@ public class DialogueManager : MonoBehaviour
 
     //스킵 가능한 메시지 출력(플레이어 or 스토리 상 NPC)
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
+
+        
         goSkip = false;
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;

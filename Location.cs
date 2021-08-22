@@ -74,6 +74,7 @@ public class Location : MonoBehaviour
                 if(Input.GetButton("Interact")&&!locFlag){
                     locFlag = true;
                     LocationScript(other);
+                    Debug.Log(trigNum +"번 트리거 실행 시도");
                 }
             }
         }
@@ -83,6 +84,16 @@ public class Location : MonoBehaviour
             //     LocationScript(other);
             // }
     }
+    // void OnTriggerExit2D(Collider2D other){
+        
+      
+    //     if(other.CompareTag("Player")){
+
+    //         if(waitKey){
+    //                 locFlag = false;
+    //         }
+    //     }
+    // }
     void OnTriggerEnter2D(Collider2D other) {
             // if(waitKey){
             //     if(Input.GetButton("Interact")&&!locFlag){
@@ -188,13 +199,21 @@ public class Location : MonoBehaviour
                         //선행 트리거 실행 여부 확인
                         if(completedTriggerNums.Length>0){
                             for(int i=0;i<completedTriggerNums.Length;i++){
-                                if(DBManager.instance.CheckTrigOver(i)){
-                                    break;
+
+                                for(int j=0;j<DBManager.instance.data.trigOverList.Count;j++){
+                                    Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인");
+                                    if(DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
+                                        Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인됨");
+                                        break;
+                                    }
                                 }
                             }
+                            Debug.Log(trigNum +"번 트리거 실행 실패 : 선행 트리거 실행 안됨");
+                            locFlag = false;
                             return;
                         }
 
+                        Debug.Log(trigNum +"번 트리거 실행 성공");
 
                         if(other.CompareTag("Player")){
                             if(trigNum>=0){

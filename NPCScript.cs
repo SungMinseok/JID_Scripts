@@ -16,6 +16,7 @@ public class NPCScript : MonoBehaviour
     public float JYDCoolDown;
     [Tooltip("체크 시 멈추는 경우 제외")]
     public bool isNonStop;
+    public bool isPaused;
     bool JYDFlag;
     [Header("감시 모드")]
     public bool onPatrol;
@@ -90,7 +91,8 @@ public class NPCScript : MonoBehaviour
                 LoadText();
             }
         }
-
+        //기본세팅
+        gameObject.tag = "NPC";
 
         //RigidBody2D 기본 세팅
         rb.drag = 10;
@@ -106,7 +108,7 @@ public class NPCScript : MonoBehaviour
 
         if(onJYD){
             wSet = patrolInput;
-            if(!JYDFlag){
+            if(!JYDFlag && !isPaused){
                 StartCoroutine(SetJYD());
             }
         } 
@@ -164,6 +166,15 @@ public class NPCScript : MonoBehaviour
             }
 
         }
+
+        if(talkCanvas.gameObject.activeSelf){
+            isPaused = true;
+            patrolInput = 0;
+            if(interactiveMark!=null) interactiveMark.gameObject.SetActive(false);
+        }
+        else{
+            isPaused = false;
+        }
     }
 
     void FixedUpdate(){
@@ -180,11 +191,25 @@ public class NPCScript : MonoBehaviour
 
         
     }
+    public void PauseNPC(){
+        patrolInput = 0;
+        isPaused = true;
+    }
+    public void UnpauseNPC(){
+        
+        isPaused = false;
+    }
 
     IEnumerator SetJYD(){
         //if(!patrolFlag){
             JYDFlag = true;  
-            patrolInput = Random.Range(0,3) - 1;//0 좌 1 정지 2 우
+            if(!isNonStop){
+                patrolInput = Random.Range(0,3) - 1;//0 좌 1 정지 2 우
+            }
+            else{
+                int ranNum = Random.Range(0,2);
+                patrolInput = ranNum == 1 ? -1 : 1;
+            }
             yield return new WaitForSeconds(JYDCoolDown);
             JYDFlag = false;  
 
