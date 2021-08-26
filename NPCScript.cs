@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-[RequireComponent (typeof (Rigidbody2D))]
+//[RequireComponent (typeof (Rigidbody2D))]
 [RequireComponent (typeof (CircleCollider2D))]
 public class NPCScript : MonoBehaviour
 {
+    [Header("Sub things")]
+    public Transform talkCanvas;
+    public Transform interactiveMark;
     
     [Header("Status")]
     [SerializeField][Range(2f,10f)] public float speed = 2f;
@@ -39,9 +42,6 @@ public class NPCScript : MonoBehaviour
 
     [Header("flip 사용 안함")]
     public bool noFlip;
-    [Header("Sub things")]
-    public Transform talkCanvas;
-    public Transform interactiveMark;
     [Space]
     [Header("Debug")]
     
@@ -87,7 +87,7 @@ public class NPCScript : MonoBehaviour
 
         if(dialogues !=null){
 
-            if(TextLoader.instance!=null){
+            if(CSVReader.instance!=null){
                 LoadText();
             }
         }
@@ -95,13 +95,16 @@ public class NPCScript : MonoBehaviour
         gameObject.tag = "NPC";
 
         //RigidBody2D 기본 세팅
-        rb.drag = 10;
-        rb.gravityScale = 10;
-        rb.freezeRotation = true;
+        if(rb!=null){
+
+            rb.drag = 10;
+            rb.gravityScale = 10;
+            rb.freezeRotation = true;
+        }
 
         //Sub things 세팅
-        if(transform.childCount>=1) talkCanvas = transform.GetChild(0).GetChild(0);
-        if(transform.childCount>=2) interactiveMark = transform.GetChild(1).GetChild(0);
+        if(talkCanvas !=null ) talkCanvas = talkCanvas.GetChild(0);
+        if(interactiveMark!=null) interactiveMark = interactiveMark.GetChild(0);
     }
 
     void Update(){
@@ -136,7 +139,7 @@ public class NPCScript : MonoBehaviour
 
             if (wSet != 0)   
             {
-                animator.SetBool("walk", true);
+                if(animator!=null) animator.SetBool("walk", true);
                 if(wSet>0){
                     spriteRenderer.flipX = false;
                     if(rader!=null){
@@ -154,7 +157,7 @@ public class NPCScript : MonoBehaviour
             }
             else{
                 
-                animator.SetBool("walk", false);
+                if(animator!=null) animator.SetBool("walk", false);
 
             }
         }
@@ -178,7 +181,8 @@ public class NPCScript : MonoBehaviour
     }
 
     void FixedUpdate(){
-        if(wSet!=0){
+        if(wSet!=0 && rb!=null){
+            
             rb.velocity = new Vector2(speed * wSet  , rb.velocity.y);
 
         }
@@ -278,7 +282,7 @@ public class NPCScript : MonoBehaviour
                         PlayerManager.instance.isCaught = true;
                         GetInRader();
                         //DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
-                        animator.SetTrigger("found");
+                        if(animator!=null) animator.SetTrigger("found");
                         wSet = 0;
                     }
                 }
@@ -319,7 +323,8 @@ public class NPCScript : MonoBehaviour
             for(int i=0; i<dialogues.Length;i++){
                 for(int j=0; j<dialogues[i].sentences.Length;j++){
                     int temp = int.Parse(dialogues[i].sentences[j]);
-                    dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                    //dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+                    dialogues[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
                 }
             }
         }

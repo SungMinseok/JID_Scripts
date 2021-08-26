@@ -61,6 +61,8 @@ public class SelectManager : MonoBehaviour
         HighlightSelectedAnswer(0);
 
         UIManager.instance.ui_select.SetActive(true);
+
+        PlayerManager.instance.ActivateWaitInteract();  //대화 스킵하다가 바로 선택해버리기 방지
         
         StartCoroutine(SelectSlotAnimationCoroutine(select));
 
@@ -113,7 +115,7 @@ public class SelectManager : MonoBehaviour
             }
 
 
-            if(Input.GetButtonDown("Interact_OnlyKey")){
+            if(Input.GetButtonDown("Interact_OnlyKey") && !PlayerManager.instance.isWaitingInteract){
                 ExitSelect();
             }
 

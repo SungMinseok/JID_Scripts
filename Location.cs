@@ -39,12 +39,15 @@ public class Location : MonoBehaviour
     public Dialogue[] dialogues;
     [Header("Trigger")]
     public int trigNum;
+    public string trigComment;
     public Transform target;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
     public Select[] selects_T;
     public bool waitKey;
     public int[] completedTriggerNums;
+    public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
+    public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     [Header("Patrol_NPC")]
      public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
@@ -71,7 +74,7 @@ public class Location : MonoBehaviour
         if(other.CompareTag("Player")){
 
             if(waitKey){
-                if(Input.GetButton("Interact")&&!locFlag){
+                if(Input.GetButton("Interact")&&!locFlag&&!PlayerManager.instance.isWaitingInteract){
                     locFlag = true;
                     LocationScript(other);
                     Debug.Log(trigNum +"번 트리거 실행 시도");
@@ -200,17 +203,19 @@ public class Location : MonoBehaviour
                         if(completedTriggerNums.Length>0){
                             for(int i=0;i<completedTriggerNums.Length;i++){
 
-                                for(int j=0;j<DBManager.instance.data.trigOverList.Count;j++){
-                                    Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인");
-                                    if(DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
-                                        Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인됨");
-                                        break;
-                                    }
+                                // for(int j=0;j<DBManager.instance.data.trigOverList.Count;j++){
+                                //     Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인");
+                                    
+                                // }
+                                if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
+                                    Debug.Log(completedTriggerNums[i] + "번 트리거 실행되지 않음");
+                                    locFlag = false;
+                                    return;
                                 }
                             }
-                            Debug.Log(trigNum +"번 트리거 실행 실패 : 선행 트리거 실행 안됨");
-                            locFlag = false;
-                            return;
+                            //Debug.Log(trigNum +"번 트리거 실행 실패 : 선행 트리거 실행 안됨");
+                            //locFlag = false;
+                            //return;
                         }
 
                         Debug.Log(trigNum +"번 트리거 실행 성공");
@@ -241,9 +246,9 @@ public class Location : MonoBehaviour
                             }
 
                                             
-                            if(!preserveTrigger){
-                                DBManager.instance.TrigOver(trigNum);
-                            }
+                            // if(!preserveTrigger){
+                            //     DBManager.instance.TrigOver(trigNum);
+                            // }
                         }
 
                     }
@@ -487,6 +492,7 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.Trigger)
         {
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
+            selected.trigComment =  EditorGUILayout.TextField("주석",selected.trigComment);
             EditorGUILayout.LabelField("선행 트리거 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
             selected.target = EditorGUILayout.ObjectField("오브젝트 부착", selected.target, typeof(Transform), true) as Transform;

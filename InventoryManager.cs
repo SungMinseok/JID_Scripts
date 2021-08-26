@@ -61,6 +61,11 @@ public class InventoryManager : MonoBehaviour
         itemList.Add(ID);
         RefreshInventory(curPage);
     }
+    public void RemoveItem(int ID){
+        itemList.Remove(ID);
+        RefreshInventory(curPage);
+
+    }
     public void RefreshInventory(int pageNum){
         var theUI = UIManager.instance;
         var theDB = DBManager.instance;

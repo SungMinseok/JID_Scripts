@@ -46,6 +46,7 @@ public class PlayerManager : MonoBehaviour
     public bool isDead;
     public bool getDirt;
     public bool digFlag;
+    public bool isWaitingInteract;
     public DirtScript dirtTarget;
     public Transform playerBody;
     public SpriteRenderer[] spriteRenderers;
@@ -370,6 +371,11 @@ public class PlayerManager : MonoBehaviour
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
         // }
+        
+        if(other.gameObject.CompareTag("Collider_NPC")){
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), boxCollider2D, true);
+        }
     }
     // void OnCollisionStay2D(Collision2D other)
     // {
@@ -454,5 +460,11 @@ public class PlayerManager : MonoBehaviour
     public void MovePlayer(Transform destination){
         PlayerManager.instance.transform.position = destination.position;
     }
-
+    public void ActivateWaitInteract(float waitTime = 1f){
+        isWaitingInteract = true;
+        Invoke("DeactivateWaitInteract",waitTime);
+    }
+    public void DeactivateWaitInteract(){
+        isWaitingInteract = false;
+    }
 }

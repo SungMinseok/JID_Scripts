@@ -148,17 +148,39 @@ public class TriggerScript : MonoBehaviour
 
 #region 6
             case 6 :
-                
-                SetDialogue(dialogues[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                SetDialogue(dialogues[6]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                SetDialogue(dialogues[7]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                SetSelect(selects[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                if(GetSelect()==0){
-
+                if(location.selectPhase == 0){
+                    SetDialogue(dialogues[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    SetDialogue(dialogues[6]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    SetDialogue(dialogues[7]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    SetSelect(selects[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                        location.selectPhase ++;
+                        SetDialogue(dialogues[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        SetSelect(selects[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                        if(GetSelect()==0){
+                        }
+                        else if(GetSelect()==1){
+                            location.selectPhase ++;
+                            SetDialogue(dialogues[2]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            SetDialogue(dialogues[3]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            SetDialogue(dialogues[4]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            InventoryManager.instance.AddItem(2);
+                        }
+                    }
+                    else if(GetSelect()==1){
+                        
+                    }
+                }
+                else if(location.selectPhase == 1){
                     SetDialogue(dialogues[1]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     SetSelect(selects[1]);
@@ -166,29 +188,29 @@ public class TriggerScript : MonoBehaviour
                     if(GetSelect()==0){
                     }
                     else if(GetSelect()==1){
-                        
+                        location.selectPhase ++;
                         SetDialogue(dialogues[2]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                         SetDialogue(dialogues[3]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                         SetDialogue(dialogues[4]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        InventoryManager.instance.AddItem(2);
                     }
                 }
-                else if(GetSelect()==1){
-                    
-                }
-
-
-
-
-
-
                 break;
 #endregion
 
 #region 7
             case 7 :
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                break;
+#endregion
+
+#region 8
+            case 8 :
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -252,8 +274,8 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region 8
-            case 8 :
+#region 9
+            case 9 :
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -262,6 +284,8 @@ public class TriggerScript : MonoBehaviour
                 SetSelect(selects[0]);
                 yield return waitSelecting;
                 if(GetSelect()==0){
+                    location.selectPhase ++;
+                    InventoryManager.instance.RemoveItem(6);
                     SetDialogue(dialogues[2]);
                     yield return waitTalking;
                 }
@@ -276,16 +300,133 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion
+
+#region 10
+            case 10 :
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                InventoryManager.instance.AddItem(6);
+                break;
+#endregion
+
+#region 11
+            case 11 :
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                InventoryManager.instance.AddItem(7);
+                break;
+#endregion
+
+#region 12
+            case 12 :   //술먹는 개미에게 말을 건다.
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                InventoryManager.instance.RemoveItem(8);
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetDialogue(dialogues[2]);
+                yield return waitTalking;
+                SetDialogue(dialogues[3]);
+                yield return waitTalking;
+
+                
+                CheatManager.instance.InputCheat("minigame 1");
+                yield return new WaitUntil(()=>MinigameManager.instance.success);
+                break;
+#endregion
+
+#region 13
+            case 13 :   //"로메슈제" 미니게임 성공 후 취한 개미 ( 선행 : 12 )
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                break;
+#endregion
+
+#region 14
+            case 14 :   //중독 수개미에게 말을 건다.
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetDialogue(dialogues[2]);
+                yield return waitTalking;
+                SetDialogue(dialogues[3]);
+                yield return waitTalking;
+                break;
+#endregion
+
+#region 15
+            case 15 :   //빛나는 양동이를 클릭한다.
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                CheatManager.instance.InputCheat("minigame 2");
+                yield return new WaitUntil(()=>MinigameManager.instance.success);
+
+                //성공 시 끝맵으로 이동.(FI/FO)
+                
+                break;
+#endregion
+
+#region 16
+            case 16 :   //"도망" 미니게임 성공 후, 노개미 만남
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetDialogue(dialogues[2]);
+                yield return waitTalking;
+                
+                break;
+#endregion
+
+#region 17
+            case 17 :   //"도망" 미니게임 성공 후, 수레개미 만남
+                
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                
+                break;
+#endregion
             default : 
                 break;
         }
         
         yield return null;    
 
-        location.locFlag = false;
+
         
         PlayerManager.instance.isActing =false;    
-        PlayerManager.instance.canMove =true;    
+        PlayerManager.instance.canMove =true;   
+
+        //yield return wait1s;
+        PlayerManager.instance.ActivateWaitInteract(0.1f);
+        location.locFlag = false; 
+
+        
+        if(!location.preserveTrigger){
+            if(location.selects_T.Length == location.selectPhase){
+                DBManager.instance.TrigOver(location.trigNum);
+                Debug.Log(location.trigNum +"번 실행 완료");
+            }
+            else{
+                
+                Debug.Log(location.trigNum +"번 실행 완료하였으나, 선택지가 종료되지 않아 다시 실행 가능");
+            }
+
+
+
+        }
+
+
     }
 
     public void SetDialogue(Dialogue dialogue){

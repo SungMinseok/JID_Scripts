@@ -41,5 +41,11 @@ public class MinigameManager : MonoBehaviour
         PlayerManager.instance.isPlayingMinigame = false;
         
     }
-
+    public void GiveReward(int gameNum){
+        switch(gameNum){
+            case 3 :
+                InventoryManager.instance.AddItem(18);
+                break;
+        }
+    }
 }
