@@ -58,13 +58,30 @@ public class UIManager : MonoBehaviour
         StartCoroutine(ActivateEffectCoroutine(num, timer, bgOn));
     }
     IEnumerator ActivateEffectCoroutine(int num,float timer,bool bgOn){
+        
+        var canvasGroup = effects.GetComponent<CanvasGroup>();
+        canvasGroup.alpha = 0;
+        
+        
+
         if(bgOn){
             effects.GetChild(0).gameObject.SetActive(true);
         }
-        var canvasGroup = effects.GetComponent<CanvasGroup>();
 
         effects.GetChild(num).gameObject.SetActive(true);
+
+
+        
+        while (canvasGroup.alpha <= 0.99f)
+        {
+            canvasGroup.alpha += 0.1f;
+            yield return null;
+        }
+
+        
         yield return new WaitForSeconds(timer);
+
+
 
         while (canvasGroup.alpha >= 0.11)
         {
