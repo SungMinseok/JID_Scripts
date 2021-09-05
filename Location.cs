@@ -32,6 +32,7 @@ public class Location : MonoBehaviour
     public Transform desLoc;
     public string orderDirection;
     public bool flipCheck;
+    public bool isLocked;
     [Header("Dialogue")]
     //public int dialogueNum;
     public bool stopCheck;
@@ -68,6 +69,11 @@ public class Location : MonoBehaviour
                 this.transform.SetParent(target);
                 this.transform.localPosition = Vector3.zero;
             }
+        }
+
+        
+        if(type!=LocationType.Trigger){
+            waitKey = false;
         }
     }
     void OnTriggerStay2D(Collider2D other) {
@@ -117,50 +123,56 @@ public class Location : MonoBehaviour
                     //Debug.Log("3");
             switch(type){
                 case LocationType.Teleport :
+                    if(!isLocked){
 
-                    if(other.CompareTag("Player")){
-                        if(desLoc!=null){
-                            PlayerManager.instance.transform.position = desLoc.position;
-                            PlayerManager.instance.hInput = 1;
-                            PlayerManager.instance.hInput = 0;
-//                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
-                            SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
-                        }
-                        else{
-
-                            DM("목적지 없음");
-                        }
-                    }
-
-                    if(preserveTrigger) locFlag = false;
-                    break;
-
-                case LocationType.Order :   
-                    if(targetType == TargetType.Player){
                         if(other.CompareTag("Player")){
-
-                            //Debug.Log("1");
                             if(desLoc!=null){
-                                StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
+                                PlayerManager.instance.transform.position = desLoc.position;
+                                PlayerManager.instance.hInput = 1;
+                                PlayerManager.instance.hInput = 0;
+    //                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
+                                SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                             }
                             else{
+
                                 DM("목적지 없음");
                             }
                         }
+
+                        if(preserveTrigger) locFlag = false;
                     }
-                    else if(targetType == TargetType.NPC){
-                       // Debug.Log("2");
-                        if(other.CompareTag("NPC")){
-                            Debug.Log("2");
-                            if(desLoc!=null){
-                                StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
-                            }
-                            else{
-                                other.GetComponent<NPCScript>().wSet = orderDirection == "R" ? 1 : -1;
-                                //DM("목적지 없음");
+
+                    break;
+
+                case LocationType.Order :   
+                    if(!isLocked){
+
+                        if(targetType == TargetType.Player){
+                            if(other.CompareTag("Player")){
+
+                                //Debug.Log("1");
+                                if(desLoc!=null){
+                                    StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
+                                }
+                                else{
+                                    DM("목적지 없음");
+                                }
                             }
                         }
+                        else if(targetType == TargetType.NPC){
+                        // Debug.Log("2");
+                            if(other.CompareTag("NPC")){
+                                Debug.Log("2");
+                                if(desLoc!=null){
+                                    StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
+                                }
+                                else{
+                                    other.GetComponent<NPCScript>().wSet = orderDirection == "R" ? 1 : -1;
+                                    //DM("목적지 없음");
+                                }
+                            }
 
+                        }
                     }
                     
                     
@@ -450,6 +462,8 @@ public class LocationEditor : Editor
             EditorGUILayout.Space();
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
+            selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
+            EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }
         else if (selected.type == LocationType.Order)
@@ -462,6 +476,8 @@ public class LocationEditor : Editor
             selected.direction = EditorGUILayout.TextField("L/R 방향이동", selected.direction);
             EditorGUILayout.Space();
             selected.flipCheck = EditorGUILayout.ToggleLeft("스프라이트 좌우 반전", selected.flipCheck);
+            EditorGUILayout.Space();
+            selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
         }

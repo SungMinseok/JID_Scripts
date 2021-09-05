@@ -5,7 +5,9 @@ using UnityEngine;
 public class MinigameManager : MonoBehaviour
 {   
     public static MinigameManager instance;
+    public Transform minigameParent;
     public GameObject successBtn;
+    public Transform[] minigameScriptTransforms;
     //public bool minigameFlag;
 
     public bool success, fail;
@@ -15,7 +17,10 @@ public class MinigameManager : MonoBehaviour
     }
     void Start()
     {
-
+        // for(int i=0;i<minigameParent.childCount;i++){
+        //     //if(i==minigameParent.childCount-1) break;
+        //     minigameScriptTransforms[i] = minigameParent.GetChild(i);
+        // }
     }
     
 #if UNITY_EDITOR || alpha
@@ -46,6 +51,23 @@ public class MinigameManager : MonoBehaviour
             case 3 :
                 InventoryManager.instance.AddItem(18);
                 break;
+        }
+    }
+    public void StartMinigame(int gameNum){
+        var nowMinigame = minigameScriptTransforms[gameNum];
+
+        if(gameNum!=2){
+            if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
+                
+                PlayerManager.instance.isPlayingMinigame = true;
+                nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
+
+            }
+
+        }
+        else if(gameNum==2){
+            PlayerManager.instance.MovePlayer(nowMinigame.GetComponent<Minigame2Script>().startPoint);
+            SceneController.instance.SetSomeConfiner(nowMinigame.GetComponent<Minigame2Script>().mapCollider);
         }
     }
 }

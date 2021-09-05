@@ -6,11 +6,12 @@ using System;
 //Level, Stage  : Level이 상위 개념
 //Level : 총 3레벨
 //Stage : 레벨 당 3스테이지
-public class Minigame3Script : MonoBehaviour
+public class Minigame1Script : MonoBehaviour
 {
-    [Header("허용 간격(0~1)")]
+    [Header("단계별 허용 간격(0.3/0.2/0.1)")]
     [Header("[Game Settings]")]
     public float[] acceptableIntervals;
+    [Header("단계별 속도(0.04/0.045/0.05)")]
     public float[] pointerSpeedPerStage;
     public RectTransform errorArea;
     public Animator mainBottle;
@@ -39,12 +40,12 @@ public class Minigame3Script : MonoBehaviour
 
     public Transform bubbleObjects;
     public Slider sliderPointer;
-    public bool isSliderUp;
-    Coroutine sliderMovementCoroutine;
 
     [Space]
 
-    [Header("Debug")]
+    [Header("[Debug]")]
+    public bool isSliderUp;
+    Coroutine sliderMovementCoroutine;
     Coroutine minigameCoroutine;
     public bool canSelect;
     public float randomCenterPosVar;

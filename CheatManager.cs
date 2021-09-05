@@ -12,7 +12,7 @@ public class CheatManager : MonoBehaviour
     public InputField cheat;
     public Transform checkPoint;
     public Transform checkPoint_Special;
-    public Transform MinigameParent;
+    public Transform minigameParent;
     void Awake(){
         instance = this;
     }
@@ -86,10 +86,10 @@ public class CheatManager : MonoBehaviour
                 case "minigame":
                     if(temp[1]!=null && temp[1]!="2"){
                         int minigameNum = int.Parse(temp[1]);
-                        if(minigameNum < MinigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
+                        if(minigameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
                             
                             PlayerManager.instance.isPlayingMinigame = true;
-                            var tempGame = MinigameParent.GetChild(minigameNum).gameObject;
+                            var tempGame = minigameParent.GetChild(minigameNum).gameObject;
                             tempGame.SetActive(!tempGame.activeSelf);
 
                         }
@@ -107,7 +107,13 @@ public class CheatManager : MonoBehaviour
                     }
                     else if(temp[1]=="2"){
                         PlayerManager.instance.MovePlayer(checkPoint_Special.GetChild(0).transform);
-                        SceneController.instance.SetSomeConfiner(MinigameParent.GetChild(2).GetComponent<Minigame4Script>().mapCollider);
+                        SceneController.instance.SetSomeConfiner(minigameParent.GetChild(2).GetComponent<Minigame2Script>().mapCollider);
+
+                        
+                            PlayerManager.instance.isPlayingMinigame = true;
+                            var tempGame = minigameParent.GetChild(2).gameObject;
+                            tempGame.SetActive(!tempGame.activeSelf);
+
                     }
                     break;
             }

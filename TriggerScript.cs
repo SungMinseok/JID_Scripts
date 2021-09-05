@@ -233,7 +233,8 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[9]);
                 yield return waitTalking;
 
-                CheatManager.instance.InputCheat("minigame 0");
+                //CheatManager.instance.InputCheat("minigame 0");
+                MinigameManager.instance.StartMinigame(0);
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
                 SetDialogue(dialogues[10]);
                 yield return waitTalking;
