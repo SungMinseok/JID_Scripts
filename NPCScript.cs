@@ -103,7 +103,11 @@ public class NPCScript : MonoBehaviour
         }
 
         //Sub things 세팅
-        if(talkCanvas !=null ) talkCanvas = talkCanvas.GetChild(0);
+        if(talkCanvas !=null ){
+            talkCanvas = talkCanvas.GetChild(0);
+            talkCanvas.gameObject.SetActive(false);
+        }
+
         if(interactiveMark!=null) interactiveMark = interactiveMark.GetChild(0);
     }
 

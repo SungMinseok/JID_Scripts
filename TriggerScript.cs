@@ -373,9 +373,21 @@ public class TriggerScript : MonoBehaviour
                 
                 break;
 #endregion
-
 #region 16
-            case 16 :   //"도망" 미니게임 성공 후, 노개미 만남
+            case 16 :   //"도망" 미니게임 성공 , 끝 맵으로 이동
+                
+                UIManager.instance.SetFadeOut();
+
+                yield return wait1s;
+                PlayerManager.instance.transform.position = poses[0].position;
+                SceneController.instance.SetSomeConfiner(poses[1].GetComponent<PolygonCollider2D>());
+                UIManager.instance.SetFadeIn();
+                
+                break;
+#endregion
+
+#region 17
+            case 17 :   //"도망" 미니게임 성공 후, 노개미 만남
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -387,8 +399,8 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region 17
-            case 17 :   //"도망" 미니게임 성공 후, 수레개미 만남
+#region 18
+            case 18 :   //"도망" 미니게임 성공 후, 수레개미 만남
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;

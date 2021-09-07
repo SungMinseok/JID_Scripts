@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 [System.Serializable]
@@ -11,11 +12,15 @@ public class Dialogue
     public Transform talker;
     //[TextArea(2,2)]
     public string[] sentences;
+    public bool isMonologue;
     
 }
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager instance;
+
+    public Sprite playerNormalTalkCanvas;
+    public Sprite playerMonologueTalkCanvas;
     // public Queue<string> sentQue;
     // public Queue<Dialogue> dialogueQue;
     public string curSentence;
@@ -26,6 +31,7 @@ public class DialogueManager : MonoBehaviour
     public bool canSkip;
     public bool canSkip2;
     public bool goSkip;
+
     
 
     public Coroutine nowDialogueCoroutine;
@@ -81,6 +87,15 @@ public class DialogueManager : MonoBehaviour
         PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
         if(dialogue.talker==null) dialogue.talker = PlayerManager.instance.transform;
+
+        if(dialogue.isMonologue){
+            dialogue.talker.GetChild(0).GetChild(0).GetComponent<Image>().sprite = playerMonologueTalkCanvas;
+        }
+        else{
+            if(dialogue.talker == PlayerManager.instance.transform)
+                dialogue.talker.GetChild(0).GetChild(0).GetComponent<Image>().sprite = playerNormalTalkCanvas;
+
+        }
             
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
 
@@ -153,8 +168,12 @@ public class DialogueManager : MonoBehaviour
         WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
         WaitForSeconds _typingInterval = new WaitForSeconds(typingInterval);
         //Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
-
-        tmp.text = curSentence;
+        if(dialogue.isMonologue){
+            tmp.text = "<color=white>" + curSentence;
+        }
+        else{
+            tmp.text = curSentence;
+        }
         tmp.maxVisibleCharacters = 0;
 
         canSkip = true;

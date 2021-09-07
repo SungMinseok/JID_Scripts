@@ -68,6 +68,10 @@ public class Location : MonoBehaviour
             if(target!=null){
                 this.transform.SetParent(target);
                 this.transform.localPosition = Vector3.zero;
+
+                if(target.GetComponent<NPCScript>() != null && target.GetComponent<NPCScript>().interactiveMark !=null && !DBManager.instance.CheckTrigOver(trigNum)){
+                    target.GetComponent<NPCScript>().interactiveMark.gameObject.SetActive(true);
+                }
             }
         }
 

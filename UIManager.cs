@@ -31,6 +31,8 @@ public class UIManager : MonoBehaviour
     public bool onEffect;
     [Header("UI_GameOver")]
     public GameObject ui_gameOver;
+    [Header("UI_Fader")]
+    public Animator ui_fader;
 
     //WaitForSeconds waitTime = new WaitForSeconds(0.5f);
     void Awake()
@@ -98,5 +100,12 @@ public class UIManager : MonoBehaviour
         canvasGroup.alpha = 1;
         
         onEffect = false;
+    }
+
+    public void SetFadeOut(float speed = 1f){
+        ui_fader.SetTrigger("fadeOut");
+    }
+    public void SetFadeIn(float speed = 1f){
+        ui_fader.SetTrigger("fadeIn");
     }
 }
