@@ -11,8 +11,8 @@ public class NPCScript : MonoBehaviour
     public Transform interactiveMark;
     
     [Header("Status")]
-    [SerializeField][Range(2f,10f)] public float speed = 2f;
-    [SerializeField][Range(10f,50f)] public float jumpPower = 10f;
+    [SerializeField][Range(1f,10f)] public float speed = 2f;
+    //[SerializeField][Range(10f,50f)] public float jumpPower = 10f;
     
     [Header("배회 모드")]
     public bool onJYD;
@@ -191,11 +191,11 @@ public class NPCScript : MonoBehaviour
 
         }
 
-        if(jumpInput){
-            if(!isJumping && !jumpDelay){
-                Jump();
-            }
-        }
+        // if(jumpInput){
+        //     if(!isJumping && !jumpDelay){
+        //         Jump();
+        //     }
+        // }
 
         
     }
@@ -227,12 +227,12 @@ public class NPCScript : MonoBehaviour
 
 
 
-    void Jump(float multiple = 1){
-        Debug.Log(multiple);
-        StartCoroutine(JumpDelay());
-        rb.velocity = Vector2.zero;
-        rb.AddForce(Vector2.up*(jumpPower*multiple),ForceMode2D.Impulse);
-    }
+    // void Jump(float multiple = 1){
+    //     Debug.Log(multiple);
+    //     StartCoroutine(JumpDelay());
+    //     rb.velocity = Vector2.zero;
+    //     rb.AddForce(Vector2.up*(jumpPower*multiple),ForceMode2D.Impulse);
+    // }
     IEnumerator JumpDelay(){
         if(!jumpDelay){
                 
