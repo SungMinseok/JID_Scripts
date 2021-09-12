@@ -43,7 +43,7 @@ public class NPCScript : MonoBehaviour
     [Header("flip 사용 안함")]
     public bool noFlip;
     [Space]
-    [Header("Debug")]
+    [Header("Debug ───────────────────")]
     
     public int patrolInput;
     public Collider2D lastPlatform;
