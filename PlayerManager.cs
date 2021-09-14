@@ -26,7 +26,7 @@ public class PlayerManager : MonoBehaviour
     public bool jumpInput, downInput, interactInput;
     [Space]
     public float wSet;
-    [Header("States")]
+    [Header("States────────────────────")]
     public bool isTalking;
     public bool isSelecting;
     public bool isPlayingMinigame;
@@ -39,14 +39,14 @@ public class PlayerManager : MonoBehaviour
     public bool ladderDelay;
     public bool onLadder;
     public bool isFalling;
-    //public string[] fallExceptList;
-    //public bool fallDelay;//지형 겹쳐있을 때 내려가지지 않는 현상 방지
-    public bool isHiding;
+    public bool isHiding;   //구조물에 숨은 상태 (경비개미에게 발각되지 않음)
     public bool isCaught;
     public bool isDead;
-    public bool getDirt;
+    public bool getDirt;    //플레이어가 흙더미 로케이션에 닿아있는 것 체크 (흙 팔 수 있는 상태)
     public bool digFlag;
     public bool isWaitingInteract;
+    public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
+    [Header("────────────────────────────")]
     public DirtScript dirtTarget;
     public Transform playerBody;
     public SpriteRenderer[] spriteRenderers;
@@ -69,7 +69,7 @@ public class PlayerManager : MonoBehaviour
     public Animator animator_back;
 
     public Transform dialogueHolder;
-    [Header("Debugging")]
+    [Header("Debug─────────────────────")]
     public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
     void Awake()
@@ -149,7 +149,7 @@ public class PlayerManager : MonoBehaviour
         }
 
 //좌우 이동 중
-        if (wInput != 0 || wSet != 0)   
+        if (wInput != 0 || wSet != 0 || isForcedRun)   
         {
             animator.SetBool("run", true);
             if (wInput > 0|| wSet > 0)

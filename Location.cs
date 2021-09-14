@@ -119,6 +119,7 @@ public class Location : MonoBehaviour
             if(!waitKey && !locFlag){
                 locFlag = true;
                 LocationScript(other);
+                Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");
             }
         }
     }
@@ -145,6 +146,10 @@ public class Location : MonoBehaviour
 
                         if(preserveTrigger) locFlag = false;
                     }
+                    else{
+                        locFlag = false;
+                    }
+                    
 
                     break;
 
@@ -177,6 +182,9 @@ public class Location : MonoBehaviour
                             }
 
                         }
+                    }
+                    else{
+                        locFlag = false;
                     }
                     
                     

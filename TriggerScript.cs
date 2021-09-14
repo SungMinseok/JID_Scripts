@@ -366,8 +366,17 @@ public class TriggerScript : MonoBehaviour
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
+
+                UIManager.instance.SetFadeOut();
+                yield return wait1s;
+                PlayerManager.instance.transform.position = poses[0].position;
+                SceneController.instance.SetSomeConfiner(poses[1].GetComponent<PolygonCollider2D>());
+                UIManager.instance.SetFadeIn();
+
                 CheatManager.instance.InputCheat("minigame 2");
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
+
+
 
                 //성공 시 끝맵으로 이동.(FI/FO)
                 
@@ -377,12 +386,13 @@ public class TriggerScript : MonoBehaviour
             case 16 :   //"도망" 미니게임 성공 , 끝 맵으로 이동
                 
                 UIManager.instance.SetFadeOut();
-
                 yield return wait1s;
+                
                 PlayerManager.instance.transform.position = poses[0].position;
                 SceneController.instance.SetSomeConfiner(poses[1].GetComponent<PolygonCollider2D>());
                 UIManager.instance.SetFadeIn();
                 
+                PlayerManager.instance.isForcedRun = false;
                 break;
 #endregion
 

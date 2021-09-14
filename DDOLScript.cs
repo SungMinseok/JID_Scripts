@@ -9,7 +9,7 @@ public class DDOLScript : MonoBehaviour
         Application.targetFrameRate = 60;
         QualitySettings.vSyncCount = 0;
         //DontDestroyOnLoad(this.gameObject);
-        Debug.Log(Application.targetFrameRate);
+//        Debug.Log(Application.targetFrameRate);
         
         if (null == instance)
         {

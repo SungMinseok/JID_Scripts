@@ -9,6 +9,7 @@ public class NPCScript : MonoBehaviour
     [Header("Sub things")]
     public Transform talkCanvas;
     public Transform interactiveMark;
+    public Transform mainBody;
     
     [Header("Status")]
     [SerializeField][Range(1f,10f)] public float speed = 2f;
@@ -29,6 +30,14 @@ public class NPCScript : MonoBehaviour
     //public float waitTime;
     public Transform rader;
     float raderFlipX;
+    [Header("미친 개미 모드")]
+    public bool onMadAnt;
+    //public bool onMode_FlyingMadAnt;
+    public GameObject[] bullets;
+    //public GameObject[] bulletsNonGravity;
+    public Vector2 bulletsPos;
+    //public Vector2 bulletsNonGravityPos;
+    //public float JYDCoolDown;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision = true;
     [Header("랜덤 대화 설정")]
@@ -109,6 +118,14 @@ public class NPCScript : MonoBehaviour
         }
 
         if(interactiveMark!=null) interactiveMark = interactiveMark.GetChild(0);
+
+        if(onMadAnt){
+            bulletsPos = bullets[0].transform.localPosition;
+            // for(int i=0 ; i<3; i++){
+            //     ThrowDownBullets();
+            // }
+        }
+
     }
 
     void Update(){
@@ -264,6 +281,10 @@ public class NPCScript : MonoBehaviour
         if(other.gameObject.CompareTag("NPC")){
             Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         }
+        
+        if(other.gameObject.CompareTag("Collider_Player")){
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
+        }
         // if(other.gameObject.CompareTag("Player")){
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         // }
@@ -331,6 +352,22 @@ public class NPCScript : MonoBehaviour
                     dialogues[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
                 }
             }
+        }
+    }
+    public void ThrowDownBullets(){
+        for(int i=0;i<bullets.Length;i++){
+
+            bullets[i].transform.localPosition = bulletsPos;
+            bullets[i].SetActive(true);
+            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(i-1,0) * (2), ForceMode2D.Impulse);
+        }
+    }
+    public void ThrowRightBullets(){
+        for(int i=0;i<bullets.Length;i++){
+
+            bullets[i].transform.localPosition = bulletsPos;
+            bullets[i].SetActive(true);
+            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(1,0) * (1), ForceMode2D.Impulse);
         }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
