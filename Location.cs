@@ -276,6 +276,14 @@ public class Location : MonoBehaviour
                         }
 
                     }
+
+                    //트리거 이미 실행됨.
+                    else{
+                        if(poses!=null){
+                            
+                            triggerScript.TrigIsDone(this);
+                        }
+                    }
                 
                     break;
 
@@ -523,9 +531,9 @@ public class LocationEditor : Editor
             selected.trigComment =  EditorGUILayout.TextField("주석",selected.trigComment);
             EditorGUILayout.LabelField("선행 트리거 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
-            selected.target = EditorGUILayout.ObjectField("오브젝트 부착", selected.target, typeof(Transform), true) as Transform;
+            selected.target = EditorGUILayout.ObjectField("트리거 부착", selected.target, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("장소");
+            EditorGUILayout.LabelField("오브젝트");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
             EditorGUILayout.LabelField("대화");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"),GUIContent.none, true);

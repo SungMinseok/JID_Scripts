@@ -21,7 +21,7 @@ public class TriggerScript : MonoBehaviour
     void Start(){
     }
 
-   //public void Action(Location location, Dialogue[] dialogues = null, Select[] selects = null, Transform[] poses = null){
+   //public void Action(Location location, Dialogue[] dialogues = null, Select[] selects = null, Transform[] objects = null){
     public void Action(Location location){
         //Debug.Log("트리거 발동" + trigNum);
         // if(selects != null){
@@ -31,19 +31,19 @@ public class TriggerScript : MonoBehaviour
         //     Debug.Log("선택지 없음");
         // }
         
-//StartCoroutine(ActionCoroutine(location, dialogues, selects, poses));
+//StartCoroutine(ActionCoroutine(location, dialogues, selects, objects));
         StartCoroutine(ActionCoroutine(location));
 //        Debug.Log("44");
 
     }
 
-    //IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues, Select[] selects, Transform[] poses){
+    //IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues, Select[] selects, Transform[] objects){
     IEnumerator ActionCoroutine(Location location){
         PlayerManager.instance.canMove =false;
 
         Dialogue[] dialogues = null;
         Select[] selects = null;
-        Transform[] poses = null;
+        Transform[] objects = null;
 
         if(location.dialogues_T !=null){
             dialogues = location.dialogues_T;
@@ -58,10 +58,10 @@ public class TriggerScript : MonoBehaviour
         //     selects = null;
         // }
         if(location.poses != null){
-            poses = location.poses;
+            objects = location.poses;
         }
         else{
-            poses = null;
+            objects = null;
         }
 
         switch(location.trigNum){
@@ -94,7 +94,7 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[1]);
                 nerd_ant.animator.SetTrigger("count");
-                //CameraView(poses[0]);
+                //CameraView(objects[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[2]);
                 nerd_ant.animator.SetTrigger("sweat");
@@ -107,8 +107,8 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 yield return wait3s;
                 nerd_ant.gameObject.SetActive(false);
-                PlayerManager.instance.transform.position = poses[0].position;
-                SceneController.instance.SetConfiner(poses[0].parent.transform.GetSiblingIndex());
+                PlayerManager.instance.transform.position = objects[0].position;
+                SceneController.instance.SetConfiner(objects[0].parent.transform.GetSiblingIndex());
                 yield return new WaitForSeconds(0.1f);
                 CameraView(PlayerManager.instance.transform);
                 //MapManager.instance.virtualCamera.Follow = null;
@@ -130,7 +130,7 @@ public class TriggerScript : MonoBehaviour
 #region 5
             case 5 :
             
-                CameraView(poses[0]);
+                CameraView(objects[0]);
                 SceneController.instance.npcs[1].gameObject.SetActive(true);
                 SceneController.instance.npcs[2].gameObject.SetActive(true);
                 yield return wait3s;
@@ -211,6 +211,8 @@ public class TriggerScript : MonoBehaviour
 
 #region 8
             case 8 :
+            
+                CameraView(objects[0]);
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -242,6 +244,7 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
 
 
+                CameraView(PlayerManager.instance.transform);
 
                 // SetSelect(selects[0]);
                 // yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
@@ -363,15 +366,19 @@ public class TriggerScript : MonoBehaviour
 
 #region 15
             case 15 :   //빛나는 양동이를 클릭한다.
-                
+                objects[2].gameObject.SetActive(false);
+                objects[3].gameObject.SetActive(true);
+                yield return wait1s;
+
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
 
                 UIManager.instance.SetFadeOut();
                 yield return wait1s;
-                PlayerManager.instance.transform.position = poses[0].position;
-                SceneController.instance.SetSomeConfiner(poses[1].GetComponent<PolygonCollider2D>());
+                PlayerManager.instance.transform.position = objects[0].position;
+                SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
                 UIManager.instance.SetFadeIn();
+                objects[4].gameObject.SetActive(false);
 
                 CheatManager.instance.InputCheat("minigame 2");
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
@@ -388,8 +395,8 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.SetFadeOut();
                 yield return wait1s;
                 
-                PlayerManager.instance.transform.position = poses[0].position;
-                SceneController.instance.SetSomeConfiner(poses[1].GetComponent<PolygonCollider2D>());
+                PlayerManager.instance.transform.position = objects[0].position;
+                SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
                 UIManager.instance.SetFadeIn();
                 
                 PlayerManager.instance.isForcedRun = false;
@@ -405,6 +412,8 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 SetDialogue(dialogues[2]);
                 yield return waitTalking;
+                UIManager.instance.SetFadeOut();
+                yield return wait1s;
                 
                 break;
 #endregion
@@ -416,6 +425,8 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 SetDialogue(dialogues[1]);
                 yield return waitTalking;
+                UIManager.instance.SetFadeOut();
+                yield return wait1s;
                 
                 break;
 #endregion
@@ -451,6 +462,33 @@ public class TriggerScript : MonoBehaviour
 
 
     }
+    public void TrigIsDone(Location location){
+
+        Transform[] objects = null;
+
+        if(location.poses != null){
+            objects = location.poses;
+        }
+        else{
+            objects = null;
+        }
+
+        switch(location.trigNum){
+            case 15 :
+                objects[2].gameObject.SetActive(false);
+                objects[3].gameObject.SetActive(true);
+                objects[4].gameObject.SetActive(false);
+
+                break;
+
+            default :
+                break;
+        }
+
+        Debug.Log(location.trigNum + "(" + location.trigComment + ") 실행 처리됨");
+
+    }
+    
 
     public void SetDialogue(Dialogue dialogue){
         

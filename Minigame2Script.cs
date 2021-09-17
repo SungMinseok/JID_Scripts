@@ -65,11 +65,10 @@ public class Minigame2Script : MonoBehaviour
             }
 
             
-            //flyingBottle.Translate(new Vector3(1f * flyingBottleSpeed,0,0));
-            flyingBottle.localPosition = new Vector3(flyingBottle.localPosition.x + flyingBottleSpeed,0,0);
-            if(flyingBottle.localPosition.x >= flyingBottlePos.x){
-                flyingBottle.localPosition = new Vector3(flyingBottlePos.x-29.88f,flyingBottlePos.y,flyingBottlePos.z);
-            }
+            // flyingBottle.localPosition = new Vector3(flyingBottle.localPosition.x + flyingBottleSpeed,0,0);
+            // if(flyingBottle.localPosition.x >= flyingBottlePos.x){
+            //     flyingBottle.localPosition = new Vector3(flyingBottlePos.x-29.88f,flyingBottlePos.y,flyingBottlePos.z);
+            // }
         }
     }    
     IEnumerator MinigameCoroutine(){
@@ -144,6 +143,9 @@ public class Minigame2Script : MonoBehaviour
 
         //우측 이동 로케이션 활성화
         exitLocation.isLocked = false;
+
+        
+        DBManager.instance.TrigOver(1002);
         
     }
 }

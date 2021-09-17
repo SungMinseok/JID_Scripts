@@ -8,6 +8,7 @@ public class DebugManager : MonoBehaviour
 {
     public static DebugManager instance;
     public bool isDebugMode;
+    public bool cheatAvailable;
     public uint buildNum;
     public string buildDate;
     public GameObject debugPanel,cheatPanel;

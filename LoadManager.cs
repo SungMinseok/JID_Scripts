@@ -64,11 +64,11 @@ public class LoadManager : MonoBehaviour
                 // if (slider.value == 1.0f)
                 // {
                 //while()
-                while (fogsNoiseTexPE.Density <= 4)
-                {
-                    fogsNoiseTexPE.Density += 0.01f;
-                    yield return null;
-                }
+                // while (fogsNoiseTexPE.Density <= 4)
+                // {
+                //     fogsNoiseTexPE.Density += 0.01f;
+                //     yield return null;
+                // }
 
                 asyncScene.allowSceneActivation = true;
 
