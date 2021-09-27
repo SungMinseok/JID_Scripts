@@ -15,6 +15,10 @@ public class NPCScript : MonoBehaviour
     [SerializeField][Range(1f,10f)] public float speed = 2f;
     //[SerializeField][Range(10f,50f)] public float jumpPower = 10f;
     
+    [Header("Set Animator")]
+    public bool haveWalk = false;
+    public bool haveTalk = false;
+    
     [Header("배회 모드")]
     public bool onJYD;
     public float JYDCoolDown;
@@ -22,6 +26,7 @@ public class NPCScript : MonoBehaviour
     public bool isNonStop;
     public bool isPaused;
     bool JYDFlag;
+    public bool lookPlayer;
     [Header("감시 모드")]
     public bool onPatrol;
     public bool patrolFlag;
@@ -60,10 +65,11 @@ public class NPCScript : MonoBehaviour
     public bool isJumping;
     public bool jumpDelay;
     public Transform onTriggerCol;
+    Vector2 defaultScale;
 
     Rigidbody2D rb;
     CircleCollider2D circleCollider2D;
-    SpriteRenderer spriteRenderer;
+    public SpriteRenderer spriteRenderer;
     public float wSet, hInput;
     public bool jumpInput, downInput;
     PlayerManager thePlayer;
@@ -74,8 +80,10 @@ public class NPCScript : MonoBehaviour
         thePlayer = PlayerManager.instance;
         rb = GetComponent<Rigidbody2D>();
         circleCollider2D = GetComponent<CircleCollider2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+        if(mainBody!=null) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
+        else spriteRenderer = GetComponent<SpriteRenderer>();
+        if(mainBody!=null) animator = mainBody.GetComponent<Animator>();
+        else animator = GetComponent<Animator>();
         defaultScaleX = transform.localScale.x;
 
 
@@ -125,6 +133,8 @@ public class NPCScript : MonoBehaviour
             //     ThrowDownBullets();
             // }
         }
+        
+        if(mainBody!=null) defaultScale = mainBody.transform.localScale;
 
     }
 
@@ -160,7 +170,7 @@ public class NPCScript : MonoBehaviour
 
             if (wSet != 0)   
             {
-                if(animator!=null) animator.SetBool("walk", true);
+                if(haveWalk&&animator!=null) animator.SetBool("walk", true);
                 if(wSet>0){
                     spriteRenderer.flipX = false;
                     if(rader!=null){
@@ -178,7 +188,7 @@ public class NPCScript : MonoBehaviour
             }
             else{
                 
-                if(animator!=null) animator.SetBool("walk", false);
+                if(haveWalk&&animator!=null)  animator.SetBool("walk", false);
 
             }
         }
@@ -192,12 +202,14 @@ public class NPCScript : MonoBehaviour
         }
 
         if(talkCanvas.gameObject.activeSelf){
-            isPaused = true;
-            patrolInput = 0;
+            // isPaused = true;
+            // patrolInput = 0;
+            if(haveTalk&&animator!=null) animator.SetBool("talk", true);
             if(interactiveMark!=null) interactiveMark.gameObject.SetActive(false);
         }
         else{
-            isPaused = false;
+            // isPaused = false;
+            if(haveTalk&&animator!=null) animator.SetBool("talk", false);
         }
     }
 
@@ -309,6 +321,8 @@ public class NPCScript : MonoBehaviour
                         //DM(gameObject.name+"의 레이더 내부 진입하어 발각됨");
                         if(animator!=null) animator.SetTrigger("found");
                         wSet = 0;
+                        
+                        UIManager.instance.SetGameOver(1);
                     }
                 }
             }
@@ -368,6 +382,20 @@ public class NPCScript : MonoBehaviour
             bullets[i].transform.localPosition = bulletsPos;
             bullets[i].SetActive(true);
             bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(1,0) * (1), ForceMode2D.Impulse);
+        }
+    }
+    public void Look(string direction){
+        if(mainBody == null) return;
+
+        switch(direction){
+            case "left" : 
+                spriteRenderer.flipX = true;
+               // mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+                break;
+            case "right" : 
+                spriteRenderer.flipX = false;
+                //mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
+                break;
         }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);

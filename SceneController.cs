@@ -12,6 +12,8 @@ public class SceneController : MonoBehaviour
     public CinemachineConfiner2D confiner2D;
     [Header("NPC")]
     public List<NPCScript> npcs;
+    [Header("오브젝트")]
+    public Transform[] objects;
     // Start is called before the first frame update
     void Awake()
     {
@@ -28,8 +30,6 @@ public class SceneController : MonoBehaviour
     void Start()
     {
     }
-
-    // Update is called once per frame
     void Update()
     {
         

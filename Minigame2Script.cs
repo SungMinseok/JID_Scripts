@@ -77,6 +77,7 @@ public class Minigame2Script : MonoBehaviour
 
         PlayerManager.instance.isForcedRun = true;
 
+
         while(curMapScrollSpeed < mapScrollSpeed){
             curMapScrollSpeed += 0.005f;
             yield return null;
@@ -85,6 +86,7 @@ public class Minigame2Script : MonoBehaviour
 
         //뛰다니는 미친 개미
 
+#region RunningMode
         yield return new WaitForSeconds(1f);
 
         runningMadAnt.transform.localPosition = createPos0.localPosition;
@@ -104,39 +106,41 @@ public class Minigame2Script : MonoBehaviour
             runningMadAnt.transform.localPosition += Vector3.left * runningMadAntSpeed * Time.deltaTime  ;
             yield return null;
         }
-
-        //날으는 미친 개미 (기본등장)
+#endregion
+#region FlyingMode
+        // //날으는 미친 개미 (기본등장)
         
-        while(flyingMadAnt.transform.localPosition.x < defaultPos1.localPosition.x){
-            flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
-            yield return null;
-        }
-        
-        //소주병 n 번 날림
-        for(int i=0;i<flyingMadAntThrowCount;i++){
-            var movingObject = flyingMadAnt;
-            var targetPos = new Vector2(PlayerManager.instance.transform.position.x,movingObject.transform.position.y);
+        // while(flyingMadAnt.transform.localPosition.x < defaultPos1.localPosition.x){
+        //     flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
+        //     yield return null;
+        // }
 
-            Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
+        // //소주병 n 번 날림
+        // for(int i=0;i<flyingMadAntThrowCount;i++){
+        //     var movingObject = flyingMadAnt;
+        //     var targetPos = new Vector2(PlayerManager.instance.transform.position.x,movingObject.transform.position.y);
 
-            while(!flyingMadAnt.mainBody.GetComponent<NPCSkillScript>().raderFlag ){
-                //flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
-                movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 7f * Time.deltaTime);
+        //     Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
 
-                yield return null;
-            }
+        //     while(!flyingMadAnt.mainBody.GetComponent<NPCSkillScript>().raderFlag ){
+        //         //flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
+        //         movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 7f * Time.deltaTime);
 
-
+        //         yield return null;
+        //     }
 
 
-            flyingMadAnt.mainBody.GetComponent<Animator>().SetTrigger("throw_immy");
-            yield return new WaitForSeconds(3f);
-        }
 
-        while(flyingMadAnt.transform.localPosition.x > createPos1.localPosition.x){
-            flyingMadAnt.transform.localPosition += Vector3.left * flyingMadAntSpeed * Time.deltaTime  ;
-            yield return null;
-        }
+
+        //     flyingMadAnt.mainBody.GetComponent<Animator>().SetTrigger("throw_immy");
+        //     yield return new WaitForSeconds(3f);
+        // }
+
+        // while(flyingMadAnt.transform.localPosition.x > createPos1.localPosition.x){
+        //     flyingMadAnt.transform.localPosition += Vector3.left * flyingMadAntSpeed * Time.deltaTime  ;
+        //     yield return null;
+        // }
+#endregion
         //yield return new WaitForSeconds(gameTimer);
 
         isActive = false;
@@ -146,6 +150,12 @@ public class Minigame2Script : MonoBehaviour
 
         
         DBManager.instance.TrigOver(1002);
+        MinigameManager.instance.SuccessMinigame();
+        PlayerManager.instance.isForcedRun = false;
+
+        
+
+        
         
     }
 }

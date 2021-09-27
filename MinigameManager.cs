@@ -5,6 +5,7 @@ using UnityEngine;
 public class MinigameManager : MonoBehaviour
 {   
     public static MinigameManager instance;
+    public int nowMinigameNum;
     public Transform minigameParent;
     public GameObject successBtn;
     public Transform[] minigameScriptTransforms;
@@ -37,6 +38,7 @@ public class MinigameManager : MonoBehaviour
     public void SuccessMinigame(){
         success = true;
         PlayerManager.instance.isPlayingMinigame = false;
+        Debug.Log(nowMinigameNum + "번 미니게임 종료");
     }
     public void SuccessMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
@@ -44,6 +46,11 @@ public class MinigameManager : MonoBehaviour
         }
         success = true;
         PlayerManager.instance.isPlayingMinigame = false;
+        Debug.Log(nowMinigameNum + "번 미니게임 종료");
+
+        // if(nowMinigameNum == 2){
+        //     TriggerScript.instance.Action(16);
+        // }
         
     }
     public void GiveReward(int gameNum){
@@ -54,9 +61,13 @@ public class MinigameManager : MonoBehaviour
         }
     }
     public void StartMinigame(int gameNum){
+        Debug.Log(gameNum + "번 미니게임 시작");
+
+        nowMinigameNum = gameNum;
+
         var nowMinigame = minigameScriptTransforms[gameNum];
 
-        if(gameNum!=2){
+       // if(gameNum!=2){
             if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
                 
                 PlayerManager.instance.isPlayingMinigame = true;
@@ -64,10 +75,10 @@ public class MinigameManager : MonoBehaviour
 
             }
 
-        }
-        else if(gameNum==2){
-            PlayerManager.instance.MovePlayer(nowMinigame.GetComponent<Minigame2Script>().startPoint);
-            SceneController.instance.SetSomeConfiner(nowMinigame.GetComponent<Minigame2Script>().mapCollider);
-        }
+        // }
+        // else if(gameNum==2){
+        //     PlayerManager.instance.MovePlayer(nowMinigame.GetComponent<Minigame2Script>().startPoint);
+        //     SceneController.instance.SetSomeConfiner(nowMinigame.GetComponent<Minigame2Script>().mapCollider);
+        // }
     }
 }

@@ -6,10 +6,10 @@ using UnityEngine.UI;
 
 [System.Serializable]
 public class Item{
-    public int itemId;
+    public int itemID;
     public string itemName;
     public string itemDesc;
-    public int itemType;
+    public byte itemType;
     public int resourceID;
     public bool isStack;
     public Sprite itemIcon;
@@ -18,13 +18,13 @@ public class Item{
     public enum ItemType{
         equip,
     }
-    public Item(int _itemId, string _itemName, string _itemDesc, int _itemType, int _resourceID, bool _isStack){
-        itemId = _itemId;
+    public Item(int _itemId, string _itemName, string _itemDesc, byte _itemType, int _resourceID, bool _isStack){
+        itemID = _itemId;
         itemName = _itemName;
         itemDesc = _itemDesc;
         itemType = _itemType;
         resourceID = _resourceID;
-        itemIcon = UIManager.instance.itemSprites[resourceID];
+        itemIcon = InventoryManager.instance.itemSprites[resourceID];
 
 
 
@@ -35,10 +35,23 @@ public class Item{
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
-    public List<int> itemList;
+    public List<int> itemList;  //현재 보유한 아이템 ID 저장
     public int curPage;
+    public UIManager theUI;
+    
+    [Header("UI_Inventory")]
+    public Transform itemSlotGrid;
+    public Transform[] itemSlot;
+    public GameObject upArrow, downArrow;
+    public Sprite[] itemSprites;
+    public Sprite nullSprite;
     void Awake(){
         instance = this;
+
+        itemSlot = new Transform[itemSlotGrid.childCount];
+        for(int i=0;i<itemSlotGrid.childCount;i++){
+            itemSlot[i]=itemSlotGrid.GetChild(i);
+        }
     }
     // Start is called before the first frame update
     void Start()
@@ -67,41 +80,33 @@ public class InventoryManager : MonoBehaviour
 
     }
     public void RefreshInventory(int pageNum){
-        var theUI = UIManager.instance;
+        //var theUI = UIManager.instance;
         var theDB = DBManager.instance;
-        // for(int i=0;i<theUI.ItemSlotGrid.childCount;i++){
-
-        // }
-
-        //Debug.Log(pageNum + "번 페이지 출력");
 
         for(int i= pageNum * 7 ; i< (pageNum + 1) * 7 ;i++){
             if(i<itemList.Count){
-
-                theUI.itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theDB.itemDataList[itemList[i]].itemIcon;
-                //Debug.Log(i+"번 아이템 출력");
-                //UIManager.instance.ItemSlotGrid.GetChild(i).GetComponent<Image>().sprite = UIManager.instance.itemSprites[TextLoader.instance.dictionaryItemText[itemList[i]].resourceID];
+                int itemID = itemList[i];
+                //itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theDB.itemDataList[itemList[i]].itemIcon;
+                itemSlot[i%7].GetComponent<Image>().sprite = theDB.itemDataList[itemID].itemIcon;
+                for(var j=0;j<PlayerManager.instance.equipments.Length;j++){
+                    if(PlayerManager.instance.equipments[j]==itemID){
+                        itemSlot[i%7].GetChild(0).gameObject.SetActive(true);
+                        break;
+                    }
+                    itemSlot[i%7].GetChild(0).gameObject.SetActive(false);
+                }
             }
             else{
-                theUI.itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theUI.nullSprite;
-                //Debug.Log(i+"번 스롯 아이템 없음");
-
-                //Debug.Log(i);
+                //itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = nullSprite;
+                itemSlot[i%7].GetComponent<Image>().sprite = nullSprite;
+                itemSlot[i%7].GetChild(0).gameObject.SetActive(false);
             }
-
-            //if(i>=itemList.Count) break;
-
         }
         BtnActivateCheck();
     }
     public void BtnNextPage(){
-        //curPage ++;
         RefreshInventory(++curPage );
         BtnActivateCheck();
-        // if(curPage > 0){
-        //     UIManager.instance.upArrow.SetActive(true);
-        // }
-       // if(itemList.Count> c)
     }
     public void BtnPreviousPage(){
         RefreshInventory(--curPage);
@@ -110,20 +115,57 @@ public class InventoryManager : MonoBehaviour
     public void BtnActivateCheck(){
 
         if(curPage == 0){
-            UIManager.instance.upArrow.SetActive(false);
+            upArrow.SetActive(false);
         }
         else{
-            UIManager.instance.upArrow.SetActive(true);
+            upArrow.SetActive(true);
         }
 
         if(itemList.Count > (curPage+1)*7) {
 
-            UIManager.instance.downArrow.SetActive(true);
+            downArrow.SetActive(true);
         }
         else{
             
-            UIManager.instance.downArrow.SetActive(false);
+            downArrow.SetActive(false);
         }
         
+    }
+    public void PushItemBtn(int slotNum){
+        int curSlotNum = curPage * 7 + slotNum;
+        
+        if(curSlotNum >= itemList.Count){
+            return;
+        }
+
+        Item curItem = DBManager.instance.itemDataList[itemList[curSlotNum]];
+
+        Debug.Log(curSlotNum + "번 슬롯 클릭, itemID : " + curItem.itemID + ", name : " + DBManager.instance.itemDataList[curItem.itemID].itemName);
+
+        // if(curItem.itemType != 0 || curItem.itemType != 4){
+        //     itemSlot[slotNum].gameObject.SetActive(!itemSlot[slotNum].gameObject.activeSelf);
+        // }
+        UseItem(curItem);
+    }
+    public void UseItem(Item curItem){
+        
+        if(curItem.itemType==0||curItem.itemType ==4){
+            return;
+        }
+        
+        switch(curItem.itemType){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
+            case 1 : 
+                PlayerManager.instance.SetEquipment(curItem.itemType, curItem.itemID);
+                break;
+            case 3 : 
+                PlayerManager.instance.SetEquipment(curItem.itemType, curItem.itemID);
+                break;
+            default :
+                break;
+        }
+
+        
+        RefreshInventory(curPage);
+
     }
 }

@@ -42,6 +42,7 @@ public class Location : MonoBehaviour
     public int trigNum;
     public string trigComment;
     public Transform target;
+    public bool activateTargetMark;//True: 플레이어가 근처에 있을 경우 + 해당 트리거가 완료되지 않았을 경우 = 느낌표 표시 출력
     public Transform[] poses;
     public Dialogue[] dialogues_T;
     public Select[] selects_T;
@@ -82,44 +83,25 @@ public class Location : MonoBehaviour
     }
     void OnTriggerStay2D(Collider2D other) {
         if(other.CompareTag("Player")){
-
-            if(waitKey){
-                if(Input.GetButton("Interact")&&!locFlag&&!PlayerManager.instance.isWaitingInteract){
+            if(waitKey&&!locFlag&&!PlayerManager.instance.isWaitingInteract&&!PlayerManager.instance.isActing){
+                if(Input.GetButton("Interact_OnlyKey")){
                     locFlag = true;
-                    LocationScript(other);
                     Debug.Log(trigNum +"번 트리거 실행 시도");
+                    //PlayerManager.instance.ActivateWaitInteract(1);
+                    LocationScript(other);
                 }
             }
         }
-            // else 
-            // if(!waitKey && !locFlag){
-            //     locFlag = true;
-            //     LocationScript(other);
-            // }
     }
-    // void OnTriggerExit2D(Collider2D other){
-        
-      
-    //     if(other.CompareTag("Player")){
-
-    //         if(waitKey){
-    //                 locFlag = false;
-    //         }
-    //     }
-    // }
     void OnTriggerEnter2D(Collider2D other) {
-            // if(waitKey){
-            //     if(Input.GetButton("Interact")&&!locFlag){
-            //         locFlag = true;
-            //         LocationScript(other);
-            //     }
-            // }
-            // else 
         if(other.CompareTag("Player")){
-            if(!waitKey && !locFlag){
+            if(!waitKey && !locFlag&&!PlayerManager.instance.isActing){
                 locFlag = true;
+                Debug.Log(trigNum +"번 트리거 실행 시도");
+                //PlayerManager.instance.ActivateWaitInteract(1);
                 LocationScript(other);
-                Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");
+                //Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");
+                
             }
         }
     }
@@ -136,7 +118,8 @@ public class Location : MonoBehaviour
                                 PlayerManager.instance.hInput = 1;
                                 PlayerManager.instance.hInput = 0;
     //                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
-                                SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
+                                //SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
+                                SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
                             }
                             else{
 
@@ -232,7 +215,7 @@ public class Location : MonoBehaviour
                                     
                                 // }
                                 if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
-                                    Debug.Log(completedTriggerNums[i] + "번 트리거 실행되지 않음");
+                                    Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
                                     locFlag = false;
                                     return;
                                 }
@@ -540,6 +523,7 @@ public class LocationEditor : Editor
             EditorGUILayout.LabelField("선택");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("selects_T"),GUIContent.none, true);
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+            selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 

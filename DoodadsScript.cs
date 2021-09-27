@@ -78,6 +78,7 @@ public class DoodadsScript : MonoBehaviour
                     PlayerManager.instance.isDead = true;
                     PlayerManager.instance.canMove = false;
                     PlayerManager.instance.animator.SetBool("dead0",true);
+                    UIManager.instance.SetGameOver(0);
                 }
             }
         }

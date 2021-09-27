@@ -63,10 +63,9 @@ public class DBManager : MonoBehaviour
         var a = CSVReader.instance.data_item;
 
         for(int i=0; i<a.Count; i++){
-            
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             itemDataList.Add(new Item(int.Parse(a[i]["ID"].ToString()),a[i]["name_kr"].ToString(),a[i]["desc_kr"].ToString(),
-            int.Parse(a[i]["type"].ToString()),int.Parse(a[i]["resourceID"].ToString()),bool.Parse(a[i]["isStack"].ToString())));
+            byte.Parse(a[i]["type"].ToString()),int.Parse(a[i]["resourceID"].ToString()),bool.Parse(a[i]["isStack"].ToString())));
         }
     }
 

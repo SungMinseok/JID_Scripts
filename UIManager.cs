@@ -14,11 +14,6 @@ public class UIManager : MonoBehaviour
     [Header("UI_States")]
     public Image dirtGauge;
     public TextMeshProUGUI honeyText;
-    [Header("UI_Inventory")]
-    public Transform itemSlotGrid;
-    public GameObject upArrow, downArrow;
-    public Sprite[] itemSprites;
-    public Sprite nullSprite;
     [Header("UI_Select")]
     public GameObject ui_select;
     public Transform ui_select_grid;
@@ -31,6 +26,9 @@ public class UIManager : MonoBehaviour
     public bool onEffect;
     [Header("UI_GameOver")]
     public GameObject ui_gameOver;
+    public Image ui_gameOver_image;
+    public GameObject ui_gameOver_btns;
+    public Sprite[] ui_gameOver_sprites;
     [Header("UI_Fader")]
     public Animator ui_fader;
 
@@ -107,5 +105,27 @@ public class UIManager : MonoBehaviour
     }
     public void SetFadeIn(float speed = 1f){
         ui_fader.SetTrigger("fadeIn");
+    }
+    public void ResetFader(float value){
+        var defaultColor = ui_fader.GetComponent<Image>().color;
+        ui_fader.GetComponent<Image>().color = new Color(defaultColor.r,defaultColor.g,defaultColor.b,value);
+    }
+    public void FirstSceneLoad(){
+        ResetFader(1);
+        ui_fader.SetTrigger("fadeIn");
+    }
+    public void SetGameOver(int num){
+        
+        StartCoroutine(SetGameOverCoroutine(num));
+    }
+    IEnumerator SetGameOverCoroutine(int num){
+        yield return new WaitForSeconds(1.5f);
+        SetFadeOut();
+        yield return new WaitForSeconds(1.5f);
+
+        ui_gameOver_image.sprite = ui_gameOver_sprites[num];
+        ui_gameOver.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        ui_gameOver_btns.gameObject.SetActive(true);
     }
 }

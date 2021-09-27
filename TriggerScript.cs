@@ -64,6 +64,34 @@ public class TriggerScript : MonoBehaviour
             objects = null;
         }
 
+//타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 중 움직이지 않도록 함.
+        if(location.target != null){
+            
+            var npc = location.target.GetComponent<NPCScript>();
+            npc.isPaused = true;
+            npc.patrolInput = 0;
+
+            if(npc.lookPlayer){
+                if(npc.transform.position.x > PlayerManager.instance.transform.position.x){
+                    npc.Look("left");
+                }
+                else{
+                    npc.Look("right");
+
+                }
+            }
+
+            if(npc.transform.position.x > PlayerManager.instance.transform.position.x){
+                PlayerManager.instance.Look("right");
+            }
+            else{
+                PlayerManager.instance.Look("left");
+
+            }
+
+            //if(npc.animator!=null) npc.animator.SetBool("talk", true);
+        }
+
         switch(location.trigNum){
 #region 1
             case 1 :
@@ -148,7 +176,10 @@ public class TriggerScript : MonoBehaviour
 
 #region 6
             case 6 :
+
                 if(location.selectPhase == 0){
+                    location.selectPhase = 1;
+                    //npc.SetBool("talk",true);
                     SetDialogue(dialogues[0]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     SetDialogue(dialogues[6]);
@@ -158,7 +189,7 @@ public class TriggerScript : MonoBehaviour
                     SetSelect(selects[0]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                     if(GetSelect()==0){
-                        location.selectPhase ++;
+                        location.selectPhase = 2;
                         SetDialogue(dialogues[1]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                         SetSelect(selects[1]);
@@ -166,7 +197,8 @@ public class TriggerScript : MonoBehaviour
                         if(GetSelect()==0){
                         }
                         else if(GetSelect()==1){
-                            location.selectPhase ++;
+                            //선택지 완료 시 -1
+                            location.selectPhase = -1;
                             SetDialogue(dialogues[2]);
                             yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                             SetDialogue(dialogues[3]);
@@ -180,7 +212,36 @@ public class TriggerScript : MonoBehaviour
                         
                     }
                 }
-                else if(location.selectPhase == 1){
+                else if(location.selectPhase == 1){                    
+                    SetDialogue(dialogues[7]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    SetSelect(selects[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                        location.selectPhase = 2;
+                        SetDialogue(dialogues[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        SetSelect(selects[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                        if(GetSelect()==0){
+                        }
+                        else if(GetSelect()==1){
+                            //선택지 완료 시 -1
+                            location.selectPhase = -1;
+                            SetDialogue(dialogues[2]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            SetDialogue(dialogues[3]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            SetDialogue(dialogues[4]);
+                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            InventoryManager.instance.AddItem(2);
+                        }
+                    }
+                    else if(GetSelect()==1){
+                        
+                    }
+                }
+                else if(location.selectPhase == 2){
                     SetDialogue(dialogues[1]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     SetSelect(selects[1]);
@@ -188,7 +249,8 @@ public class TriggerScript : MonoBehaviour
                     if(GetSelect()==0){
                     }
                     else if(GetSelect()==1){
-                        location.selectPhase ++;
+                        //선택지 완료 시 -1
+                        location.selectPhase = -1;
                         SetDialogue(dialogues[2]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                         SetDialogue(dialogues[3]);
@@ -204,8 +266,10 @@ public class TriggerScript : MonoBehaviour
 #region 7
             case 7 :
                 
+                dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", true);
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
+                dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", false);
                 break;
 #endregion
 
@@ -288,7 +352,7 @@ public class TriggerScript : MonoBehaviour
                 SetSelect(selects[0]);
                 yield return waitSelecting;
                 if(GetSelect()==0){
-                    location.selectPhase ++;
+                    location.selectPhase = -1;
                     InventoryManager.instance.RemoveItem(6);
                     SetDialogue(dialogues[2]);
                     yield return waitTalking;
@@ -337,7 +401,8 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
 
                 
-                CheatManager.instance.InputCheat("minigame 1");
+                MinigameManager.instance.StartMinigame(1);
+                // CheatManager.instance.InputCheat("minigame 1");
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
                 break;
 #endregion
@@ -365,7 +430,7 @@ public class TriggerScript : MonoBehaviour
 #endregion
 
 #region 15
-            case 15 :   //빛나는 양동이를 클릭한다.
+            case 15 :   //빛나는 양동이를 클릭한다. > 미니게임2 시작
                 objects[2].gameObject.SetActive(false);
                 objects[3].gameObject.SetActive(true);
                 yield return wait1s;
@@ -380,8 +445,13 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.SetFadeIn();
                 objects[4].gameObject.SetActive(false);
 
-                CheatManager.instance.InputCheat("minigame 2");
+                //CheatManager.instance.InputCheat("minigame 2");
+                MinigameManager.instance.StartMinigame(2);
+                PlayerManager.instance.canMove = true;
+                SceneController.instance.virtualCamera.Follow = null;
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
+                
+                //PlayerManager.instance.canMove = true;
 
 
 
@@ -392,14 +462,15 @@ public class TriggerScript : MonoBehaviour
 #region 16
             case 16 :   //"도망" 미니게임 성공 , 끝 맵으로 이동
                 
-                UIManager.instance.SetFadeOut();
-                yield return wait1s;
+                // UIManager.instance.SetFadeOut();
+                // yield return wait1s;
+                SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
                 
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
-                UIManager.instance.SetFadeIn();
+                //UIManager.instance.SetFadeIn();
                 
-                PlayerManager.instance.isForcedRun = false;
+                
                 break;
 #endregion
 
@@ -414,6 +485,12 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 UIManager.instance.SetFadeOut();
                 yield return wait1s;
+
+                
+                PlayerManager.instance.transform.position = objects[0].position;
+                SceneController.instance.SetConfiner(7);
+                UIManager.instance.SetFadeIn();
+                
                 
                 break;
 #endregion
@@ -427,6 +504,12 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 UIManager.instance.SetFadeOut();
                 yield return wait1s;
+
+                
+                PlayerManager.instance.transform.position = objects[0].position;
+                SceneController.instance.SetConfiner(7);
+                UIManager.instance.SetFadeIn();
+                
                 
                 break;
 #endregion
@@ -436,28 +519,29 @@ public class TriggerScript : MonoBehaviour
         
         yield return null;    
 
-
+//타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동
+        if(location.target != null){
+            var npc = location.target.GetComponent<NPCScript>();
+            npc.isPaused = false;
+            //if(npc.animator!=null) npc.animator.SetBool("talk", false);
+        }
         
         PlayerManager.instance.isActing =false;    
         PlayerManager.instance.canMove =true;   
 
         //yield return wait1s;
-        PlayerManager.instance.ActivateWaitInteract(0.1f);
+        PlayerManager.instance.ActivateWaitInteract(PlayerManager.instance.waitingInteractDelayTime);
         location.locFlag = false; 
 
         
         if(!location.preserveTrigger){
-            if(location.selects_T.Length == location.selectPhase){
+            if(location.selects_T.Length==0 || location.selectPhase == -1){
                 DBManager.instance.TrigOver(location.trigNum);
-                Debug.Log(location.trigNum +"번 실행 완료");
+                Debug.Log(location.trigNum +"번 트리거 실행 완료");
             }
             else{
-                
-                Debug.Log(location.trigNum +"번 실행 완료하였으나, 선택지가 종료되지 않아 다시 실행 가능");
+                Debug.Log(location.trigNum +"번 트리거 실행 완료하였으나, 선택지가 종료되지 않아 다시 실행 가능");
             }
-
-
-
         }
 
 

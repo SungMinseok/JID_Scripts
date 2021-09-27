@@ -6,17 +6,22 @@ public class PlayerManager : MonoBehaviour
 {
 
     public static PlayerManager instance;
+    [Header("Status")]
+    public float curDirtAmount;
+    public float curHoneyAmount;
+    [Header("Equipment : Helmet/Armor/Weapon")]
+    public int[] equipments;
+    //public byte armorNum;
+    //public uint weaponNum;
     [Header("Set Status")]
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
     [SerializeField] [Range(1f, 20f)] public float gravityScale;
     public float maxDirtAmount;
-    public float curDirtAmount;
     public float maxHoneyAmount;
-    public float curHoneyAmount;
 
     [Header("Wearable")]
-    public SpriteRenderer helmet;
+    public SpriteRenderer[] helmets;
     public SpriteRenderer wearables0;
     Coroutine animationCoroutine;
     WaitForSeconds animDelay0 = new WaitForSeconds(0.833f);
@@ -27,11 +32,11 @@ public class PlayerManager : MonoBehaviour
     [Space]
     public float wSet;
     [Header("States────────────────────")]
+    public bool canMove;
     public bool isTalking;
     public bool isSelecting;
     public bool isPlayingMinigame;
     public bool isActing;   //트리거 로케이션 onTriggerStay 체크용 bool 값
-    public bool canMove;
     public bool isGrounded;
     public bool isJumping;
     public bool jumpDelay;
@@ -46,6 +51,8 @@ public class PlayerManager : MonoBehaviour
     public bool digFlag;
     public bool isWaitingInteract;
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
+    [Header("────────────────────────────")]
+    public float waitingInteractDelayTime;
     [Header("────────────────────────────")]
     public DirtScript dirtTarget;
     public Transform playerBody;
@@ -72,6 +79,7 @@ public class PlayerManager : MonoBehaviour
     [Header("Debug─────────────────────")]
     public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
+    public GameObject curEquipment;
     void Awake()
     {
         Application.targetFrameRate = 60;
@@ -84,6 +92,8 @@ public class PlayerManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        equipments = new int[3]{-1,-1,-1};
     }
     public AnimationClip animation0;
     Color hideColor = new Color(1,1,1,0);
@@ -113,7 +123,7 @@ public class PlayerManager : MonoBehaviour
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
             jumpInput = Input.GetButton("Jump") ? true : false;
-            interactInput = Input.GetButton("Interact") ? true : false;
+            interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
 
 
 
@@ -171,6 +181,8 @@ public class PlayerManager : MonoBehaviour
             if(interactInput){
                 //InteractAction();
                 if(getDirt){
+                    if(equipments[2]==21){
+
                     //if()
                         //interactInput = false;
                         animator.SetBool("shoveling1", true);
@@ -182,6 +194,7 @@ public class PlayerManager : MonoBehaviour
                             animationCoroutine = StartCoroutine(CheckAnimationState(0));
                             dirtTarget.GetDug();
                         }
+                    }
                 }
                 //wearables0.gameObject.SetActive(true);
             }
@@ -326,63 +339,52 @@ public class PlayerManager : MonoBehaviour
             ladderDelay = false;
         }
     }
-    void OnTriggerStay2D(Collider2D other)
-    {
-        if (other.CompareTag("Ladder"))
-        {
-            if (!ladderDelay) getLadder = true;
-        }
-
-        else if (other.CompareTag("Dirt"))
-        {
-            getDirt = true;
-            dirtTarget = other.GetComponent<DirtScript>();
-            //UIManager.instance.clearPanel.SetActive(true);
-        }
-
-        else if (other.CompareTag("Cover"))
-        {
-            Debug.Log(other.gameObject.name);
-            other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
-        }
-
-    }
-
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Ladder"))
-        {
-            getLadder = false;
-        }
-        else if (other.CompareTag("Dirt"))
-        {
-            getDirt = false;
-            //UIManager.instance.clearPanel.SetActive(true);
-        }
-
-        else if (other.CompareTag("Cover"))
-        {
-            other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
-        }
-    }
-    void OnCollisionEnter2D(Collision2D other){
-        
-        // if(other.gameObject.CompareTag("NPC")){
-        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
-        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
-        // }
-        
-        if(other.gameObject.CompareTag("Collider_NPC")){
-            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
-            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), boxCollider2D, true);
-        }
-    }
-    // void OnCollisionStay2D(Collision2D other)
+    // void OnTriggerStay2D(Collider2D other)
     // {
+    //     if (other.CompareTag("Ladder"))
+    //     {
+    //         if (!ladderDelay) getLadder = true;
+    //     }
+
+    //     else if (other.CompareTag("Dirt"))
+    //     {
+    //         getDirt = true;
+    //         dirtTarget = other.GetComponent<DirtScript>();
+    //         //UIManager.instance.clearPanel.SetActive(true);
+    //     }
+
+    //     else if (other.CompareTag("Cover"))
+    //     {
+    //         Debug.Log(other.gameObject.name);
+    //         other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
+    //     }
+
     // }
-    // void OnCollisionExit2D(Collision2D other)
-    // {
 
+    // void OnTriggerExit2D(Collider2D other)
+    // {
+    //     if (other.CompareTag("Ladder"))
+    //     {
+    //         getLadder = false;
+    //     }
+    //     else if (other.CompareTag("Dirt"))
+    //     {
+    //         getDirt = false;
+    //         //UIManager.instance.clearPanel.SetActive(true);
+    //     }
+
+    //     else if (other.CompareTag("Cover"))
+    //     {
+    //         other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+    //     }
+    // }
+    // void OnCollisionEnter2D(Collision2D other){
+        
+        
+    //     if(other.gameObject.CompareTag("Collider_NPC")){
+    //         Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
+    //         Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), boxCollider2D, true);
+    //     }
     // }
 
     public void Look(string direction){
@@ -466,5 +468,60 @@ public class PlayerManager : MonoBehaviour
     }
     public void DeactivateWaitInteract(){
         isWaitingInteract = false;
+    }
+    public void SetEquipment(byte type, int itemID){// 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
+        //byte itemID = (byte)_itemID;
+        switch(itemID){
+            case 2 :
+                curEquipment = helmets[0].gameObject;
+                break;
+        }
+
+        switch(type){
+            case 1:
+                if(equipments[0]!=itemID){
+                    equipments[0] = itemID;
+                    curEquipment.gameObject.SetActive(true);
+                    Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                }
+                else{
+                    equipments[0] = -1;
+                    curEquipment.gameObject.SetActive(false);
+                    Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                }
+                break;            
+            case 3:
+                if(equipments[2]!=itemID){
+                    equipments[2] = itemID;
+                    //curEquipment.gameObject.SetActive(true);
+                    Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                }
+                else{
+                    equipments[2] = -1;
+                    //curEquipment.gameObject.SetActive(false);
+                    Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                }
+                break;
+
+
+
+                // switch(itemID){
+                //     case 2:
+                //         if(equipments[0]!=itemID){
+                //             equipments[0] = itemID;
+                //             helmets[0].gameObject.SetActive(true);
+                //             Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                //         }
+                //         else{
+                //             equipments[0] = -1;
+                //             helmets[0].gameObject.SetActive(false);
+                //             Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                //         }
+                        
+                //         break;
+                // }
+            default :
+                break;
+        }
     }
 }
