@@ -43,6 +43,7 @@ public class Location : MonoBehaviour
     public string trigComment;
     public Transform target;
     public bool activateTargetMark;//True: 플레이어가 근처에 있을 경우 + 해당 트리거가 완료되지 않았을 경우 = 느낌표 표시 출력
+    public Transform targetMark;
     public Transform[] poses;
     public Dialogue[] dialogues_T;
     public Select[] selects_T;
@@ -73,6 +74,11 @@ public class Location : MonoBehaviour
                 if(target.GetComponent<NPCScript>() != null && target.GetComponent<NPCScript>().interactiveMark !=null && !DBManager.instance.CheckTrigOver(trigNum)){
                     target.GetComponent<NPCScript>().interactiveMark.gameObject.SetActive(true);
                 }
+            }
+
+            if(activateTargetMark){
+                targetMark=this.transform.GetChild(0).GetChild(0);
+                //targetMark.gameObject.SetActive(false);
             }
         }
 
@@ -208,29 +214,30 @@ public class Location : MonoBehaviour
 
                         //선행 트리거 실행 여부 확인
                         if(completedTriggerNums.Length>0){
-                            for(int i=0;i<completedTriggerNums.Length;i++){
+                            if(!DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums)){
 
-                                // for(int j=0;j<DBManager.instance.data.trigOverList.Count;j++){
-                                //     Debug.Log(completedTriggerNums[i] + "번 트리거 실행 여부 확인");
-                                    
-                                // }
-                                if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
-                                    Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
-                                    locFlag = false;
-                                    return;
-                                }
+                                //locFlag = false;
+                                Invoke("ResetFlagDelay",1f);
+                                return;
                             }
-                            //Debug.Log(trigNum +"번 트리거 실행 실패 : 선행 트리거 실행 안됨");
-                            //locFlag = false;
-                            //return;
+                            // for(int i=0;i<completedTriggerNums.Length;i++){
+                            //     if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
+                            //         Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
+                            //         locFlag = false;
+                            //         return;
+                            //     }
+                            // }
                         }
 
-                        Debug.Log(trigNum +"번 트리거 실행 성공");
 
                         if(other.CompareTag("Player")){
                             if(trigNum>=0){
                                 if(!PlayerManager.instance.isActing){
                                     PlayerManager.instance.isActing = true;
+                                    //triggerScript.Action(this);
+                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetTrigger("off");
+                                    Debug.Log(trigNum +"번 트리거 실행 성공");
+
                                     triggerScript.Action(this);
                                     // if(dialogues_T!=null){
                                     //     if(poses!=null){
@@ -331,7 +338,9 @@ public class Location : MonoBehaviour
         }
 
     }
-
+    public void ResetFlagDelay(){
+        locFlag= false;
+    }
 
 
 

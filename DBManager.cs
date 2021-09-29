@@ -40,6 +40,25 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
+    public bool CheckCompletedTrigs(int trigNum, int[] completedTriggerNums){
+        List<int> tempList = new List<int>();
+
+        for(int i=0;i<completedTriggerNums.Length;i++){
+            if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
+                Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
+                tempList.Add(completedTriggerNums[i]);
+            }
+        }
+
+        if(tempList.Count != 0){
+            tempList.Clear();
+            return false;
+        }
+        else{
+            tempList.Clear();
+            return true;
+        }
+    }
     void Awake(){
         //Application.targetFrameRate = 60;
         if (null == instance)

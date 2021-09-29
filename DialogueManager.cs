@@ -24,10 +24,12 @@ public class DialogueManager : MonoBehaviour
     // public Queue<string> sentQue;
     // public Queue<Dialogue> dialogueQue;
     public string curSentence;
+
+    [Header("Debug──────────────────")]
     //public TextMeshPro text;
-    bool revealTextFlag;
-    bool revealTextFlag_NPC;
-    bool dialogueFlag;
+    public bool revealTextFlag;
+    public bool revealTextFlag_NPC;
+    public bool dialogueFlag;
     public bool canSkip;
     public bool canSkip2;
     public bool goSkip;
@@ -69,6 +71,7 @@ public class DialogueManager : MonoBehaviour
 
     IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
     {
+        //Debug.Log("A");
         PlayerManager.instance.canMove = false;
         for(int i=0;i<dialogues.Length;i++){
             
@@ -84,6 +87,7 @@ public class DialogueManager : MonoBehaviour
     //스킵 가능한 메시지 출력
     IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
+        //Debug.Log("B");
         PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
         if(dialogue.talker==null) dialogue.talker = PlayerManager.instance.transform;
@@ -94,7 +98,6 @@ public class DialogueManager : MonoBehaviour
         else{
             if(dialogue.talker == PlayerManager.instance.transform)
                 dialogue.talker.GetChild(0).GetChild(0).GetComponent<Image>().sprite = playerNormalTalkCanvas;
-
         }
             
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
@@ -273,3 +276,4 @@ public class DialogueManager : MonoBehaviour
         string content = dialogueData.text;
     }
 }
+
