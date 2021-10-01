@@ -1,7 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+//플레이어 로케이션
 public class LocationRader : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other) {
