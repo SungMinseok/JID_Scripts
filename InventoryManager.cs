@@ -2,60 +2,56 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+
 
 
 [System.Serializable]
-public class Item{
-    public int itemID;
-    public string itemName;
-    public string itemDesc;
-    public byte itemType;
-    public int resourceID;
-    public bool isStack;
-    public Sprite itemIcon;
-    //public bool isStack;
-
-    public enum ItemType{
-        equip,
-    }
-    public Item(int _itemId, string _itemName, string _itemDesc, byte _itemType, int _resourceID, bool _isStack){
-        itemID = _itemId;
-        itemName = _itemName;
-        itemDesc = _itemDesc;
-        itemType = _itemType;
-        resourceID = _resourceID;
-        itemIcon = InventoryManager.instance.itemSprites[resourceID];
-
-
-
-        isStack = _isStack;
-    }
+public class ItemSlot{
+    public Button itemSlotBtn;
+    public GameObject equippedMark;
+    public TextMeshProUGUI itemAmount;
+    public Image itemImage;
+    public GameObject itemDescriptionWindow;
+    public TextMeshProUGUI itemName;
+    public TextMeshProUGUI itemDescription;
+    
+    //public ItemSlot(GameObject a)
 }
-
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
-    public List<int> itemList;  //현재 보유한 아이템 ID 저장
     public int curPage;
     public UIManager theUI;
     
     [Header("UI_Inventory")]
     public Transform itemSlotGrid;
-    public Transform[] itemSlot;
+    //[SerializeField]
+    public ItemSlot[] itemSlot;
+    //public ItemSlot[] temp;
     public GameObject upArrow, downArrow;
-    public Sprite[] itemSprites;
+   // public Sprite[] itemSprites;
     public Sprite nullSprite;
     void Awake(){
         instance = this;
 
-        itemSlot = new Transform[itemSlotGrid.childCount];
-        for(int i=0;i<itemSlotGrid.childCount;i++){
-            itemSlot[i]=itemSlotGrid.GetChild(i);
-        }
+
+        
     }
     // Start is called before the first frame update
     void Start()
     {
+        //itemSlot = new ItemSlot[7];
+        for(int i=0;i<7;i++){
+            //itemSlot[i].equippedMark = PlayerManager.instance.gameObject;
+            itemSlot[i].itemSlotBtn = itemSlotGrid.GetChild(i).GetComponent<Button>();
+            itemSlot[i].equippedMark = itemSlotGrid.GetChild(i).GetChild(0).gameObject;
+            itemSlot[i].itemAmount = itemSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+            itemSlot[i].itemImage = itemSlotGrid.GetChild(i).GetChild(2).GetComponent<Image>();
+            itemSlot[i].itemDescriptionWindow = itemSlotGrid.GetChild(i).GetChild(3).gameObject;
+            itemSlot[i].itemName = itemSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+            itemSlot[i].itemDescription = itemSlotGrid.GetChild(i).GetChild(3).GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
         ResetInventory();
     }
 
@@ -71,11 +67,11 @@ public class InventoryManager : MonoBehaviour
     }
 
     public void AddItem(int ID){
-        itemList.Add(ID);
+        DBManager.instance.curData.itemList.Add(ID);
         RefreshInventory(curPage);
     }
     public void RemoveItem(int ID){
-        itemList.Remove(ID);
+        DBManager.instance.curData.itemList.Remove(ID);
         RefreshInventory(curPage);
 
     }
@@ -84,22 +80,37 @@ public class InventoryManager : MonoBehaviour
         var theDB = DBManager.instance;
 
         for(int i= pageNum * 7 ; i< (pageNum + 1) * 7 ;i++){
-            if(i<itemList.Count){
-                int itemID = itemList[i];
-                //itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = theDB.itemDataList[itemList[i]].itemIcon;
-                itemSlot[i%7].GetComponent<Image>().sprite = theDB.itemDataList[itemID].itemIcon;
+            //아이템 있을 경우
+            if(i<DBManager.instance.curData.itemList.Count){
+                int itemID = DBManager.instance.curData.itemList[i];
+
+                //아이템 이미지 불러오기
+                itemSlot[i%7].itemImage.sprite = theDB.cache_ItemDataList[itemID].icon;
+
+                //아이템 정보 불러오기
+                itemSlot[i%7].itemName.text = theDB.cache_ItemDataList[itemID].name;
+                itemSlot[i%7].itemDescription.text = theDB.cache_ItemDataList[itemID].description;
+
+                //장착한 아이템일 경우 장착 중 표시 여부
                 for(var j=0;j<PlayerManager.instance.equipments.Length;j++){
                     if(PlayerManager.instance.equipments[j]==itemID){
-                        itemSlot[i%7].GetChild(0).gameObject.SetActive(true);
+                        itemSlot[i%7].equippedMark.SetActive(true);
                         break;
                     }
-                    itemSlot[i%7].GetChild(0).gameObject.SetActive(false);
+                    itemSlot[i%7].equippedMark.SetActive(false);
                 }
+
+                //아이템 버튼 활성화
+                itemSlot[i%7].itemSlotBtn.interactable = true;
             }
+            //아이템 없을 경우
             else{
                 //itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = nullSprite;
-                itemSlot[i%7].GetComponent<Image>().sprite = nullSprite;
-                itemSlot[i%7].GetChild(0).gameObject.SetActive(false);
+                itemSlot[i%7].itemImage.sprite = nullSprite;
+                itemSlot[i%7].equippedMark.gameObject.SetActive(false);
+
+                //아이템 버튼 비활성화
+                itemSlot[i%7].itemSlotBtn.interactable = false;
             }
         }
         BtnActivateCheck();
@@ -121,7 +132,7 @@ public class InventoryManager : MonoBehaviour
             upArrow.SetActive(true);
         }
 
-        if(itemList.Count > (curPage+1)*7) {
+        if(DBManager.instance.curData.itemList.Count > (curPage+1)*7) {
 
             downArrow.SetActive(true);
         }
@@ -134,13 +145,13 @@ public class InventoryManager : MonoBehaviour
     public void PushItemBtn(int slotNum){
         int curSlotNum = curPage * 7 + slotNum;
         
-        if(curSlotNum >= itemList.Count){
+        if(curSlotNum >= DBManager.instance.curData.itemList.Count){
             return;
         }
 
-        Item curItem = DBManager.instance.itemDataList[itemList[curSlotNum]];
+        Item curItem = DBManager.instance.cache_ItemDataList[DBManager.instance.curData.itemList[curSlotNum]];
 
-        Debug.Log(curSlotNum + "번 슬롯 클릭, itemID : " + curItem.itemID + ", name : " + DBManager.instance.itemDataList[curItem.itemID].itemName);
+        Debug.Log(curSlotNum + "번 슬롯 클릭, itemID : " + curItem.ID + ", name : " + DBManager.instance.cache_ItemDataList[curItem.ID].name);
 
         // if(curItem.itemType != 0 || curItem.itemType != 4){
         //     itemSlot[slotNum].gameObject.SetActive(!itemSlot[slotNum].gameObject.activeSelf);
@@ -149,16 +160,16 @@ public class InventoryManager : MonoBehaviour
     }
     public void UseItem(Item curItem){
         
-        if(curItem.itemType==0||curItem.itemType ==4){
+        if(curItem.type==0||curItem.type ==4){
             return;
         }
         
-        switch(curItem.itemType){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
+        switch(curItem.type){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
             case 1 : 
-                PlayerManager.instance.SetEquipment(curItem.itemType, curItem.itemID);
+                PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
                 break;
             case 3 : 
-                PlayerManager.instance.SetEquipment(curItem.itemType, curItem.itemID);
+                PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
                 break;
             default :
                 break;

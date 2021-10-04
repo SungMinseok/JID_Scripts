@@ -3,10 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System; 
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
-    public List<Item> itemDataList;
+    [Header("Current Data")]
+
+    public Data curData;
+
+
+    [Header("Cache")]
+    public List<Item> cache_ItemDataList;
+    public List<EndingCollection> cache_EndingCollectionDataList;
+    
+    [Header("Sprites Files")]
+    public Sprite[] endingCollectionSprites;
+    public Sprite[] itemSprites;
+
+    //public List<Item> cache_ItemDataList;
 
 
 
@@ -18,22 +33,45 @@ public class DBManager : MonoBehaviour
 
     [System.Serializable]
     public class Data{
+        public List<int> itemList;  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
+        public List<int> endingCollectionOverList = new List<int>();
     }
-    public Data data;
-    public void CallSave(){
+    public void CallSave(int fileNum){
+
+        BinaryFormatter bf = new BinaryFormatter();
+
+        FileStream file = File.Create(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+        
+        Debug.Log(Application.persistentDataPath);
+        bf.Serialize(file, curData);
+        file.Close();
+    }
+    public void CallLoad(int fileNum){
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+
+        if(fileCheck.Exists){
+            FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
+        
+            if(file != null && file.Length >0){
+                curData =(Data)bf.Deserialize(file);
+            }
+            
+            file.Close();
+        }
 
     }
-    public void CallLoad(){
 
-    }
+#region Trigger 관련
     public void TrigOver(int trigNum){
         if(!CheckTrigOver(trigNum)){
-            data.trigOverList.Add(trigNum);
+            curData.trigOverList.Add(trigNum);
         }
     }
     public bool CheckTrigOver(int trigNum){
-        if(data.trigOverList.Contains(trigNum)){
+        if(curData.trigOverList.Contains(trigNum)){
             return true;
         }
         else{
@@ -59,6 +97,24 @@ public class DBManager : MonoBehaviour
             return true;
         }
     }
+#endregion
+
+
+    //엔딩 컬렉션 달성 등록
+    public void EndingCollectionOver(int collectionNum){
+        if(!CheckEndingCollectionOver(collectionNum)){
+            curData.endingCollectionOverList.Add(collectionNum);
+        }
+    }
+    //엔딩 컬렉션 달성되었는지 확인
+    public bool CheckEndingCollectionOver(int collectionNum){
+        if(curData.endingCollectionOverList.Contains(collectionNum)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
     void Awake(){
         //Application.targetFrameRate = 60;
         if (null == instance)
@@ -75,6 +131,7 @@ public class DBManager : MonoBehaviour
     void Start()
     {
         ApplyItemInfo();
+        ApplyCollectionInfo();
     }
     
     void ApplyItemInfo(){
@@ -83,12 +140,89 @@ public class DBManager : MonoBehaviour
 
         for(int i=0; i<a.Count; i++){
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
-            itemDataList.Add(new Item(int.Parse(a[i]["ID"].ToString()),a[i]["name_kr"].ToString(),a[i]["desc_kr"].ToString(),
-            byte.Parse(a[i]["type"].ToString()),int.Parse(a[i]["resourceID"].ToString()),bool.Parse(a[i]["isStack"].ToString())));
+            cache_ItemDataList.Add(new Item(
+                int.Parse(a[i]["ID"].ToString()),
+                a[i]["name_kr"].ToString(),
+                a[i]["desc_kr"].ToString(),
+                byte.Parse(a[i]["type"].ToString()),
+                int.Parse(a[i]["resourceID"].ToString()),
+                bool.Parse(a[i]["isStack"].ToString())
+            ));
+        }
+    }
+    
+    void ApplyCollectionInfo(){
+        //var a = TextLoader.instance.dictionaryItemText;
+        var a = CSVReader.instance.data_collection;
+
+        for(int i=0; i<a.Count; i++){
+            //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
+            cache_EndingCollectionDataList.Add(new EndingCollection(
+                int.Parse(a[i]["ID"].ToString())
+                ,a[i]["name_kr"].ToString()
+                ,int.Parse(a[i]["resourceID"].ToString())
+                //byte.Parse(a[i]["type"].ToString()),
+                //int.Parse(a[i]["resourceID"].ToString()),
+                //bool.Parse(a[i]["isStack"].ToString())
+            ));
         }
     }
 
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 
     
+}
+
+
+[System.Serializable]
+public class Item{
+    public int ID;
+    public string name;
+    public string description;
+    public byte type;
+    public int resourceID;
+    public bool isStack;
+    public Sprite icon;
+    //public bool isStack;
+
+    public enum ItemType{
+        equip,
+    }
+    public Item(int a, string b, string c, byte d, int e, bool f){
+        ID = a;
+        name = b;
+        description = c;
+        type = d;
+        resourceID = e;
+        icon = DBManager.instance.itemSprites[resourceID];
+        isStack = f;
+    }
+}
+
+
+
+[System.Serializable]
+public class EndingCollection{
+    public int ID;
+    public string name;
+    public string description;
+
+    
+    public int resourceID;
+    public Sprite sprite;
+
+    [Space]
+    
+    public string date;
+    public string count;
+
+    public EndingCollection(int a, string b, int c){
+        ID = a;
+        name = b;
+        //description = c;
+        //date = d;
+        //count = e;
+        resourceID = c;
+        sprite = DBManager.instance.endingCollectionSprites[resourceID];
+    }
 }

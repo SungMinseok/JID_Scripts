@@ -20,7 +20,7 @@ public class ChangeScrollImage : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         Debug.Log("33");
-       MenuManager.instance.RearrangeCardImages();
+       MenuManager.instance.RearrangeCards();
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

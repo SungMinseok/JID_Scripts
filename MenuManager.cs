@@ -8,29 +8,58 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
     [Header("UI_Menu_Main")]
+    public GameObject menuPanel;
     public Color defaultBtnColor;
     public Color activatedBtnColor;
     public GameObject collectionPanel;
     public GameObject antCollectionPanel;
     public GameObject endingCollectionPanel;
+    [Header("UI_PopUp")]
+    public GameObject popUpPanel;
+    public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
+    [Header("UI_Save&Load")]
+    public Transform saveSlotGrid;
+    public Transform loadSlotGrid;
+    public class SaveLoadSlot{
+        public string name;
+        public string date;
+    }
     [Header("UI_Collection_Ending")]
     public Animator animator;
     public TextMeshProUGUI collectionSubText0;
     public TextMeshProUGUI collectionNameText;
+    public Sprite collectionNullImage;
     public Image[] collectionCardImages;
     public Sprite[] collectionCardSprites;
     public Button[] collectionScrollArrows;
-    public float scrollTime;
     [Header("Debug────────────────────")]
+    public string curPopUpType;
+    public int curSaveNum;
+    public int curLoadNum;
     public int totalPage;
     public int curPage;
     public int[] tempCardNum = new int[5];
 
     void Awake(){
         instance = this;
+    }    
+    void Update(){
+            if(Input.GetButtonUp("Cancel")){
+                menuPanel.SetActive(!menuPanel.activeSelf);
+                
+            }
     }
     void Start(){
+
+        totalPage = DBManager.instance.endingCollectionSprites.Length;
         ResetCardOrder();
+
+        
+        for(int i=0;i<saveSlotGrid.childCount;i++){
+            int temp = i;
+            //toggleImage[i] = settingGrid.GetChild(i).GetChild(2).gameObject;
+            saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
+        }
     }
     // void Update(){
     //     if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Collection_Scroll_Right") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime>=1f){
@@ -65,7 +94,7 @@ public class MenuManager : MonoBehaviour
     public void ResetCardOrder(){
         curPage = 0;
         RearrangeCardOrder();
-        RearrangeCardImages();
+        RearrangeCards();
     }
     public void RearrangeCardOrder(){
         tempCardNum = new int[]{curPage-2,curPage-1,curPage,curPage+1,curPage+2};
@@ -77,9 +106,32 @@ public class MenuManager : MonoBehaviour
         else if(tempCardNum[4]==totalPage) tempCardNum[4]=0;
         Debug.Log(tempCardNum[0]+","+tempCardNum[1]+","+tempCardNum[2]+","+tempCardNum[3]+","+tempCardNum[4]);
     }
-    public void RearrangeCardImages(){
+    public void RearrangeCards(){
         for(int i=0;i<5;i++){
-            collectionCardImages[i].sprite = collectionCardSprites[tempCardNum[i]];
+
+            if(DBManager.instance.CheckEndingCollectionOver(tempCardNum[i])){
+                collectionCardImages[i].sprite = DBManager.instance.endingCollectionSprites[tempCardNum[i]];//collectionCardSprites[tempCardNum[i]];
+                //collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[i].name;
+            }
+            else{
+
+                collectionCardImages[i].sprite = collectionNullImage;//collectionCardSprites[tempCardNum[i]];
+                //collectionNameText.text = "???";
+            }
+
+
+
+        }
+
+    
+        if(DBManager.instance.CheckEndingCollectionOver(tempCardNum[2])){
+            collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
+            collectionSubText0.text = "획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].count +"번 째 플레이";
+        }
+        else{                
+            collectionSubText0.text = "미획득";
+            collectionNameText.text = "???";
+
         }
         ActivateBtns(collectionScrollArrows);
     }
@@ -92,5 +144,41 @@ public class MenuManager : MonoBehaviour
         for(int i=0; i<btns.Length;i++){
             btns[i].interactable = false;
         }
+    }
+    public void TrySave(int num){
+        curSaveNum = num;
+        
+        OpenPopUpPanel("save");
+    }
+    public void OpenPopUpPanel(string type){
+        curPopUpType = type;
+        //popUpMainText.text = ;
+        //popUpSubText.text = ;
+        popUpText[2].text = "2";
+        popUpText[3].text ="3";
+        switch(type){
+            case "save" :
+                popUpText[0].text = "0";
+                popUpText[1].text = "1";
+                break;
+            default :
+                break;
+        }
+
+        for(int i=0;i<4;i++){
+            popUpText[i].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText[i].text),"sysmsg");
+        }
+
+        popUpPanel.SetActive(true);
+    }
+    public void PopUpOkayBtn(){
+        switch(curPopUpType){
+            case "save" :
+                DBManager.instance.CallSave(curSaveNum);
+                Debug.Log(curSaveNum + "번 저장 시도");
+                break;
+
+        }
+
     }
 }

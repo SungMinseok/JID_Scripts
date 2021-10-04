@@ -482,24 +482,24 @@ public class PlayerManager : MonoBehaviour
                 if(equipments[0]!=itemID){
                     equipments[0] = itemID;
                     curEquipment.gameObject.SetActive(true);
-                    Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                    Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 else{
                     equipments[0] = -1;
                     curEquipment.gameObject.SetActive(false);
-                    Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                    Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;            
             case 3:
                 if(equipments[2]!=itemID){
                     equipments[2] = itemID;
                     //curEquipment.gameObject.SetActive(true);
-                    Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                    Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 else{
                     equipments[2] = -1;
                     //curEquipment.gameObject.SetActive(false);
-                    Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
+                    Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;
 
