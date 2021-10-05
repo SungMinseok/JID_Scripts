@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
 
 public class MenuManager : MonoBehaviour
 {
@@ -19,10 +20,13 @@ public class MenuManager : MonoBehaviour
     public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
     [Header("UI_Save&Load")]
     public Transform saveSlotGrid;
+    public SaveLoadSlot[] saveSlots;
     public Transform loadSlotGrid;
+    public SaveLoadSlot[] loadSlots;
+    [System.Serializable]
     public class SaveLoadSlot{
-        public string name;
-        public string date;
+        public TextMeshProUGUI saveNameText;
+        public TextMeshProUGUI saveDateText;
     }
     [Header("UI_Collection_Ending")]
     public Animator animator;
@@ -51,15 +55,34 @@ public class MenuManager : MonoBehaviour
     }
     void Start(){
 
+#region Collection
         totalPage = DBManager.instance.endingCollectionSprites.Length;
         ResetCardOrder();
+#endregion
 
-        
+#region Save&Load
+
+        //saveSlots = new SaveLoadSlot[saveSlotGrid.childCount];
+        //loadSlots = new SaveLoadSlot[loadSlotGrid.childCount];
+
         for(int i=0;i<saveSlotGrid.childCount;i++){
             int temp = i;
             //toggleImage[i] = settingGrid.GetChild(i).GetChild(2).gameObject;
+            //saveSlots[temp] = saveSlotGrid.GetChild(temp).GetComponent<SaveLoadSlot>();
             saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
         }
+
+        for(int i=0;i<saveSlotGrid.childCount;i++){
+            //int temp = i;
+            //toggleImage[i] = settingGrid.GetChild(i).GetChild(2).gameObject;
+            //saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
+            
+            saveSlots[i].saveNameText = saveSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
+            saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
+
+        ResetSaveSlots();
+#endregion
     }
     // void Update(){
     //     if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Collection_Scroll_Right") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime>=1f){
@@ -67,7 +90,7 @@ public class MenuManager : MonoBehaviour
     //         Debug.Log("33");
     //     }
     // }
-
+#region Collection
     public void CollectionScrollRightBtn(){
         DeactivateBtns(collectionScrollArrows);
         if(curPage+1 == totalPage){
@@ -145,10 +168,34 @@ public class MenuManager : MonoBehaviour
             btns[i].interactable = false;
         }
     }
+    
+#endregion
+    
+    
+#region Save&Load 
+    public void ResetSaveSlots(){
+        for(int i=0; i<saveSlotGrid.childCount; i++){
+            if(DBManager.instance.CheckSaveFile(i)){
+                saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+            }
+            else{
+                saveSlots[i].saveNameText.text = "빈 슬롯";
+                saveSlots[i].saveDateText.text = "-";
+            }
+        }
+    }
+    //저장 슬롯 터치 시
     public void TrySave(int num){
         curSaveNum = num;
+
+        if(DBManager.instance.CheckSaveFile(num)){
+            OpenPopUpPanel("save");
+        }
+        else{
+            Save(curSaveNum);
+        }
         
-        OpenPopUpPanel("save");
     }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
@@ -174,11 +221,17 @@ public class MenuManager : MonoBehaviour
     public void PopUpOkayBtn(){
         switch(curPopUpType){
             case "save" :
-                DBManager.instance.CallSave(curSaveNum);
-                Debug.Log(curSaveNum + "번 저장 시도");
+                Save(curSaveNum);
+                //Debug.Log(curSaveNum + "번 저장 시도");
                 break;
 
         }
 
     }
+    public void Save(int curSaveNum){
+        DBManager.instance.CallSave(curSaveNum);
+        saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
+        saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+    }
+#endregion
 }

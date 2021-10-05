@@ -16,6 +16,7 @@ public class CSVReader : MonoBehaviour
     public List<Dictionary<string,object>> data_item;// = CSVReader.Read ("data_select");
     public List<Dictionary<string,object>> data_collection;
     public List<Dictionary<string,object>> data_sysmsg;
+    public List<Dictionary<string,object>> data_map;
 
     public int itemAmount;
     void Awake() {
@@ -26,6 +27,7 @@ public class CSVReader : MonoBehaviour
         data_item = CSVReader.Read ("data_item");
         data_collection = CSVReader.Read ("data_collection");
         data_sysmsg = CSVReader.Read ("data_sysmsg");
+        data_map = CSVReader.Read ("data_map");
         
         itemAmount = data_item.Count;
         //print(data_dialogue[0]["text_kr"]);

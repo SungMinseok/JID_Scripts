@@ -36,13 +36,19 @@ public class DBManager : MonoBehaviour
         public List<int> itemList;  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
         public List<int> endingCollectionOverList = new List<int>();
+
+        public string curMapName;
+        public string curPlayDate;
+        public int curPlayCount;
+        
     }
     public void CallSave(int fileNum){
 
         BinaryFormatter bf = new BinaryFormatter();
-
         FileStream file = File.Create(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
         
+        //curData.
+
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, curData);
         file.Close();
@@ -62,6 +68,28 @@ public class DBManager : MonoBehaviour
             file.Close();
         }
 
+    }
+    public bool CheckSaveFile(int fileNum){
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+
+        if(fileCheck.Exists){
+            //FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    public Data GetData(int fileNum){
+        BinaryFormatter bf = new BinaryFormatter();
+
+        FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
+
+        var data = (Data)bf.Deserialize(file);
+
+        file.Close();
+        
+        return data;
     }
 
 #region Trigger 관련
@@ -132,6 +160,10 @@ public class DBManager : MonoBehaviour
     {
         ApplyItemInfo();
         ApplyCollectionInfo();
+    }
+    void Update(){
+        //System.DateTime dateTime = System.DateTime.Now;
+        curData.curPlayDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm");
     }
     
     void ApplyItemInfo(){

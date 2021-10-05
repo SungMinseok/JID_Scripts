@@ -30,6 +30,7 @@ public class Location : MonoBehaviour
     public int doorNum;
     public TargetType targetType;
     public Transform desLoc;
+    public int desMapNum;
     public string orderDirection;
     public bool flipCheck;
     public bool isLocked;
@@ -473,6 +474,8 @@ public class LocationEditor : Editor
             selected.doorNum = EditorGUILayout.IntField("문 번호",selected.doorNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
+            EditorGUILayout.Space();
+            selected.desMapNum = EditorGUILayout.IntField("도착 맵 번호",selected.desMapNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();
