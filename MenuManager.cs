@@ -8,6 +8,8 @@ using System.IO;
 public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
+    public GameObject[] panels;
+    public GameObject[] btns;
     [Header("UI_Menu_Main")]
     public GameObject menuPanel;
     public Color defaultBtnColor;
@@ -65,23 +67,32 @@ public class MenuManager : MonoBehaviour
         //saveSlots = new SaveLoadSlot[saveSlotGrid.childCount];
         //loadSlots = new SaveLoadSlot[loadSlotGrid.childCount];
 
-        for(int i=0;i<saveSlotGrid.childCount;i++){
+        
+        for(int i=0;i<3;i++){
             int temp = i;
-            //toggleImage[i] = settingGrid.GetChild(i).GetChild(2).gameObject;
-            //saveSlots[temp] = saveSlotGrid.GetChild(temp).GetComponent<SaveLoadSlot>();
-            saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
+            btns[temp].GetComponent<Button>().onClick.AddListener(()=>OpenPanel(temp));
         }
 
         for(int i=0;i<saveSlotGrid.childCount;i++){
-            //int temp = i;
-            //toggleImage[i] = settingGrid.GetChild(i).GetChild(2).gameObject;
-            //saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
-            
+            int temp = i;
+            saveSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TrySave(temp));
+        }
+        for(int i=0;i<loadSlotGrid.childCount;i++){
+            int temp = i;
+            loadSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TryLoad(temp));
+        }
+
+        for(int i=0;i<saveSlotGrid.childCount;i++){
             saveSlots[i].saveNameText = saveSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
             saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
         }
+        for(int i=0;i<loadSlotGrid.childCount;i++){
+            loadSlots[i].saveNameText = loadSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
+            loadSlots[i].saveDateText = loadSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
 
         ResetSaveSlots();
+        ResetLoadSlots();
 #endregion
     }
     // void Update(){
@@ -185,6 +196,18 @@ public class MenuManager : MonoBehaviour
             }
         }
     }
+    public void ResetLoadSlots(){
+        for(int i=0; i<loadSlotGrid.childCount; i++){
+            if(DBManager.instance.CheckSaveFile(i)){
+                loadSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+            }
+            else{
+                loadSlots[i].saveNameText.text = "빈 슬롯";
+                loadSlots[i].saveDateText.text = "-";
+            }
+        }
+    }
     //저장 슬롯 터치 시
     public void TrySave(int num){
         curSaveNum = num;
@@ -197,14 +220,29 @@ public class MenuManager : MonoBehaviour
         }
         
     }
+    public void TryLoad(int num){
+        curLoadNum = num;
+
+        if(DBManager.instance.CheckSaveFile(num)){
+            OpenPopUpPanel("load");
+        }
+        else{
+            Load(curLoadNum);
+        }
+        
+    }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
         //popUpMainText.text = ;
         //popUpSubText.text = ;
-        popUpText[2].text = "2";
+        popUpText[2].text ="2";
         popUpText[3].text ="3";
         switch(type){
             case "save" :
+                popUpText[0].text = "0";
+                popUpText[1].text = "1";
+                break;
+            case "load" :
                 popUpText[0].text = "0";
                 popUpText[1].text = "1";
                 break;
@@ -225,6 +263,10 @@ public class MenuManager : MonoBehaviour
                 //Debug.Log(curSaveNum + "번 저장 시도");
                 break;
 
+            case "load" :
+                Load(curLoadNum);
+                //Debug.Log(curSaveNum + "번 저장 시도");
+                break;
         }
 
     }
@@ -232,6 +274,55 @@ public class MenuManager : MonoBehaviour
         DBManager.instance.CallSave(curSaveNum);
         saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
         saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+    }
+    public void Load(int curLoadNum){
+        CloseAllPanels();
+        CloseMenuPanel();
+        LoadManager.instance.isLoadingInGame = true;
+        LoadManager.instance.lastLoadFileNum = curLoadNum;
+        LoadManager.instance.LoadGame();
+        Debug.Log(curLoadNum + "번 파일 로드 시도");
+        //DBManager.instance.CallLoad(curSaveNum);
+        //saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
+        //saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+    }
+    public void CloseAllPanels(){
+        for(int i=0; i<panels.Length;i++){
+            panels[i].SetActive(false);
+        }
+    }
+    public void CloseMenuPanel(){
+        menuPanel.SetActive(false);
+    }
+    public void OpenPanel(int panelNum){
+        CloseAllPanels();
+
+        switch(panelNum){
+            case 0 :
+                ResetSaveSlots();
+                break;
+            case 1 :
+                ResetLoadSlots();
+                break;
+        }
+
+
+
+
+
+
+
+        panels[panelNum].SetActive(true);
+        
+    }
+    public void LoadLast(){
+        CloseAllPanels();
+        CloseMenuPanel();
+        LoadManager.instance.isLoadingInGameToLastPoint = true;
+        //LoadManager.instance.lastLoadFileNum = curLoadNum;
+        LoadManager.instance.LoadGame();
+        Debug.Log(LoadManager.instance.lastLoadFileNum + "번 파일 로드 시도 (마지막 저장)");
+
     }
 #endregion
 }

@@ -54,6 +54,9 @@ public class PlayerManager : MonoBehaviour
     [Header("────────────────────────────")]
     public float waitingInteractDelayTime;
     [Header("────────────────────────────")]
+    public Transform talkCanvas;
+    float defaultTalkCanvasHolderPosX;
+    [Header("────────────────────────────")]
     public DirtScript dirtTarget;
     public Transform playerBody;
     public SpriteRenderer[] spriteRenderers;
@@ -75,7 +78,7 @@ public class PlayerManager : MonoBehaviour
     public Animator animator;
     public Animator animator_back;
 
-    public Transform dialogueHolder;
+    //public Transform dialogueHolder;
     [Header("Debug─────────────────────")]
     public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
@@ -109,6 +112,10 @@ public class PlayerManager : MonoBehaviour
         defaultScale = playerBody.transform.localScale;
 
         canMove = true;
+
+        talkCanvas = transform.GetChild(0).GetChild(0);
+        talkCanvas.gameObject.SetActive(false);
+        defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
 
         // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
@@ -522,6 +529,26 @@ public class PlayerManager : MonoBehaviour
                 // }
             default :
                 break;
+        }
+    }
+    public void SetTalkCanvasDirection(){
+        if(talkCanvas!=null){
+            //var v = 1;
+            Debug.Log("A");
+            
+            var v = playerBody.localScale.x > 0 ? 1 : -1;
+            
+            // else{
+            //     var v = 1;
+            // }
+
+
+            var tempRect = talkCanvas.GetComponent<RectTransform>();
+            tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
+            tempRect.localScale = new Vector2(v, tempRect.localScale.y);
+            
+            var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
+            tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
         }
     }
 }

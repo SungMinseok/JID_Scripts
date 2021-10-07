@@ -14,6 +14,7 @@ public class Select
 public class SelectManager : MonoBehaviour
 {
     public static SelectManager instance;
+    public Transform selectSlotGrid;
     public int curSelectedNum;
     public int maxSelectedNum;
     public int lastSelectedNum;
@@ -35,6 +36,10 @@ public class SelectManager : MonoBehaviour
     }
     void Start(){
         
+        for(int i=0;i<selectSlotGrid.childCount;i++){
+            int temp = i;
+            selectSlotGrid.GetChild(temp).GetChild(1).GetComponent<Button>().onClick.AddListener(()=>PushSelect(temp));
+        }
     }
     public void ResetSelectUI(){
         for(int i=0;i<UIManager.instance.ui_select_grid.childCount;i++){
@@ -124,6 +129,10 @@ public class SelectManager : MonoBehaviour
 
         }
 
+    }
+    public void PushSelect(int selectNum){
+        curSelectedNum = selectNum;
+        ExitSelect();
     }
     public int GetSelect(){
         return lastSelectedNum;

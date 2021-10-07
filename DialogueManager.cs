@@ -137,29 +137,6 @@ public class DialogueManager : MonoBehaviour
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
         
     }
-    // IEnumerator DialogueCoroutine2(Dialogue dialogue, bool atOnce=true, float typingSpeed =0.05f, float typingInterval= 1.5f)
-    // {
-    //     //PlayerManager.instance.isTalking = true;
-    //     dialogueFlag= true;
-    //     dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
-        
-
-    //     for(int i=0; i<dialogue.sentences.Length;i++){
-            
-    //         var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
-    //         curSentence = dialogue.sentences[i];
-    //         StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
-    //         yield return new WaitUntil(()=>!revealTextFlag);
-
-    //     }
-
-    //     dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
-        
-    //     dialogueFlag= false;
-
-        
-    //     PlayerManager.instance.isTalking = false;
-    // }
 
     //스킵 가능한 메시지 출력(플레이어 or 스토리 상 NPC)
     IEnumerator RevealText(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
@@ -239,6 +216,7 @@ public class DialogueManager : MonoBehaviour
 
     }
 
+    //스킵 불가능한 NPC 자체 랜덤 메시지 출력
     IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
         talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
         talker.GetChild(0).GetChild(0).gameObject.SetActive(true);

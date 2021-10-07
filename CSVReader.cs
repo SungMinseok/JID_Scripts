@@ -20,7 +20,15 @@ public class CSVReader : MonoBehaviour
 
     public int itemAmount;
     void Awake() {
-        instance = this;
+        if (null == instance)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
 
         data_dialogue = CSVReader.Read ("data_dialogue");
         data_select = CSVReader.Read ("data_select");
@@ -96,8 +104,13 @@ public class CSVReader : MonoBehaviour
                 }
                 break;    
             case "sysmsg" :
-                if(data_select.Count>index){
+                if(data_sysmsg.Count>index){
                     result = data_sysmsg[index][curLanguage];
+                }
+                break;
+            case "map" :
+                if(data_map.Count>index){
+                    result = data_map[index][curLanguage];
                 }
                 break;
             default : 

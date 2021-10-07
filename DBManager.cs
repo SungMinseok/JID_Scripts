@@ -8,9 +8,16 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
+    [Header("Game Info")]
+    public uint buildNum;
+    public string buildDate;
     [Header("Current Data")]
 
     public Data curData;
+
+    [Header("Local Data")]
+
+    public LocalData localData;
 
 
     [Header("Cache")]
@@ -26,7 +33,10 @@ public class DBManager : MonoBehaviour
 
 
 
+    
+    [Header("Empty Data")]
 
+    public Data emptyData;
 
 
 
@@ -35,12 +45,20 @@ public class DBManager : MonoBehaviour
     public class Data{
         public List<int> itemList;  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
-        public List<int> endingCollectionOverList = new List<int>();
+        //public List<int> endingCollectionOverList = new List<int>();
 
         public string curMapName;
+        public int curMapNum;
         public string curPlayDate;
         public int curPlayCount;
+
+        public float playerX, playerY;
         
+    }
+    
+    [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
+    public class LocalData{
+        public List<int> endingCollectionOverList = new List<int>();
     }
     public void CallSave(int fileNum){
 
@@ -48,6 +66,8 @@ public class DBManager : MonoBehaviour
         FileStream file = File.Create(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
         
         //curData.
+        curData.playerX = PlayerManager.instance.transform.position.x;
+        curData.playerY = PlayerManager.instance.transform.position.y;
 
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, curData);
@@ -92,6 +112,35 @@ public class DBManager : MonoBehaviour
         return data;
     }
 
+#region LocalData
+    public void CallLocalDataSave(){
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/LocalDataFile.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+        
+
+        //Debug.Log(Application.persistentDataPath);
+        bf.Serialize(file, localData);
+        file.Close();
+    }
+    public void CallLocalDataLoad(){
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/LocalDataFile.dat");
+
+        if(fileCheck.Exists){
+            FileStream file = File.Open(Application.persistentDataPath + "/LocalDataFile.dat", FileMode.Open);
+        
+            if(file != null && file.Length >0){
+                localData =(LocalData)bf.Deserialize(file);
+            }
+            
+            file.Close();
+        }
+
+    }
+#endregion
+
 #region Trigger 관련
     public void TrigOver(int trigNum){
         if(!CheckTrigOver(trigNum)){
@@ -131,12 +180,13 @@ public class DBManager : MonoBehaviour
     //엔딩 컬렉션 달성 등록
     public void EndingCollectionOver(int collectionNum){
         if(!CheckEndingCollectionOver(collectionNum)){
-            curData.endingCollectionOverList.Add(collectionNum);
+            localData.endingCollectionOverList.Add(collectionNum);
+            //CallLocalDataSave();
         }
     }
     //엔딩 컬렉션 달성되었는지 확인
     public bool CheckEndingCollectionOver(int collectionNum){
-        if(curData.endingCollectionOverList.Contains(collectionNum)){
+        if(localData.endingCollectionOverList.Contains(collectionNum)){
             return true;
         }
         else{
@@ -154,6 +204,8 @@ public class DBManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        //CallLocalDataLoad();
     }
 
     void Start()
@@ -200,6 +252,28 @@ public class DBManager : MonoBehaviour
         }
     }
 
+
+    // void OnApplicationQuit(){
+        
+    //     if(DBManager.instance != null) DBManager.instance.CallSave(0);
+    // }
+    // void OnApplicationPause(bool pause)
+    // {
+    //     if(DBManager.instance != null){
+                
+    //         if (pause)
+    //         {
+    //             isPaused = true;
+    //             DBManager.instance.CallSave(0);
+    //             /* 앱이 비활성화 되었을 때 처리 */    
+    //         }
+    //         else{
+    //             if(isPaused){
+    //                 isPaused = false;
+    //             }
+    //         }
+    //     }
+    // }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 
     

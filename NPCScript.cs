@@ -6,6 +6,17 @@ using TMPro;
 [RequireComponent (typeof (CircleCollider2D))]
 public class NPCScript : MonoBehaviour
 {
+    
+    [Header("Set Animator")]
+    public bool haveWalk = false;
+    public bool haveTalk = false;
+    [Header("Setting")]
+    //public bool canMove;
+    //public bool canTalk;
+    [Tooltip("스프라이트 스킨아닐 시 체크")]
+    public bool isSpriteRenderer;
+    //[Tooltip("기본 스프라이트가 우향일 시 체크")]
+    //public bool isRight;
     [Header("Sub things")]
     public Transform talkCanvas;
     public Transform interactiveMark;
@@ -14,10 +25,6 @@ public class NPCScript : MonoBehaviour
     [Header("Status")]
     [SerializeField][Range(1f,10f)] public float speed = 2f;
     //[SerializeField][Range(10f,50f)] public float jumpPower = 10f;
-    
-    [Header("Set Animator")]
-    public bool haveWalk = false;
-    public bool haveTalk = false;
     
     [Header("배회 모드")]
     public bool onJYD;
@@ -75,17 +82,23 @@ public class NPCScript : MonoBehaviour
     PlayerManager thePlayer;
     public Animator animator;
     float defaultScaleX;
+    float defaultTalkCanvasHolderPosX;
     void Start()
     {
+        if(haveTalk) talkCanvas = transform.GetChild(0).GetChild(0);
+        if((haveWalk || !isSpriteRenderer)&&transform.childCount>=2) mainBody = transform.GetChild(1);
+
         thePlayer = PlayerManager.instance;
         rb = GetComponent<Rigidbody2D>();
         circleCollider2D = GetComponent<CircleCollider2D>();
-        if(mainBody!=null) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
-        else spriteRenderer = GetComponent<SpriteRenderer>();
+        //if(mainBody!=null) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
+        if(isSpriteRenderer) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
+        //else spriteRenderer = GetComponent<SpriteRenderer>();
         if(mainBody!=null) animator = mainBody.GetComponent<Animator>();
+        //if(isSpriteSkin) animator = mainBody.GetComponent<Animator>();
         else animator = GetComponent<Animator>();
         defaultScaleX = transform.localScale.x;
-
+        defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
 
         if(noCollision){
                 
@@ -121,7 +134,7 @@ public class NPCScript : MonoBehaviour
 
         //Sub things 세팅
         if(talkCanvas !=null ){
-            talkCanvas = talkCanvas.GetChild(0);
+            //talkCanvas = talkCanvas.GetChild(0);
             talkCanvas.gameObject.SetActive(false);
         }
 
@@ -389,13 +402,37 @@ public class NPCScript : MonoBehaviour
 
         switch(direction){
             case "left" : 
-                spriteRenderer.flipX = true;
+                //wSet = -1;
+                if(spriteRenderer!=null) spriteRenderer.flipX = true;
                // mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
                 break;
             case "right" : 
-                spriteRenderer.flipX = false;
+                //wSet = 1;
+                if(spriteRenderer!=null) spriteRenderer.flipX = false;
                 //mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
                 break;
+        }
+        SetTalkCanvasDirection();
+        PlayerManager.instance.SetTalkCanvasDirection();
+    }
+    public void SetTalkCanvasDirection(){
+        if(talkCanvas!=null){
+            var v = 1;
+
+            if(spriteRenderer!=null){
+                v = spriteRenderer.flipX ? -1 : 1;
+            }
+            // else{
+            //     var v = 1;
+            // }
+
+
+            var tempRect = talkCanvas.GetComponent<RectTransform>();
+            tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
+            tempRect.localScale = new Vector2(v, tempRect.localScale.y);
+            
+            var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
+            tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
         }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);

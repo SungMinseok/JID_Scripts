@@ -120,12 +120,16 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator SetGameOverCoroutine(int num){
         yield return new WaitForSeconds(1.5f);
-        SetFadeOut();
+        //SetFadeOut();
+        LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1.5f);
 
         ui_gameOver_image.sprite = ui_gameOver_sprites[num];
         ui_gameOver.SetActive(true);
+        LoadManager.instance.FadeIn();
         yield return new WaitForSeconds(2f);
         ui_gameOver_btns.gameObject.SetActive(true);
+
+        DBManager.instance.EndingCollectionOver(num);
     }
 }

@@ -96,7 +96,7 @@ public class DoodadsScript : MonoBehaviour
                             
                         Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], true);
                         Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], true);
-                        DM(platformCollider[i].name);
+                        //DM(platformCollider[i].name);
                     }
                 // Debug.Log("무시중");
                 }

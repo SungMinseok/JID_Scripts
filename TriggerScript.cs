@@ -64,7 +64,7 @@ public class TriggerScript : MonoBehaviour
             objects = null;
         }
 
-//타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 중 움직이지 않도록 함.
+//타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 중 움직이지 않고, 바라보도록 함
         if(location.target != null){
             
             var npc = location.target.GetComponent<NPCScript>();
@@ -72,7 +72,7 @@ public class TriggerScript : MonoBehaviour
             npc.patrolInput = 0;
 
             if(npc.lookPlayer){
-                if(npc.transform.position.x > PlayerManager.instance.transform.position.x){
+                if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
                     npc.Look("left");
                 }
                 else{
@@ -81,7 +81,7 @@ public class TriggerScript : MonoBehaviour
                 }
             }
 
-            if(npc.transform.position.x > PlayerManager.instance.transform.position.x){
+            if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
                 PlayerManager.instance.Look("right");
             }
             else{
@@ -438,11 +438,14 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
 
-                UIManager.instance.SetFadeOut();
+                //UIManager.instance.SetFadeOut();
+                LoadManager.instance.FadeOut();
                 yield return wait1s;
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
-                UIManager.instance.SetFadeIn();
+                //UIManager.instance.SetFadeIn();
+                
+                LoadManager.instance.FadeIn();
                 objects[4].gameObject.SetActive(false);
 
                 //CheatManager.instance.InputCheat("minigame 2");
@@ -483,13 +486,15 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 SetDialogue(dialogues[2]);
                 yield return waitTalking;
-                UIManager.instance.SetFadeOut();
+                //UIManager.instance.SetFadeOut();
+                LoadManager.instance.FadeOut();
                 yield return wait1s;
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetConfiner(7);
-                UIManager.instance.SetFadeIn();
+                //UIManager.instance.SetFadeIn();
+                LoadManager.instance.FadeIn();
                 
                 
                 break;
@@ -502,13 +507,17 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 SetDialogue(dialogues[1]);
                 yield return waitTalking;
-                UIManager.instance.SetFadeOut();
+                //UIManager.instance.SetFadeOut();
+                
+                LoadManager.instance.FadeOut();
                 yield return wait1s;
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetConfiner(7);
-                UIManager.instance.SetFadeIn();
+                //UIManager.instance.SetFadeIn();
+                
+                LoadManager.instance.FadeIn();
                 
                 
                 break;
@@ -682,4 +691,6 @@ public class TriggerScript : MonoBehaviour
     }
 
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+
+
 }

@@ -9,8 +9,8 @@ public class DebugManager : MonoBehaviour
     public static DebugManager instance;
     public bool isDebugMode;
     public bool cheatAvailable;
-    public uint buildNum;
-    public string buildDate;
+    //public uint buildNum;
+    //public string buildDate;
     public GameObject debugPanel,cheatPanel;
     public Text buildInfoText;
     public Text buildDateText;
@@ -46,9 +46,9 @@ public class DebugManager : MonoBehaviour
 #if UNITY_EDITOR || alpha
  		isDebugMode = true;
         debugPanel.SetActive(true);
-        buildInfoText.text = "Build # : "+ buildNum.ToString();
+        buildInfoText.text = "Build # : "+ DBManager.instance.buildNum.ToString();
         //buildInfoText.text += "\n"+ DateTime.Now.ToString(("yyyy-MM-dd"));  
-        buildInfoText.text += "\n"+ buildDate;  
+        buildInfoText.text += "\n"+ DBManager.instance.buildDate;  
 #else
         isDebugMode = false;
         debugPanel.SetActive(false);

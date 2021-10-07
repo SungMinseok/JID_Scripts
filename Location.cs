@@ -72,8 +72,13 @@ public class Location : MonoBehaviour
                 this.transform.SetParent(target);
                 this.transform.localPosition = Vector3.zero;
 
-                if(target.GetComponent<NPCScript>() != null && target.GetComponent<NPCScript>().interactiveMark !=null && !DBManager.instance.CheckTrigOver(trigNum)){
-                    target.GetComponent<NPCScript>().interactiveMark.gameObject.SetActive(true);
+                if(target.GetComponent<NPCScript>() != null && target.GetComponent<NPCScript>().interactiveMark !=null){
+                    if(!DBManager.instance.CheckTrigOver(trigNum) /*&& DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums)*/){
+                        target.GetComponent<NPCScript>().interactiveMark.gameObject.SetActive(true);
+                    }
+                    // else{
+                    //     target.GetComponent<NPCScript>().interactiveMark.gameObject.SetActive(false);
+                    // }
                 }
             }
 
@@ -88,6 +93,8 @@ public class Location : MonoBehaviour
             waitKey = false;
         }
     }
+
+    //키 입력시 발동
     void OnTriggerStay2D(Collider2D other) {
         if(other.CompareTag("Player")){
             if(waitKey&&!locFlag&&!PlayerManager.instance.isWaitingInteract&&!PlayerManager.instance.isActing){
@@ -100,6 +107,7 @@ public class Location : MonoBehaviour
             }
         }
     }
+    //키 안입력해도 발동
     void OnTriggerEnter2D(Collider2D other) {
         if(other.CompareTag("Player")){
             if(!waitKey && !locFlag&&!PlayerManager.instance.isActing){
@@ -110,7 +118,15 @@ public class Location : MonoBehaviour
                 //Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");
                 
             }
+        }        
+        else if(other.CompareTag("NPC")){
+            if(type == LocationType.Order && targetType == TargetType.NPC){
+                LocationScript(other);
+
+            }
+
         }
+
     }
     void LocationScript(Collider2D other){
         
@@ -126,7 +142,9 @@ public class Location : MonoBehaviour
                                 PlayerManager.instance.hInput = 0;
     //                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
                                 //SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
-                                SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
+                                //SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
+                                //SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[desMapNum]);
+                                SceneController.instance.SetConfiner(desMapNum);
                             }
                             else{
 
@@ -149,7 +167,7 @@ public class Location : MonoBehaviour
                         if(targetType == TargetType.Player){
                             if(other.CompareTag("Player")){
 
-                                //Debug.Log("1");
+                                Debug.Log("1");
                                 if(desLoc!=null){
                                     StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
                                 }
@@ -158,10 +176,23 @@ public class Location : MonoBehaviour
                                 }
                             }
                         }
+//                         else 
+//                     if(other.CompareTag("NPC")){
+//                         if(desLoc_Patrol_NPC!=null){
+//                             if(!other.GetComponent<NPCScript>().patrolFlag){
+// //                                DM("gogo");
+// //                                Debug.Log("1");
+//                                 StartCoroutine(TriggerScript.instance.NPCPatrolCoroutineToStart(other.GetComponent<NPCScript>()));
+//                             }   
+//                         }
+//                         else{
+//                             DM("목적지 없음");
+//                         }
+//                     }
                         else if(targetType == TargetType.NPC){
-                        // Debug.Log("2");
+                         Debug.Log("2");
                             if(other.CompareTag("NPC")){
-                                Debug.Log("2");
+                                Debug.Log("3");
                                 if(desLoc!=null){
                                     StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
                                 }
