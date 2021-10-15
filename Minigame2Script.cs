@@ -28,16 +28,17 @@ public class Minigame2Script : MonoBehaviour
     public Transform defaultPos1;
     public Transform createPos1;
 
+    [Space]
 
+    public Transform[] spriteSets;
+    public Transform startPoint;
+    public PolygonCollider2D mapCollider;
     [Space]
 
     [Header("[Debug]─────────────────")]
     public float curMapScrollSpeed = 0 ;
     Coroutine minigameCoroutine;
-    public Transform[] spriteSets;
-    public Transform startPoint;
     public bool isActive;
-    public PolygonCollider2D mapCollider;
 
     WaitForSeconds wait1s = new WaitForSeconds(1f);
     WaitForSeconds wait2s = new WaitForSeconds(2f);
@@ -72,6 +73,10 @@ public class Minigame2Script : MonoBehaviour
         }
     }    
     IEnumerator MinigameCoroutine(){
+
+        PlayerManager.instance.transform.position = startPoint.position;
+        SceneController.instance.SetSomeConfiner(mapCollider);
+        SceneController.instance.virtualCamera.Follow = null;
 
         isActive = true;
 
@@ -108,38 +113,38 @@ public class Minigame2Script : MonoBehaviour
         }
 #endregion
 #region FlyingMode
-        // //날으는 미친 개미 (기본등장)
+        //날으는 미친 개미 (기본등장)
         
-        // while(flyingMadAnt.transform.localPosition.x < defaultPos1.localPosition.x){
-        //     flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
-        //     yield return null;
-        // }
+        while(flyingMadAnt.transform.localPosition.x < defaultPos1.localPosition.x){
+            flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
+            yield return null;
+        }
 
-        // //소주병 n 번 날림
-        // for(int i=0;i<flyingMadAntThrowCount;i++){
-        //     var movingObject = flyingMadAnt;
-        //     var targetPos = new Vector2(PlayerManager.instance.transform.position.x,movingObject.transform.position.y);
+        //소주병 n 번 날림
+        for(int i=0;i<flyingMadAntThrowCount;i++){
+            var movingObject = flyingMadAnt;
+            var targetPos = new Vector2(PlayerManager.instance.transform.position.x,movingObject.transform.position.y);
 
-        //     Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
+            Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
 
-        //     while(!flyingMadAnt.mainBody.GetComponent<NPCSkillScript>().raderFlag ){
-        //         //flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
-        //         movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 7f * Time.deltaTime);
+            while(!flyingMadAnt.mainBody.GetComponent<NPCSkillScript>().raderFlag ){
+                //flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
+                movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 7f * Time.deltaTime);
 
-        //         yield return null;
-        //     }
-
-
+                yield return null;
+            }
 
 
-        //     flyingMadAnt.mainBody.GetComponent<Animator>().SetTrigger("throw_immy");
-        //     yield return new WaitForSeconds(3f);
-        // }
 
-        // while(flyingMadAnt.transform.localPosition.x > createPos1.localPosition.x){
-        //     flyingMadAnt.transform.localPosition += Vector3.left * flyingMadAntSpeed * Time.deltaTime  ;
-        //     yield return null;
-        // }
+
+            flyingMadAnt.mainBody.GetComponent<Animator>().SetTrigger("throw_immy");
+            yield return new WaitForSeconds(3f);
+        }
+
+        while(flyingMadAnt.transform.localPosition.x > createPos1.localPosition.x){
+            flyingMadAnt.transform.localPosition += Vector3.left * flyingMadAntSpeed * Time.deltaTime  ;
+            yield return null;
+        }
 #endregion
         //yield return new WaitForSeconds(gameTimer);
 

@@ -9,14 +9,18 @@ using System;
 public class Minigame1Script : MonoBehaviour
 {
     [Header("단계별 허용 간격(0.3/0.2/0.1)")]
-    [Header("[Game Settings]")]
+    [Header("Game Settings──────────")]
     public float[] acceptableIntervals;
     [Header("단계별 속도(0.04/0.045/0.05)")]
     public float[] pointerSpeedPerStage;
+    
+    [Header("Objects──────────")]
+
     public RectTransform errorArea;
     public Animator mainBottle;
     public GameObject[] emptyBottles;
     public GameObject[] fullBottles;
+    public Animator failBubbleAnimator;
     //public float errorAreaDefaultWidth;
     
     // [Header("1 번째 간격")]
@@ -43,7 +47,7 @@ public class Minigame1Script : MonoBehaviour
 
     [Space]
 
-    [Header("[Debug]")]
+    [Header("Debug──────────")]
     public bool isSliderUp;
     Coroutine sliderMovementCoroutine;
     Coroutine minigameCoroutine;
@@ -52,7 +56,8 @@ public class Minigame1Script : MonoBehaviour
     public int curStage;
     public int curLevel;
 
-
+    WaitForSeconds wait1000ms = new WaitForSeconds(1f);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
 
 
     // public int curGetKey;
@@ -71,7 +76,7 @@ public class Minigame1Script : MonoBehaviour
     IEnumerator MinigameCoroutine(){
         //bubbleObjects.GetChild(0).gameObject.SetActive(true);
         SetLevel();
-        yield return new WaitForSeconds(1f);
+        yield return wait1000ms;
         curStage = 0;
         StartCoroutine(SetStage());
         // canSelect = true;
@@ -79,7 +84,7 @@ public class Minigame1Script : MonoBehaviour
         // SetErrorArea(0);
     }
     void SetLevel(){
-        for(int i=0;i<bubbleObjects.childCount;i++){
+        for(int i=0;i<4;i++){
             bubbleObjects.GetChild(i).gameObject.SetActive(false);
         }
 
@@ -89,7 +94,7 @@ public class Minigame1Script : MonoBehaviour
     IEnumerator SetStage(){
         canSelect = true;
         sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
-        yield return new WaitForSeconds(1f);
+        yield return wait1000ms;
         SetErrorArea();
     }
     void SetErrorArea(){
@@ -108,7 +113,7 @@ public class Minigame1Script : MonoBehaviour
     IEnumerator Wait(){
 
         canSelect = false;
-        yield return new WaitForSeconds(1f);
+        yield return wait1000ms;
         sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
         yield return new WaitForSeconds(2.5f);
     }  
@@ -167,7 +172,7 @@ public class Minigame1Script : MonoBehaviour
         mainBottle.SetTrigger("tilt");
         canSelect = false;
         //sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1.8f);
         float minErrorValue = randomCenterPosVar - acceptableIntervals[curStage]/2f;
         float maxErrorValue = randomCenterPosVar + acceptableIntervals[curStage]/2f;
 
@@ -176,32 +181,33 @@ public class Minigame1Script : MonoBehaviour
         //StartCoroutine(Wait());
         if(sliderPointer.value>=minErrorValue && sliderPointer.value<=maxErrorValue){
             if(curStage<=1){
-                Debug.Log("1");
+                //Debug.Log("1");
                 bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("off");
                 bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);
-                yield return new WaitForSeconds(0.5f);
+        yield return wait500ms;
                 //curStage = curStage + 1;
                 curStage ++;
                 StartCoroutine(SetStage());
             }
             else{   
-                Debug.Log("2");
+                //Debug.Log("2");
                 bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("off");
-                bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);
-                yield return new WaitForSeconds(0.5f);
+                bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);        
+                yield return wait500ms;
+
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("finish");
-                yield return new WaitForSeconds(1f);
+        yield return wait1000ms;
                 emptyBottles[curLevel].SetActive(false);
                 fullBottles[curLevel].SetActive(true);
-                yield return new WaitForSeconds(1f);
+        yield return wait1000ms;
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("reset");
                 //curLevel ++;
                 if(++curLevel <= 2){
-                Debug.Log("3");
+                //Debug.Log("3");
                     StartCoroutine(MinigameCoroutine());
                 }
                 else{
-                Debug.Log("4");
+                //Debug.Log("4");
                     gameObject.SetActive(false);
                 }
                 
@@ -211,9 +217,13 @@ public class Minigame1Script : MonoBehaviour
             
         }
         else{
-                Debug.Log("5");
-            bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("fail");
-            yield return new WaitForSeconds(1f);
+                //Debug.Log("5");
+        yield return wait500ms;
+                //yield return new WaitForSeconds(0.5f);
+            //bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("fail");
+            bubbleObjects.GetChild(curStage).gameObject.SetActive(false);
+            failBubbleAnimator.SetTrigger("off"+curStage.ToString());
+        yield return wait1000ms;
             StartCoroutine(MinigameCoroutine());
         }
     }    

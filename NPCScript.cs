@@ -53,7 +53,11 @@ public class NPCScript : MonoBehaviour
     [Header("플레이어와 충돌 무시")]
     public bool noCollision = true;
     [Header("랜덤 대화 설정")]
-    public bool onRandomDialogue;
+    //아무때나 랜덤 대화 활성화
+    public bool alwaysRandomDialogue;
+    //플레이어 근처에서만 랜덤 대화 활성화
+    public bool onlyNearPlayerRandomDialogue;
+    //public bool activateRandomDialogue;
     bool randomDialogueFlag;
     public float dialogueDuration;
     public int dialogueInterval;
@@ -65,6 +69,7 @@ public class NPCScript : MonoBehaviour
     public bool noFlip;
     [Space]
     [Header("Debug ───────────────────")]
+    public bool onRandomDialogue;
     
     public int patrolInput;
     public Collider2D lastPlatform;
@@ -149,6 +154,10 @@ public class NPCScript : MonoBehaviour
         
         if(mainBody!=null) defaultScale = mainBody.transform.localScale;
 
+        //랜덤대화
+        if(alwaysRandomDialogue){
+            onRandomDialogue = true;
+        }
     }
 
     void Update(){

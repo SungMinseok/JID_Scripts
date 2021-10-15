@@ -227,7 +227,7 @@ public class MenuManager : MonoBehaviour
             OpenPopUpPanel("load");
         }
         else{
-            Load(curLoadNum);
+            //Load(curLoadNum);
         }
         
     }

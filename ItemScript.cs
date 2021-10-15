@@ -13,11 +13,13 @@ public class ItemScript : MonoBehaviour
     //[Header("Honey")]
     public float amount;
     public int itemID;
+    public Dialogue getItemDialogue;
     //[Header("Dirt")]
     //public float dirtAmount;
     Animator animator;
     //public BoxCollider2D itemCol;
     //Vector2 itemVector;
+    WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     bool getFlag;
 
     void Start(){
@@ -28,44 +30,51 @@ public class ItemScript : MonoBehaviour
     }
 
     void OnTriggerStay2D(Collider2D other) {
-            
-                    //Debug.Log("1");
-            if(other.CompareTag("Player")){
-                if(!getFlag) {
-                    getFlag = true;
+        
+        if(other.CompareTag("Player")){
+            if(!getFlag) {
+                getFlag = true;
 
-                // Debug.Log("2");
-                    if(type == ItemType.Honey){
-                    // Debug.Log("33");
-                        
-                        StartCoroutine(GetItemAndRemoveCoroutine());
-                        DM("꿀 충전 : "+amount);
-                        PlayerManager.instance.curHoneyAmount+=amount;
-                    }
-                    else if(type == ItemType.Dirt){
-                    // Debug.Log("33");
-                        
-                        StartCoroutine(GetItemAndRemoveCoroutine());
-                        DM("흙 충전 : "+amount);
-                        
-                        PlayerManager.instance.curDirtAmount+=amount;
-                        if(PlayerManager.instance.curDirtAmount>PlayerManager.instance.maxDirtAmount){
-                            PlayerManager.instance.curDirtAmount=PlayerManager.instance.maxDirtAmount;
-                        }
-                    }
-                    else if(type == ItemType.Item){
-                    // Debug.Log("33");
-                        
-                        StartCoroutine(GetItemAndRemoveCoroutine());
-                        DM(itemID+"번 아이템 "+amount+"개 획득");
-                        
-                        InventoryManager.instance.AddItem(itemID);
-                    }
-                }
+                StartCoroutine(GetItemCoroutine());
+
             }
+        }
 
     }
+    IEnumerator GetItemCoroutine(){
 
+        if(getItemDialogue != null){
+
+            DialogueManager.instance.SetDialogue(getItemDialogue);
+            yield return waitTalking;
+        }
+
+
+        if(type == ItemType.Honey){
+            StartCoroutine(GetItemAndRemoveCoroutine());
+            DM("꿀 충전 : "+amount);
+            PlayerManager.instance.curHoneyAmount+=amount;
+        }
+        else if(type == ItemType.Dirt){
+            StartCoroutine(GetItemAndRemoveCoroutine());
+            DM("흙 충전 : "+amount);
+            
+            PlayerManager.instance.curDirtAmount+=amount;
+            if(PlayerManager.instance.curDirtAmount>PlayerManager.instance.maxDirtAmount){
+                PlayerManager.instance.curDirtAmount=PlayerManager.instance.maxDirtAmount;
+            }
+        }
+        else if(type == ItemType.Item){
+            StartCoroutine(GetItemAndRemoveCoroutine());
+            DM(itemID+"번 아이템 "+amount+"개 획득");
+            
+            InventoryManager.instance.AddItem(itemID);
+        }
+
+
+
+
+    }
 
     IEnumerator GetItemAndRemoveCoroutine(){
         yield return null;

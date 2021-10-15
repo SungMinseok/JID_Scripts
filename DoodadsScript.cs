@@ -5,18 +5,22 @@ public enum DoodadsType{
     Ladder,
     Cover,
     Trap,
+    SlowDown,
 }
 public class DoodadsScript : MonoBehaviour
 {
     public DoodadsType type;
     SpriteRenderer spriteRenderer;
-    Color defaultColor = new Color(1,1,1);
-    Color darkColor = new Color(0.3f,0.3f,0.3f);
+    //Color defaultColor = new Color(1,1,1);
+    //Color darkColor = new Color(0.3f,0.3f,0.3f);
     Color color;
     WaitForSeconds waitTime = new WaitForSeconds(0.01f);
     //PlayerManager thePlayer;
     
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
+    
+    [Header("SlowDown")]
+    public float slowDownValue;
 
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -82,6 +86,12 @@ public class DoodadsScript : MonoBehaviour
                 }
             }
         }
+        else if(type == DoodadsType.SlowDown){
+            if(other.CompareTag("Player")){
+                PlayerManager.instance.isSlowDown += slowDownValue;
+                Debug.Log("A");
+            }
+        }
         
     }
     
@@ -116,6 +126,7 @@ public class DoodadsScript : MonoBehaviour
                 }
             }
         }
+        
         // else if(type == DoodadsType.Cover){
             
         //     if(other.CompareTag("Player")){
@@ -146,6 +157,12 @@ public class DoodadsScript : MonoBehaviour
                 PlayerManager.instance.isHiding = false;
                 Decloak();
 
+            }
+        }
+        else if(type == DoodadsType.SlowDown){
+            if(other.CompareTag("Player")){
+                PlayerManager.instance.isSlowDown -= slowDownValue;
+                Debug.Log("B");
             }
         }
     }

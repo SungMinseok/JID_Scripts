@@ -6,10 +6,10 @@ using Cinemachine;
 public class TriggerScript : MonoBehaviour
 {    
     public static TriggerScript instance;
-
-    WaitForSeconds wait1s = new WaitForSeconds(1);
-    WaitForSeconds wait2s = new WaitForSeconds(2);
-    WaitForSeconds wait3s = new WaitForSeconds(3);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
+    WaitForSeconds wait1000ms = new WaitForSeconds(1);
+    WaitForSeconds wait2000ms = new WaitForSeconds(2);
+    WaitForSeconds wait3000ms = new WaitForSeconds(3);
 
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     WaitUntil waitSelecting = new WaitUntil(()=>!PlayerManager.instance.isSelecting);
@@ -71,6 +71,13 @@ public class TriggerScript : MonoBehaviour
             npc.isPaused = true;
             npc.patrolInput = 0;
 
+            if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
+                PlayerManager.instance.Look("right");
+            }
+            else{
+                PlayerManager.instance.Look("left");
+
+            }
             if(npc.lookPlayer){
                 if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
                     npc.Look("left");
@@ -81,18 +88,13 @@ public class TriggerScript : MonoBehaviour
                 }
             }
 
-            if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
-                PlayerManager.instance.Look("right");
-            }
-            else{
-                PlayerManager.instance.Look("left");
-
-            }
 
             //if(npc.animator!=null) npc.animator.SetBool("talk", true);
         }
 
         switch(location.trigNum){
+
+//여긴 어디?
 #region 1
             case 1 :
                 SetDialogue(dialogues[0]);
@@ -106,19 +108,20 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//먹이창고 탈출
 #region 3
             case 3 :
                 var nerd_ant = SceneController.instance.npcs[0];
 
                 CameraView(nerd_ant.transform);
-                yield return wait1s;
+                yield return wait1000ms;
                 nerd_ant.animator.SetTrigger("wakeUp");
-                yield return wait2s;
+                yield return wait2000ms;
                 //MapManager.instance.virtualCamera.Follow = ObjectController.instance.npcs[0].transform;
                 nerd_ant.animator.SetTrigger("standUp");
                 SetDialogue(dialogues[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                //yield return wait2s;
+                //yield return wait2000ms;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                 SetDialogue(dialogues[1]);
                 nerd_ant.animator.SetTrigger("count");
@@ -133,7 +136,7 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                yield return wait3s;
+                yield return wait3000ms;
                 nerd_ant.gameObject.SetActive(false);
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetConfiner(objects[0].parent.transform.GetSiblingIndex());
@@ -145,6 +148,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//수배지 확인
 #region 4
             case 4 :
                 ActivateEffect(1,3);
@@ -155,13 +159,14 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//복도 경비병 만남
 #region 5
             case 5 :
             
                 CameraView(objects[0]);
                 SceneController.instance.npcs[1].gameObject.SetActive(true);
                 SceneController.instance.npcs[2].gameObject.SetActive(true);
-                yield return wait3s;
+                yield return wait3000ms;
                 CameraView(PlayerManager.instance.transform);
                 SceneController.instance.npcs[1].onPatrol = true;
                 SceneController.instance.npcs[2].onPatrol = true;
@@ -174,6 +179,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//노개미에게 말을 건다.(선택지)
 #region 6
             case 6 :
 
@@ -263,6 +269,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//화난 노개미에게 말을 다시 건다.
 #region 7
             case 7 :
                 
@@ -273,6 +280,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//[미니게임0 - 종이 오리기] 유치원 센세에게 말을 건다.
 #region 8
             case 8 :
             
@@ -342,6 +350,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//꽃핀 가졌을 때 유치원 센세 말걸기
 #region 9
             case 9 :
                 
@@ -369,6 +378,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//꽃핀을 가진 아이
 #region 10
             case 10 :
                 
@@ -378,6 +388,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//수레개미에게 말을 건다.
 #region 11
             case 11 :
                 
@@ -387,8 +398,9 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//[미니게임1 - 로메슈제 제조] 술먹는 개미에게 말을 건다.
 #region 12
-            case 12 :   //술먹는 개미에게 말을 건다.
+            case 12 :   
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -407,16 +419,18 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//"로메슈제" 미니게임 성공 후 취한 개미 ( 선행 : 12 )
 #region 13
-            case 13 :   //"로메슈제" 미니게임 성공 후 취한 개미 ( 선행 : 12 )
+            case 13 :   
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 break;
 #endregion
 
+//중독 수개미에게 말을 건다.
 #region 14
-            case 14 :   //중독 수개미에게 말을 건다.
+            case 14 :   
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -429,32 +443,31 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//[미니게임2 - 미친 수개미 피하기] 빛나는 양동이를 클릭한다.
 #region 15
-            case 15 :   //빛나는 양동이를 클릭한다. > 미니게임2 시작
+            case 15 :   
                 objects[2].gameObject.SetActive(false);
                 objects[3].gameObject.SetActive(true);
-                yield return wait1s;
+                yield return wait1000ms;
+                PlayerManager.instance.Look("left");
 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
 
-                //UIManager.instance.SetFadeOut();
-                LoadManager.instance.FadeOut();
-                yield return wait1s;
-                PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
-                //UIManager.instance.SetFadeIn();
+                //LoadManager.instance.FadeOut();
+                //yield return wait1000ms;
+                //PlayerManager.instance.transform.position = objects[0].position;
+                //SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
                 
-                LoadManager.instance.FadeIn();
-                objects[4].gameObject.SetActive(false);
+                
+                //LoadManager.instance.FadeIn();
+                //objects[4].gameObject.SetActive(false);
 
-                //CheatManager.instance.InputCheat("minigame 2");
                 MinigameManager.instance.StartMinigame(2);
-                PlayerManager.instance.canMove = true;
-                SceneController.instance.virtualCamera.Follow = null;
-                yield return new WaitUntil(()=>MinigameManager.instance.success);
-                
                 //PlayerManager.instance.canMove = true;
+                //SceneController.instance.virtualCamera.Follow = null;
+                //yield return new WaitUntil(()=>MinigameManager.instance.success);
+                
 
 
 
@@ -462,11 +475,13 @@ public class TriggerScript : MonoBehaviour
                 
                 break;
 #endregion
+
+//"도망" 미니게임 성공 , 끝 맵으로 이동
 #region 16
-            case 16 :   //"도망" 미니게임 성공 , 끝 맵으로 이동
+            case 16 :   
                 
                 // UIManager.instance.SetFadeOut();
-                // yield return wait1s;
+                // yield return wait1000ms;
                 SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
                 
                 PlayerManager.instance.transform.position = objects[0].position;
@@ -477,8 +492,9 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//"도망" 미니게임 성공 후, 노개미 만남
 #region 17
-            case 17 :   //"도망" 미니게임 성공 후, 노개미 만남
+            case 17 :   
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -488,7 +504,7 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 //UIManager.instance.SetFadeOut();
                 LoadManager.instance.FadeOut();
-                yield return wait1s;
+                yield return wait1000ms;
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
@@ -500,8 +516,9 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+//"도망" 미니게임 성공 후, 수레개미 만남
 #region 18
-            case 18 :   //"도망" 미니게임 성공 후, 수레개미 만남
+            case 18 :   
                 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
@@ -510,7 +527,7 @@ public class TriggerScript : MonoBehaviour
                 //UIManager.instance.SetFadeOut();
                 
                 LoadManager.instance.FadeOut();
-                yield return wait1s;
+                yield return wait1000ms;
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
@@ -522,6 +539,10 @@ public class TriggerScript : MonoBehaviour
                 
                 break;
 #endregion
+            
+            
+            
+            
             default : 
                 break;
         }
@@ -538,8 +559,8 @@ public class TriggerScript : MonoBehaviour
         PlayerManager.instance.isActing =false;    
         PlayerManager.instance.canMove =true;   
 
-        //yield return wait1s;
-        PlayerManager.instance.ActivateWaitInteract(PlayerManager.instance.waitingInteractDelayTime);
+        //yield return wait1000ms;
+        PlayerManager.instance.ActivateWaitInteract(PlayerManager.instance.delayTime_WaitingInteract);
         location.locFlag = false; 
 
         
@@ -553,7 +574,8 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
-
+        //트리거 완료 혹은 재시작 가능 시 느낌표 재출력을 위해 로케이션 레이더 재활성화
+        PlayerManager.instance.locationRader.ResetLocationRader();
     }
     public void TrigIsDone(Location location){
 
@@ -579,6 +601,7 @@ public class TriggerScript : MonoBehaviour
         }
 
         Debug.Log(location.trigNum + "(" + location.trigComment + ") 실행 처리됨");
+
 
     }
     
@@ -640,7 +663,7 @@ public class TriggerScript : MonoBehaviour
             //if(location.flipCheck) objCol.GetComponent<SpriteRenderer>().flipX = !objCol.GetComponent<SpriteRenderer>().flipX ;
         }
 
-        yield return wait1s;
+        yield return wait1000ms;
 
         
         if(location.preserveTrigger) location.locFlag = false;

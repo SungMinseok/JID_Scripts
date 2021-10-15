@@ -22,7 +22,8 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
     public int curPage;
-    public UIManager theUI;
+    public int slotCountPerPage;
+    //public UIManager theUI;
     
     [Header("UI_Inventory")]
     public Transform itemSlotGrid;

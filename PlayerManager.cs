@@ -6,21 +6,22 @@ public class PlayerManager : MonoBehaviour
 {
 
     public static PlayerManager instance;
-    [Header("Status")]
+    [Header("Current Status")]
+    public float curSpeed;
     public float curDirtAmount;
     public float curHoneyAmount;
-    [Header("Equipment : Helmet/Armor/Weapon")]
+    [Header("Current Equipment : Helmet/Armor/Weapon")]
     public int[] equipments;
     //public byte armorNum;
     //public uint weaponNum;
-    [Header("Set Status")]
+    [Header("Set Default Status")]
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
     [SerializeField] [Range(1f, 20f)] public float gravityScale;
     public float maxDirtAmount;
     public float maxHoneyAmount;
 
-    [Header("Wearable")]
+    [Header("Wearable Objects")]
     public SpriteRenderer[] helmets;
     public SpriteRenderer wearables0;
     Coroutine animationCoroutine;
@@ -51,10 +52,13 @@ public class PlayerManager : MonoBehaviour
     public bool digFlag;
     public bool isWaitingInteract;
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
+    public float isSlowDown;
     [Header("────────────────────────────")]
-    public float waitingInteractDelayTime;
+    public float delayTime_WaitingInteract;
+    public float delayTime_Jump;
     [Header("────────────────────────────")]
     public Transform talkCanvas;
+    public LocationRader locationRader;
     float defaultTalkCanvasHolderPosX;
     [Header("────────────────────────────")]
     public DirtScript dirtTarget;
@@ -75,12 +79,13 @@ public class PlayerManager : MonoBehaviour
 
 
     public DebugManager d;
+    [Header("Animation─────────────────────")]
     public Animator animator;
     public Animator animator_back;
 
     //public Transform dialogueHolder;
     [Header("Debug─────────────────────")]
-    public Collider2D lastPlatform;
+    //public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
     public GameObject curEquipment;
     void Awake()
@@ -160,15 +165,16 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-
+            //점프안하고 추락 시 점프 가능한 것 방지
+            if(!jumpDelay) Jump(0);
             animator.SetBool("jump", true);
             animator.SetBool("down", false);
         }
 
 //좌우 이동 중
-        if (wInput != 0 || wSet != 0 || isForcedRun)   
+        if ((wInput != 0 || wSet != 0 || isForcedRun) )   
         {
-            animator.SetBool("run", true);
+            if(!isForcedRun) animator.SetBool("run", true);
             if (wInput > 0|| wSet > 0)
             {
                 //spriteRenderer.flipX = false;
@@ -222,25 +228,39 @@ public class PlayerManager : MonoBehaviour
         footRadius = 0.075f;
 
         isGrounded = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
+
+//이속 제어
+        curSpeed = speed * (1-isSlowDown);
+        animator.SetFloat("walkSpeed", 1-isSlowDown);
+
         //nowPlatform = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
 
         //if(canMove){
         if (wInput != 0)
         {
-            rb.velocity = new Vector2(speed * wInput, rb.velocity.y);
+            if(!animator.GetBool("down")){
+
+                rb.velocity = new Vector2(curSpeed * wInput, rb.velocity.y);
+            }
+            // else if(isForcedRun){
+            //     if(animator.GetBool("down")){
+            //         rb.velocity = new Vector2(curSpeed * -1 * 0.5f, rb.velocity.y);
+            //     }
+            // }
 
         }
         else if (wSet != 0)
         {
-            rb.velocity = new Vector2(speed * wSet, rb.velocity.y);
-
+            if(!animator.GetBool("down")){
+                rb.velocity = new Vector2(curSpeed * wSet, rb.velocity.y);
+            }
         }
 
         if (jumpInput && !isJumping)
         {
-
             if (!jumpDelay && !onLadder)
             {
+                //jumpDelay = true;
                 Jump();
             }
 
@@ -256,17 +276,18 @@ public class PlayerManager : MonoBehaviour
         else{
             onLadder = false;
         }
+
         if(onLadder){
             
             if(jumpInput && wInput!=0){
                 onLadder = false;
                 StartCoroutine(GetLadderDelay());
-                if(!jumpDelay) Jump(0.7f);
+                if(!jumpDelay) Jump();
             }
             else{   
                 isJumping = false;
                 rb.gravityScale = 0f;
-                rb.velocity = new Vector2(0, (speed*0.7f) * hInput  );
+                rb.velocity = new Vector2(0, (curSpeed*0.7f) * hInput  );
                 // animator.gameObject.SetActive(false);
                 // animator_back.gameObject.SetActive(true);
                 ToggleBodyMode(0);
@@ -290,6 +311,27 @@ public class PlayerManager : MonoBehaviour
             //animator_back.gameObject.SetActive(false);
         }
 
+//[미니게임 2] - 강제 달리기 모션 + 포복 시 뒤로 이동
+        if(isForcedRun){
+            animator.SetBool("runForced", true);
+
+            if(animator.GetBool("down")){
+                rb.velocity = new Vector2(curSpeed * -1 * 0.7f, rb.velocity.y);
+            }
+
+            if(isSlowDown > 0){
+                rb.velocity = new Vector2(curSpeed * -1 * 2, rb.velocity.y);
+
+            }
+        }
+        else if(!isForcedRun){
+            animator.SetBool("runForced", false);
+        }
+
+//경비개미에게 잡혔을 시 이동 불가
+        if(isCaught){
+            canMove = false;
+        }
 
     }
     void ToggleBodyMode(int modeNum){
@@ -314,26 +356,28 @@ public class PlayerManager : MonoBehaviour
     }
     void Jump(float multiple = 1)
     {
+        jumpDelay = true;
 //        Debug.Log(multiple);
         StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
+        Debug.Log("Jump");
         rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
     }
     IEnumerator JumpDelay()
     {
-        if (!jumpDelay)
-        {
+        //if (!jumpDelay)
+        //{
 
-            jumpDelay = true;
+        //    jumpDelay = true;
             //yield return new WaitForSeconds(0.5f);
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(delayTime_Jump);
             //if(!onLadder)
                 yield return new WaitUntil(() => isGrounded);
             //else
             //    jumpDelay = false;
             jumpDelay = false;
-        }
+        //}
     }
     IEnumerator GetLadderDelay()
     {
@@ -457,6 +501,10 @@ public class PlayerManager : MonoBehaviour
     public void RevivePlayer(){
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.animator.SetBool("dead0", false);
+
+        PlayerManager.instance.isCaught = false;
+        PlayerManager.instance.isDead = false;
+        
     }
 
     public void LockPlayer(){

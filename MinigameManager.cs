@@ -10,6 +10,8 @@ public class MinigameManager : MonoBehaviour
     public GameObject successBtn;
     public Transform[] minigameScriptTransforms;
     //public bool minigameFlag;
+    
+    WaitForSeconds wait1000ms = new WaitForSeconds(1f);
 
     public bool success, fail;
 
@@ -61,24 +63,33 @@ public class MinigameManager : MonoBehaviour
         }
     }
     public void StartMinigame(int gameNum){
+
+
         Debug.Log(gameNum + "번 미니게임 시작");
+
+        StartCoroutine(StartMinigameCoroutine(gameNum));
+
+
+    }
+
+    IEnumerator StartMinigameCoroutine(int gameNum){
 
         nowMinigameNum = gameNum;
 
+        LoadManager.instance.FadeOut();
+        yield return wait1000ms;
+
+
         var nowMinigame = minigameScriptTransforms[gameNum];
 
-       // if(gameNum!=2){
-            if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
-                
-                PlayerManager.instance.isPlayingMinigame = true;
-                nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
+        if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
+            
+            PlayerManager.instance.isPlayingMinigame = true;
+            nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
 
-            }
+        }
 
-        // }
-        // else if(gameNum==2){
-        //     PlayerManager.instance.MovePlayer(nowMinigame.GetComponent<Minigame2Script>().startPoint);
-        //     SceneController.instance.SetSomeConfiner(nowMinigame.GetComponent<Minigame2Script>().mapCollider);
-        // }
+        
+        LoadManager.instance.FadeIn();
     }
 }

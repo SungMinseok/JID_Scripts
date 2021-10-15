@@ -5,11 +5,12 @@ using UnityEngine;
 public class LocationRader : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("Location")){
+        if(other.CompareTag("Location") ){
             var curLocation = other.GetComponent<Location>();
-            if(curLocation.activateTargetMark && !DBManager.instance.CheckTrigOver(curLocation.trigNum) && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums)){
+            if(curLocation.activateTargetMark && !DBManager.instance.CheckTrigOver(curLocation.trigNum) 
+            && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums)){
 
-                //Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
+                Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
                 //curLocation.targetMark.gameObject.SetActive(true);
                 curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");
             }
@@ -25,6 +26,11 @@ public class LocationRader : MonoBehaviour
                 curLocation.targetMark.GetComponent<Animator>().SetTrigger("off");
             }
         }
+    }
+
+    public void ResetLocationRader(){
+        gameObject.SetActive(false);
+        gameObject.SetActive(true);
     }
 }
 
