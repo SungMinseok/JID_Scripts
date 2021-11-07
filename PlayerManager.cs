@@ -53,9 +53,11 @@ public class PlayerManager : MonoBehaviour
     public bool isWaitingInteract;
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
     public float isSlowDown;
+    public bool jumpDownFlag;
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
+    public float delayTime_JumpDown;
     [Header("────────────────────────────")]
     public Transform talkCanvas;
     public LocationRader locationRader;
@@ -69,7 +71,7 @@ public class PlayerManager : MonoBehaviour
     Vector2 defaultScale;
     public Rigidbody2D rb;
     public BoxCollider2D boxCollider2D;
-    public CircleCollider2D circleCollider2D;
+    public Collider2D circleCollider2D;
     //SpriteRenderer spriteRenderer;
 
     [SerializeField] LayerMask groundLayer;
@@ -87,7 +89,16 @@ public class PlayerManager : MonoBehaviour
     [Header("Debug─────────────────────")]
     //public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
+    public Collider2D footCol;
     public GameObject curEquipment;
+    public GameObject[] tempHelmet;
+    [Header("ETC─────────────────────")]
+    public GameObject vignette;
+    public GameObject darkerVignette;
+    public GameObject[] redEyes;
+    WaitForSeconds wait1000ms = new WaitForSeconds(1);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
+    WaitForSeconds wait125ms = new WaitForSeconds(0.125f);
     void Awake()
     {
         Application.targetFrameRate = 60;
@@ -134,10 +145,14 @@ public class PlayerManager : MonoBehaviour
             wSet = 0;
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
-            jumpInput = Input.GetButton("Jump") ? true : false;
+            //jumpInput = Input.GetButton("Jump") ? true : false;
+            jumpInput = Input.GetButtonDown("Jump") ? true : false;
             interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
 
-
+            if(DBManager.instance.curData.curDirtAmount<=0 && canMove){
+                canMove = false;
+                StartCoroutine(DepletedDirt());
+            }
 
 
 
@@ -156,6 +171,11 @@ public class PlayerManager : MonoBehaviour
             if(hInput<0){
                 
                 animator.SetBool("down", true);
+
+                if(jumpInput && !jumpDownFlag){
+                    jumpDownFlag = true;
+                    StartCoroutine(JumpDown());
+                }
             }
             else{
                 animator.SetBool("down", false);
@@ -166,7 +186,7 @@ public class PlayerManager : MonoBehaviour
         else
         {
             //점프안하고 추락 시 점프 가능한 것 방지
-            if(!jumpDelay) Jump(0);
+            if(!jumpDelay && !onLadder) Jump(0);
             animator.SetBool("jump", true);
             animator.SetBool("down", false);
         }
@@ -256,7 +276,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        if (jumpInput && !isJumping)
+        if (jumpInput && !isJumping && hInput>=0)
         {
             if (!jumpDelay && !onLadder)
             {
@@ -370,6 +390,7 @@ public class PlayerManager : MonoBehaviour
 
         //    jumpDelay = true;
             //yield return new WaitForSeconds(0.5f);
+            //Debug.Log("딜레이시작");
 
             yield return new WaitForSeconds(delayTime_Jump);
             //if(!onLadder)
@@ -377,6 +398,7 @@ public class PlayerManager : MonoBehaviour
             //else
             //    jumpDelay = false;
             jumpDelay = false;
+            //Debug.Log("딜레이끝");
         //}
     }
     IEnumerator GetLadderDelay()
@@ -389,6 +411,29 @@ public class PlayerManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             ladderDelay = false;
         }
+    }
+
+    IEnumerator JumpDown(){
+        var tempCollider = footCol;
+
+        Jump(0.1f);
+        if(tempCollider!=null){
+
+            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, true);
+            Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, true);
+        }
+        yield return new WaitForSeconds(delayTime_JumpDown);
+
+        yield return new WaitUntil(()=>footCol!=null);
+
+        if(tempCollider!=null){
+
+        
+            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, false);
+            Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, false);
+        }
+
+        jumpDownFlag = false;
     }
     // void OnTriggerStay2D(Collider2D other)
     // {
@@ -525,10 +570,12 @@ public class PlayerManager : MonoBehaviour
         isWaitingInteract = false;
     }
     public void SetEquipment(byte type, int itemID){// 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
-        //byte itemID = (byte)_itemID;
         switch(itemID){
+            //개미탈
             case 2 :
-                curEquipment = helmets[0].gameObject;
+                tempHelmet[0] = helmets[0].gameObject;
+                tempHelmet[1] = helmets[1].gameObject;
+                //curEquipment = helmets[0].gameObject;
                 break;
         }
 
@@ -536,12 +583,16 @@ public class PlayerManager : MonoBehaviour
             case 1:
                 if(equipments[0]!=itemID){
                     equipments[0] = itemID;
-                    curEquipment.gameObject.SetActive(true);
+                    for(int i=0;i<2;i++){
+                        tempHelmet[i].SetActive(true);
+                    }
                     Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 else{
                     equipments[0] = -1;
-                    curEquipment.gameObject.SetActive(false);
+                    for(int i=0;i<2;i++){
+                        tempHelmet[i].SetActive(false);
+                    }
                     Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;            
@@ -598,5 +649,21 @@ public class PlayerManager : MonoBehaviour
             var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
             tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
         }
+    }
+
+    IEnumerator DepletedDirt(){
+        darkerVignette.SetActive(true);
+        SceneController.instance.SetLensOrthoSize(3.5f);
+        yield return wait1000ms;
+        for(int i=0; i<4;i++){
+            redEyes[i].SetActive(true);
+            yield return wait500ms;
+        }
+        for(int i=4; i<redEyes.Length;i++){
+            redEyes[i].SetActive(true);
+            yield return wait125ms;
+        }
+        yield return wait1000ms;
+        UIManager.instance.SetGameOverUI(0);
     }
 }

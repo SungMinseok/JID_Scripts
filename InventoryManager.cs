@@ -21,11 +21,13 @@ public class ItemSlot{
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
+    [Header("Debug───────────────")]
     public int curPage;
     public int slotCountPerPage;
+    public bool isHide;
     //public UIManager theUI;
     
-    [Header("UI_Inventory")]
+    [Header("UI_Inventory───────────────")]
     public Transform itemSlotGrid;
     //[SerializeField]
     public ItemSlot[] itemSlot;
@@ -33,6 +35,8 @@ public class InventoryManager : MonoBehaviour
     public GameObject upArrow, downArrow;
    // public Sprite[] itemSprites;
     public Sprite nullSprite;
+    public Animator inventoryAnimator;
+    public Button toggleBtn;
     void Awake(){
         instance = this;
 
@@ -43,7 +47,7 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         //itemSlot = new ItemSlot[7];
-        for(int i=0;i<7;i++){
+        for(int i=0;i<slotCountPerPage;i++){
             //itemSlot[i].equippedMark = PlayerManager.instance.gameObject;
             itemSlot[i].itemSlotBtn = itemSlotGrid.GetChild(i).GetComponent<Button>();
             itemSlot[i].equippedMark = itemSlotGrid.GetChild(i).GetChild(0).gameObject;
@@ -80,71 +84,87 @@ public class InventoryManager : MonoBehaviour
         //var theUI = UIManager.instance;
         var theDB = DBManager.instance;
 
-        for(int i= pageNum * 7 ; i< (pageNum + 1) * 7 ;i++){
+        for(int i= pageNum * slotCountPerPage ; i< (pageNum + 1) * slotCountPerPage ;i++){
             //아이템 있을 경우
             if(i<DBManager.instance.curData.itemList.Count){
                 int itemID = DBManager.instance.curData.itemList[i];
 
                 //아이템 이미지 불러오기
-                itemSlot[i%7].itemImage.sprite = theDB.cache_ItemDataList[itemID].icon;
+                itemSlot[i%slotCountPerPage].itemImage.sprite = theDB.cache_ItemDataList[itemID].icon;
 
                 //아이템 정보 불러오기
-                itemSlot[i%7].itemName.text = theDB.cache_ItemDataList[itemID].name;
-                itemSlot[i%7].itemDescription.text = theDB.cache_ItemDataList[itemID].description;
+                itemSlot[i%slotCountPerPage].itemName.text = theDB.cache_ItemDataList[itemID].name;
+                itemSlot[i%slotCountPerPage].itemDescription.text = theDB.cache_ItemDataList[itemID].description;
 
                 //장착한 아이템일 경우 장착 중 표시 여부
                 for(var j=0;j<PlayerManager.instance.equipments.Length;j++){
                     if(PlayerManager.instance.equipments[j]==itemID){
-                        itemSlot[i%7].equippedMark.SetActive(true);
+                        itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);
                         break;
                     }
-                    itemSlot[i%7].equippedMark.SetActive(false);
+                    itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
                 }
 
                 //아이템 버튼 활성화
-                itemSlot[i%7].itemSlotBtn.interactable = true;
+                itemSlot[i%slotCountPerPage].itemSlotBtn.interactable = true;
             }
             //아이템 없을 경우
             else{
-                //itemSlotGrid.GetChild(i%7).GetComponent<Image>().sprite = nullSprite;
-                itemSlot[i%7].itemImage.sprite = nullSprite;
-                itemSlot[i%7].equippedMark.gameObject.SetActive(false);
+                //itemSlotGrid.GetChild(i%slotCountPerPage).GetComponent<Image>().sprite = nullSprite;
+                itemSlot[i%slotCountPerPage].itemImage.sprite = nullSprite;
+                itemSlot[i%slotCountPerPage].equippedMark.gameObject.SetActive(false);
 
                 //아이템 버튼 비활성화
-                itemSlot[i%7].itemSlotBtn.interactable = false;
+                itemSlot[i%slotCountPerPage].itemSlotBtn.interactable = false;
             }
         }
         BtnActivateCheck();
     }
     public void BtnNextPage(){
-        RefreshInventory(++curPage );
-        BtnActivateCheck();
-    }
-    public void BtnPreviousPage(){
-        RefreshInventory(--curPage);
-        BtnActivateCheck();
-    }
-    public void BtnActivateCheck(){
-
-        if(curPage == 0){
-            upArrow.SetActive(false);
+        if((curPage+1)*slotCountPerPage < DBManager.instance.curData.itemList.Count ){
+            RefreshInventory(++curPage );
         }
         else{
-            upArrow.SetActive(true);
+            RefreshInventory(0);
+            curPage = 0;
+
         }
 
-        if(DBManager.instance.curData.itemList.Count > (curPage+1)*7) {
+        BtnActivateCheck();
+    }
+    // public void BtnPreviousPage(){
+    //     RefreshInventory(--curPage);
+    //     BtnActivateCheck();
+    // }
+    public void BtnActivateCheck(){
 
-            downArrow.SetActive(true);
+        // if(curPage == 0){
+        //     upArrow.SetActive(false);
+        // }
+        // else{
+        //     upArrow.SetActive(true);
+        // }
+
+        // if(DBManager.instance.curData.itemList.Count > (curPage+1)*slotCountPerPage) {
+
+        //     downArrow.SetActive(true);
+        // }
+        // else{
+            
+        //     downArrow.SetActive(false);
+        // }
+        if(DBManager.instance.curData.itemList.Count < slotCountPerPage) {
+
+            downArrow.SetActive(false);
         }
         else{
             
-            downArrow.SetActive(false);
+            downArrow.SetActive(true);
         }
         
     }
     public void PushItemBtn(int slotNum){
-        int curSlotNum = curPage * 7 + slotNum;
+        int curSlotNum = curPage * slotCountPerPage + slotNum;
         
         if(curSlotNum >= DBManager.instance.curData.itemList.Count){
             return;
@@ -179,5 +199,22 @@ public class InventoryManager : MonoBehaviour
         
         RefreshInventory(curPage);
 
+    }
+    public void PushToggleBtn(){
+        if(isHide){
+            isHide = !isHide;
+            inventoryAnimator.SetTrigger("open");
+            toggleBtn.interactable = false;
+            Invoke("ActivateToggleBtn", 1.34f);
+        }
+        else{
+            isHide = !isHide;
+            inventoryAnimator.SetTrigger("close");
+            toggleBtn.interactable = false;
+            Invoke("ActivateToggleBtn", 1.34f);
+        }
+    }
+    public void ActivateToggleBtn(){
+        toggleBtn.interactable = true;
     }
 }

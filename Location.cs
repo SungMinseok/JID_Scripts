@@ -53,7 +53,7 @@ public class Location : MonoBehaviour
     public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     [Header("Patrol_NPC")]
-     public Transform desLoc_Patrol_NPC;
+    public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
     public float patrolWaitTime;
     [HideInInspector] public bool locFlag;
@@ -89,7 +89,7 @@ public class Location : MonoBehaviour
         }
 
         
-        if(type!=LocationType.Trigger){
+        if(type!=LocationType.Trigger && type!=LocationType.Teleport ){
             waitKey = false;
         }
     }
@@ -507,6 +507,8 @@ public class LocationEditor : Editor
             selected.desLoc = EditorGUILayout.ObjectField("도착지", selected.desLoc, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
             selected.desMapNum = EditorGUILayout.IntField("도착 맵 번호",selected.desMapNum,EditorStyles.toolbarTextField);
+            EditorGUILayout.Space();
+            selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
             EditorGUILayout.Space();
             selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();

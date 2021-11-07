@@ -31,6 +31,13 @@ public class UIManager : MonoBehaviour
     public Sprite[] ui_gameOver_sprites;
     [Header("UI_Fader")]
     public Animator ui_fader;
+    [Header("UI_HUD")]
+    public GameObject hud_state;
+    public GameObject hud_inventory;
+    // [Header("UI_Fog")]
+    // public Canvas ui_fog_canvas;
+    // public Transform ui_fog;
+    // Vector3 offset = Vector3.zero;
 
     //WaitForSeconds waitTime = new WaitForSeconds(0.5f);
     void Awake()
@@ -41,16 +48,21 @@ public class UIManager : MonoBehaviour
     {
         thePlayer = PlayerManager.instance;
         //playerOriginPos = thePlayer.transform.position;
+        // offset = transform.position - worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position);
     }
     void Update(){
 
-        if(dirtGauge.fillAmount != thePlayer.curDirtAmount / thePlayer.maxDirtAmount){
-            dirtGauge.fillAmount = thePlayer.curDirtAmount / thePlayer.maxDirtAmount;
+        if(dirtGauge.fillAmount != DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount){
+            dirtGauge.fillAmount = DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount;
         }
 
-        if(honeyText.text != thePlayer.curHoneyAmount.ToString()){
-            honeyText.text = thePlayer.curHoneyAmount.ToString();
+        if(honeyText.text != DBManager.instance.curData.curHoneyAmount.ToString()){
+            honeyText.text = DBManager.instance.curData.curHoneyAmount.ToString();
         }
+
+        
+        //Convert the player's position to the UI space then apply the offset
+        // ui_fog.transform.position = worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position) + offset;
     }
 
     public void ActivateEffect(int num,float timer,bool bgOn = true){
@@ -114,11 +126,11 @@ public class UIManager : MonoBehaviour
         ResetFader(1);
         ui_fader.SetTrigger("fadeIn");
     }
-    public void SetGameOver(int num){
+    public void SetGameOverUI(int num){
         
-        StartCoroutine(SetGameOverCoroutine(num));
+        StartCoroutine(SetGameOverUICoroutine(num));
     }
-    IEnumerator SetGameOverCoroutine(int num){
+    IEnumerator SetGameOverUICoroutine(int num){
         yield return new WaitForSeconds(1.5f);
         //SetFadeOut();
         LoadManager.instance.FadeOut();
@@ -132,4 +144,21 @@ public class UIManager : MonoBehaviour
 
         DBManager.instance.EndingCollectionOver(num);
     }
+    public void SetHUD(bool active){
+        hud_state.SetActive(active);
+        hud_inventory.SetActive(active);
+    }
+
+    // public Vector3 worldToUISpace(Canvas parentCanvas, Vector3 worldPos)
+    // {
+    //     //Convert the world for screen point so that it can be used with ScreenPointToLocalPointInRectangle function
+    //     Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+    //     Vector2 movePos;
+
+    //     //Convert the screenpoint to ui rectangle local point
+    //     RectTransformUtility.ScreenPointToLocalPointInRectangle(parentCanvas.transform as RectTransform, screenPos, parentCanvas.worldCamera, out movePos);
+    //     //Convert the local point to world point
+    //     return parentCanvas.transform.TransformPoint(movePos);
+    // }
+
 }

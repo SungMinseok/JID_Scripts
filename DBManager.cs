@@ -8,25 +8,35 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
-    [Header("Game Info")]
+    [Header("[Game Info] ─────────────────────")]
     public uint buildNum;
     public string buildDate;
-    [Header("Current Data")]
+    public string language;
+    [Header("[Current Data] ─────────────────────")]
 
     public Data curData;
 
-    [Header("Local Data")]
+    [Header("[Local Data] ─────────────────────")]
 
     public LocalData localData;
 
-
-    [Header("Cache")]
+    [Header("[Game Settings] ─────────────────────")]
+    public float maxDirtAmount;
+    public float dirtAmountPaneltyPerSeconds;
+    [Header("[Cache] ─────────────────────")]
+    [Space]
+    [Space]
+    [Space]
+    [Space]
+    [Space]
+    [Space]
     public List<Item> cache_ItemDataList;
     public List<EndingCollection> cache_EndingCollectionDataList;
     
-    [Header("Sprites Files")]
+    [Header("[Sprites Files] ─────────────────────")]
     public Sprite[] endingCollectionSprites;
     public Sprite[] itemSprites;
+    public Sprite honeySprite;
 
     //public List<Item> cache_ItemDataList;
 
@@ -34,7 +44,7 @@ public class DBManager : MonoBehaviour
 
 
     
-    [Header("Empty Data")]
+    [Header("[Empty Data] ─────────────────────")]
 
     public Data emptyData;
 
@@ -43,17 +53,25 @@ public class DBManager : MonoBehaviour
 
     [System.Serializable]
     public class Data{
-        public List<int> itemList;  //현재 보유한 아이템 ID 저장
-        public List<int> trigOverList = new List<int>();
         //public List<int> endingCollectionOverList = new List<int>();
 
+        public float playerX, playerY;
         public string curMapName;
         public int curMapNum;
         public string curPlayDate;
+        public float curPlayTime;
         public int curPlayCount;
+        public float curDirtAmount;
+        public float curHoneyAmount;
 
-        public float playerX, playerY;
+
+
+
         
+
+        [Space]
+        public List<int> itemList;  //현재 보유한 아이템 ID 저장
+        public List<int> trigOverList = new List<int>();
     }
     
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
@@ -205,17 +223,25 @@ public class DBManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        ApplyItemInfo();
+        ApplyCollectionInfo();
         //CallLocalDataLoad();
     }
 
     void Start()
     {
-        ApplyItemInfo();
-        ApplyCollectionInfo();
     }
     void Update(){
         //System.DateTime dateTime = System.DateTime.Now;
         curData.curPlayDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm");
+    }
+
+    void FixedUpdate(){
+        curData.curPlayTime += Time.fixedDeltaTime;
+
+        if(PlayerManager.instance.canMove){
+            if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
+        }
     }
     
     void ApplyItemInfo(){

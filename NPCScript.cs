@@ -190,7 +190,7 @@ public class NPCScript : MonoBehaviour
         }
         if(!noFlip){
 
-            if (wSet != 0)   
+            if (wSet != 0)    
             {
                 if(haveWalk&&animator!=null) animator.SetBool("walk", true);
                 if(wSet>0){
@@ -344,7 +344,7 @@ public class NPCScript : MonoBehaviour
                         if(animator!=null) animator.SetTrigger("found");
                         wSet = 0;
                         
-                        UIManager.instance.SetGameOver(1);
+                        UIManager.instance.SetGameOverUI(1);
                     }
                 }
             }

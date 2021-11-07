@@ -233,9 +233,9 @@ public class MenuManager : MonoBehaviour
     }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
-        //popUpMainText.text = ;
-        //popUpSubText.text = ;
+        //확인
         popUpText[2].text ="2";
+        //취소
         popUpText[3].text ="3";
         switch(type){
             case "save" :

@@ -52,6 +52,29 @@ public class SceneController : MonoBehaviour
             //DM("Error : no pos");
         }
     }
+    
+    public void SetLensOrthoSize(float value){
+        if(virtualCamera.m_Lens.OrthographicSize > value){
+            StartCoroutine(SetDownLensOrthoSizeCoroutine(value));
+        }
+        else{
+            StartCoroutine(SetUpLensOrthoSizeCoroutine(value));
+        }
+    }
+    IEnumerator SetDownLensOrthoSizeCoroutine(float value){  // size = 3.5, y= 4 
+        while (virtualCamera.m_Lens.OrthographicSize > value)
+        {
+            virtualCamera.m_Lens.OrthographicSize -= 0.1f;
+            yield return null;
+        }
+    }
+    IEnumerator SetUpLensOrthoSizeCoroutine(float value){  // size = 5.3, y= 6 
+        while (virtualCamera.m_Lens.OrthographicSize < value)
+        {
+            virtualCamera.m_Lens.OrthographicSize += 0.1f;
+            yield return null;
+        }
+    }
     void Start()
     {
     }

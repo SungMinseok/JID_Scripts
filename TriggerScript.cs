@@ -6,6 +6,7 @@ using Cinemachine;
 public class TriggerScript : MonoBehaviour
 {    
     public static TriggerScript instance;
+    WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait2000ms = new WaitForSeconds(2);
@@ -112,9 +113,17 @@ public class TriggerScript : MonoBehaviour
 #region 3
             case 3 :
                 var nerd_ant = SceneController.instance.npcs[0];
+                
+                FadeOut();
+                yield return wait1000ms;
+                SetHUD(false);
+                PlayerManager.instance.vignette.SetActive(false);
+                objects[1].gameObject.SetActive(true);
 
                 CameraView(nerd_ant.transform);
-                yield return wait1000ms;
+                yield return wait500ms;
+                FadeIn();
+
                 nerd_ant.animator.SetTrigger("wakeUp");
                 yield return wait2000ms;
                 //MapManager.instance.virtualCamera.Follow = ObjectController.instance.npcs[0].transform;
@@ -136,12 +145,19 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
                 yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
-                yield return wait3000ms;
+                yield return wait2000ms;
+                FadeOut();
+                yield return wait1000ms;
+                PlayerManager.instance.vignette.SetActive(true);
+                objects[1].gameObject.SetActive(false);
                 nerd_ant.gameObject.SetActive(false);
                 PlayerManager.instance.transform.position = objects[0].position;
                 SceneController.instance.SetConfiner(objects[0].parent.transform.GetSiblingIndex());
                 yield return new WaitForSeconds(0.1f);
+                SetHUD(true);
                 CameraView(PlayerManager.instance.transform);
+                FadeIn();
+
                 //MapManager.instance.virtualCamera.Follow = null;
                 //ObjectController.instance.npcs[0].animator.SetTrigger("wakeUp");
 
@@ -162,11 +178,31 @@ public class TriggerScript : MonoBehaviour
 //복도 경비병 만남
 #region 5
             case 5 :
-            
+
+                FadeOut();
+                yield return wait1000ms;
+                SetHUD(false);
+                PlayerManager.instance.vignette.SetActive(false);
+                objects[1].gameObject.SetActive(true);
+                
+                SceneController.instance.SetConfiner(2);
+                yield return wait100ms;
+
                 CameraView(objects[0]);
+                yield return wait500ms;
+                FadeIn();
+                
                 SceneController.instance.npcs[1].gameObject.SetActive(true);
                 SceneController.instance.npcs[2].gameObject.SetActive(true);
                 yield return wait3000ms;
+
+                FadeOut();
+                yield return wait1000ms;
+                PlayerManager.instance.vignette.SetActive(true);
+                objects[1].gameObject.SetActive(false);
+                
+                PlayerManager.instance.transform.position = objects[2].position;
+
                 CameraView(PlayerManager.instance.transform);
                 SceneController.instance.npcs[1].onPatrol = true;
                 SceneController.instance.npcs[2].onPatrol = true;
@@ -175,7 +211,9 @@ public class TriggerScript : MonoBehaviour
                 ForceToPatrol(SceneController.instance.npcs[1]);
                 ForceToPatrol(SceneController.instance.npcs[2]);
 
-
+                SetHUD(true);
+                CameraView(PlayerManager.instance.transform);
+                FadeIn();
                 break;
 #endregion
 
@@ -633,8 +671,15 @@ public class TriggerScript : MonoBehaviour
     public void ActivateEffect(int num,float timer,bool bgOn = true){
         UIManager.instance.ActivateEffect(num,timer,bgOn);
     }
-
-    
+    public void SetHUD(bool active){
+        UIManager.instance.SetHUD(active);
+    }
+    public void FadeOut(){
+        LoadManager.instance.FadeOut();
+    }
+    public void FadeIn(){
+        LoadManager.instance.FadeIn();
+    }
     public IEnumerator OrderCoroutine(Location location,Transform objCol,Transform desCol){    
         
             PlayerManager.instance.canMove = false;
