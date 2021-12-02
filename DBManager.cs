@@ -118,6 +118,7 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
+    
     public Data GetData(int fileNum){
         BinaryFormatter bf = new BinaryFormatter();
 
@@ -129,7 +130,23 @@ public class DBManager : MonoBehaviour
         
         return data;
     }
+    public void DeleteSaveFile(int fileNum){
 
+        BinaryFormatter bf = new BinaryFormatter();
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+
+        if(fileCheck.Exists){
+            File.Delete(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+
+            Debug.Log(fileNum + "번 파일 제거 성공");
+            MenuManager.instance.ResetLoadSlots();
+
+            //file.Close();
+        }
+        else{
+            Debug.Log(fileNum + "번 파일 제거 불가 : 파일 없음");
+        }
+    }
 #region LocalData
     public void CallLocalDataSave(){
 
@@ -159,7 +176,7 @@ public class DBManager : MonoBehaviour
     }
 #endregion
 
-#region Trigger 관련
+#region Triggers
     public void TrigOver(int trigNum){
         if(!CheckTrigOver(trigNum)){
             curData.trigOverList.Add(trigNum);
@@ -194,11 +211,13 @@ public class DBManager : MonoBehaviour
     }
 #endregion
 
+#region EndingCollection
 
     //엔딩 컬렉션 달성 등록
     public void EndingCollectionOver(int collectionNum){
         if(!CheckEndingCollectionOver(collectionNum)){
             localData.endingCollectionOverList.Add(collectionNum);
+            UIManager.instance.gameOverNewImage.gameObject.SetActive(true);
             //CallLocalDataSave();
         }
     }
@@ -211,6 +230,7 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
+#endregion
     void Awake(){
         //Application.targetFrameRate = 60;
         if (null == instance)
@@ -239,8 +259,11 @@ public class DBManager : MonoBehaviour
     void FixedUpdate(){
         curData.curPlayTime += Time.fixedDeltaTime;
 
-        if(PlayerManager.instance.canMove){
-            if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
+        if(PlayerManager.instance != null){
+
+            if(PlayerManager.instance.isMoving){
+                if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
+            }
         }
     }
     
@@ -252,8 +275,8 @@ public class DBManager : MonoBehaviour
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             cache_ItemDataList.Add(new Item(
                 int.Parse(a[i]["ID"].ToString()),
-                a[i]["name_kr"].ToString(),
-                a[i]["desc_kr"].ToString(),
+                a[i]["name_"+language].ToString(),
+                a[i]["desc_"+language].ToString(),
                 byte.Parse(a[i]["type"].ToString()),
                 int.Parse(a[i]["resourceID"].ToString()),
                 bool.Parse(a[i]["isStack"].ToString())
@@ -269,7 +292,7 @@ public class DBManager : MonoBehaviour
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             cache_EndingCollectionDataList.Add(new EndingCollection(
                 int.Parse(a[i]["ID"].ToString())
-                ,a[i]["name_kr"].ToString()
+                ,a[i]["name_"+language].ToString()
                 ,int.Parse(a[i]["resourceID"].ToString())
                 //byte.Parse(a[i]["type"].ToString()),
                 //int.Parse(a[i]["resourceID"].ToString()),
@@ -345,8 +368,8 @@ public class EndingCollection{
 
     [Space]
     
-    public string date;
-    public string count;
+    public string clearedDate;
+    public string clearedCount;
 
     public EndingCollection(int a, string b, int c){
         ID = a;

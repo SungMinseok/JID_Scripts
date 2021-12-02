@@ -52,17 +52,16 @@ public class MenuManager : MonoBehaviour
     void Update(){
             if(Input.GetButtonUp("Cancel")){
                 menuPanel.SetActive(!menuPanel.activeSelf);
-                
             }
     }
     void Start(){
 
-#region Collection
+#region Reset Collection
         totalPage = DBManager.instance.endingCollectionSprites.Length;
         ResetCardOrder();
 #endregion
 
-#region Save&Load
+#region Reset Save&Load
 
         //saveSlots = new SaveLoadSlot[saveSlotGrid.childCount];
         //loadSlots = new SaveLoadSlot[loadSlotGrid.childCount];
@@ -94,6 +93,7 @@ public class MenuManager : MonoBehaviour
         ResetSaveSlots();
         ResetLoadSlots();
 #endregion
+    
     }
     // void Update(){
     //     if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Collection_Scroll_Right") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime>=1f){
@@ -160,7 +160,7 @@ public class MenuManager : MonoBehaviour
     
         if(DBManager.instance.CheckEndingCollectionOver(tempCardNum[2])){
             collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
-            collectionSubText0.text = "획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].count +"번 째 플레이";
+            collectionSubText0.text = "획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
         }
         else{                
             collectionSubText0.text = "미획득";
@@ -229,29 +229,45 @@ public class MenuManager : MonoBehaviour
         else{
             //Load(curLoadNum);
         }
-        
+    }
+    public void TryLoadLast(){
+        OpenPopUpPanel("loadLast");
+
+    }
+    public void TryLoadMain(){
+
+        OpenPopUpPanel("goMain");
     }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
         //확인
-        popUpText[2].text ="2";
+        popUpText[2].text ="0";
         //취소
-        popUpText[3].text ="3";
+        popUpText[3].text ="1";
         switch(type){
             case "save" :
-                popUpText[0].text = "0";
-                popUpText[1].text = "1";
+                popUpText[0].text = "2";
+                popUpText[1].text = "3";
                 break;
             case "load" :
-                popUpText[0].text = "0";
-                popUpText[1].text = "1";
+                popUpText[0].text = "2";
+                popUpText[1].text = "3";
+                break;
+            case "loadLast" :
+                popUpText[0].text = "5";
+                popUpText[1].text = "";
+                break;
+            case "goMain" :
+                popUpText[0].text = "6";
+                popUpText[1].text = "3";
                 break;
             default :
                 break;
         }
 
         for(int i=0;i<4;i++){
-            popUpText[i].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText[i].text),"sysmsg");
+            if(popUpText[i].text != "")
+                popUpText[i].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText[i].text),"sysmsg");
         }
 
         popUpPanel.SetActive(true);
@@ -266,6 +282,13 @@ public class MenuManager : MonoBehaviour
             case "load" :
                 Load(curLoadNum);
                 //Debug.Log(curSaveNum + "번 저장 시도");
+                break;
+
+            case "loadLast" :
+                LoadLast();
+                break;
+            case "goMain" :
+                LoadManager.instance.LoadMain();
                 break;
         }
 
@@ -306,12 +329,6 @@ public class MenuManager : MonoBehaviour
                 break;
         }
 
-
-
-
-
-
-
         panels[panelNum].SetActive(true);
         
     }
@@ -325,4 +342,6 @@ public class MenuManager : MonoBehaviour
 
     }
 #endregion
+
+
 }

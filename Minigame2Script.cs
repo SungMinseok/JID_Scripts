@@ -123,12 +123,13 @@ public class Minigame2Script : MonoBehaviour
         //소주병 n 번 날림
         for(int i=0;i<flyingMadAntThrowCount;i++){
             var movingObject = flyingMadAnt;
-            var targetPos = new Vector2(PlayerManager.instance.transform.position.x,movingObject.transform.position.y);
+            var targetPos = Vector2.zero;
 
-            Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
+            //Debug.Log(i + "번째 ," + targetPos+" / "+movingObject.transform.position);
 
             while(!flyingMadAnt.mainBody.GetComponent<NPCSkillScript>().raderFlag ){
                 //flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
+                targetPos = new Vector2(PlayerManager.instance.playerBody.transform.position.x,movingObject.transform.position.y);
                 movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPos, 7f * Time.deltaTime);
 
                 yield return null;

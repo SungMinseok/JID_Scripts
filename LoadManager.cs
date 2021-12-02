@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UB.Simple2dWeatherEffects.Standard;
+using TMPro;
 
 public class LoadManager : MonoBehaviour
 {
@@ -15,7 +16,16 @@ public class LoadManager : MonoBehaviour
     public GameObject[] mainBtns;
     public bool loadFlag;
     //public GameObject ddol;
-
+    [Header("UI_Save&Load")]
+    public Transform saveSlotGrid;
+    public SaveLoadSlot[] saveSlots;
+    public Transform loadSlotGrid;
+    public SaveLoadSlot[] loadSlots;
+    [System.Serializable]
+    public class SaveLoadSlot{
+        public TextMeshProUGUI saveNameText;
+        public TextMeshProUGUI saveDateText;
+    }
 
     [Header("───────Debug───────")]
     [Tooltip("인게임에서 로드 시 (맵설정/플레이어위치설정)")]
@@ -56,7 +66,7 @@ public class LoadManager : MonoBehaviour
         //loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
         FadeOut();
         yield return wait1s;
-        StartCoroutine(LoadNextScene("Level2"));
+        StartCoroutine(LoadNextScene("Level"));
     }
     public void LoadGame(){
         if(PlayerManager.instance!=null){
@@ -65,13 +75,20 @@ public class LoadManager : MonoBehaviour
 //실행중인 코루틴 모두 중지 (다 파괴하기 전에)
         TriggerScript.instance.StopAllCoroutines();
 
-        StartCoroutine(LoadGameCoroutine());
+        StartCoroutine(LoadCoroutine("Level"));
+    }
+    public void LoadMain(){
+        
+        TriggerScript.instance.StopAllCoroutines();
+
+        StartCoroutine(LoadCoroutine("Main"));
+
 
     }
-    IEnumerator LoadGameCoroutine(){
+    IEnumerator LoadCoroutine(string sceneName){
         FadeOut();
         yield return wait1s;
-        StartCoroutine(LoadNextScene("Level2"));
+        StartCoroutine(LoadNextScene(sceneName));
     }
     
     IEnumerator LoadNextScene(string nextScene)
@@ -99,8 +116,12 @@ public class LoadManager : MonoBehaviour
             }
             Destroy(DDOLScript.instance.gameObject);
         }
+        else if(nextScene == "Main"){
+                
+            Destroy(DDOLScript.instance.gameObject);
+            Destroy(PlayerManager.instance.gameObject);
+        }
         else{
-            
             DBManager.instance.curData = DBManager.instance.emptyData;
         }
 
@@ -244,6 +265,52 @@ public class LoadManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
         yield return new WaitForSeconds(1f);
-        StartCoroutine(LoadNextScene("Level2"));
+        StartCoroutine(LoadNextScene("Level"));
     }
+
+    
+#region Save&Load 
+    public void ResetSaveSlots(){
+        for(int i=0; i<saveSlotGrid.childCount; i++){
+            if(DBManager.instance.CheckSaveFile(i)){
+                saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+            }
+            else{
+                saveSlots[i].saveNameText.text = "빈 슬롯";
+                saveSlots[i].saveDateText.text = "-";
+            }
+        }
+    }
+    public void ResetLoadSlots(){
+        for(int i=0; i<loadSlotGrid.childCount; i++){
+            if(DBManager.instance.CheckSaveFile(i)){
+                loadSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+            }
+            else{
+                loadSlots[i].saveNameText.text = "빈 슬롯";
+                loadSlots[i].saveDateText.text = "-";
+            }
+        }
+    }
+    public void Save(int curSaveNum){
+        DBManager.instance.CallSave(curSaveNum);
+        saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
+        saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+    }
+    public void Load(int curLoadNum){
+        LoadManager.instance.isLoadingInGame = true;
+        LoadManager.instance.lastLoadFileNum = curLoadNum;
+        LoadManager.instance.LoadGame();
+        Debug.Log(curLoadNum + "번 파일 로드 시도");
+    }
+    public void LoadLast(){
+        LoadManager.instance.isLoadingInGameToLastPoint = true;
+        LoadManager.instance.LoadGame();
+        Debug.Log(LoadManager.instance.lastLoadFileNum + "번 파일 로드 시도 (마지막 저장)");
+
+    }
+#endregion
+
 }

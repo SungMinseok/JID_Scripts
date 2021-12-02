@@ -54,11 +54,17 @@ public class NPCSkillScript : MonoBehaviour
             bullets[i].transform.localPosition = bulletsPos;
         }
     }
-    public void OnTriggerEnter2D(Collider2D other){
+    public void OnTriggerStay2D(Collider2D other){
         
         if(other.CompareTag("Player")){
-            raderFlag = true;
+            if(!raderFlag){
+
+                raderFlag = true;
+                Debug.Log("CCC");
+            }
         }
+
+
     }
     public void OnTriggerExit2D(Collider2D other){
         

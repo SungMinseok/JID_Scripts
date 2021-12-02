@@ -39,6 +39,11 @@ public class CheatManager : MonoBehaviour
            // DebugManager.instance.PrintDebug(cheat.text);
 
             string[] temp = cheat.text.Split('\x020');
+            //Debug.Log(temp.Length);
+            //int x = 0;
+            if(temp.Length == 1){
+                return;
+            }
             
             switch(temp[0]){
                 case "t":
@@ -116,8 +121,54 @@ public class CheatManager : MonoBehaviour
 
                     }
                     break;
-            }
+                case "completeendingcollection":
+                    if(temp[1]!=null){
 
+                        if(temp[1]=="all"){
+                            for(int i=0;i<DBManager.instance.cache_EndingCollectionDataList.Count;i++){
+                                DBManager.instance.EndingCollectionOver(i);
+                            }
+                        }
+                        else{
+                            int collectionID = int.Parse(temp[1]);
+                            if(collectionID <DBManager.instance.cache_EndingCollectionDataList.Count)
+                                DBManager.instance.EndingCollectionOver(int.Parse(temp[1]));
+                            else{
+                                Debug.Log("해당 컬렉션 없음");
+                            }
+                        }
+
+                        MenuManager.instance.ResetCardOrder();
+
+                    }
+                    break;
+
+                case "setdirt":
+                    if(temp[1]!=null){
+                        int chargePoint = int.Parse(temp[1]);
+                        if(chargePoint>0){
+                            if(chargePoint>=100) DBManager.instance.curData.curDirtAmount = DBManager.instance.maxDirtAmount;
+                            else DBManager.instance.curData.curDirtAmount = DBManager.instance.maxDirtAmount * chargePoint * 0.01f;
+                        }
+                        MenuManager.instance.ResetCardOrder();
+                    }
+                    break;
+
+                case "deletesavefile":
+                    if(temp[1]!=null){
+
+                            int fileNum = int.Parse(temp[1]);
+                            if(fileNum>=0){
+                                DBManager.instance.DeleteSaveFile(fileNum);
+                            }
+
+                    }
+                    break;
+
+
+            }
+//EndingCollectionOver
+//DeleteSaveFile
             cheat.text = "";
             //DebugManager.instance.cheatPanel.SetActive(false);
 

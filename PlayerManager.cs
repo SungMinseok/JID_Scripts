@@ -34,6 +34,7 @@ public class PlayerManager : MonoBehaviour
     public float wSet;
     [Header("States────────────────────")]
     public bool canMove;
+    public bool isMoving;
     public bool isTalking;
     public bool isSelecting;
     public bool isPlayingMinigame;
@@ -58,6 +59,7 @@ public class PlayerManager : MonoBehaviour
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
     public float delayTime_JumpDown;
+    public float delayTime_GetLadder;
     [Header("────────────────────────────")]
     public Transform talkCanvas;
     public LocationRader locationRader;
@@ -146,7 +148,7 @@ public class PlayerManager : MonoBehaviour
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
             //jumpInput = Input.GetButton("Jump") ? true : false;
-            jumpInput = Input.GetButtonDown("Jump") ? true : false;
+            jumpInput = Input.GetButton("Jump") ? true : false;
             interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
 
             if(DBManager.instance.curData.curDirtAmount<=0 && canMove){
@@ -154,6 +156,11 @@ public class PlayerManager : MonoBehaviour
                 StartCoroutine(DepletedDirt());
             }
 
+            //가만히 있어도 OnTriggerStay2D 발동하게 함
+            rb.AddForce(Vector2.zero);
+            
+            //움직이는 중 체크
+            isMoving = rb.velocity != Vector2.zero ? true : false;
 
 
         }
@@ -203,7 +210,8 @@ public class PlayerManager : MonoBehaviour
             else if (wInput < 0|| wSet < 0)
             {
                 //spriteRenderer.flipX = true;
-                playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+                if(!isForcedRun)
+                    playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
             }
         }
         else
@@ -382,6 +390,7 @@ public class PlayerManager : MonoBehaviour
         rb.velocity = Vector2.zero;
         Debug.Log("Jump");
         rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
+        if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
     IEnumerator JumpDelay()
     {
@@ -408,30 +417,38 @@ public class PlayerManager : MonoBehaviour
 //            Debug.Log("33");
             getLadder = false;
             ladderDelay = true;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(delayTime_GetLadder);
             ladderDelay = false;
         }
     }
 
     IEnumerator JumpDown(){
         var tempCollider = footCol;
+            //Debug.Log("222");
+
+        if(tempCollider.gameObject.CompareTag("MainGround")){
+            //Debug.Log("333");
+        jumpDownFlag = false;
+            yield break;
+        }
+            //Debug.Log("444");
 
         Jump(0.1f);
-        if(tempCollider!=null){
+        //if(tempCollider!=null){
 
             Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, true);
             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, true);
-        }
+        //}
         yield return new WaitForSeconds(delayTime_JumpDown);
 
         yield return new WaitUntil(()=>footCol!=null);
 
-        if(tempCollider!=null){
+        //if(tempCollider!=null){
 
         
             Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, false);
             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, false);
-        }
+        //}
 
         jumpDownFlag = false;
     }
@@ -653,8 +670,14 @@ public class PlayerManager : MonoBehaviour
 
     IEnumerator DepletedDirt(){
         darkerVignette.SetActive(true);
-        SceneController.instance.SetLensOrthoSize(3.5f);
+        UIManager.instance.SetHUD(false);
+        SceneController.instance.SetLensOrthoSize(3.5f,0.04f);            
+        SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
+        animator.SetBool("shake", true);
+        //SceneController.instance.confiner2D.m_BoundingShape2D = null;//SceneController.instance.temp;
         yield return wait1000ms;
+        yield return wait125ms;
+        yield return wait125ms;
         for(int i=0; i<4;i++){
             redEyes[i].SetActive(true);
             yield return wait500ms;
@@ -666,4 +689,10 @@ public class PlayerManager : MonoBehaviour
         yield return wait1000ms;
         UIManager.instance.SetGameOverUI(0);
     }
+
+    public void ResetRigidbody(){
+        
+        rb.AddForce(Vector2.zero);
+    }
+
 }

@@ -27,8 +27,9 @@ public class UIManager : MonoBehaviour
     [Header("UI_GameOver")]
     public GameObject ui_gameOver;
     public Image ui_gameOver_image;
-    public GameObject ui_gameOver_btns;
-    public Sprite[] ui_gameOver_sprites;
+    public GameObject gameOverBtns;
+    public Sprite[] gameOverSprites;
+    public Animator gameOverNewImage;
     [Header("UI_Fader")]
     public Animator ui_fader;
     [Header("UI_HUD")]
@@ -47,6 +48,8 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         thePlayer = PlayerManager.instance;
+
+        ResetGameOverUI();
         //playerOriginPos = thePlayer.transform.position;
         // offset = transform.position - worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position);
     }
@@ -126,9 +129,13 @@ public class UIManager : MonoBehaviour
         ResetFader(1);
         ui_fader.SetTrigger("fadeIn");
     }
+#region GameOver
     public void SetGameOverUI(int num){
-        
         StartCoroutine(SetGameOverUICoroutine(num));
+    }
+    public void ResetGameOverUI(){
+        gameOverBtns.SetActive(false);
+        gameOverNewImage.gameObject.SetActive(false);
     }
     IEnumerator SetGameOverUICoroutine(int num){
         yield return new WaitForSeconds(1.5f);
@@ -136,14 +143,15 @@ public class UIManager : MonoBehaviour
         LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1.5f);
 
-        ui_gameOver_image.sprite = ui_gameOver_sprites[num];
+        ui_gameOver_image.sprite = gameOverSprites[num];
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();
         yield return new WaitForSeconds(2f);
-        ui_gameOver_btns.gameObject.SetActive(true);
+        gameOverBtns.gameObject.SetActive(true);
 
         DBManager.instance.EndingCollectionOver(num);
     }
+#endregion
     public void SetHUD(bool active){
         hud_state.SetActive(active);
         hud_inventory.SetActive(active);

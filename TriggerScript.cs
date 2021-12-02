@@ -92,8 +92,18 @@ public class TriggerScript : MonoBehaviour
 
             //if(npc.animator!=null) npc.animator.SetBool("talk", true);
         }
+        if(!location.notZoom){
+
+            if(GameManager.instance.mode_zoomWhenInteract){
+
+                SceneController.instance.SetLensOrthoSize(4f,0.075f);
+                SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
+            }
+        }
 
         switch(location.trigNum){
+
+
 
 //여긴 어디?
 #region 1
@@ -523,7 +533,9 @@ public class TriggerScript : MonoBehaviour
                 SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
                 
                 PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetSomeConfiner(objects[1].GetComponent<PolygonCollider2D>());
+                SceneController.instance.SetConfiner(7);
+
+                //SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[7]);
                 //UIManager.instance.SetFadeIn();
                 
                 
@@ -546,7 +558,7 @@ public class TriggerScript : MonoBehaviour
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetConfiner(7);
+                SceneController.instance.SetConfiner(8);
                 //UIManager.instance.SetFadeIn();
                 LoadManager.instance.FadeIn();
                 
@@ -569,15 +581,32 @@ public class TriggerScript : MonoBehaviour
 
                 
                 PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetConfiner(7);
+                SceneController.instance.SetConfiner(8);
                 //UIManager.instance.SetFadeIn();
                 
                 LoadManager.instance.FadeIn();
                 
                 
                 break;
+//노개미방 책장
+#region 19
+            case 19 :   
+                
+                // SetDialogue(dialogues[0]);
+                // yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+                
+                SetDialogue(dialogues[GetSelect()]);
+                yield return waitTalking;
+                
+                    
+                
+                
+                break;
 #endregion
             
+#endregion
             
             
             
@@ -612,8 +641,15 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
+        if(!location.notZoom){
+            if(GameManager.instance.mode_zoomWhenInteract){
+                SceneController.instance.SetLensOrthoSize(5.3f,0.1f);
+                SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[DBManager.instance.curData.curMapNum]);
+            }
+        }
         //트리거 완료 혹은 재시작 가능 시 느낌표 재출력을 위해 로케이션 레이더 재활성화
         PlayerManager.instance.locationRader.ResetLocationRader();
+        //PlayerManager.instance.ResetRigidbody();
     }
     public void TrigIsDone(Location location){
 

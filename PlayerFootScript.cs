@@ -48,12 +48,12 @@ public class PlayerFootScript : MonoBehaviour
     }
 
     void OnCollisionStay2D(Collision2D other){
-        PlayerManager.instance.footCol = other.transform.GetComponent<Collider2D>();
+        //if (!other.gameObject.CompareTag("MainGround"))
+            PlayerManager.instance.footCol = other.transform.GetComponent<Collider2D>();
 
     }
     void OnCollisionExit2D(Collision2D other){
         PlayerManager.instance.footCol = null;
-
     }
 
     void OnTriggerExit2D(Collider2D other) {

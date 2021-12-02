@@ -19,8 +19,9 @@ public class DoodadsScript : MonoBehaviour
     
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
     
-    [Header("SlowDown")]
+    [Header("이속 감소")]
     public float slowDownValue;
+    public bool onHit;
 
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -88,8 +89,11 @@ public class DoodadsScript : MonoBehaviour
         }
         else if(type == DoodadsType.SlowDown){
             if(other.CompareTag("Player")){
-                PlayerManager.instance.isSlowDown += slowDownValue;
-                Debug.Log("A");
+                if(!onHit){
+                    onHit = true;
+                    PlayerManager.instance.isSlowDown += slowDownValue;
+                }
+               //Debug.Log("A");
             }
         }
         
@@ -161,8 +165,11 @@ public class DoodadsScript : MonoBehaviour
         }
         else if(type == DoodadsType.SlowDown){
             if(other.CompareTag("Player")){
+                if(onHit){
+                    onHit = false;
                 PlayerManager.instance.isSlowDown -= slowDownValue;
-                Debug.Log("B");
+                }
+//                Debug.Log("B");
             }
         }
     }

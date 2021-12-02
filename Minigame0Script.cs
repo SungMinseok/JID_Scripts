@@ -94,6 +94,9 @@ public class Minigame0Script : MonoBehaviour
     void SetRandomKeyArray(){
         for(int i=0; i<keyArray.childCount; i++){
             int randomNum = Random.Range(0,4);
+
+            keyArray.GetChild(i).GetComponent<Animator>().SetBool("pop",false);
+
             keyArray.GetChild(i).GetComponent<Image>().sprite = keySprites[randomNum];
             curLevelAnswer.Add(randomNum);
         }
@@ -110,8 +113,15 @@ public class Minigame0Script : MonoBehaviour
 
         if(curGetKey == curLevelAnswer[curStage]){
             if(curStage<=9){
+
+
+                keyArray.GetChild(curStage).GetComponent<Animator>().SetBool("pop",true);
+
                 curStage ++;
+
                 mainImage.sprite = mainSprites[curLevel*11 + curStage];
+
+
                 if(curStage==10){
                     curLevelFlag = false;
                     curStage = 0;

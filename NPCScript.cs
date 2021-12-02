@@ -102,7 +102,6 @@ public class NPCScript : MonoBehaviour
         if(mainBody!=null) animator = mainBody.GetComponent<Animator>();
         //if(isSpriteSkin) animator = mainBody.GetComponent<Animator>();
         else animator = GetComponent<Animator>();
-        defaultScaleX = transform.localScale.x;
         defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
 
         if(noCollision){
@@ -153,6 +152,7 @@ public class NPCScript : MonoBehaviour
         }
         
         if(mainBody!=null) defaultScale = mainBody.transform.localScale;
+        else defaultScale = transform.localScale;
 
         //랜덤대화
         if(alwaysRandomDialogue){
@@ -194,14 +194,25 @@ public class NPCScript : MonoBehaviour
             {
                 if(haveWalk&&animator!=null) animator.SetBool("walk", true);
                 if(wSet>0){
-                    spriteRenderer.flipX = false;
+                    if(isSpriteRenderer){
+                        spriteRenderer.flipX = false;
+                    }
+                    else{
+                        mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
+                    }
                     if(rader!=null){
                         rader.transform.localScale = new Vector2(raderFlipX , rader.transform.localScale.y);
                     }
                     //transform.localScale = new Vector2(defaultScaleX, transform.localScale.y);
                 }
                 else if(wSet<0){
-                    spriteRenderer.flipX = true;
+                    if(isSpriteRenderer){
+                        spriteRenderer.flipX = true;
+                    }
+                    else{
+
+                        mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+                    }
                     if(rader!=null){
                         rader.transform.localScale = new Vector2(raderFlipX * -1 , rader.transform.localScale.y);
                     }
@@ -316,8 +327,14 @@ public class NPCScript : MonoBehaviour
             Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         }
         
-        if(other.gameObject.CompareTag("Collider_Player")){
+        else if(other.gameObject.CompareTag("Collider_Player")){
             Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
+        }
+        
+        else if(other.gameObject.CompareTag("Collider_NPC")){
+//            Debug.Log("AA");
+            patrolInput = patrolInput == 1? -1 : 1;
+            //Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
         }
         // if(other.gameObject.CompareTag("Player")){
         //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);

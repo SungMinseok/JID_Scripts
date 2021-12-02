@@ -8,6 +8,7 @@ public class SceneController : MonoBehaviour
     public static SceneController instance;
     [Header("맵")]
     public PolygonCollider2D[] mapBounds;
+    public PolygonCollider2D[] mapZoomBounds;
     public CinemachineVirtualCamera virtualCamera;
     public CinemachineConfiner2D confiner2D;
     [Header("NPC")]
@@ -15,6 +16,7 @@ public class SceneController : MonoBehaviour
     [Header("오브젝트")]
     public Transform[] objects;
     // Start is called before the first frame update
+    public Collider2D temp;
     void Awake()
     {
         instance = this;
@@ -26,8 +28,8 @@ public class SceneController : MonoBehaviour
         
            // Debug.Log(num + " : 맵번호");
     }
-    public void SetSomeConfiner(Collider2D boundCollider){
-        
+    public void SetSomeConfiner(Collider2D boundCollider = null){
+        if(boundCollider == null) temp = confiner2D.m_BoundingShape2D;
         confiner2D.m_BoundingShape2D = boundCollider;
     }
     public void SetCurrentMapName(int mapNum){
@@ -53,33 +55,33 @@ public class SceneController : MonoBehaviour
         }
     }
     
-    public void SetLensOrthoSize(float value){
+    public void SetLensOrthoSize(float value, float speed = 0.1f){
         if(virtualCamera.m_Lens.OrthographicSize > value){
-            StartCoroutine(SetDownLensOrthoSizeCoroutine(value));
+            StartCoroutine(SetDownLensOrthoSizeCoroutine(value, speed));
         }
         else{
-            StartCoroutine(SetUpLensOrthoSizeCoroutine(value));
+            StartCoroutine(SetUpLensOrthoSizeCoroutine(value, speed));
         }
     }
-    IEnumerator SetDownLensOrthoSizeCoroutine(float value){  // size = 3.5, y= 4 
+    IEnumerator SetDownLensOrthoSizeCoroutine(float value, float speed){  // size = 3.5, y= 4 
         while (virtualCamera.m_Lens.OrthographicSize > value)
         {
-            virtualCamera.m_Lens.OrthographicSize -= 0.1f;
+            virtualCamera.m_Lens.OrthographicSize -= speed;
             yield return null;
         }
     }
-    IEnumerator SetUpLensOrthoSizeCoroutine(float value){  // size = 5.3, y= 6 
+    IEnumerator SetUpLensOrthoSizeCoroutine(float value, float speed){  // size = 5.3, y= 6 
         while (virtualCamera.m_Lens.OrthographicSize < value)
         {
-            virtualCamera.m_Lens.OrthographicSize += 0.1f;
+            virtualCamera.m_Lens.OrthographicSize += speed;
             yield return null;
         }
     }
-    void Start()
-    {
+
+    #region Main Control
+    public void PushStartBtn(){
+        LoadManager.instance.StartBtn();
     }
-    void Update()
-    {
-        
-    }
+
+    #endregion
 }
