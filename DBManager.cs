@@ -70,7 +70,7 @@ public class DBManager : MonoBehaviour
         
 
         [Space]
-        public List<int> itemList;  //현재 보유한 아이템 ID 저장
+        public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
     }
     
@@ -379,5 +379,15 @@ public class EndingCollection{
         //count = e;
         resourceID = c;
         sprite = DBManager.instance.endingCollectionSprites[resourceID];
+    }
+}
+
+[System.Serializable]
+public class ItemList{
+    public int itemID;
+    public int itemAmount;
+    public ItemList(int _itemID, int _itemAmount){
+        itemID = _itemID;
+        itemAmount = _itemAmount;
     }
 }

@@ -15,6 +15,7 @@ public class PointerScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         if(type == PointerTargetType.itemSlot){
             curItemSlot = InventoryManager.instance.itemSlot[eventData.pointerEnter.transform.GetSiblingIndex()];
+            //Debug.Log(eventData.pointerEnter.transform.GetSiblingIndex());
             if(curItemSlot.itemSlotBtn.interactable)
                 curItemSlot.itemDescriptionWindow.SetActive(true);
         }

@@ -62,30 +62,29 @@ public class CheatManager : MonoBehaviour
                     break;
 
                 case "additem":
-                    if(temp[1]!=null){
+                    if(temp[1]!=""){
 
                         if(temp[1]=="all"){
                             //for(int i=0;i<TextLoader.instance.dictionaryItemText.Count;i++){
                             for(int i=0;i<CSVReader.instance.itemAmount;i++){
-                                InventoryManager.instance.AddItem(i);
+                                InventoryManager.instance.AddItem(i,1);
                             }
                             break;
                         }
-
                         int itemID = int.Parse(temp[1]);
-                        //if(itemID < TextLoader.instance.dictionaryItemText.Count)
-                        if(itemID <CSVReader.instance.itemAmount)
-                            InventoryManager.instance.AddItem(int.Parse(temp[1]));
-                        // if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
-                            
-                        //     PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
-                        //     SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
-                        //     DM("Activate teleport to location "+temp[1].ToString());
-                        // }   
-                        // else{
-                        //     DM("Error : Empty location "+temp[1].ToString());
 
-                        // }
+                        if(temp[2]!=""){
+
+                            if(itemID <CSVReader.instance.itemAmount)
+                                InventoryManager.instance.AddItem(int.Parse(temp[1]), int.Parse(temp[2]));
+                        }
+                        else{
+
+                            //int itemID = int.Parse(temp[1]);
+                            if(itemID <CSVReader.instance.itemAmount)
+                                InventoryManager.instance.AddItem(int.Parse(temp[1]));
+                        }
+
                     }
                     break;
                 case "minigame":
@@ -169,6 +168,9 @@ public class CheatManager : MonoBehaviour
             }
 //EndingCollectionOver
 //DeleteSaveFile
+            for(var a=0;a<temp.Length;a++){
+                temp[a] = "";
+            }
             cheat.text = "";
             //DebugManager.instance.cheatPanel.SetActive(false);
 
