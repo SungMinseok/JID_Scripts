@@ -147,8 +147,11 @@ public class InventoryManager : MonoBehaviour
 
 
 
-                //장착 가능 아이템 타입일 경우(1), 장착한 아이템일 경우 장착 중 표시 여부
-                if(theDB.cache_ItemDataList[itemID].type == 1){
+                //장착 가능 아이템 타입일 경우(1,2,3), 장착한 아이템일 경우 장착 중 표시 여부
+                if(theDB.cache_ItemDataList[itemID].type == 1
+                ||theDB.cache_ItemDataList[itemID].type == 2
+                ||theDB.cache_ItemDataList[itemID].type == 3              
+                ){
                     for(var j=0;j<PlayerManager.instance.equipments.Length;j++){
                         if(PlayerManager.instance.equipments[j]==itemID){
                             itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);

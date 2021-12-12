@@ -428,7 +428,7 @@ public class PlayerManager : MonoBehaviour
 
         if(tempCollider.gameObject.CompareTag("MainGround")){
             //Debug.Log("333");
-        jumpDownFlag = false;
+            jumpDownFlag = false;
             yield break;
         }
             //Debug.Log("444");
