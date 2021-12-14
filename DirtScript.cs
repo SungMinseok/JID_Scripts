@@ -15,7 +15,7 @@ public class DirtScript : MonoBehaviour
         curHp = maxHp;
 
         for(int i=0;i<dirtPieces.Length;i++){
-            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, dirtPieces[i].GetComponent<PolygonCollider2D>(), true);
+            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, dirtPieces[i].GetComponent<PolygonCollider2D>(), true);
             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, dirtPieces[i].GetComponent<PolygonCollider2D>(), true);
 
             if(i>=1){

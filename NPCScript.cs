@@ -106,7 +106,7 @@ public class NPCScript : MonoBehaviour
 
         if(noCollision){
                 
-            Physics2D.IgnoreCollision(thePlayer.boxCollider2D, circleCollider2D, true);
+            Physics2D.IgnoreCollision(thePlayer.bodyCollider2D, circleCollider2D, true);
             Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
         }
         

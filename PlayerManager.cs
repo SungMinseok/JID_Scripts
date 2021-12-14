@@ -72,7 +72,7 @@ public class PlayerManager : MonoBehaviour
     Color tempColor = new Color(1,1,1,1);
     Vector2 defaultScale;
     public Rigidbody2D rb;
-    public BoxCollider2D boxCollider2D;
+    public Collider2D bodyCollider2D;
     public Collider2D circleCollider2D;
     //SpriteRenderer spriteRenderer;
 
@@ -436,7 +436,7 @@ public class PlayerManager : MonoBehaviour
         Jump(0.1f);
         //if(tempCollider!=null){
 
-            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, true);
+            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, tempCollider, true);
             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, true);
         //}
         yield return new WaitForSeconds(delayTime_JumpDown);
@@ -446,7 +446,7 @@ public class PlayerManager : MonoBehaviour
         //if(tempCollider!=null){
 
         
-            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, tempCollider, false);
+            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, tempCollider, false);
             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, tempCollider, false);
         //}
 

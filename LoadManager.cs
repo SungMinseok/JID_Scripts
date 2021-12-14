@@ -73,7 +73,13 @@ public class LoadManager : MonoBehaviour
             PlayerManager.instance.canMove = false;
         }
 //실행중인 코루틴 모두 중지 (다 파괴하기 전에)
-        TriggerScript.instance.StopAllCoroutines();
+        if(SceneManager.GetActiveScene().name == "Main"){
+
+        }
+        else{
+            TriggerScript.instance.StopAllCoroutines();
+
+        }
 
         StartCoroutine(LoadCoroutine("Level"));
     }
@@ -99,7 +105,8 @@ public class LoadManager : MonoBehaviour
 //인게임 로드 시 데이터 불러오기
         if(isLoadingInGame){
             DBManager.instance.CallLoad(lastLoadFileNum);
-            Destroy(DDOLScript.instance.gameObject);
+
+            if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             
             Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
         }
@@ -114,12 +121,12 @@ public class LoadManager : MonoBehaviour
                 Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
 
             }
-            Destroy(DDOLScript.instance.gameObject);
+            if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
         }
         else if(nextScene == "Main"){
                 
-            Destroy(DDOLScript.instance.gameObject);
-            Destroy(PlayerManager.instance.gameObject);
+            if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
+            if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
         }
         else{
             DBManager.instance.curData = DBManager.instance.emptyData;

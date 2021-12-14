@@ -108,7 +108,7 @@ public class DoodadsScript : MonoBehaviour
                 if(PlayerManager.instance.hInput !=0){
                     for(int i=0;i<platformCollider.Length;i++){
                             
-                        Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], true);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], true);
                         Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], true);
                         //DM(platformCollider[i].name);
                     }
@@ -123,7 +123,7 @@ public class DoodadsScript : MonoBehaviour
                             
                         for(int i=0;i<platformCollider.Length;i++){
                                 
-                            Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], false);
+                            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], false);
                             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
                         }
                     }
@@ -148,7 +148,7 @@ public class DoodadsScript : MonoBehaviour
             if(other.CompareTag("Player")){
                 for(int i=0;i<platformCollider.Length;i++){
                         
-                        Physics2D.IgnoreCollision(PlayerManager.instance.boxCollider2D, platformCollider[i], false);
+                        Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], false);
                         Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
                 }
 

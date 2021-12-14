@@ -53,6 +53,8 @@ public class MenuManager : MonoBehaviour
             if(Input.GetButtonUp("Cancel")){
                 menuPanel.SetActive(!menuPanel.activeSelf);
             }
+
+            //Debug.Log(curPopUpType);
     }
     void Start(){
 
@@ -62,10 +64,6 @@ public class MenuManager : MonoBehaviour
 #endregion
 
 #region Reset Save&Load
-
-        //saveSlots = new SaveLoadSlot[saveSlotGrid.childCount];
-        //loadSlots = new SaveLoadSlot[loadSlotGrid.childCount];
-
         
         for(int i=0;i<3;i++){
             int temp = i;
@@ -95,6 +93,16 @@ public class MenuManager : MonoBehaviour
 #endregion
     
     }
+
+    public void OpenLoadPanel(){
+    
+    }
+    
+    public void OpenCollectionPanel(){
+
+    }
+
+
     // void Update(){
     //     if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Collection_Scroll_Right") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime>=1f){
     //         RearrangeCardOrder();
@@ -220,6 +228,7 @@ public class MenuManager : MonoBehaviour
         }
         
     }
+    //로드 슬롯 터치시
     public void TryLoad(int num){
         curLoadNum = num;
 
@@ -273,6 +282,7 @@ public class MenuManager : MonoBehaviour
         popUpPanel.SetActive(true);
     }
     public void PopUpOkayBtn(){
+        //Debug.Log("A");
         switch(curPopUpType){
             case "save" :
                 Save(curSaveNum);
@@ -281,7 +291,7 @@ public class MenuManager : MonoBehaviour
 
             case "load" :
                 Load(curLoadNum);
-                //Debug.Log(curSaveNum + "번 저장 시도");
+                //Debug.Log(curSaveNum + "번 로드 시도");
                 break;
 
             case "loadLast" :
@@ -290,6 +300,11 @@ public class MenuManager : MonoBehaviour
             case "goMain" :
                 LoadManager.instance.LoadMain();
                 break;
+
+            default:
+                Debug.Log(curPopUpType);
+                break;
+
         }
 
     }
