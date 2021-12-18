@@ -101,7 +101,9 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
-        switch(location.trigNum){
+        if(location.type == LocationType.Trigger){
+           
+            switch(location.trigNum){
 
 
 
@@ -109,10 +111,10 @@ public class TriggerScript : MonoBehaviour
 #region 1
             case 1 :
                 SetDialogue(dialogues[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 PlayerManager.instance.Look("right");
                 SetDialogue(dialogues[1]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 PlayerManager.instance.Look("left");
                 //MapManager.instance.virtualCamera.Follow = null;
                 //ObjectController.instance.npcs[0].animator.SetTrigger("wakeUp");
@@ -139,22 +141,22 @@ public class TriggerScript : MonoBehaviour
                 //MapManager.instance.virtualCamera.Follow = ObjectController.instance.npcs[0].transform;
                 nerd_ant.animator.SetTrigger("standUp");
                 SetDialogue(dialogues[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 //yield return wait2000ms;
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[1]);
                 nerd_ant.animator.SetTrigger("count");
                 //CameraView(objects[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[2]);
                 nerd_ant.animator.SetTrigger("sweat");
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 SetDialogue(dialogues[3]);
                 nerd_ant.animator.SetTrigger("turn");
                 //CameraView(nerd_ant.transform);
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 yield return wait2000ms;
                 FadeOut();
                 yield return wait1000ms;
@@ -180,7 +182,7 @@ public class TriggerScript : MonoBehaviour
                 ActivateEffect(1,3);
                 yield return new WaitUntil(()=>!UIManager.instance.onEffect);
                 SetDialogue(dialogues[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                yield return waitTalking;
                 PlayerManager.instance.Look("left");
                 break;
 #endregion
@@ -235,17 +237,17 @@ public class TriggerScript : MonoBehaviour
                     location.selectPhase = 1;
                     //npc.SetBool("talk",true);
                     SetDialogue(dialogues[0]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    yield return waitTalking;
                     SetDialogue(dialogues[6]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    yield return waitTalking;
                     SetDialogue(dialogues[7]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    yield return waitTalking;
                     SetSelect(selects[0]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                     if(GetSelect()==0){
                         location.selectPhase = 2;
                         SetDialogue(dialogues[1]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        yield return waitTalking;
                         SetSelect(selects[1]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                         if(GetSelect()==0){
@@ -254,11 +256,11 @@ public class TriggerScript : MonoBehaviour
                             //선택지 완료 시 -1
                             location.selectPhase = -1;
                             SetDialogue(dialogues[2]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             SetDialogue(dialogues[3]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             SetDialogue(dialogues[4]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             InventoryManager.instance.AddItem(2);
                         }
                     }
@@ -268,13 +270,13 @@ public class TriggerScript : MonoBehaviour
                 }
                 else if(location.selectPhase == 1){                    
                     SetDialogue(dialogues[7]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    yield return waitTalking;
                     SetSelect(selects[0]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                     if(GetSelect()==0){
                         location.selectPhase = 2;
                         SetDialogue(dialogues[1]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        yield return waitTalking;
                         SetSelect(selects[1]);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                         if(GetSelect()==0){
@@ -283,11 +285,11 @@ public class TriggerScript : MonoBehaviour
                             //선택지 완료 시 -1
                             location.selectPhase = -1;
                             SetDialogue(dialogues[2]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             SetDialogue(dialogues[3]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             SetDialogue(dialogues[4]);
-                            yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                            yield return waitTalking;
                             InventoryManager.instance.AddItem(2);
                         }
                     }
@@ -297,7 +299,7 @@ public class TriggerScript : MonoBehaviour
                 }
                 else if(location.selectPhase == 2){
                     SetDialogue(dialogues[1]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    yield return waitTalking;
                     SetSelect(selects[1]);
                     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                     if(GetSelect()==0){
@@ -306,11 +308,11 @@ public class TriggerScript : MonoBehaviour
                         //선택지 완료 시 -1
                         location.selectPhase = -1;
                         SetDialogue(dialogues[2]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        yield return waitTalking;
                         SetDialogue(dialogues[3]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        yield return waitTalking;
                         SetDialogue(dialogues[4]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                        yield return waitTalking;
                         InventoryManager.instance.AddItem(2);
                     }
                 }
@@ -371,7 +373,7 @@ public class TriggerScript : MonoBehaviour
                 // if(GetSelect()==0){
 
                 //     SetDialogue(dialogues[1]);
-                //     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //     yield return waitTalking;
                 //     SetSelect(selects[1]);
                 //     yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 //     if(GetSelect()==0){
@@ -379,11 +381,11 @@ public class TriggerScript : MonoBehaviour
                 //     else if(GetSelect()==1){
                         
                 //         SetDialogue(dialogues[2]);
-                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //         yield return waitTalking;
                 //         SetDialogue(dialogues[3]);
-                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //         yield return waitTalking;
                 //         SetDialogue(dialogues[4]);
-                //         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                //         yield return waitTalking;
                 //     }
                 // }
                 // else if(GetSelect()==1){
@@ -588,6 +590,8 @@ public class TriggerScript : MonoBehaviour
                 
                 
                 break;
+                
+#endregion
 //노개미방 책장
 #region 19
             case 19 :   
@@ -605,7 +609,98 @@ public class TriggerScript : MonoBehaviour
                 
                 break;
 #endregion
-            
+//요리사 로메슈제
+#region 22
+            case 22 :   
+                
+                
+                //로메슈제 보유시
+                if(location.selectPhase == 0){
+                    location.selectPhase = 1;
+
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                        location.selectPhase = 2;
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                        SetSelect(selects[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                        if(GetSelect()==0){
+                        }
+                        else if(GetSelect()==1){
+                            //선택지 완료 시 -1
+                            location.selectPhase = -1;
+                            SetDialogue(dialogues[2]);
+                            yield return waitTalking;
+                            SetDialogue(dialogues[3]);
+                            yield return waitTalking;
+                            SetDialogue(dialogues[4]);
+                            yield return waitTalking;
+                            InventoryManager.instance.AddItem(2);
+                        }
+                    }
+                    else if(GetSelect()==1){
+                        
+                    }
+                }
+                else if(location.selectPhase == 1){                    
+                    SetDialogue(dialogues[7]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                        location.selectPhase = 2;
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                        SetSelect(selects[1]);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                        if(GetSelect()==0){
+                        }
+                        else if(GetSelect()==1){
+                            //선택지 완료 시 -1
+                            location.selectPhase = -1;
+                            SetDialogue(dialogues[2]);
+                            yield return waitTalking;
+                            SetDialogue(dialogues[3]);
+                            yield return waitTalking;
+                            SetDialogue(dialogues[4]);
+                            yield return waitTalking;
+                            InventoryManager.instance.AddItem(2);
+                        }
+                    }
+                    else if(GetSelect()==1){
+                        
+                    }
+                }
+                else if(location.selectPhase == 2){
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[1]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+                    }
+                    else if(GetSelect()==1){
+                        //선택지 완료 시 -1
+                        location.selectPhase = -1;
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[3]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[4]);
+                        yield return waitTalking;
+                        InventoryManager.instance.AddItem(2);
+                    }
+                }
+                break;
+                    
+                
+                
+                break;
 #endregion
             
             
@@ -614,6 +709,18 @@ public class TriggerScript : MonoBehaviour
                 break;
         }
         
+        }
+
+        else if(location.type == LocationType.Dialogue){
+            
+            for(int i=0;i<dialogues.Length;i++){
+                SetDialogue(dialogues[i]);
+                yield return waitTalking;
+            }
+            //DialogueManager.instance.SetFullDialogue(dialogues);
+        }
+
+
         yield return null;    
 
 //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동

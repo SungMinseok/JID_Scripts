@@ -40,7 +40,7 @@ public class Location : MonoBehaviour
     //public int dialogueNum;
     public bool stopCheck;
     public string direction;
-    public Dialogue[] dialogues;
+    //public Dialogue[] dialogues;
     [Header("Trigger")]
     public int trigNum;
     public string trigComment;
@@ -73,7 +73,7 @@ public class Location : MonoBehaviour
             LoadText();
         }
 
-        if(type==LocationType.Trigger){
+        if(type==LocationType.Trigger || type==LocationType.Dialogue){
             if(target!=null){
                 this.transform.SetParent(target);
                 this.transform.localPosition = Vector3.zero;
@@ -95,7 +95,7 @@ public class Location : MonoBehaviour
         }
 
         
-        if(type!=LocationType.Trigger && type!=LocationType.Teleport ){
+        if(type!=LocationType.Trigger && type!=LocationType.Teleport && type!=LocationType.Dialogue){
             waitKey = false;
         }
     }
@@ -228,18 +228,28 @@ public class Location : MonoBehaviour
 
                     if(!DBManager.instance.CheckTrigOver(trigNum))
                     {
+                        //선행 트리거 실행 여부 확인
+                        if(completedTriggerNums.Length>0){
+                            if(!DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums)){
+                                StartCoroutine(ResetFlagDelayCoroutine());
+                                return;
+                            }
+                        }
                         if (other.CompareTag("Player"))
                         {
-                            if (dialogues != null)
+                            if (dialogues_T != null)
                             {
-                                if (!PlayerManager.instance.isTalking)
+                                if (!PlayerManager.instance.isActing)
                                 {
-                                    PlayerManager.instance.isTalking = true;
+                                    PlayerManager.instance.isActing = true;
                                     if (direction != "")
                                     {
                                         PlayerManager.instance.Look(direction);
                                     }
-                                    SetTalk();
+                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetTrigger("off");
+                                    Debug.Log(trigNum +"번 트리거 실행 성공");
+                                    //SetTalk();
+                                    triggerScript.Action(this);
                                 }
 
                             }
@@ -254,6 +264,15 @@ public class Location : MonoBehaviour
                             DBManager.instance.TrigOver(trigNum);
                         }
                     }
+                    
+                    //트리거 이미 실행됨.
+                    else{
+                        if(poses!=null){
+                            
+                            triggerScript.TrigIsDone(this);
+                        }
+                    }
+                
                     break;
                 case LocationType.Trigger :
                     if(!DBManager.instance.CheckTrigOver(trigNum)){
@@ -261,19 +280,9 @@ public class Location : MonoBehaviour
                         //선행 트리거 실행 여부 확인
                         if(completedTriggerNums.Length>0){
                             if(!DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums)){
-
-                                //locFlag = false;
-                                //Invoke("ResetFlagDelay",1f);
                                 StartCoroutine(ResetFlagDelayCoroutine());
                                 return;
                             }
-                            // for(int i=0;i<completedTriggerNums.Length;i++){
-                            //     if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
-                            //         Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
-                            //         locFlag = false;
-                            //         return;
-                            //     }
-                            // }
                         }
 
 
@@ -286,19 +295,7 @@ public class Location : MonoBehaviour
                                     Debug.Log(trigNum +"번 트리거 실행 성공");
 
                                     triggerScript.Action(this);
-                                    // if(dialogues_T!=null){
-                                    //     if(poses!=null){
-                                        
-                                    //         triggerScript.Action(trigNum, dialogues_T, poses);
-                                    //     }
-                                    //     else{
-                                    //         triggerScript.Action(trigNum, dialogues_T);
 
-                                    //     }
-                                    // }
-                                    // else{
-                                    //     triggerScript.Action(trigNum);
-                                    // }
                                 }
                                     
                             }
@@ -306,10 +303,6 @@ public class Location : MonoBehaviour
                                 DebugManager.instance.PrintDebug("트리거 설정 안됨");
                             }
 
-                                            
-                            // if(!preserveTrigger){
-                            //     DBManager.instance.TrigOver(trigNum);
-                            // }
                         }
 
                     }
@@ -349,22 +342,22 @@ public class Location : MonoBehaviour
     }
 
     public void SetTalk(){
-        DialogueManager.instance.SetFullDialogue(dialogues);
+        DialogueManager.instance.SetFullDialogue(dialogues_T);
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
     
 
     public void LoadText(){
         
-        if(dialogues!=null){
-            for(int i=0; i<dialogues.Length;i++){
-                for(int j=0; j<dialogues[i].sentences.Length;j++){
-                    int temp = int.Parse(dialogues[i].sentences[j]);
-                    //dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
-                    dialogues[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
-                }
-            }
-        }
+        // if(dialogues!=null){
+        //     for(int i=0; i<dialogues.Length;i++){
+        //         for(int j=0; j<dialogues[i].sentences.Length;j++){
+        //             int temp = int.Parse(dialogues[i].sentences[j]);
+        //             //dialogues[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+        //             dialogues[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
+        //         }
+        //     }
+        // }
         if(dialogues_T!=null){
             for(int i=0; i<dialogues_T.Length;i++){
                 for(int j=0; j<dialogues_T[i].sentences.Length;j++){
@@ -563,22 +556,19 @@ public class LocationEditor : Editor
         {
             //selected.dialogueNum = EditorGUILayout.IntField("대화 번호", selected.dialogueNum,EditorStyles.toolbarTextField);
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
+            selected.trigComment =  EditorGUILayout.TextField("주석",selected.trigComment);
+            EditorGUILayout.LabelField("선행 트리거 번호");
             EditorGUILayout.Space();
-            //EditorGUILayout.LabelField("대화 시 방향 설정");
-            
-            //EditorGUIUtility.labelWidth = 0;
-           //EditorGUILayout.LabelField("대화 시 방향 설정" );
-            //GUILayout.Label( "대화 시 방향 설정"  );
-            //GUILayout.FlexibleSpace();
-            //EditorGUILayout.PropertyField(serializedObject.FindProperty("direction"),GUIContent.none, true);
-            selected.direction = EditorGUILayout.TextField("대화 시 방향 설정", selected.direction);
-            //GUILayout.EndHorizontal();
-
             EditorGUILayout.LabelField("대화");
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues"),GUIContent.none, true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("dialogues_T"),GUIContent.none, true);
 
             
+            EditorGUILayout.Space();
+            selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+            selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
+            selected.notZoom = EditorGUILayout.ToggleLeft("카메라 줌 사용 안함", selected.notZoom);
             selected.stopCheck = EditorGUILayout.ToggleLeft("대화 중 이동 불가", selected.stopCheck);
+            selected.direction = EditorGUILayout.TextField("대화 시 방향 설정", selected.direction);
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
 

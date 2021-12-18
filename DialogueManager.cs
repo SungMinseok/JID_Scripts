@@ -66,7 +66,7 @@ public class DialogueManager : MonoBehaviour
         talker.GetComponent<NPCScript>().randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
     }
     public void StopRandomDialogue_NPC(Coroutine coroutine){
-        StopCoroutine(coroutine);
+        if(coroutine !=null) StopCoroutine(coroutine);
     }
 
     IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)

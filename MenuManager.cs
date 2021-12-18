@@ -29,6 +29,7 @@ public class MenuManager : MonoBehaviour
     public class SaveLoadSlot{
         public TextMeshProUGUI saveNameText;
         public TextMeshProUGUI saveDateText;
+        public TextMeshProUGUI slotNumText;
     }
     [Header("UI_Collection_Ending")]
     public Animator animator;
@@ -82,10 +83,14 @@ public class MenuManager : MonoBehaviour
         for(int i=0;i<saveSlotGrid.childCount;i++){
             saveSlots[i].saveNameText = saveSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
             saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+            saveSlots[i].slotNumText = saveSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
+            saveSlots[i].slotNumText.text = (i+1).ToString();
         }
         for(int i=0;i<loadSlotGrid.childCount;i++){
             loadSlots[i].saveNameText = loadSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
             loadSlots[i].saveDateText = loadSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+            loadSlots[i].slotNumText = loadSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
+            loadSlots[i].slotNumText.text = (i+1).ToString();
         }
 
         ResetSaveSlots();
@@ -221,7 +226,7 @@ public class MenuManager : MonoBehaviour
         curSaveNum = num;
 
         if(DBManager.instance.CheckSaveFile(num)){
-            OpenPopUpPanel("save");
+            OpenPopUpPanel("save_overwrite");
         }
         else{
             Save(curSaveNum);
@@ -254,12 +259,12 @@ public class MenuManager : MonoBehaviour
         //취소
         popUpText[3].text ="1";
         switch(type){
-            case "save" :
-                popUpText[0].text = "2";
-                popUpText[1].text = "3";
+            case "save_overwrite" :
+                popUpText[0].text = "7";
+                popUpText[1].text = "";
                 break;
             case "load" :
-                popUpText[0].text = "2";
+                popUpText[0].text = "8";
                 popUpText[1].text = "3";
                 break;
             case "loadLast" :
@@ -268,7 +273,7 @@ public class MenuManager : MonoBehaviour
                 break;
             case "goMain" :
                 popUpText[0].text = "6";
-                popUpText[1].text = "3";
+                popUpText[1].text = "";
                 break;
             default :
                 break;
@@ -284,8 +289,10 @@ public class MenuManager : MonoBehaviour
     public void PopUpOkayBtn(){
         //Debug.Log("A");
         switch(curPopUpType){
-            case "save" :
+            case "save_overwrite" :
                 Save(curSaveNum);
+        ResetSaveSlots();
+        ResetLoadSlots();
                 //Debug.Log(curSaveNum + "번 저장 시도");
                 break;
 

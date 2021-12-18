@@ -15,8 +15,6 @@ public class NPCScript : MonoBehaviour
     //public bool canTalk;
     [Tooltip("스프라이트 스킨아닐 시 체크")]
     public bool isSpriteRenderer;
-    //[Tooltip("기본 스프라이트가 우향일 시 체크")]
-    //public bool isRight;
     [Header("Sub things")]
     public Transform talkCanvas;
     public Transform interactiveMark;
@@ -24,7 +22,6 @@ public class NPCScript : MonoBehaviour
     
     [Header("Status")]
     [SerializeField][Range(1f,10f)] public float speed = 2f;
-    //[SerializeField][Range(10f,50f)] public float jumpPower = 10f;
     
     [Header("배회 모드")]
     public bool onJYD;
@@ -39,24 +36,19 @@ public class NPCScript : MonoBehaviour
     public bool patrolFlag;
     public float patrolInterval;
     public Transform startPos,desPos;
-    //public float waitTime;
     public Transform rader;
     float raderFlipX;
     [Header("미친 개미 모드")]
     public bool onMadAnt;
-    //public bool onMode_FlyingMadAnt;
     public GameObject[] bullets;
-    //public GameObject[] bulletsNonGravity;
     public Vector2 bulletsPos;
-    //public Vector2 bulletsNonGravityPos;
-    //public float JYDCoolDown;
     [Header("플레이어와 충돌 무시")]
     public bool noCollision = true;
     [Header("랜덤 대화 설정")]
     //아무때나 랜덤 대화 활성화
     public bool alwaysRandomDialogue;
     //플레이어 근처에서만 랜덤 대화 활성화
-    public bool onlyNearPlayerRandomDialogue;
+    //public bool onlyNearPlayerRandomDialogue;
     //public bool activateRandomDialogue;
     bool randomDialogueFlag;
     public float dialogueDuration;
@@ -70,6 +62,7 @@ public class NPCScript : MonoBehaviour
     [Space]
     [Header("Debug ───────────────────")]
     public bool onRandomDialogue;
+    public bool pauseRandomDialogue;
     
     public int patrolInput;
     public Collider2D lastPlatform;
@@ -225,15 +218,29 @@ public class NPCScript : MonoBehaviour
 
             }
         }
-
+#region 랜덤대화 관련 설정
         if(onRandomDialogue){
+
+            if(PlayerManager.instance.isActing || LoadManager.instance.reloadScene){
+                if(!pauseRandomDialogue){
+                    pauseRandomDialogue = true;
+                    DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                }
+            }
+            else{
+                if(pauseRandomDialogue){
+                    pauseRandomDialogue = false;
+                }
+            }
+        }
+
+        if(onRandomDialogue && !pauseRandomDialogue){
             if(!randomDialogueFlag){
                 randomDialogueFlag = true;
                 StartCoroutine(SetRandomDialogueCoroutine());
             }
-
         }
-
+#endregion
         if(talkCanvas.gameObject.activeSelf){
             // isPaused = true;
             // patrolInput = 0;

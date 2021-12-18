@@ -15,6 +15,7 @@ public class LoadManager : MonoBehaviour
     public D2FogsNoiseTexPE fogsNoiseTexPE;
     public GameObject[] mainBtns;
     public bool loadFlag;
+    public bool reloadScene;  //NPC 코루틴 종료용
     //public GameObject ddol;
     [Header("UI_Save&Load")]
     public Transform saveSlotGrid;
@@ -99,6 +100,7 @@ public class LoadManager : MonoBehaviour
     
     IEnumerator LoadNextScene(string nextScene)
     {
+        reloadScene = true;
         SceneManager.LoadScene("Loading");
         yield return null;
 
@@ -225,7 +227,7 @@ public class LoadManager : MonoBehaviour
         FadeIn();
 
         loadFlag = false;
-
+        reloadScene = false;
         
         yield return wait1s;
         if(PlayerManager.instance!=null){
