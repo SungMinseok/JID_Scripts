@@ -55,7 +55,7 @@ public class Minigame0Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(curLevelFlag){
+        if(curLevelFlag && !PlayerManager.instance.isGameOver){
 
             if(Input.GetButtonDown("Vertical") || Input.GetButtonDown("Horizontal") ){
                 if(Input.GetAxisRaw("Vertical")<0){
@@ -80,8 +80,17 @@ public class Minigame0Script : MonoBehaviour
 
     }
     void FixedUpdate(){
-        if(curTimer>0) curTimer -= Time.fixedDeltaTime;
-        timerGauge.fillAmount = curTimer / maxTimerSet;
+
+        if(!PlayerManager.instance.isGameOver &&PlayerManager.instance.isPlayingMinigame){
+            if(curTimer>0){
+                curTimer -= Time.fixedDeltaTime;
+            }
+            else{
+                MinigameManager.instance.FailMinigame();
+                UIManager.instance.SetGameOverUI(3);
+            }
+            timerGauge.fillAmount = curTimer / maxTimerSet;
+        }
     }
     void ResetValue(){
         //curLevelAnswer.Clear();

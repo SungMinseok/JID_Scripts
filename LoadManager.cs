@@ -215,7 +215,7 @@ public class LoadManager : MonoBehaviour
 
 
         if(PlayerManager.instance!=null){
-            if(PlayerManager.instance.isDead){
+            if(PlayerManager.instance.isGameOver){
                 PlayerManager.instance.RevivePlayer();
             }
         }

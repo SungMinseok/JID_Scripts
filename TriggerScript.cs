@@ -788,7 +788,9 @@ public class TriggerScript : MonoBehaviour
     
 
     public void SetDialogue(Dialogue dialogue){
-        
+        if(dialogue==null){
+            Debug.Log("대사 없음");
+        }
         DialogueManager.instance.SetDialogue(dialogue);
     }
     public void SetSelect(Select select){

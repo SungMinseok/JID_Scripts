@@ -48,7 +48,7 @@ public class PlayerManager : MonoBehaviour
     public bool isFalling;
     public bool isHiding;   //구조물에 숨은 상태 (경비개미에게 발각되지 않음)
     public bool isCaught;
-    public bool isDead;
+    public bool isGameOver;
     public bool getDirt;    //플레이어가 흙더미 로케이션에 닿아있는 것 체크 (흙 팔 수 있는 상태)
     public bool digFlag;
     public bool isWaitingInteract;
@@ -565,7 +565,7 @@ public class PlayerManager : MonoBehaviour
         PlayerManager.instance.animator.SetBool("dead0", false);
 
         PlayerManager.instance.isCaught = false;
-        PlayerManager.instance.isDead = false;
+        PlayerManager.instance.isGameOver = false;
         
     }
 
@@ -687,7 +687,7 @@ public class PlayerManager : MonoBehaviour
             yield return wait125ms;
         }
         yield return wait1000ms;
-        UIManager.instance.SetGameOverUI(0);
+        UIManager.instance.SetGameOverUI(2);
     }
 
     public void ResetRigidbody(){

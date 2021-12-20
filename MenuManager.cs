@@ -62,6 +62,10 @@ public class MenuManager : MonoBehaviour
 #region Reset Collection
         totalPage = DBManager.instance.endingCollectionSprites.Length;
         ResetCardOrder();
+
+        collectionScrollArrows[0].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollRightBtn());
+        collectionScrollArrows[1].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollLeftBtn());
+        
 #endregion
 
 #region Reset Save&Load

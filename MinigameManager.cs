@@ -42,6 +42,11 @@ public class MinigameManager : MonoBehaviour
         PlayerManager.instance.isPlayingMinigame = false;
         Debug.Log(nowMinigameNum + "번 미니게임 종료");
     }
+    public void FailMinigame(){
+        minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
+        PlayerManager.instance.isPlayingMinigame = false;
+        Debug.Log(nowMinigameNum + "번 미니게임 종료");
+    }
     public void SuccessMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
             instance.transform.GetChild(i).gameObject.SetActive(false);

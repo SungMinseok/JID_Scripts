@@ -77,10 +77,9 @@ public class DoodadsScript : MonoBehaviour
         }
         else if(type == DoodadsType.Trap){
             if(other.CompareTag("Player")){
-                if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isDead){
+                if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
 
-            Debug.Log("333");
-                    PlayerManager.instance.isDead = true;
+                    PlayerManager.instance.isGameOver = true;
                     PlayerManager.instance.canMove = false;
                     PlayerManager.instance.animator.SetBool("dead0",true);
                     UIManager.instance.SetGameOverUI(0);

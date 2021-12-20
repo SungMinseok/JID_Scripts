@@ -131,6 +131,7 @@ public class UIManager : MonoBehaviour
     }
 #region GameOver
     public void SetGameOverUI(int num){
+        PlayerManager.instance.LockPlayer();
         StartCoroutine(SetGameOverUICoroutine(num));
     }
     public void ResetGameOverUI(){
@@ -142,8 +143,8 @@ public class UIManager : MonoBehaviour
         //SetFadeOut();
         LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1.5f);
-
-        ui_gameOver_image.sprite = gameOverSprites[num];
+        ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[num];
+        //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();
         yield return new WaitForSeconds(2f);

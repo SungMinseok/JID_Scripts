@@ -378,6 +378,7 @@ public class EndingCollection{
         //date = d;
         //count = e;
         resourceID = c;
+        if(DBManager.instance.endingCollectionSprites.Length > resourceID)
         sprite = DBManager.instance.endingCollectionSprites[resourceID];
     }
 }
