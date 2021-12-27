@@ -615,91 +615,42 @@ public class TriggerScript : MonoBehaviour
                 
                 
                 //로메슈제 보유시
-                if(location.selectPhase == 0){
-                    location.selectPhase = 1;
+                //if(location.selectPhase == 0){
+                    //location.selectPhase = 1;
 
-                    SetDialogue(dialogues[0]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[1]);
-                    yield return waitTalking;
-                    SetSelect(selects[0]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                    if(GetSelect()==0){
-                        location.selectPhase = 2;
-                        SetDialogue(dialogues[1]);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(GetSelect()==0){
+                    InventoryManager.instance.RemoveItem(10);
+
+                    FadeOut();
+                    yield return wait1000ms;
+                    for(int i=0;i<14;i++){
+                        objects[i].gameObject.SetActive(false);
+                    }
+                    objects[14].gameObject.SetActive(true);
+                    yield return wait2000ms;
+                    FadeIn();
+
+                    for(int i=0;i<11;i++){
+                        SetDialogue(dialogues[i+2]);
                         yield return waitTalking;
-                        SetSelect(selects[1]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                        if(GetSelect()==0){
-                        }
-                        else if(GetSelect()==1){
-                            //선택지 완료 시 -1
-                            location.selectPhase = -1;
-                            SetDialogue(dialogues[2]);
-                            yield return waitTalking;
-                            SetDialogue(dialogues[3]);
-                            yield return waitTalking;
-                            SetDialogue(dialogues[4]);
-                            yield return waitTalking;
-                            InventoryManager.instance.AddItem(2);
-                        }
                     }
-                    else if(GetSelect()==1){
-                        
-                    }
+
+                    FadeOut();
+                    yield return wait1000ms;
+                    objects[14].gameObject.SetActive(false);
+                    yield return wait1000ms;
+                    FadeIn();
+
                 }
-                else if(location.selectPhase == 1){                    
-                    SetDialogue(dialogues[7]);
-                    yield return waitTalking;
-                    SetSelect(selects[0]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                    if(GetSelect()==0){
-                        location.selectPhase = 2;
-                        SetDialogue(dialogues[1]);
-                        yield return waitTalking;
-                        SetSelect(selects[1]);
-                        yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                        if(GetSelect()==0){
-                        }
-                        else if(GetSelect()==1){
-                            //선택지 완료 시 -1
-                            location.selectPhase = -1;
-                            SetDialogue(dialogues[2]);
-                            yield return waitTalking;
-                            SetDialogue(dialogues[3]);
-                            yield return waitTalking;
-                            SetDialogue(dialogues[4]);
-                            yield return waitTalking;
-                            InventoryManager.instance.AddItem(2);
-                        }
-                    }
-                    else if(GetSelect()==1){
-                        
-                    }
-                }
-                else if(location.selectPhase == 2){
-                    SetDialogue(dialogues[1]);
-                    yield return waitTalking;
-                    SetSelect(selects[1]);
-                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                    if(GetSelect()==0){
-                    }
-                    else if(GetSelect()==1){
-                        //선택지 완료 시 -1
-                        location.selectPhase = -1;
-                        SetDialogue(dialogues[2]);
-                        yield return waitTalking;
-                        SetDialogue(dialogues[3]);
-                        yield return waitTalking;
-                        SetDialogue(dialogues[4]);
-                        yield return waitTalking;
-                        InventoryManager.instance.AddItem(2);
-                    }
-                }
-                break;
+                else if(GetSelect()==1){
                     
-                
-                
+                }
                 break;
 #endregion
             

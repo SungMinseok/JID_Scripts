@@ -164,6 +164,15 @@ public class CheatManager : MonoBehaviour
                     }
                     break;
 
+                case "checkhaveitem" :
+
+                    if(temp[1]==null) return;
+
+                    int getInt = int.Parse(temp[1]);
+
+                    Debug.Log(InventoryManager.instance.CheckHaveItem(getInt));
+                    break;
+
 
             }
 //EndingCollectionOver

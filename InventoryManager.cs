@@ -119,6 +119,16 @@ public class InventoryManager : MonoBehaviour
         RefreshInventory(curPage);
 
     }
+    public bool CheckHaveItem(int ID, int amount = 1){
+
+        if(DBManager.instance.curData.itemList.Contains(new ItemList(ID,1))){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public void RefreshInventory(int pageNum){
         //var theUI = UIManager.instance;
         var theDB = DBManager.instance;
