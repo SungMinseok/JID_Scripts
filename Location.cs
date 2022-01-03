@@ -577,10 +577,13 @@ public class LocationEditor : Editor
         {
             selected.trigNum = EditorGUILayout.IntField("트리거 번호", selected.trigNum,EditorStyles.toolbarTextField);
             selected.trigComment =  EditorGUILayout.TextField("주석",selected.trigComment);
-            EditorGUILayout.LabelField("선행 트리거 번호");
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
             selected.target = EditorGUILayout.ObjectField("트리거 부착", selected.target, typeof(Transform), true) as Transform;
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("[Conditions]",EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("선행 트리거 번호");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("[Actions]",EditorStyles.boldLabel);
             EditorGUILayout.LabelField("오브젝트");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("poses"),GUIContent.none, true);
             EditorGUILayout.LabelField("대화");

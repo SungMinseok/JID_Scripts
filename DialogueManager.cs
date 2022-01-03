@@ -164,6 +164,8 @@ public class DialogueManager : MonoBehaviour
                 i = totalVisibleCharacters;
             }
             tmp.maxVisibleCharacters = i;
+            //print(i);
+            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ') SoundManager.instance.PlaySound("talk_temp");
             
             yield return _typingSpeed;
 

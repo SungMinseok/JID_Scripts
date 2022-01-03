@@ -121,7 +121,7 @@ public class InventoryManager : MonoBehaviour
     }
     public bool CheckHaveItem(int ID, int amount = 1){
 
-        if(DBManager.instance.curData.itemList.Contains(new ItemList(ID,1))){
+        if(DBManager.instance.curData.itemList.Exists(x => x.itemID == ID)){
             return true;
         }
         else{

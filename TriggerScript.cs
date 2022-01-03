@@ -620,37 +620,45 @@ public class TriggerScript : MonoBehaviour
 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
-                SetSelect(selects[0]);
-                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
-                if(GetSelect()==0){
-                    InventoryManager.instance.RemoveItem(10);
 
-                    FadeOut();
-                    yield return wait1000ms;
-                    for(int i=0;i<14;i++){
-                        objects[i].gameObject.SetActive(false);
+                if(InventoryManager.instance.CheckHaveItem(10)){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                    if(GetSelect()==0){
+
+                        location.selectPhase = -1;
+
+                        InventoryManager.instance.RemoveItem(10);
+
+                        FadeOut();
+                        yield return wait1000ms;
+                        for(int i=0;i<14;i++){
+                            objects[i].gameObject.SetActive(false);
+                        }
+                        objects[14].gameObject.SetActive(true);
+                        yield return wait2000ms;
+                        FadeIn();
+
+                        for(int i=0;i<11;i++){
+                            SetDialogue(dialogues[i+2]);
+                            yield return waitTalking;
+                        }
+
+                        FadeOut();
+                        yield return wait1000ms;
+                        objects[14].gameObject.SetActive(false);
+                        yield return wait1000ms;
+                        FadeIn();
+
                     }
-                    objects[14].gameObject.SetActive(true);
-                    yield return wait2000ms;
-                    FadeIn();
-
-                    for(int i=0;i<11;i++){
-                        SetDialogue(dialogues[i+2]);
-                        yield return waitTalking;
+                    else if(GetSelect()==1){
+                        
                     }
-
-                    FadeOut();
-                    yield return wait1000ms;
-                    objects[14].gameObject.SetActive(false);
-                    yield return wait1000ms;
-                    FadeIn();
-
                 }
-                else if(GetSelect()==1){
-                    
-                }
+
                 break;
 #endregion
             
