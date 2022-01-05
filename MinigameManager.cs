@@ -90,7 +90,15 @@ public class MinigameManager : MonoBehaviour
         if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
             
             PlayerManager.instance.isPlayingMinigame = true;
-            nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
+
+            if(nowMinigameNum == 4){
+                PlayerManager.instance.canMove = false;
+            }
+
+
+
+            //nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
+            nowMinigame.gameObject.SetActive(true);
 
         }
 

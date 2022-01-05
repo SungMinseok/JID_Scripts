@@ -92,9 +92,10 @@ public class CheatManager : MonoBehaviour
                         int minigameNum = int.Parse(temp[1]);
                         if(minigameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
                             
-                            PlayerManager.instance.isPlayingMinigame = true;
-                            var tempGame = minigameParent.GetChild(minigameNum).gameObject;
-                            tempGame.SetActive(!tempGame.activeSelf);
+                            MinigameManager.instance.StartMinigame(minigameNum);
+                            // PlayerManager.instance.isPlayingMinigame = true;
+                            // var tempGame = minigameParent.GetChild(minigameNum).gameObject;
+                            // tempGame.SetActive(!tempGame.activeSelf);
 
                         }
 

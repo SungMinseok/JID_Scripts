@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.UI;
 //using System;
 //Level, Stage  : Level이 상위 개념
@@ -16,28 +17,25 @@ public class Minigame4Script : MonoBehaviour
     public float aphidLifeTime = 2f;
     public float aphidCreationCycle = 1;
     public int aphidCreationCount = 100;
+    public float miniAntSpeed;
+    public float miniLuckySpeed;
 
 
 
     
-    [Range(0.1f, 3f)] public float mapScrollSpeed = 0.1f;
-    [Range(0.1f, 3f)] public float runningMadAntSpeed = 1f;
-    [Range(0.1f, 3f)] public float flyingMadAntSpeed = 1.2f;
-    public int runningMadAntThrowCount;
-    public int flyingMadAntThrowCount;
-    public float gameTimer;
     [Space]
     [Header("[Game Objects]─────────────────")]
     public GameObject[] aphids;
-    public NPCScript flyingMadAnt;
-    public Transform defaultPos0;
-    public Transform createPos0;
-    public Transform defaultPos1;
-    public Transform createPos1;
-
+    public Transform miniLucky, miniAnt;
+    public Vector2 miniAntDestination;
+    public PolygonCollider2D mapCollider;
+    public Transform mapViewPoint;
     [Space]
 
     [Header("[Debug]─────────────────")]
+    public int closestAphid;
+    public List<float> tempDistanceList;
+    public List<int> tempAphidNumList;
     public float curMapScrollSpeed = 0 ;
     Coroutine minigameCoroutine;
     public bool isActive;
@@ -61,12 +59,15 @@ public class Minigame4Script : MonoBehaviour
     }
     
     private void OnEnable() {
-
-        
-
+        Debug.Log("A");
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
 
-        int i = Random.Range(0,1);
+        SceneController.instance.SetSomeConfiner(mapCollider);
+        SceneController.instance.virtualCamera.Follow = mapViewPoint;
+
+
+
+        //int i = Random.Range(0,1);
     }
     // void Update(){
     //     if(!creationFlag){
@@ -75,9 +76,21 @@ public class Minigame4Script : MonoBehaviour
     //     }
         
     // }    
+
+    void Update(){
+        
+        wInput = Input.GetAxisRaw("Horizontal");
+        hInput = Input.GetAxisRaw("Vertical");
+    }
     void FixedUpdate(){
+
+        
         if(wInput!=0 || hInput!=0){
-            test.Translate(new Vector2(wInput * correctionValue,hInput * correctionValue));
+            miniLucky.Translate(new Vector2(wInput * miniLuckySpeed,hInput * miniLuckySpeed));
+        }
+
+        if(miniAntDestination != Vector2.zero){
+            miniAnt.position = Vector2.MoveTowards(miniAnt.position,miniAntDestination,miniAntSpeed);
         }
     }
     IEnumerator MinigameCoroutine(){
@@ -93,6 +106,7 @@ public class Minigame4Script : MonoBehaviour
             }
 
             aphids[Random.Range(0,aphids.Length)].SetActive(true);
+            CalculateDistance();
             yield return waitAphidCreationCycle;
         }
 
@@ -100,7 +114,30 @@ public class Minigame4Script : MonoBehaviour
 
     public void SetRandomPosition(){
         foreach(GameObject aphid in aphids){
-            aphid.transform.localPosition = new Vector2(Random.Range(-7.5f,7.5f),Random.Range(-4f,4f));
+            aphid.transform.localPosition = new Vector2(Random.Range(-7.5f,7.5f),Random.Range(-4f,2.5f));
         }
+    }
+
+    public void CalculateDistance(){
+        // tempDistanceList.Clear();
+        // tempAphidNumList.Clear();
+        Transform closestAphid = null;
+        float closestDistance = 100f;
+
+        for(int i=0;i<aphids.Length;i++){
+            if(!aphids[i].activeSelf) continue;
+            float tempDistance = Vector2.Distance(miniAnt.position,aphids[i].transform.position);
+            if(closestDistance>tempDistance){
+                closestDistance = tempDistance;
+                closestAphid = aphids[i].transform;
+            }
+            // tempDistanceList.Add(Vector2.Distance(miniAnt.position,aphids[i].transform.position));
+            // tempAphidNumList.Add(i);
+        }
+
+        miniAntDestination = new Vector2(closestAphid.position.x,closestAphid.position.y);
+
+
+        //miniAntDestination = new Vector2(closestAphid)
     }
 }
