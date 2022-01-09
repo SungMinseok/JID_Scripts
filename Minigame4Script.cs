@@ -59,24 +59,18 @@ public class Minigame4Script : MonoBehaviour
     }
     
     private void OnEnable() {
-        Debug.Log("A");
+
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
 
         SceneController.instance.SetSomeConfiner(mapCollider);
         SceneController.instance.virtualCamera.Follow = mapViewPoint;
 
-
-
-        //int i = Random.Range(0,1);
+        UIManager.instance.SetHUD(false);
     }
-    // void Update(){
-    //     if(!creationFlag){
-    //         creationFlag = true;
-            
-    //     }
+    void OnDisable(){
         
-    // }    
-
+        UIManager.instance.SetHUD(true);
+    }
     void Update(){
         
         wInput = Input.GetAxisRaw("Horizontal");

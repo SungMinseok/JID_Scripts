@@ -208,42 +208,19 @@ public class Minigame1Script : MonoBehaviour
                 }
                 else{
                 //Debug.Log("4");
+
+                //게임 성공 success
                     gameObject.SetActive(false);
                 }
                 
             }
-            //curStage ++;
-            //bubbleObjects.GetChild(curStage).gameObject.SetActive(true);
-            
         }
         else{
-                //Debug.Log("5");
         yield return wait500ms;
-                //yield return new WaitForSeconds(0.5f);
-            //bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("fail");
             bubbleObjects.GetChild(curStage).gameObject.SetActive(false);
             failBubbleAnimator.SetTrigger("off"+curStage.ToString());
         yield return wait1000ms;
             StartCoroutine(MinigameCoroutine());
         }
     }    
-    // void CheckPointerPostion_Debug(int curStage){
-    //     // switch(curLevel){
-    //     //     case 0 : 
-    //     //         break;
-            
-    //     // }
-    //     Debug.Log(sliderPointer.value);
-
-    //     float minErrorValue = randomCenterPosVar - acceptableIntervals[curStage]/2f;
-    //     float maxErrorValue = randomCenterPosVar + acceptableIntervals[curStage]/2f;
-    //     //StartCoroutine(Wait());
-    //     if(sliderPointer.value>=minErrorValue && sliderPointer.value<=maxErrorValue){
-    //         Debug.Log("성공");
-    //     }
-    //     else{
-    //         Debug.Log("실패");
-
-    //     }
-    // }
 }
