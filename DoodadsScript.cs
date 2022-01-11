@@ -6,6 +6,7 @@ public enum DoodadsType{
     Cover,
     Trap,
     SlowDown,
+    Bullet,
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -68,33 +69,78 @@ public class DoodadsScript : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other){
 
-        if(type == DoodadsType.Cover){
-            
-            if(other.CompareTag("Player")){
-                Cloak();
-                PlayerManager.instance.isHiding = true;
-            }
-        }
-        else if(type == DoodadsType.Trap){
-            if(other.CompareTag("Player")){
-                if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+        switch(type){
+            case DoodadsType.Cover :
+                if(other.CompareTag("Player")){
+                    Cloak();
+                    PlayerManager.instance.isHiding = true;
+                }
+                break;
 
-                    PlayerManager.instance.isGameOver = true;
-                    PlayerManager.instance.canMove = false;
-                    PlayerManager.instance.animator.SetBool("dead0",true);
-                    UIManager.instance.SetGameOverUI(0);
+            case DoodadsType.Trap :
+                if(other.CompareTag("Player")){
+                    if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+
+                        PlayerManager.instance.isGameOver = true;
+                        PlayerManager.instance.canMove = false;
+                        PlayerManager.instance.animator.SetBool("dead0",true);
+                        UIManager.instance.SetGameOverUI(0);
+                    }
                 }
-            }
-        }
-        else if(type == DoodadsType.SlowDown){
-            if(other.CompareTag("Player")){
-                if(!onHit){
-                    onHit = true;
-                    PlayerManager.instance.isSlowDown += slowDownValue;
+                break;
+
+            case DoodadsType.SlowDown :
+                if(other.CompareTag("Player")){
+                    if(!onHit){
+                        onHit = true;
+                        PlayerManager.instance.isSlowDown += slowDownValue;
+                    }
+                //Debug.Log("A");
                 }
-               //Debug.Log("A");
-            }
+                break;
+            case DoodadsType.Bullet :
+                if(other.CompareTag("Player")){
+                    
+                    if(!PlayerManager.instance.isGameOver){
+
+                        PlayerManager.instance.isGameOver = true;
+                        PlayerManager.instance.canMove = false;
+                        PlayerManager.instance.animator.SetBool("dead0",true);
+                        UIManager.instance.SetGameOverUI(4);
+                    }
+                }
+                break;
+
+            
         }
+
+        // if(type == DoodadsType.Cover){
+            
+        //     if(other.CompareTag("Player")){
+        //         Cloak();
+        //         PlayerManager.instance.isHiding = true;
+        //     }
+        // }
+        // else if(type == DoodadsType.Trap){
+        //     if(other.CompareTag("Player")){
+        //         if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+
+        //             PlayerManager.instance.isGameOver = true;
+        //             PlayerManager.instance.canMove = false;
+        //             PlayerManager.instance.animator.SetBool("dead0",true);
+        //             UIManager.instance.SetGameOverUI(0);
+        //         }
+        //     }
+        // }
+        // else if(type == DoodadsType.SlowDown){
+        //     if(other.CompareTag("Player")){
+        //         if(!onHit){
+        //             onHit = true;
+        //             PlayerManager.instance.isSlowDown += slowDownValue;
+        //         }
+        //        //Debug.Log("A");
+        //     }
+        // }
         
     }
     

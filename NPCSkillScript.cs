@@ -14,7 +14,7 @@ public class NPCSkillScript : MonoBehaviour
         bulletsPos = bullets[0].transform.localPosition;
         
     }
-
+    //FlyingMadAnt > madant_flying > ant_mad_fly_throw 의 애니메이션에 연결
     public void ThrowDownBullets(){
         if(skillCoroutine != null)  StopCoroutine(skillCoroutine);
         skillCoroutine = StartCoroutine(ThrowDownBulletsCoroutine());
@@ -25,7 +25,7 @@ public class NPCSkillScript : MonoBehaviour
         for(int i=0;i<bullets.Length;i++){
 
             bullets[i].SetActive(true);
-            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(i-1,0) * (2), ForceMode2D.Impulse);
+            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(i-1,0) * (Minigame2Script.instance.flyingBottleSpeed), ForceMode2D.Impulse);
         }
 
         yield return new WaitForSeconds(3f);
@@ -41,7 +41,7 @@ public class NPCSkillScript : MonoBehaviour
         for(int i=0;i<bullets.Length;i++){
             bullets[i].transform.localPosition = bulletsPos;
             bullets[i].SetActive(true);
-            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(1,0) * (10), ForceMode2D.Impulse);
+            bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(1,0) * (Minigame2Script.instance.throwingBottleSpeed), ForceMode2D.Impulse);
         }
         yield return new WaitForSeconds(3f);
         ResetBullets();

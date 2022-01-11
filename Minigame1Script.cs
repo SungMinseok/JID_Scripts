@@ -72,6 +72,14 @@ public class Minigame1Script : MonoBehaviour
         //StartCoroutine(Wait());
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
         //StartSliderMoving();
+        UIManager.instance.SetHUD(false);
+    }
+    void OnDisable(){
+        PlayerManager.instance.UnlockPlayer();
+
+        UIManager.instance.SetHUD(true);
+        StopAllCoroutines();
+
     }
     IEnumerator MinigameCoroutine(){
         //bubbleObjects.GetChild(0).gameObject.SetActive(true);

@@ -40,10 +40,13 @@ public class Minigame0Script : MonoBehaviour
         ResetValue();
 
         StartCoroutine(MinigameCoroutine());
+        UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
         PlayerManager.instance.UnlockPlayer();
 
+        UIManager.instance.SetHUD(true);
+        StopAllCoroutines();
 
     }
     // Start is called before the first frame update

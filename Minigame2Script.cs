@@ -8,6 +8,7 @@ using System;
 //Stage : 레벨 당 3스테이지
 public class Minigame2Script : MonoBehaviour
 {
+    public static Minigame2Script instance;
     [Header("[Game Settings]─────────────────")]
     [Range(0.1f, 3f)] public float mapScrollSpeed = 0.1f;
     [Range(0.1f, 3f)] public float runningMadAntSpeed = 1f;
@@ -18,7 +19,8 @@ public class Minigame2Script : MonoBehaviour
     public GameObject destinationMap;
     public Location exitLocation;
     public Transform flyingBottle;
-    [Range(0.1f, 3f)] public float flyingBottleSpeed = 0.2f;
+    [Range(1f, 4f)] public float flyingBottleSpeed = 2f;
+    [Range(8f, 15f)] public float throwingBottleSpeed = 10f;
     [Space]
     [Header("[Game Objects]─────────────────")]
     public NPCScript runningMadAnt;
@@ -45,7 +47,9 @@ public class Minigame2Script : MonoBehaviour
     WaitForSeconds wait3s = new WaitForSeconds(3f);
     Vector3 flyingBottlePos;
     
-
+    void Awake(){
+        instance = this;
+    }
     
     private void OnEnable() {
         //canSelect = true;
@@ -55,6 +59,11 @@ public class Minigame2Script : MonoBehaviour
 
         flyingBottlePos = flyingBottle.localPosition;
         //StartSliderMoving();
+        UIManager.instance.SetHUD(false);
+    }
+    void OnDisable(){
+        UIManager.instance.SetHUD(true);
+        StopAllCoroutines();
     }
     void Update(){
         if(isActive){
@@ -119,7 +128,7 @@ public class Minigame2Script : MonoBehaviour
             flyingMadAnt.transform.localPosition += Vector3.right * flyingMadAntSpeed * Time.deltaTime  ;
             yield return null;
         }
-
+        //NPCSkillScript.cs에서 관리
         //소주병 n 번 날림
         for(int i=0;i<flyingMadAntThrowCount;i++){
             var movingObject = flyingMadAnt;

@@ -11,6 +11,7 @@ using UnityEngine.UI;
 //진딧물 미니게임
 public class Minigame4Script : MonoBehaviour
 {
+    public static Minigame4Script instance;
 
     //x : 7.5  y : 4
     [Header("[Game Settings]─────────────────")]
@@ -19,7 +20,7 @@ public class Minigame4Script : MonoBehaviour
     public int aphidCreationCount = 100;
     public float miniAntSpeed;
     public float miniLuckySpeed;
-
+    public int goalScore;
 
 
     
@@ -30,6 +31,7 @@ public class Minigame4Script : MonoBehaviour
     public Vector2 miniAntDestination;
     public PolygonCollider2D mapCollider;
     public Transform mapViewPoint;
+    public int score_lucky, score_ant;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -54,6 +56,9 @@ public class Minigame4Script : MonoBehaviour
     public float correctionValue;
     public bool creationFlag;
 
+    void Awake(){
+        instance = this;
+    }
     void Start(){
         waitAphidCreationCycle = new WaitForSeconds(aphidCreationCycle);
     }
@@ -70,6 +75,7 @@ public class Minigame4Script : MonoBehaviour
     void OnDisable(){
         
         UIManager.instance.SetHUD(true);
+        StopAllCoroutines();
     }
     void Update(){
         
@@ -95,7 +101,7 @@ public class Minigame4Script : MonoBehaviour
             GameObject curAphid = aphids[Random.Range(0,aphids.Length)];
 
             if(curAphid.activeSelf){
-                Debug.Log("AA");
+               // Debug.Log("AA");
                 continue;
             }
 

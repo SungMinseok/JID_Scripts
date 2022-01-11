@@ -8,11 +8,9 @@ using System;
 //Stage : 레벨 당 3스테이지
 public class test : MonoBehaviour
 {
-    // void OnTriggerEnter2D(collider2D collider2D){
-    //     if(collider2D.gameObject.tag){
-
-    //         Debug.Log("11");
-    //     }
-        
-    // }
+    void OnTriggerEnter2D(Collider2D other) {
+        if(other.CompareTag("Aphid")){
+        Debug.Log("AAAA");
+        }
+    }
 }
