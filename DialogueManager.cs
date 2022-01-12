@@ -155,9 +155,11 @@ public class DialogueManager : MonoBehaviour
             tmp.text = curSentence;
         }
         tmp.maxVisibleCharacters = 0;
-
-        canSkip = true;
+        //Invoke("WaitSkip",0.5f);
+        //canSkip = true;
         for(int i=0; i<totalVisibleCharacters+1; i++){
+            if(i==3) canSkip = true;
+
             if(goSkip){
                 goSkip = false;
                 canSkip = false;
@@ -165,7 +167,7 @@ public class DialogueManager : MonoBehaviour
             }
             tmp.maxVisibleCharacters = i;
             //print(i);
-            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ') SoundManager.instance.PlaySound("talk_temp");
+            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0) SoundManager.instance.PlaySound("talk_temp");
             
             yield return _typingSpeed;
 
@@ -196,6 +198,9 @@ public class DialogueManager : MonoBehaviour
         // }
 #endregion
 
+    }
+    public void WaitSkip(){
+        canSkip = true;
     }
 
     //스킵 불가능한 NPC 자체 메시지 출력

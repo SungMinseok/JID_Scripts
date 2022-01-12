@@ -178,6 +178,8 @@ public class PlayerManager : MonoBehaviour
             if(hInput<0){
                 
                 animator.SetBool("down", true);
+                //bodyCollider2D.gameObject.SetActive(false);
+                bodyCollider2D.enabled = false;
 
                 if(jumpInput && !jumpDownFlag){
                     jumpDownFlag = true;
@@ -186,6 +188,8 @@ public class PlayerManager : MonoBehaviour
             }
             else{
                 animator.SetBool("down", false);
+                //bodyCollider2D.gameObject.SetActive(true);
+                bodyCollider2D.enabled = true;
 
             }
 

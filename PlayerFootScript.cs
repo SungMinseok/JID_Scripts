@@ -55,6 +55,13 @@ public class PlayerFootScript : MonoBehaviour
     void OnCollisionExit2D(Collision2D other){
         PlayerManager.instance.footCol = null;
     }
+    void OnTriggerStay2D(Collider2D other){
+        
+        if (other.CompareTag("Ladder"))
+        {
+            if (!thePlayer.ladderDelay) thePlayer.getLadder = true;
+        }
+    }
 
     void OnTriggerExit2D(Collider2D other) {
 

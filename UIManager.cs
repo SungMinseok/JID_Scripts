@@ -157,6 +157,8 @@ public class UIManager : MonoBehaviour
         hud_state.SetActive(active);
         hud_inventory.SetActive(active);
     }
+    public void SetFadeHUD(bool active){
+    }
 
     // public Vector3 worldToUISpace(Canvas parentCanvas, Vector3 worldPos)
     // {

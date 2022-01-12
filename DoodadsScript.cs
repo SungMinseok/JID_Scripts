@@ -66,6 +66,25 @@ public class DoodadsScript : MonoBehaviour
             yield return waitTime;
         }
     }
+    void OnCollisionEnter2D(Collision2D other){
+        
+        switch(type){
+            case DoodadsType.Bullet :
+                if(other.gameObject.CompareTag("Player")){
+                    
+                    if(!PlayerManager.instance.isGameOver){
+
+                        PlayerManager.instance.isGameOver = true;
+                        PlayerManager.instance.canMove = false;
+                        PlayerManager.instance.animator.SetBool("dead0",true);
+                        UIManager.instance.SetGameOverUI(4);
+                    }
+                }
+                break;
+
+            
+        }
+    }
 
     void OnTriggerEnter2D(Collider2D other){
 
@@ -98,18 +117,18 @@ public class DoodadsScript : MonoBehaviour
                 //Debug.Log("A");
                 }
                 break;
-            case DoodadsType.Bullet :
-                if(other.CompareTag("Player")){
+            // case DoodadsType.Bullet :
+            //     if(other.CompareTag("Player")){
                     
-                    if(!PlayerManager.instance.isGameOver){
+            //         if(!PlayerManager.instance.isGameOver){
 
-                        PlayerManager.instance.isGameOver = true;
-                        PlayerManager.instance.canMove = false;
-                        PlayerManager.instance.animator.SetBool("dead0",true);
-                        UIManager.instance.SetGameOverUI(4);
-                    }
-                }
-                break;
+            //             PlayerManager.instance.isGameOver = true;
+            //             PlayerManager.instance.canMove = false;
+            //             PlayerManager.instance.animator.SetBool("dead0",true);
+            //             UIManager.instance.SetGameOverUI(4);
+            //         }
+            //     }
+            //     break;
 
             
         }

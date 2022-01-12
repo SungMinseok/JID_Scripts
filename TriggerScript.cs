@@ -101,6 +101,8 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
+        UIManager.instance.SetHUD(false);
+
         if(location.type == LocationType.Trigger){
            
             switch(location.trigNum){
@@ -681,6 +683,9 @@ public class TriggerScript : MonoBehaviour
 
 
         yield return null;    
+
+        UIManager.instance.SetHUD(true);
+
 
 //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동
         if(location.target != null){
