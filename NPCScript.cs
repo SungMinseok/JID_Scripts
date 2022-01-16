@@ -219,7 +219,7 @@ public class NPCScript : MonoBehaviour
             }
         }
 #region 랜덤대화 관련 설정
-        if(onRandomDialogue){
+        if(onRandomDialogue && !alwaysRandomDialogue){
 
             if(PlayerManager.instance.isActing || LoadManager.instance.reloadScene){
                 if(!pauseRandomDialogue){

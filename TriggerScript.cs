@@ -799,9 +799,13 @@ public class TriggerScript : MonoBehaviour
         else{
             PlayerManager.instance.wSet = -1;
         }
-        yield return new WaitUntil(()=>PlayerManager.instance.onTriggerCol == desCol);
+        yield return new WaitUntil(()=>PlayerManager.instance.orderDestinationCol == desCol);
         
         if(!location.stopCheck) PlayerManager.instance.canMove = true;
+        else{
+            Debug.Log("3333333333");
+            PlayerManager.instance.wSet = 0;
+        }
 
         if(location.preserveTrigger) location.locFlag = false;
     }

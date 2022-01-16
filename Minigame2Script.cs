@@ -63,11 +63,13 @@ public class Minigame2Script : MonoBehaviour
     }
     void OnDisable(){
         UIManager.instance.SetHUD(true);
+        isActive = false;
         StopAllCoroutines();
     }
     void Update(){
         if(isActive){
             for(var i=0; i<spriteSets.Length; i++){
+                if(spriteSets[i]==null) return;
                 spriteSets[i].Translate(new Vector2(-1f * curMapScrollSpeed,0));
                 if(spriteSets[i].localPosition.x <= -5f){
                     spriteSets[i].localPosition = new Vector2(spriteSets[i].localPosition.x+29.88f,spriteSets[i].localPosition.y);

@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerFootScript : MonoBehaviour
 {
     public PlayerManager thePlayer;
+    public bool canJumpFromLadderFlag;
     // [Header ("push 애니메이션 용, 본체 애니메이터 연결")]
     // public Animator animator;
     // void OnCollisionStay2D(Collision2D other){
@@ -60,7 +61,18 @@ public class PlayerFootScript : MonoBehaviour
         if (other.CompareTag("Ladder"))
         {
             if (!thePlayer.ladderDelay) thePlayer.getLadder = true;
+            if(!canJumpFromLadderFlag && !thePlayer.canJumpFromLadder){
+                canJumpFromLadderFlag = true;
+                Invoke("SetCanJumpFromLadder",0.3f);
+            }
         }
+        else if (other.CompareTag("OrderDestination"))
+        {
+            thePlayer.orderDestinationCol = other.transform;
+        }
+    }
+    void SetCanJumpFromLadder(){
+        thePlayer.canJumpFromLadder = true;
     }
 
     void OnTriggerExit2D(Collider2D other) {
@@ -70,6 +82,12 @@ public class PlayerFootScript : MonoBehaviour
         if (other.CompareTag("Ladder"))
         {
             thePlayer.getLadder = false;
+            canJumpFromLadderFlag = false;
+            thePlayer.canJumpFromLadder = false;
+        }
+        else if (other.CompareTag("OrderDestination"))
+        {
+            thePlayer.orderDestinationCol = null;
         }
         // else if (other.CompareTag("Dirt"))
         // {

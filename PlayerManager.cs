@@ -43,6 +43,7 @@ public class PlayerManager : MonoBehaviour
     public bool isJumping;
     public bool jumpDelay;
     public bool getLadder;
+    public bool canJumpFromLadder;
     public bool ladderDelay;
     public bool onLadder;
     public bool isFalling;
@@ -91,6 +92,7 @@ public class PlayerManager : MonoBehaviour
     [Header("Debug─────────────────────")]
     //public Collider2D lastPlatform;
     public Transform onTriggerCol;//onTrigger 콜라이더
+    public Transform orderDestinationCol;
     public Collider2D footCol;
     public GameObject curEquipment;
     public GameObject[] tempHelmet;
@@ -101,6 +103,8 @@ public class PlayerManager : MonoBehaviour
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     WaitForSeconds wait125ms = new WaitForSeconds(0.125f);
+    Coroutine jumpDelayCoroutine;
+    Coroutine getLadderDelayCoroutine;
     void Awake()
     {
         Application.targetFrameRate = 60;
@@ -183,7 +187,7 @@ public class PlayerManager : MonoBehaviour
 
                 if(jumpInput && !jumpDownFlag){
                     jumpDownFlag = true;
-                    StartCoroutine(JumpDown());
+                    if(footCol!=null) StartCoroutine(JumpDown());
                 }
             }
             else{
@@ -293,7 +297,9 @@ public class PlayerManager : MonoBehaviour
             if (!jumpDelay && !onLadder)
             {
                 //jumpDelay = true;
+        //Debug.Log("jumpDelay : " + jumpDelay);
                 Jump();
+        //jumpDelay = true;
             }
 
         }
@@ -311,10 +317,16 @@ public class PlayerManager : MonoBehaviour
 
         if(onLadder){
             
-            if(jumpInput && wInput!=0){
+            if(jumpInput && wInput!=0 && canJumpFromLadder){
                 onLadder = false;
-                StartCoroutine(GetLadderDelay());
-                if(!jumpDelay) Jump();
+                
+                //if(!jumpDelay){
+                    if(getLadderDelayCoroutine!=null) StopCoroutine(getLadderDelayCoroutine);
+                    getLadderDelayCoroutine = StartCoroutine(GetLadderDelay());
+                    //jumpDelay = true;
+        Debug.Log("jumpDelay : " + jumpDelay);
+                    Jump();
+                //}
             }
             else{   
                 isJumping = false;
@@ -388,11 +400,28 @@ public class PlayerManager : MonoBehaviour
     }
     void Jump(float multiple = 1)
     {
+        //if(jumpDelay) return;
+        //isJumping = true;
+        //Debug.Log("jumpDelay : " + jumpDelay);
         jumpDelay = true;
 //        Debug.Log(multiple);
-        StartCoroutine(JumpDelay());
+        if(jumpDelayCoroutine!=null) StopCoroutine(jumpDelayCoroutine);
+        jumpDelayCoroutine = StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
         Debug.Log("Jump");
+        rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
+        if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
+    }
+    void JumpFromLadder(float multiple = 1)
+    {
+        //if(jumpDelay) return;
+
+        jumpDelay = true;
+//        Debug.Log(multiple);
+        if(jumpDelayCoroutine!=null) StopCoroutine(jumpDelayCoroutine);
+        jumpDelayCoroutine = StartCoroutine(JumpDelay());
+        rb.velocity = Vector2.zero;
+        Debug.Log("JumpFromLadder");
         rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
@@ -421,8 +450,10 @@ public class PlayerManager : MonoBehaviour
 //            Debug.Log("33");
             getLadder = false;
             ladderDelay = true;
+            //jumpDelay = true;
             yield return new WaitForSeconds(delayTime_GetLadder);
             ladderDelay = false;
+            //jumpDelay = false;
         }
     }
 
