@@ -88,9 +88,7 @@ public class ItemScript : MonoBehaviour
 
     }
     IEnumerator GetItemCoroutine(){
-
-
-
+//아이템 습득 시 대화
         if(useDialogue){
             PlayerManager.instance.LockPlayer();
             DialogueManager.instance.SetDialogue(getItemDialogue);
@@ -98,20 +96,22 @@ public class ItemScript : MonoBehaviour
             PlayerManager.instance.UnlockPlayer();
         }
 
-
         if(type == ItemType.Honey){
             StartCoroutine(GetItemAndRemoveCoroutine());
-            DM("꿀 충전 : "+amount_honey);
+            //DM("꿀 충전 : "+amount_honey);
             DBManager.instance.curData.curHoneyAmount+=amount_honey;
         }
         else if(type == ItemType.Dirt){
             StartCoroutine(GetItemAndRemoveCoroutine());
-            DM("흙 충전 : "+amount_dirt);
             
-            DBManager.instance.curData.curDirtAmount+=amount_dirt;
-            if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
-                DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
-            }
+            InventoryManager.instance.AddItem(5,3);
+
+            //DM("흙 충전 : "+amount_dirt);
+            
+            // DBManager.instance.curData.curDirtAmount+=amount_dirt;
+            // if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
+            //     DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
+            // }
         }
         else if(type == ItemType.Item){
             StartCoroutine(GetItemAndRemoveCoroutine());

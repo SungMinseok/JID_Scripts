@@ -275,6 +275,32 @@ public class InventoryManager : MonoBehaviour
                                 RemoveItem(curItem.ID);
                             }
                             RefreshInventory(curPage);
+#region 아이템 별 사용 내용
+                            switch(curItem.ID){
+                                case 5:
+
+
+
+                                
+                                    DBManager.instance.curData.curDirtAmount+=5;
+                                    if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
+                                        DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
+                                    }
+                                    break;
+                                
+                                default :
+                                    break;
+                            }
+#endregion
+
+
+
+
+
+
+
+
+                            
                             return;
                         }
                     }
