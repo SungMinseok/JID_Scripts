@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Minigame0Script : MonoBehaviour
 {
     [Header("게임 최대 시간")]
-    [Header("[Game Settings]")]
+    [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━")]
     public float maxTimerSet;
     [Header("정답 맞췄을 때 추가 시간")]
     public float timerBonus;
@@ -14,6 +14,8 @@ public class Minigame0Script : MonoBehaviour
     public float timerPanelty;
 
 
+    [Space]
+    [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
     public Image timerGauge;
     public Image mainImage;
 
@@ -21,9 +23,11 @@ public class Minigame0Script : MonoBehaviour
     public Sprite[] keySprites,mainSprites;
     public Transform keyArray;
 
+    public Animator handAnimator;
     [Space]
 
-    [Header("[Debug]")]
+    [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
+    public bool isPaused;
     public int curGetKey;
     public float curTimer;  
     public int curLevel;//0~4  
@@ -84,13 +88,13 @@ public class Minigame0Script : MonoBehaviour
     }
     void FixedUpdate(){
 
-        if(!PlayerManager.instance.isGameOver &&PlayerManager.instance.isPlayingMinigame){
+        if(!PlayerManager.instance.isGameOver &&PlayerManager.instance.isPlayingMinigame && !isPaused){
             if(curTimer>0){
                 curTimer -= Time.fixedDeltaTime;
             }
             else{
                 MinigameManager.instance.FailMinigame();
-                UIManager.instance.SetGameOverUI(3);
+                UIManager.instance.SetGameOverUI(2);
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
         }
@@ -128,6 +132,7 @@ public class Minigame0Script : MonoBehaviour
 
 
                 keyArray.GetChild(curStage).GetComponent<Animator>().SetBool("pop",true);
+                handAnimator.SetTrigger("act");
 
                 curStage ++;
 
@@ -169,6 +174,7 @@ public class Minigame0Script : MonoBehaviour
 
         gameObject.SetActive(false);
         
+        isPaused = true;
         MinigameManager.instance.SuccessMinigame();
 
 

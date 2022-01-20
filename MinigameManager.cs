@@ -40,12 +40,12 @@ public class MinigameManager : MonoBehaviour
     public void SuccessMinigame(){
         success = true;
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료");
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
     }
     public void FailMinigame(){
         minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료");
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
     }
     public void SuccessMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
@@ -53,7 +53,7 @@ public class MinigameManager : MonoBehaviour
         }
         success = true;
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료");
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공(테스트)");
 
         // if(nowMinigameNum == 2){
         //     TriggerScript.instance.Action(16);
