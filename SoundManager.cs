@@ -3,10 +3,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
  
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager instance;
+    [Header("[Game Settings] ─────────────────────")]
+    public string defaultBtnSoundName;
 
     public float masterVolumeSFX = 1f;
     public float masterVolumeBGM = 1f;
@@ -15,6 +18,7 @@ public class SoundManager : MonoBehaviour
     Dictionary<string, AudioClip> audioClipsDic;
     AudioSource sfxPlayer;
     AudioSource bgmPlayer;
+    [SerializeField] AudioClip[] testClips; // 오디오 소스들 지정.
 
     void Awake() {
         if (null == instance)
@@ -33,13 +37,24 @@ public class SoundManager : MonoBehaviour
         sfxPlayer = GetComponent<AudioSource>();
         //SetupBGM();
 
+        LoadResources();
+
+        PutSoundsToDictionary();
+
+
+    }
+    void LoadResources(){
+        audioClips = Resources.LoadAll<AudioClip>("Sounds");
+    }
+    void PutSoundsToDictionary(){
+
         audioClipsDic = new Dictionary<string, AudioClip>();
         foreach (AudioClip a in audioClips)
         {
             if (audioClipsDic.ContainsKey(a.name) == false){
 
                 audioClipsDic.Add(a.name, a);
-//                print(a.name);
+                //print(a.name);
             }
         }
     }
@@ -56,14 +71,15 @@ public class SoundManager : MonoBehaviour
     // }
 
     // 한 번 재생 : 볼륨 매개변수로 지정
-    public void PlaySound(string a_name, float a_volume = 1f)
+    public void PlaySound(string soundFildName, float a_volume = 1f)
     {
-        if (audioClipsDic.ContainsKey(a_name) == false)
+        if (audioClipsDic.ContainsKey(soundFildName) == false)
         {
-            Debug.Log(a_name + " is not Contained audioClipsDic");
+            Debug.Log(soundFildName + " is not Contained audioClipsDic");
             return;
         }
-        sfxPlayer.PlayOneShot(audioClipsDic[a_name], a_volume * masterVolumeSFX);
+        sfxPlayer.PlayOneShot(audioClipsDic[soundFildName], a_volume * masterVolumeSFX);
+        
     }
 
     #region 옵션에서 볼륨조절
@@ -78,4 +94,5 @@ public class SoundManager : MonoBehaviour
         bgmPlayer.volume = masterVolumeBGM;
     }
     #endregion
+
 }

@@ -28,8 +28,8 @@ public class Minigame0Script : MonoBehaviour
 
     [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
     public bool isPaused;
-    public int curGetKey;
     public float curTimer;  
+    public int curGetKey;
     public int curLevel;//0~4  
     public int curStage;//0~9
     public List<int> curLevelAnswer;
@@ -41,7 +41,7 @@ public class Minigame0Script : MonoBehaviour
 
         PlayerManager.instance.LockPlayer();
 
-        ResetValue();
+        ResetGameSettings();
 
         StartCoroutine(MinigameCoroutine());
         UIManager.instance.SetHUD(false);
@@ -93,13 +93,13 @@ public class Minigame0Script : MonoBehaviour
                 curTimer -= Time.fixedDeltaTime;
             }
             else{
-                MinigameManager.instance.FailMinigame();
-                UIManager.instance.SetGameOverUI(2);
+                MinigameManager.instance.FailMinigame(2);
+                //UIManager.instance.SetGameOverUI(2);
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
         }
     }
-    void ResetValue(){
+    void ResetGameSettings(){
         //curLevelAnswer.Clear();
         curGetKey = 0;
         curLevel = 0;

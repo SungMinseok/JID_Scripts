@@ -15,6 +15,7 @@ public class Minigame4Script : MonoBehaviour
 
     //x : 7.5  y : 4
     [Header("[Game Settings]─────────────────")]
+    public float maxTimerSet;
     public float aphidLifeTime = 2f;
     public float aphidCreationCycle = 1;
     public int aphidCreationCount = 100;
@@ -27,14 +28,19 @@ public class Minigame4Script : MonoBehaviour
     [Space]
     [Header("[Game Objects]─────────────────")]
     public GameObject[] aphids;
+    public Sprite[] numberSprites;
     public Transform miniLucky, miniAnt;
     public Vector2 miniAntDestination;
     public PolygonCollider2D mapCollider;
     public Transform mapViewPoint;
     public int score_lucky, score_ant;
+    public Image[] score_lucky_img, score_ant_img;
+    public Image timerGauge;
     [Space]
 
     [Header("[Debug]─────────────────")]
+    public bool isPaused;
+    public float curTimer;  
     public int closestAphid;
     public List<float> tempDistanceList;
     public List<int> tempAphidNumList;
@@ -62,8 +68,26 @@ public class Minigame4Script : MonoBehaviour
     void Start(){
         waitAphidCreationCycle = new WaitForSeconds(aphidCreationCycle);
     }
-    
+    void ResetGameSettings(){
+        curTimer = maxTimerSet;
+    }
+    void FixedUpdate(){
+
+        if(!PlayerManager.instance.isGameOver &&PlayerManager.instance.isPlayingMinigame && !isPaused){
+            if(curTimer>0){
+                curTimer -= Time.fixedDeltaTime;
+            }
+            else{
+                MinigameManager.instance.SuccessMinigame();
+                //MinigameManager.instance.FailMinigame();
+                //UIManager.instance.SetGameOverUI(2);
+            }
+            timerGauge.fillAmount = curTimer / maxTimerSet;
+        }
+    }
     private void OnEnable() {
+        PlayerManager.instance.LockPlayer();
+        ResetGameSettings();
 
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
 
@@ -81,8 +105,6 @@ public class Minigame4Script : MonoBehaviour
         
         wInput = Input.GetAxisRaw("Horizontal");
         hInput = Input.GetAxisRaw("Vertical");
-    }
-    void FixedUpdate(){
 
         
         if(wInput!=0 || hInput!=0){
@@ -139,5 +161,12 @@ public class Minigame4Script : MonoBehaviour
 
 
         //miniAntDestination = new Vector2(closestAphid)
+    }
+
+    public void SetScoreImage(){
+        score_lucky_img[0].sprite = numberSprites[score_lucky / 10];
+        score_lucky_img[1].sprite = numberSprites[score_lucky % 10];
+        score_ant_img[0].sprite = numberSprites[score_ant / 10];
+        score_ant_img[1].sprite = numberSprites[score_ant % 10];
     }
 }

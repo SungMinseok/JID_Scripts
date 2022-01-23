@@ -139,8 +139,10 @@ public class AphidScript : MonoBehaviour
 
             Minigame4Script.instance.score_ant ++ ;
         }
+        Minigame4Script.instance.SetScoreImage();
         getFlag = false;
     }
+
 
     // void Update(){
     //     Debug.Log(Vector2.Distance(gameObject.transform.position,temp0.position));

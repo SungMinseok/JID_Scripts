@@ -8,6 +8,8 @@ using System.IO;
 public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
+    [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
+    public GameObject btnGridObject;
     public GameObject[] panels;
     public GameObject[] btns;
     [Header("UI_Menu_Main")]
@@ -155,7 +157,7 @@ public class MenuManager : MonoBehaviour
         if(tempCardNum[3]==totalPage) tempCardNum[3]=0;
         if(tempCardNum[4]==totalPage+1) tempCardNum[4]=1;
         else if(tempCardNum[4]==totalPage) tempCardNum[4]=0;
-        Debug.Log(tempCardNum[0]+","+tempCardNum[1]+","+tempCardNum[2]+","+tempCardNum[3]+","+tempCardNum[4]);
+//        Debug.Log(tempCardNum[0]+","+tempCardNum[1]+","+tempCardNum[2]+","+tempCardNum[3]+","+tempCardNum[4]);
     }
     public void RearrangeCards(){
         for(int i=0;i<5;i++){
@@ -342,6 +344,10 @@ public class MenuManager : MonoBehaviour
     }
     public void CloseMenuPanel(){
         menuPanel.SetActive(false);
+    }
+    public void ToggleSubPanel(int panelNum){
+        CloseAllPanels();
+        panels[panelNum].SetActive(true);
     }
     public void OpenPanel(int panelNum){
         CloseAllPanels();

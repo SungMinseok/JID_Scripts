@@ -147,6 +147,8 @@ public class UIManager : MonoBehaviour
         //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();
+
+        SoundManager.instance.PlaySound("gameover"+Random.Range(0,3));
         yield return new WaitForSeconds(2f);
         gameOverBtns.gameObject.SetActive(true);
 

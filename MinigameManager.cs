@@ -42,10 +42,15 @@ public class MinigameManager : MonoBehaviour
         PlayerManager.instance.isPlayingMinigame = false;
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
     }
-    public void FailMinigame(){
+    //-1이면 setgameoverui 실행 x
+    public void FailMinigame(int gameOverSpriteNum = -1){
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
         minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
+
+        if(gameOverSpriteNum != -1){
+            UIManager.instance.SetGameOverUI(gameOverSpriteNum);
+        }
     }
     public void SuccessMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
