@@ -8,32 +8,35 @@ using System.Runtime.Serialization.Formatters.Binary;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
-    [Header("[Game Info] ─────────────────────")]
+    [Header("[Game Info]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public uint buildNum;
     public string buildDate;
     public string language;
-    [Header("[Current Data] ─────────────────────")]
-
-    public Data curData;
-
-    [Header("[Local Data] ─────────────────────")]
-
-    public LocalData localData;
-
-    [Header("[Game Settings] ─────────────────────")]
+    
+    [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public float maxDirtAmount;
     public float dirtAmountPaneltyPerSeconds;
-    [Header("[Cache] ─────────────────────")]
+    [Header("[Dialogue]─────────")]
+    public float waitTime_dialogueInterval;
+    public float waitTime_dialogueTypingInterval;
+    [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
+
     [Space]
     [Space]
     [Space]
     [Space]
     [Space]
     [Space]
+    public Data curData;
+
+    [Header("[Local Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
+
+    public LocalData localData;
+    [Header("[Cache]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public List<Item> cache_ItemDataList;
     public List<EndingCollection> cache_EndingCollectionDataList;
     
-    [Header("[Sprites Files] ─────────────────────")]
+    [Header("[Sprites Files]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public Sprite[] endingCollectionSprites;
     public Sprite[] itemSprites;
     public Sprite honeySprite;
@@ -44,7 +47,7 @@ public class DBManager : MonoBehaviour
 
 
     
-    [Header("[Empty Data] ─────────────────────")]
+    [Header("[Empty Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     public Data emptyData;
 

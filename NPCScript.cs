@@ -225,6 +225,7 @@ public class NPCScript : MonoBehaviour
                 if(!pauseRandomDialogue){
                     pauseRandomDialogue = true;
                     DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                    talkCanvas.gameObject.SetActive(false);
                 }
             }
             else{

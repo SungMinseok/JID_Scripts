@@ -24,18 +24,21 @@ public class DialogueManager : MonoBehaviour
     // public Queue<string> sentQue;
     // public Queue<Dialogue> dialogueQue;
     public string curSentence;
+    Coroutine curWaitSkipCoroutine;
 
     [Header("Debug──────────────────")]
     //public TextMeshPro text;
     public bool revealTextFlag;
     public bool revealTextFlag_NPC;
     public bool dialogueFlag;
-    public bool canSkip;
+    [Tooltip("현재 진행 중인 대화 텍스트 모두 출력 가능한 상태")]
+    public bool canSkip;    
+    [Tooltip("다음 대화 출력 가능 상태")]
     public bool canSkip2;
     public bool goSkip;
 
     
-
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     public Coroutine nowDialogueCoroutine;
     
     void Awake()
@@ -87,6 +90,7 @@ public class DialogueManager : MonoBehaviour
     //스킵 가능한 메시지 출력
     IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
+        //curWaitSkipCoroutine = StartCoroutine(WaitSkipCoroutine());
         //Debug.Log("B");
         PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
@@ -106,7 +110,7 @@ public class DialogueManager : MonoBehaviour
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
             curSentence = dialogue.sentences[i];
-            if(!oneTime) nowDialogueCoroutine = StartCoroutine(RevealText(dialogue, tmp, typingSpeed, typingInterval));
+            if(!oneTime) nowDialogueCoroutine = StartCoroutine(RevealText(dialogue, tmp, DBManager.instance.waitTime_dialogueTypingInterval, DBManager.instance.waitTime_dialogueInterval));
              
             yield return new WaitUntil(()=>!revealTextFlag);
 
@@ -114,13 +118,18 @@ public class DialogueManager : MonoBehaviour
 
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
         
+        
         dialogueFlag= false;
+        
+        //StopCoroutine(curWaitSkipCoroutine);
+
         PlayerManager.instance.isTalking = false;
+        
     }
     
     
     //스킵 불가능한 NPC 자체 메시지 출력
-    IEnumerator DialogueCoroutine_NPC(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    IEnumerator DialogueCoroutine_NPC(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval = 1.5f)
     {
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
 
@@ -143,6 +152,7 @@ public class DialogueManager : MonoBehaviour
 
         
         goSkip = false;
+        canSkip2 =false;
         revealTextFlag = true;
         int totalVisibleCharacters = curSentence.Length;
         WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
@@ -158,7 +168,7 @@ public class DialogueManager : MonoBehaviour
         //Invoke("WaitSkip",0.5f);
         //canSkip = true;
         for(int i=0; i<totalVisibleCharacters+1; i++){
-            if(i==3) canSkip = true;
+            if(i==6) canSkip = true;
 
             if(goSkip){
                 goSkip = false;
@@ -174,8 +184,14 @@ public class DialogueManager : MonoBehaviour
         }
         canSkip =false;
         canSkip2 = true;
-        yield return _typingInterval;
-        canSkip2 =false;
+        if(DBManager.instance.waitTime_dialogueInterval>0){
+
+            yield return _typingInterval;
+            canSkip2 =false;
+        }
+        else{
+            yield return new WaitUntil(()=>!canSkip2);
+        }
         //Debug.Log("문장종료");
         revealTextFlag = false;
 #region 
@@ -199,7 +215,10 @@ public class DialogueManager : MonoBehaviour
 #endregion
 
     }
-    public void WaitSkip(){
+    public IEnumerator WaitSkipCoroutine(){
+        yield return wait500ms;
+        yield return wait500ms;
+        
         canSkip = true;
     }
 
