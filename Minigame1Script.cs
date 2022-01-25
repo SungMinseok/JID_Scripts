@@ -8,13 +8,15 @@ using System;
 //Stage : 레벨 당 3스테이지
 public class Minigame1Script : MonoBehaviour
 {
-    [Header("단계별 허용 간격(0.3/0.2/0.1)")]
-    [Header("Game Settings──────────")]
+    [Header("단계별 허용 간격")]
+    [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━")]
     public float[] acceptableIntervals;
-    [Header("단계별 속도(0.04/0.045/0.05)")]
+    [Header("단계별 속도")]
     public float[] pointerSpeedPerStage;
-    
-    [Header("Objects──────────")]
+    [Header("최대 목숨")]
+    public int maxLife;
+    [Space]
+    [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
 
     public RectTransform errorArea;
     public Animator mainBottle;
@@ -47,7 +49,7 @@ public class Minigame1Script : MonoBehaviour
 
     [Space]
 
-    [Header("Debug──────────")]
+    [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
     public bool isSliderUp;
     Coroutine sliderMovementCoroutine;
     Coroutine minigameCoroutine;
@@ -55,6 +57,7 @@ public class Minigame1Script : MonoBehaviour
     public float randomCenterPosVar;
     public int curStage;
     public int curLevel;
+    public int curLife;
 
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
@@ -68,7 +71,7 @@ public class Minigame1Script : MonoBehaviour
     // public bool curLevelFlag;
     private void OnEnable() {
         //canSelect = true;
-        FirstSetGame();
+        ResetGameSettings();
         //StartCoroutine(Wait());
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
         //StartSliderMoving();
@@ -126,7 +129,7 @@ public class Minigame1Script : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
     }  
 
-    void FirstSetGame(){
+    void ResetGameSettings(){
         canSelect = false;
         errorArea.gameObject.SetActive(false);
         sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -134,6 +137,7 @@ public class Minigame1Script : MonoBehaviour
             emptyBottles[i].SetActive(true);
             fullBottles[i].SetActive(false);
         }
+        curLife = maxLife;
     }
 
     void Update()
@@ -172,63 +176,64 @@ public class Minigame1Script : MonoBehaviour
         }
     }
     IEnumerator CheckPointerPostion(){
-        // switch(curLevel){
-        //     case 0 : 
-        //         break;
-        
-       // }
+
         mainBottle.SetTrigger("tilt");
         canSelect = false;
-        //sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+
         yield return new WaitForSeconds(1.8f);
         float minErrorValue = randomCenterPosVar - acceptableIntervals[curStage]/2f;
         float maxErrorValue = randomCenterPosVar + acceptableIntervals[curStage]/2f;
 
         
         errorArea.gameObject.SetActive(false);
-        //StartCoroutine(Wait());
+
         if(sliderPointer.value>=minErrorValue && sliderPointer.value<=maxErrorValue){
             if(curStage<=1){
-                //Debug.Log("1");
+
                 bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("off");
                 bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);
-        yield return wait500ms;
-                //curStage = curStage + 1;
+                yield return wait500ms;
+
                 curStage ++;
                 StartCoroutine(SetStage());
             }
             else{   
-                //Debug.Log("2");
                 bubbleObjects.GetChild(curStage).GetComponent<Animator>().SetTrigger("off");
                 bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);        
                 yield return wait500ms;
 
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("finish");
-        yield return wait1000ms;
+                yield return wait1000ms;
                 emptyBottles[curLevel].SetActive(false);
                 fullBottles[curLevel].SetActive(true);
-        yield return wait1000ms;
+                yield return wait1000ms;
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("reset");
-                //curLevel ++;
                 if(++curLevel <= 2){
-                //Debug.Log("3");
                     StartCoroutine(MinigameCoroutine());
                 }
                 else{
-                //Debug.Log("4");
-
-                //게임 성공 success
+                    //게임성공
                     gameObject.SetActive(false);
+                    MinigameManager.instance.SuccessMinigame();
                 }
                 
             }
         }
         else{
-        yield return wait500ms;
+            yield return wait500ms;
             bubbleObjects.GetChild(curStage).gameObject.SetActive(false);
             failBubbleAnimator.SetTrigger("off"+curStage.ToString());
-        yield return wait1000ms;
-            StartCoroutine(MinigameCoroutine());
+            curLife --;
+            yield return wait1000ms;
+
+            if(curLife > 0){
+                StartCoroutine(MinigameCoroutine());
+            }
+            else{
+                MinigameManager.instance.FailMinigame(-1);
+
+            }
+
         }
     }    
 }
