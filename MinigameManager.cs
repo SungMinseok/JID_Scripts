@@ -88,26 +88,20 @@ public class MinigameManager : MonoBehaviour
 
         LoadManager.instance.FadeOut();
         yield return wait1000ms;
-
-
         var nowMinigame = minigameScriptTransforms[gameNum];
 
         if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
             
             PlayerManager.instance.isPlayingMinigame = true;
-
             if(nowMinigameNum == 4){
                 PlayerManager.instance.canMove = false;
             }
-
-
-
-            //nowMinigame.gameObject.SetActive(!nowMinigame.gameObject.activeSelf);
             nowMinigame.gameObject.SetActive(true);
 
         }
-
-        
         LoadManager.instance.FadeIn();
     }
+    // IEnumerator FinishMinigameCoroutine(int gameNum){
+
+    // }
 }

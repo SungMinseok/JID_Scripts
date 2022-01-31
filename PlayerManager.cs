@@ -23,9 +23,10 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Wearable Objects")]
     public SpriteRenderer[] helmets;
-    public SpriteRenderer wearables0;
+    public SpriteRenderer[] wearables;
     Coroutine animationCoroutine;
     WaitForSeconds animDelay0 = new WaitForSeconds(0.833f);
+    WaitForSeconds animDelay1 = new WaitForSeconds(0.82f);
     [Header("Input Check")]
     public float wInput;
     public float hInput;
@@ -51,6 +52,7 @@ public class PlayerManager : MonoBehaviour
     public bool isCaught;
     public bool isGameOver;
     public bool getDirt;    //플레이어가 흙더미 로케이션에 닿아있는 것 체크 (흙 팔 수 있는 상태)
+    public bool getIcicle;    //플레이어가 고드름 로케이션에 닿아있는 것 체크 (흙 팔 수 있는 상태)
     public bool digFlag;
     public bool isWaitingInteract;
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
@@ -245,10 +247,22 @@ public class PlayerManager : MonoBehaviour
                         }
                     }
                 }
+                else if(getIcicle){
+                    if(equipments[2]==26){
+                        animator.SetBool("icebreak", true);
+                        if(!digFlag){
+                            digFlag = true;
+                            if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
+                            animationCoroutine = StartCoroutine(CheckAnimationState(1));
+                            dirtTarget.GetDug();
+                        }
+                    }
+                }
                 //wearables0.gameObject.SetActive(true);
             }
             else{
                 animator.SetBool("shoveling1", false);
+                animator.SetBool("icebreak", false);
                 //wearables0.gameObject.SetActive(false);
 
             }
@@ -559,7 +573,10 @@ public class PlayerManager : MonoBehaviour
 
         switch(animNum){
             case 0 : 
-                _spriteRenderer = wearables0;
+                _spriteRenderer = wearables[0];
+                break;
+            case 1 : 
+                _spriteRenderer = wearables[1];
                 break;
             default :
                 _spriteRenderer = null;
@@ -567,22 +584,23 @@ public class PlayerManager : MonoBehaviour
         }
         if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
 
-        // while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime <= 0.8f){
-        //     yield return null;
-        //     Debug.Log("대기");
-        // }
-
-        yield return animDelay0;
-        //진행중
-        // while(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.833f){
-
-        //     if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
-        //     yield return null;
-        // }
+        switch(animNum){
+            case 0 : 
+                yield return animDelay0;
+                break;
+            case 1 : 
+                yield return animDelay1;
+                break;
+            default :
+                yield return null;
+                break;
+        }
+        
         if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
 
         switch(animNum){
             case 0 : 
+            case 1 : 
                 digFlag = false;
                 break;
             default :

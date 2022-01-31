@@ -23,6 +23,7 @@ public class Minigame1Script : MonoBehaviour
     public GameObject[] emptyBottles;
     public GameObject[] fullBottles;
     public Animator failBubbleAnimator;
+    public Transform lifeObjectGrid;
     //public float errorAreaDefaultWidth;
     
     // [Header("1 번째 간격")]
@@ -94,6 +95,23 @@ public class Minigame1Script : MonoBehaviour
         // sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
         // SetErrorArea(0);
     }
+    void ResetGameSettings(){
+        canSelect = false;
+        errorArea.gameObject.SetActive(false);
+        sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        for(int i=0; i<3; i++){
+            emptyBottles[i].SetActive(true);
+            fullBottles[i].SetActive(false);
+        }
+        curLife = maxLife;
+        for(int i=0;i<lifeObjectGrid.childCount;i++){
+            lifeObjectGrid.GetChild(i).gameObject.SetActive(false);
+        }
+        
+        for(int i=0;i<curLife-1;i++){
+            lifeObjectGrid.GetChild(i).gameObject.SetActive(true);
+        }
+    }
     void SetLevel(){
         for(int i=0;i<4;i++){
             bubbleObjects.GetChild(i).gameObject.SetActive(false);
@@ -129,16 +147,6 @@ public class Minigame1Script : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
     }  
 
-    void ResetGameSettings(){
-        canSelect = false;
-        errorArea.gameObject.SetActive(false);
-        sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-        for(int i=0; i<3; i++){
-            emptyBottles[i].SetActive(true);
-            fullBottles[i].SetActive(false);
-        }
-        curLife = maxLife;
-    }
 
     void Update()
     {
@@ -221,12 +229,26 @@ public class Minigame1Script : MonoBehaviour
         }
         else{
             yield return wait500ms;
+
+            //스테이지 실패 처리
             bubbleObjects.GetChild(curStage).gameObject.SetActive(false);
             failBubbleAnimator.SetTrigger("off"+curStage.ToString());
             curLife --;
+
+            // for(int i=0;i<lifeObjectGrid.childCount;i++){
+            //     lifeObjectGrid.GetChild(i).gameObject.SetActive(true);
+            // }
+            
+            // for(int i=0;i<curLife-1;i++){
+            //     lifeObjectGrid.GetChild(i).gameObject.SetActive(true);
+            // }
+
+
+
             yield return wait1000ms;
 
             if(curLife > 0){
+                lifeObjectGrid.GetChild(curLife-1).gameObject.SetActive(false);
                 StartCoroutine(MinigameCoroutine());
             }
             else{

@@ -58,6 +58,15 @@ public class PlayerBodyScript : MonoBehaviour
         else if (other.CompareTag("Dirt"))
         {
             thePlayer.getDirt = false;
+            thePlayer.animator.SetBool("shoveling1", false);
+            thePlayer.dirtTarget = null;
+            //UIManager.instance.clearPanel.SetActive(true);
+        }
+        else if (other.CompareTag("Icicle"))
+        {
+            thePlayer.getIcicle = false;
+            thePlayer.animator.SetBool("icebreak", false);
+            thePlayer.dirtTarget = null;
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
@@ -87,16 +96,25 @@ public class PlayerBodyScript : MonoBehaviour
 
         else if (other.CompareTag("Dirt"))
         {
-            thePlayer.getDirt = true;
-            thePlayer.dirtTarget = other.GetComponent<DirtScript>();
+            var tempGetObject = other.GetComponent<DirtScript>();
+            if(tempGetObject.curHp>0) thePlayer.getDirt = true;
+            thePlayer.dirtTarget = tempGetObject;
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
+        else if (other.CompareTag("Icicle"))
+        {
+            var tempGetObject = other.GetComponent<DirtScript>();
+            if(tempGetObject.curHp>0) thePlayer.getIcicle = true;
+            thePlayer.dirtTarget = tempGetObject;
+            //UIManager.instance.clearPanel.SetActive(true);
+        }
         else if (other.CompareTag("Cover"))
         {
             Debug.Log(other.gameObject.name);
             other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
         }
+
 
     }
 }

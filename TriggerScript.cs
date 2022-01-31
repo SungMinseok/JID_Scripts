@@ -20,6 +20,22 @@ public class TriggerScript : MonoBehaviour
             instance = this;
     }
     void Start(){
+        
+    }
+    public void PreAction(Location location){
+        if(DBManager.instance.CheckTrigOver(location.trigNum)){
+            switch(location.trigNum){
+                case 22 :
+                    //location.poses[10].gameObject.SetActive(false);
+                        for(int i=0;i<14;i++){
+                            location.poses[i].gameObject.SetActive(false);
+                        }
+
+                    break;
+                default :
+                    break;
+            }
+        }
     }
 
    //public void Action(Location location, Dialogue[] dialogues = null, Select[] selects = null, Transform[] objects = null){
@@ -106,6 +122,20 @@ public class TriggerScript : MonoBehaviour
         if(location.type == LocationType.Trigger){
            
             switch(location.trigNum){
+
+//저장개미
+#region 999
+            case 999 :
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(GetSelect()==0){
+                    MenuManager.instance.savePanel.SetActive(true);
+                    yield return new WaitUntil(()=>!MenuManager.instance.savePanel.activeSelf);
+                }
+                break;
+#endregion
 
 
 
@@ -640,6 +670,8 @@ public class TriggerScript : MonoBehaviour
                         for(int i=0;i<14;i++){
                             objects[i].gameObject.SetActive(false);
                         }
+                        
+                        objects[14].GetComponent<Animator>().SetBool("hang", false);
                         objects[14].gameObject.SetActive(true);
                         yield return wait2000ms;
                         FadeIn();

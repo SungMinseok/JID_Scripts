@@ -15,6 +15,7 @@ public class NPCScript : MonoBehaviour
     //public bool canTalk;
     [Tooltip("스프라이트 스킨아닐 시 체크")]
     public bool isSpriteRenderer;
+    [Header("Holder")]
     [Header("Sub things")]
     public Transform talkCanvas;
     public Transform interactiveMark;
@@ -83,8 +84,8 @@ public class NPCScript : MonoBehaviour
     float defaultTalkCanvasHolderPosX;
     void Start()
     {
-        if(haveTalk) talkCanvas = transform.GetChild(0).GetChild(0);
-        if((haveWalk || !isSpriteRenderer)&&transform.childCount>=2) mainBody = transform.GetChild(1);
+        if(haveTalk && talkCanvas == null) talkCanvas = transform.GetChild(0).GetChild(0);
+        if((haveWalk || !isSpriteRenderer)&&transform.childCount>=2 && mainBody == null) mainBody = transform.GetChild(1);
 
         thePlayer = PlayerManager.instance;
         rb = GetComponent<Rigidbody2D>();

@@ -92,6 +92,8 @@ public class Location : MonoBehaviour
                 targetMark=this.transform.GetChild(0).GetChild(0);
                 //targetMark.gameObject.SetActive(false);
             }
+
+            triggerScript.PreAction(this);
         }
 
         

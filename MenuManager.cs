@@ -23,6 +23,8 @@ public class MenuManager : MonoBehaviour
     public GameObject popUpPanel;
     public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
     [Header("UI_Save&Load")]
+    public GameObject savePanel;
+    public GameObject loadPanel;
     public Transform saveSlotGrid;
     public SaveLoadSlot[] saveSlots;
     public Transform loadSlotGrid;
@@ -32,6 +34,8 @@ public class MenuManager : MonoBehaviour
         public TextMeshProUGUI saveNameText;
         public TextMeshProUGUI saveDateText;
         public TextMeshProUGUI slotNumText;
+        public TextMeshProUGUI itemInfoText0;
+        public TextMeshProUGUI itemInfoText1;
     }
     [Header("UI_Collection_Ending")]
     public Animator animator;
@@ -53,7 +57,7 @@ public class MenuManager : MonoBehaviour
         instance = this;
     }    
     void Update(){
-            if(Input.GetButtonUp("Cancel")){
+            if(Input.GetButtonUp("Cancel") && PlayerManager.instance.canMove){
                 menuPanel.SetActive(!menuPanel.activeSelf);
             }
 
@@ -91,12 +95,16 @@ public class MenuManager : MonoBehaviour
             saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
             saveSlots[i].slotNumText = saveSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
             saveSlots[i].slotNumText.text = (i+1).ToString();
+            saveSlots[i].itemInfoText0 = saveSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+            saveSlots[i].itemInfoText1 = saveSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
         }
         for(int i=0;i<loadSlotGrid.childCount;i++){
             loadSlots[i].saveNameText = loadSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
             loadSlots[i].saveDateText = loadSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
             loadSlots[i].slotNumText = loadSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
             loadSlots[i].slotNumText.text = (i+1).ToString();
+            loadSlots[i].itemInfoText0 = loadSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+            loadSlots[i].itemInfoText1 = loadSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
         }
 
         ResetSaveSlots();
@@ -208,10 +216,14 @@ public class MenuManager : MonoBehaviour
             if(DBManager.instance.CheckSaveFile(i)){
                 saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
                 saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+                saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
+                saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount);
             }
             else{
                 saveSlots[i].saveNameText.text = "빈 슬롯";
                 saveSlots[i].saveDateText.text = "-";
+                saveSlots[i].itemInfoText0.text ="-";
+                saveSlots[i].itemInfoText1.text = "-";
             }
         }
     }
@@ -220,10 +232,15 @@ public class MenuManager : MonoBehaviour
             if(DBManager.instance.CheckSaveFile(i)){
                 loadSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
                 loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+                loadSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
+                loadSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+                //loadSlots[i].itemInfoText1.text = DBManager.instance.GetData(i).curDirtAmount.ToString();
             }
             else{
                 loadSlots[i].saveNameText.text = "빈 슬롯";
                 loadSlots[i].saveDateText.text = "-";
+                loadSlots[i].itemInfoText0.text ="-";
+                loadSlots[i].itemInfoText1.text = "-";
             }
         }
     }
