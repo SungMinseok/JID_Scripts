@@ -173,6 +173,7 @@ public class PlayerManager : MonoBehaviour
         else{
 
             wInput = 0;
+            hInput = 0;
             jumpInput = false;
         }
 
@@ -181,7 +182,7 @@ public class PlayerManager : MonoBehaviour
             isJumping = false;
             animator.SetBool("jump", false);
 
-            if(hInput<0){
+            if(hInput<0 && !getLadder){
                 
                 animator.SetBool("down", true);
                 //bodyCollider2D.gameObject.SetActive(false);
@@ -422,7 +423,7 @@ public class PlayerManager : MonoBehaviour
         if(jumpDelayCoroutine!=null) StopCoroutine(jumpDelayCoroutine);
         jumpDelayCoroutine = StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
-        Debug.Log("Jump");
+        //Debug.Log("Jump");
         rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }

@@ -28,9 +28,21 @@ public class SceneController : MonoBehaviour
         
            // Debug.Log(num + " : 맵번호");
     }
-    public void SetSomeConfiner(Collider2D boundCollider = null){
+    public void SetSomeConfiner(Collider2D boundCollider = null, bool isDirect = false){
+        if(isDirect){
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
+
+        }
+        else{
+            
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
+        }
         if(boundCollider == null) temp = confiner2D.m_BoundingShape2D;
         confiner2D.m_BoundingShape2D = boundCollider;
+        //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+        //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
     }
     public void SetCurrentMapName(int mapNum){
         //Debug.Log(DBManager.instance);

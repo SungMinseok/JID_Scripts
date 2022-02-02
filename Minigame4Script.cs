@@ -69,6 +69,7 @@ public class Minigame4Script : MonoBehaviour
         waitAphidCreationCycle = new WaitForSeconds(aphidCreationCycle);
     }
     void ResetGameSettings(){
+        isPaused = true;
         curTimer = maxTimerSet;
     }
     void FixedUpdate(){
@@ -91,7 +92,7 @@ public class Minigame4Script : MonoBehaviour
 
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
 
-        SceneController.instance.SetSomeConfiner(mapCollider);
+        SceneController.instance.SetSomeConfiner(mapCollider,true);
         SceneController.instance.virtualCamera.Follow = mapViewPoint;
 
         UIManager.instance.SetHUD(false);
@@ -103,19 +104,28 @@ public class Minigame4Script : MonoBehaviour
     }
     void Update(){
         
-        wInput = Input.GetAxisRaw("Horizontal");
-        hInput = Input.GetAxisRaw("Vertical");
+        if(!isPaused){
 
-        
-        if(wInput!=0 || hInput!=0){
-            miniLucky.Translate(new Vector2(wInput * miniLuckySpeed,hInput * miniLuckySpeed));
-        }
+            wInput = Input.GetAxisRaw("Horizontal");
+            hInput = Input.GetAxisRaw("Vertical");
 
-        if(miniAntDestination != Vector2.zero){
-            miniAnt.position = Vector2.MoveTowards(miniAnt.position,miniAntDestination,miniAntSpeed);
+            
+            if(wInput!=0 || hInput!=0){
+                miniLucky.Translate(new Vector2(wInput * miniLuckySpeed,hInput * miniLuckySpeed));
+                miniLucky.GetComponent<SpriteRenderer>().flipX = wInput>0 ? true : false;
+            }
+
+            if(miniAntDestination != Vector2.zero){
+                miniAnt.position = Vector2.MoveTowards(miniAnt.position,miniAntDestination,miniAntSpeed);
+                miniAnt.GetComponent<SpriteRenderer>().flipX = miniAntDestination.x>miniAnt.position.x ? true : false;
+            }
         }
     }
     IEnumerator MinigameCoroutine(){
+
+        MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
+        yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+        isPaused = false;
 
         SetRandomPosition();
 

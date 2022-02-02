@@ -22,6 +22,9 @@ public class MenuManager : MonoBehaviour
     [Header("UI_PopUp")]
     public GameObject popUpPanel;
     public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
+    public GameObject popUpPanel1;
+    public TextMeshProUGUI[] popUpText1; //main, sub, ok, cancel
+    public bool popUpOkayCheck;
     [Header("UI_Save&Load")]
     public GameObject savePanel;
     public GameObject loadPanel;
@@ -309,6 +312,21 @@ public class MenuManager : MonoBehaviour
 
         popUpPanel.SetActive(true);
     }
+    
+    public void OpenPopUpPanel_SetStringByIndex(string mainIndex, string okayIndex = "0"){
+
+        popUpText1[0].text = mainIndex;
+        //확인
+        popUpText1[1].text = okayIndex;
+
+        
+        for(int i=0;i<2;i++){
+            if(popUpText1[i].text != "")
+                popUpText1[i].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText1[i].text),"sysmsg");
+        }
+
+        popUpPanel1.SetActive(true);
+    }
     public void PopUpOkayBtn(){
         //Debug.Log("A");
         switch(curPopUpType){
@@ -333,9 +351,15 @@ public class MenuManager : MonoBehaviour
 
             default:
                 Debug.Log(curPopUpType);
+                popUpOkayCheck = true;
+                Invoke("ResetPopUpOkayCheck",0.5f);
                 break;
 
         }
+
+    }
+    public void ResetPopUpOkayCheck(){
+        popUpOkayCheck = false;
 
     }
     public void Save(int curSaveNum){

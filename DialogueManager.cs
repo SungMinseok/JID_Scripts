@@ -158,12 +158,20 @@ public class DialogueManager : MonoBehaviour
         WaitForSeconds _typingSpeed = new WaitForSeconds(typingSpeed);
         WaitForSeconds _typingInterval = new WaitForSeconds(typingInterval);
         //Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
+
+        if(curSentence.Length>20){
+            curSentence = curSentence.Insert(20,"\n");
+            //Debug.Log(curSentence);
+        }
+
         if(dialogue.isMonologue){
             tmp.text = "<color=white>" + curSentence;
         }
         else{
             tmp.text = curSentence;
         }
+
+
         tmp.maxVisibleCharacters = 0;
         //Invoke("WaitSkip",0.5f);
         //canSkip = true;
