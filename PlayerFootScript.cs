@@ -48,6 +48,13 @@ public class PlayerFootScript : MonoBehaviour
  
     }
 
+    void OnCollisionEnter2D(Collision2D other){
+        
+        if(other.gameObject.CompareTag("Collider_NPC")){
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), thePlayer.circleCollider2D, true);
+            Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), thePlayer.bodyCollider2D, true);
+        }
+    }
     void OnCollisionStay2D(Collision2D other){
         //if (!other.gameObject.CompareTag("MainGround"))
             PlayerManager.instance.footCol = other.transform.GetComponent<Collider2D>();

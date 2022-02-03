@@ -56,7 +56,7 @@ public class DirtScript : MonoBehaviour
                 dirtPhases[0].SetActive(false);
                 CreatePiece(0);
 
-                if(bundleType == BundleType.Icicle) InventoryManager.instance.AddItem(9);
+                if(bundleType == BundleType.Icicle) InventoryManager.instance.AddItem(31);
 
             }
             else if(curHp/maxHp<0.334f && remainPieceCount==2){

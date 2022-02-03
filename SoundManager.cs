@@ -10,6 +10,7 @@ public class SoundManager : MonoBehaviour
     public static SoundManager instance;
     [Header("[Game Settings] ─────────────────────")]
     public string defaultBtnSoundName;
+    public string defaultGetItemSoundName;
 
     public float masterVolumeSFX = 1f;
     public float masterVolumeBGM = 1f;

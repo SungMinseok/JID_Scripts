@@ -79,6 +79,7 @@ public class InventoryManager : MonoBehaviour
 
     public void AddItem(int ID, int amount = 1){
         if(amount<1) return;
+        SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
         //DBManager.instance.curData.itemList.Add(ID);
         //스택형 아이템이면
         if(DBManager.instance.cache_ItemDataList[ID].isStack){
