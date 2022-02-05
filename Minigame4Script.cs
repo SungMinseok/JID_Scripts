@@ -21,7 +21,7 @@ public class Minigame4Script : MonoBehaviour
     public int aphidCreationCount = 100;
     public float miniAntSpeed;
     public float miniLuckySpeed;
-    public int goalScore;
+    public int goalScoreToWin;
 
 
     
@@ -33,13 +33,14 @@ public class Minigame4Script : MonoBehaviour
     public Vector2 miniAntDestination;
     public PolygonCollider2D mapCollider;
     public Transform mapViewPoint;
-    public int score_lucky, score_ant;
     public Image[] score_lucky_img, score_ant_img;
     public Image timerGauge;
     [Space]
 
     [Header("[Debug]─────────────────")]
     public bool isPaused;
+    public int setScore_lucky, setScore_ant;
+    public int score_lucky, score_ant;
     public float curTimer;  
     public int closestAphid;
     public List<float> tempDistanceList;
@@ -79,12 +80,24 @@ public class Minigame4Script : MonoBehaviour
                 curTimer -= Time.fixedDeltaTime;
             }
             else{
-                MinigameManager.instance.SuccessMinigame();
-                //MinigameManager.instance.FailMinigame();
-                //UIManager.instance.SetGameOverUI(2);
+                isPaused = true;
+                // if(score_ant>score_lucky){
+                //     setScore_ant ++;
+                // }
+                // else{
+
+                // }
+
+
+
+
+                // MinigameManager.instance.SuccessMinigame();
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
         }
+    }
+    void GameSet(){
+        
     }
     private void OnEnable() {
         PlayerManager.instance.LockPlayer();
@@ -112,34 +125,74 @@ public class Minigame4Script : MonoBehaviour
             
             if(wInput!=0 || hInput!=0){
                 miniLucky.Translate(new Vector2(wInput * miniLuckySpeed,hInput * miniLuckySpeed));
-                miniLucky.GetComponent<SpriteRenderer>().flipX = wInput>0 ? true : false;
+                miniLucky.GetComponent<SpriteRenderer>().flipX = wInput<0 ? true : false;
+                miniLucky.GetComponent<Animator>().SetFloat("speed",1f);
+            }
+            else{
+                miniLucky.GetComponent<Animator>().SetFloat("speed",0);
+
             }
 
             if(miniAntDestination != Vector2.zero){
                 miniAnt.position = Vector2.MoveTowards(miniAnt.position,miniAntDestination,miniAntSpeed);
-                miniAnt.GetComponent<SpriteRenderer>().flipX = miniAntDestination.x>miniAnt.position.x ? true : false;
+                miniAnt.GetComponent<SpriteRenderer>().flipX = miniAntDestination.x<miniAnt.position.x ? true : false;
+                miniAnt.GetComponent<Animator>().SetFloat("speed",1f);
+            }
+            else{
+                miniAnt.GetComponent<Animator>().SetFloat("speed",0);
             }
         }
     }
     IEnumerator MinigameCoroutine(){
-
+        
         MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
         yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
-        isPaused = false;
 
-        SetRandomPosition();
+        while(setScore_ant < goalScoreToWin && setScore_lucky < goalScoreToWin){
+            
 
-        for(int i=0;i<aphidCreationCount;i++){
-            GameObject curAphid = aphids[Random.Range(0,aphids.Length)];
 
-            if(curAphid.activeSelf){
-               // Debug.Log("AA");
-                continue;
+            curTimer = maxTimerSet;
+            score_ant=0;
+            score_lucky = 0;
+            SetScoreImage();
+            isPaused = false;
+
+            SetRandomPosition();
+
+            //Coroutine StageCoroutine = StartCoroutine(CreateAphids());
+            //for(int i=0;i<aphidCreationCount;i++){
+            while(curTimer>0 && !isPaused){
+                GameObject curAphid = aphids[Random.Range(0,aphids.Length)];
+
+                if(curAphid.activeSelf){
+                // Debug.Log("AA");
+                    continue;
+                }
+
+                aphids[Random.Range(0,aphids.Length)].SetActive(true);
+                CalculateDistance();
+                yield return waitAphidCreationCycle;
             }
 
-            aphids[Random.Range(0,aphids.Length)].SetActive(true);
-            CalculateDistance();
-            yield return waitAphidCreationCycle;
+
+            if(score_ant>score_lucky){
+                setScore_ant ++;
+            }
+            else if(score_ant<score_lucky){
+                setScore_lucky ++;
+            }
+            
+            //결과 팝업
+            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
+            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+        }
+
+        if(setScore_lucky == goalScoreToWin){
+            MinigameManager.instance.SuccessMinigame();
+        }
+        else{
+            MinigameManager.instance.FailMinigame();
         }
 
     }
