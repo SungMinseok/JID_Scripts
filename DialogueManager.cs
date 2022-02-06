@@ -161,7 +161,9 @@ public class DialogueManager : MonoBehaviour
 
         if(curSentence.Length>20){
             curSentence = curSentence.Insert(20,"\n");
-            //Debug.Log(curSentence);
+        }
+        if(curSentence.Length>40){
+            curSentence = curSentence.Insert(40,"\n");
         }
 
         if(dialogue.isMonologue){

@@ -221,7 +221,7 @@ public class Minigame1Script : MonoBehaviour
                 }
                 else{
                     //게임성공
-                    gameObject.SetActive(false);
+                    //gameObject.SetActive(false);
                     MinigameManager.instance.SuccessMinigame();
                 }
                 

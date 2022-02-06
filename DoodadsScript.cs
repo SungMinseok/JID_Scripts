@@ -77,8 +77,12 @@ public class DoodadsScript : MonoBehaviour
                         PlayerManager.instance.isGameOver = true;
                         PlayerManager.instance.canMove = false;
                         PlayerManager.instance.animator.SetBool("dead0",true);
-                        UIManager.instance.SetGameOverUI(4);
+                        MinigameManager.instance.FailMinigame(4);
+                        //UIManager.instance.SetGameOverUI(4);
                     }
+                }
+                else if(other.gameObject.CompareTag("MainGround")){
+                    gameObject.SetActive(false);
                 }
                 break;
 

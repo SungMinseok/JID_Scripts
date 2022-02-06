@@ -143,6 +143,8 @@ public class UIManager : MonoBehaviour
         //SetFadeOut();
         LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1.5f);
+
+        if(MinigameManager.instance.nowMinigameNum!=-1) MinigameManager.instance.minigameScriptTransforms[MinigameManager.instance.nowMinigameNum].gameObject.SetActive(false);
         ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[num];
         //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
         ui_gameOver.SetActive(true);

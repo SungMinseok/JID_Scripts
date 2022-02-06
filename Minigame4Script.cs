@@ -72,6 +72,8 @@ public class Minigame4Script : MonoBehaviour
     void ResetGameSettings(){
         isPaused = true;
         curTimer = maxTimerSet;
+        setScore_lucky=0;
+        setScore_ant=0;
     }
     void FixedUpdate(){
 
@@ -111,6 +113,8 @@ public class Minigame4Script : MonoBehaviour
         UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
+        SceneController.instance.SetConfiner(DBManager.instance.curData.curMapNum);
+        SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
         
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();
@@ -178,20 +182,28 @@ public class Minigame4Script : MonoBehaviour
 
             if(score_ant>score_lucky){
                 setScore_ant ++;
+                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
             }
             else if(score_ant<score_lucky){
                 setScore_lucky ++;
+                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
             }
+            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
             
             //결과 팝업
-            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
-            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+            // if(setScore_lucky != goalScoreToWin && setScore_ant != goalScoreToWin){
+
+            // }
         }
 
         if(setScore_lucky == goalScoreToWin){
+            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","9");
+            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
             MinigameManager.instance.SuccessMinigame();
         }
         else{
+            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","9");
+            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
             MinigameManager.instance.FailMinigame();
         }
 

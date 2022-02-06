@@ -39,20 +39,27 @@ public class MinigameManager : MonoBehaviour
 #endif
     public void SuccessMinigame(){
         success = true;
-        PlayerManager.instance.isPlayingMinigame = false;
-        minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
+        //PlayerManager.instance.isPlayingMinigame = false;
+        //minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
         StartCoroutine(FinishMinigameCoroutine());
     }
     //-1이면 setgameoverui 실행 x
     public void FailMinigame(int gameOverSpriteNum = -1){
-        PlayerManager.instance.isPlayingMinigame = false;
-        minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
+        fail = true;
+        //PlayerManager.instance.isPlayingMinigame = false;
+        //minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
+
+        //FailMinigame(gameOverSpriteNum);
 
         if(gameOverSpriteNum != -1){
             UIManager.instance.SetGameOverUI(gameOverSpriteNum);
         }
+        else{
+            StartCoroutine(FinishMinigameCoroutine());
+        }
+        
     }
     public void SuccessMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
@@ -103,13 +110,17 @@ public class MinigameManager : MonoBehaviour
         }
         LoadManager.instance.FadeIn();
     }
+    void FinishMinigame(int gameOverSpriteNum){
+
+    }
     IEnumerator FinishMinigameCoroutine(){
 
-        nowMinigameNum = -1;
         LoadManager.instance.FadeOut();
         yield return wait1000ms;
-        var nowMinigame = minigameScriptTransforms[gameNum];
-        nowMinigame.gameObject.SetActive(true);
-        LoadManager.instance.FadeOut();
+        var nowMinigame = minigameScriptTransforms[nowMinigameNum];
+        nowMinigame.gameObject.SetActive(false);
+        LoadManager.instance.FadeIn();
+        nowMinigameNum = -1;
+        PlayerManager.instance.isPlayingMinigame = false;
     }
 }

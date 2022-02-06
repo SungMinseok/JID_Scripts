@@ -172,7 +172,7 @@ public class Minigame0Script : MonoBehaviour
 
         }
 
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
         
         isPaused = true;
         MinigameManager.instance.SuccessMinigame();

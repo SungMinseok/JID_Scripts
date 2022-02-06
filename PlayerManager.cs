@@ -620,6 +620,7 @@ public class PlayerManager : MonoBehaviour
 
         PlayerManager.instance.isCaught = false;
         PlayerManager.instance.isGameOver = false;
+        PlayerManager.instance.isForcedRun = false;
         
     }
 

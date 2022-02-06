@@ -277,12 +277,13 @@ public class DBManager : MonoBehaviour
         for(int i=0; i<a.Count; i++){
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             cache_ItemDataList.Add(new Item(
-                int.Parse(a[i]["ID"].ToString()),
-                a[i]["name_"+language].ToString(),
-                a[i]["desc_"+language].ToString(),
-                byte.Parse(a[i]["type"].ToString()),
-                int.Parse(a[i]["resourceID"].ToString()),
-                bool.Parse(a[i]["isStack"].ToString())
+                int.Parse(a[i]["ID"].ToString())
+                ,a[i]["name_"+language].ToString()
+                ,a[i]["desc_"+language].ToString()
+                ,byte.Parse(a[i]["type"].ToString())
+                ,int.Parse(a[i]["resourceID"].ToString())
+                ,bool.Parse(a[i]["isStack"].ToString())
+                ,int.Parse(a[i]["price"].ToString())
             ));
         }
     }
@@ -341,12 +342,13 @@ public class Item{
     public int resourceID;
     public bool isStack;
     public Sprite icon;
+    public int price;
     //public bool isStack;
 
     public enum ItemType{
         equip,
     }
-    public Item(int a, string b, string c, byte d, int e, bool f){
+    public Item(int a, string b, string c, byte d, int e, bool f, int g){
         ID = a;
         name = b;
         description = c;
@@ -354,6 +356,7 @@ public class Item{
         resourceID = e;
         icon = DBManager.instance.itemSprites[resourceID];
         isStack = f;
+        price = g;
     }
 }
 
