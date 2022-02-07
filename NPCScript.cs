@@ -96,7 +96,7 @@ public class NPCScript : MonoBehaviour
         if(mainBody!=null) animator = mainBody.GetComponent<Animator>();
         //if(isSpriteSkin) animator = mainBody.GetComponent<Animator>();
         else animator = GetComponent<Animator>();
-        defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
+        if(haveTalk) defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
 
         if(noCollision){
                 
@@ -243,7 +243,7 @@ public class NPCScript : MonoBehaviour
             }
         }
 #endregion
-        if(talkCanvas.gameObject.activeSelf){
+        if(haveTalk && talkCanvas.gameObject.activeSelf){
             // isPaused = true;
             // patrolInput = 0;
             if(haveTalk&&animator!=null) animator.SetBool("talk", true);

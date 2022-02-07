@@ -79,6 +79,7 @@ public class LoadManager : MonoBehaviour
         }
         else{
             TriggerScript.instance.StopAllCoroutines();
+            PlayerManager.instance.StopAllCoroutines();
 
         }
 
@@ -87,6 +88,7 @@ public class LoadManager : MonoBehaviour
     public void LoadMain(){
         
         TriggerScript.instance.StopAllCoroutines();
+        PlayerManager.instance.StopAllCoroutines();
 
         StartCoroutine(LoadCoroutine("Main"));
 
@@ -109,9 +111,11 @@ public class LoadManager : MonoBehaviour
             DBManager.instance.CallLoad(lastLoadFileNum);
 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
+            if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
             
             Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
         }
+//인게임 로드 시 데이터 불러오기(마지막 저장지점)
         else if(isLoadingInGameToLastPoint){
             if(lastLoadFileNum == -1){
                 DBManager.instance.curData = DBManager.instance.emptyData;
@@ -124,6 +128,7 @@ public class LoadManager : MonoBehaviour
 
             }
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
+            if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
         }
         else if(nextScene == "Main"){
                 
@@ -214,11 +219,11 @@ public class LoadManager : MonoBehaviour
         }
 
 
-        if(PlayerManager.instance!=null){
-            if(PlayerManager.instance.isGameOver){
-                PlayerManager.instance.RevivePlayer();
-            }
-        }
+        // if(PlayerManager.instance!=null){
+        //     if(PlayerManager.instance.isGameOver){
+        //         PlayerManager.instance.RevivePlayer();
+        //     }
+        // }
 
 
 

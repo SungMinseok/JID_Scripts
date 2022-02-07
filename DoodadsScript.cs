@@ -27,6 +27,8 @@ public class DoodadsScript : MonoBehaviour
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
         //thePlayer = PlayerManager.instance;
+
+        
     }
 
     void Cloak(float _speed = 0.03f){
@@ -81,12 +83,22 @@ public class DoodadsScript : MonoBehaviour
                         //UIManager.instance.SetGameOverUI(4);
                     }
                 }
-                else if(other.gameObject.CompareTag("MainGround")){
+                else if(other.gameObject.CompareTag("MainGround") || other.gameObject.CompareTag("Collider_Player")){
                     gameObject.SetActive(false);
                 }
                 break;
 
             
+        }
+    }
+    void OnCollisionStay2D(Collision2D other){
+
+        switch(type){
+            case DoodadsType.Bullet :
+                if(other.gameObject.CompareTag("Collider_Player")){
+                    Physics2D.IgnoreCollision(GetComponent<Collider2D>(), other.transform.GetComponent<Collider2D>(), true);
+                }
+                break;
         }
     }
 
