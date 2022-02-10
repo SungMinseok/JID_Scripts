@@ -6,6 +6,9 @@ using Cinemachine;
 public class SceneController : MonoBehaviour
 {
     public static SceneController instance;
+    [Header("세팅값")]
+    public float defaultZoomInSize = 4f;
+    public float defaultZoomOutSize = 5.3f;
     [Header("맵")]
     public PolygonCollider2D[] mapBounds;
     public PolygonCollider2D[] mapZoomBounds;
@@ -89,6 +92,15 @@ public class SceneController : MonoBehaviour
             yield return null;
         }
     }
+    public void SetCameraDefaultZoomIn(){
+
+        SetLensOrthoSize(defaultZoomInSize,0.075f);
+    }
+    public void SetCameraDefaultZoomOut(){
+
+        SetLensOrthoSize(defaultZoomOutSize,0.1f);
+    }
+
 
     #region Main Control
     public void PushStartBtn(){

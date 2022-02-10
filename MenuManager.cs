@@ -220,7 +220,7 @@ public class MenuManager : MonoBehaviour
                 saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
                 saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
                 saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
-                saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount);
+                saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
             }
             else{
                 saveSlots[i].saveNameText.text = "빈 슬롯";
@@ -352,7 +352,7 @@ public class MenuManager : MonoBehaviour
             default:
                 Debug.Log(curPopUpType);
                 popUpOkayCheck = true;
-                Invoke("ResetPopUpOkayCheck",0.5f);
+                Invoke("ResetPopUpOkayCheck",0.05f);
                 break;
 
         }

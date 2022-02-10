@@ -29,13 +29,13 @@ public class AphidScript : MonoBehaviour
         switch(unitType){
             case UnitType.aphid :
             
-                Debug.Log(unitType);
+                //Debug.Log(unitType);
                 break;
             case UnitType.ant :
-                Debug.Log(unitType);
+                //Debug.Log(unitType);
                 break;
             case UnitType.lucky :
-                Debug.Log(unitType);
+                //Debug.Log(unitType);
                 break;
             default:
                 Debug.Log("has no unitType");
@@ -110,7 +110,7 @@ public class AphidScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other){
 
-        Debug.Log("3");
+//        Debug.Log("3");
         switch(unitType){
             case UnitType.aphid :
                 break;

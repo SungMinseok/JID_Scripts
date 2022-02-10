@@ -31,6 +31,13 @@ public class TriggerScript : MonoBehaviour
                             location.poses[i].gameObject.SetActive(false);
                         }
 
+                    break;                
+                case 23 :
+                    var objects = location.poses;
+                    objects[17].GetComponent<Location>().isLocked = false;
+                    for(int i=8;i<17;i++){
+                        objects[i].gameObject.SetActive(false);
+                    }
                     break;
                 default :
                     break;
@@ -112,7 +119,7 @@ public class TriggerScript : MonoBehaviour
 
             if(GameManager.instance.mode_zoomWhenInteract){
 
-                SceneController.instance.SetLensOrthoSize(4f,0.075f);
+                SceneController.instance.SetCameraDefaultZoomIn();
                 SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
             }
         }
@@ -368,30 +375,18 @@ public class TriggerScript : MonoBehaviour
             
                 CameraView(objects[0]);
                 
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
-                SetDialogue(dialogues[2]);
-                yield return waitTalking;
-                SetDialogue(dialogues[3]);
-                yield return waitTalking;
-                SetDialogue(dialogues[4]);
-                yield return waitTalking;
-                SetDialogue(dialogues[5]);
-                yield return waitTalking;
-                SetDialogue(dialogues[6]);
-                yield return waitTalking;
-                SetDialogue(dialogues[7]);
-                yield return waitTalking;
-                SetDialogue(dialogues[8]);
-                yield return waitTalking;
-                SetDialogue(dialogues[9]);
-                yield return waitTalking;
+                for(int k=0;k<10;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
 
                 //CheatManager.instance.InputCheat("minigame 0");
                 MinigameManager.instance.StartMinigame(0);
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
+                MinigameManager.instance.success = false;
+                
+                PlayerManager.instance.canMove =true;   
                 SetDialogue(dialogues[10]);
                 yield return waitTalking;
                 SetDialogue(dialogues[11]);
@@ -671,7 +666,7 @@ public class TriggerScript : MonoBehaviour
                             objects[i].gameObject.SetActive(false);
                         }
                         
-                        objects[14].GetComponent<Animator>().SetBool("hang", false);
+                        objects[14].GetChild(1).GetComponent<Animator>().SetBool("hang", false);
                         objects[14].gameObject.SetActive(true);
                         yield return wait2000ms;
                         FadeIn();
@@ -696,7 +691,95 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
             
-            
+//진딧물농장
+#region 23
+            case 23 :
+
+                FadeOut();
+                yield return wait1000ms;
+                SetHUD(false);
+                PlayerManager.instance.vignette.SetActive(false);
+                
+                SceneController.instance.SetConfiner(15);
+                PlayerManager.instance.transform.position = objects[5].position;
+                yield return wait100ms;
+
+                CameraView(objects[0]);
+                yield return wait500ms;
+                FadeIn();
+
+                for(int k=0;k<9;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+                yield return wait500ms;
+
+
+                CameraView(PlayerManager.instance.transform);
+
+                SetSelect(selects[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(GetSelect()==0){
+                }
+                else if(GetSelect()==1){
+                    
+                }
+                location.selectPhase = -1;
+
+                yield return wait500ms;
+
+                SceneController.instance.SetCameraDefaultZoomOut();
+
+                MinigameManager.instance.StartMinigame(4);
+                // CheatManager.instance.InputCheat("minigame 1");
+                yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
+
+                yield return wait1000ms;
+                PlayerManager.instance.vignette.SetActive(true);
+                for(int i=8;i<17;i++){
+                    objects[i].gameObject.SetActive(false);
+                }
+                PlayerManager.instance.transform.position = objects[6].position;
+                PlayerManager.instance.Look("right");
+                objects[7].gameObject.SetActive(true);
+                SceneController.instance.SetCameraDefaultZoomIn();
+
+
+                SetHUD(false);
+
+                yield return wait500ms;
+                if(GetSelect()==0){
+                    SetDialogue(dialogues[9]);
+                    yield return waitTalking;
+                }
+                else if(GetSelect()==1){
+                    
+                    SetDialogue(dialogues[10]);
+                    yield return waitTalking;
+                }
+
+                FadeOut();
+
+                if(GetSelect()==0){
+                    InventoryManager.instance.AddItem(17);
+                }
+                else if(GetSelect()==1){
+                    
+                    InventoryManager.instance.AddItem(0);
+                }
+                yield return wait2000ms;
+                objects[7].gameObject.SetActive(false);
+
+                FadeIn();
+
+                objects[17].GetComponent<Location>().isLocked = false;
+
+
+                //FadeIn();
+                break;
+#endregion
+
             
             default : 
                 break;
@@ -746,7 +829,7 @@ public class TriggerScript : MonoBehaviour
 
         if(!location.notZoom){
             if(GameManager.instance.mode_zoomWhenInteract){
-                SceneController.instance.SetLensOrthoSize(5.3f,0.1f);
+                SceneController.instance.SetCameraDefaultZoomOut();
                 SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[DBManager.instance.curData.curMapNum]);
             }
         }

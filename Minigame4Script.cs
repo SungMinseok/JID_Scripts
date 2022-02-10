@@ -51,7 +51,9 @@ public class Minigame4Script : MonoBehaviour
 
     WaitForSeconds waitAphidLifeTime;
     WaitForSeconds waitAphidCreationCycle;
-
+    WaitUntil popUpOkayCheck = new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+    WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     WaitForSeconds wait1s = new WaitForSeconds(1f);
     WaitForSeconds wait2s = new WaitForSeconds(2f);
     WaitForSeconds wait3s = new WaitForSeconds(3f);
@@ -150,7 +152,7 @@ public class Minigame4Script : MonoBehaviour
     IEnumerator MinigameCoroutine(){
         
         MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
-        yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+        yield return popUpOkayCheck;
 
         while(setScore_ant < goalScoreToWin && setScore_lucky < goalScoreToWin){
             
@@ -183,27 +185,33 @@ public class Minigame4Script : MonoBehaviour
             if(score_ant>score_lucky){
                 setScore_ant ++;
                 MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
+                yield return popUpOkayCheck;
             }
             else if(score_ant<score_lucky){
                 setScore_lucky ++;
                 MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
+                yield return popUpOkayCheck;
             }
-            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+            else{
+                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("35","9");
+                yield return popUpOkayCheck;
+            }
             
             //결과 팝업
             // if(setScore_lucky != goalScoreToWin && setScore_ant != goalScoreToWin){
 
             // }
         }
+        yield return wait100ms;
 
         if(setScore_lucky == goalScoreToWin){
             MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","9");
-            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+            yield return popUpOkayCheck;
             MinigameManager.instance.SuccessMinigame();
         }
         else{
             MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","9");
-            yield return new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+            yield return popUpOkayCheck;
             MinigameManager.instance.FailMinigame();
         }
 

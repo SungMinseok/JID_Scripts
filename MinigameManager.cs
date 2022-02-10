@@ -65,9 +65,10 @@ public class MinigameManager : MonoBehaviour
         for(int i=0;i<instance.transform.childCount;i++){
             instance.transform.GetChild(i).gameObject.SetActive(false);
         }
-        success = true;
+        //success = true;
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공(테스트)");
+        Debug.Log(nowMinigameNum + "번 미니게임 강제 종료 : (테스트)");
+        ResetMinigameResult();
 
         // if(nowMinigameNum == 2){
         //     TriggerScript.instance.Action(16);
@@ -122,5 +123,10 @@ public class MinigameManager : MonoBehaviour
         LoadManager.instance.FadeIn();
         nowMinigameNum = -1;
         PlayerManager.instance.isPlayingMinigame = false;
+        ResetMinigameResult();
+    }
+    public void ResetMinigameResult(){
+        success = false;
+        fail = false;
     }
 }
