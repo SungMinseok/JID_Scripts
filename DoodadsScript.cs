@@ -7,6 +7,7 @@ public enum DoodadsType{
     Trap,
     SlowDown,
     Bullet,
+    Mushroom
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -24,6 +25,8 @@ public class DoodadsScript : MonoBehaviour
     public float slowDownValue;
     public bool onHit;
 
+    [Header("머시룸")]
+    public int mushroomNum;
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
         //thePlayer = PlayerManager.instance;
@@ -133,6 +136,23 @@ public class DoodadsScript : MonoBehaviour
                 //Debug.Log("A");
                 }
                 break;
+                
+            case DoodadsType.Mushroom :
+                if(other.CompareTag("Player")){
+                    if(!PlayerManager.instance.isGrounded ){
+                        if(mushroomNum != 4)
+                            MushroomGameScript.instance.PushPiano(mushroomNum);
+                        else{
+                            MushroomGameScript.instance.PushMain();
+
+                        }
+                    }
+                }
+                break;
+
+            default : 
+                break;
+
             // case DoodadsType.Bullet :
             //     if(other.CompareTag("Player")){
                     

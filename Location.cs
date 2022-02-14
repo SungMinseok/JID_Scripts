@@ -112,7 +112,8 @@ public class Location : MonoBehaviour
                     //Debug.Log("AAA");
                     if(Input.GetButton("Interact_OnlyKey")){
                         locFlag = true;
-                        Debug.Log(trigNum +"번 트리거 실행 시도");
+                        if(type == LocationType.Trigger)
+                            Debug.Log(trigNum +"번 트리거 실행 시도");
                         //PlayerManager.instance.ActivateWaitInteract(1);
                         LocationScript(other);
                     }
@@ -127,7 +128,8 @@ public class Location : MonoBehaviour
             if(other.CompareTag("Player")){
                 if(!waitKey && !locFlag&&!PlayerManager.instance.isActing){
                     locFlag = true;
-                    Debug.Log(trigNum +"번 트리거 실행 시도");
+                    if(type == LocationType.Trigger)
+                        Debug.Log(trigNum +"번 트리거 실행 시도");
                     //PlayerManager.instance.ActivateWaitInteract(1);
                     LocationScript(other);
                     //Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");

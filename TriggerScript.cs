@@ -691,7 +691,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
             
-//진딧물농장
+//진딧물농장 미니게임4
 #region 23
             case 23 :
 
