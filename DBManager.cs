@@ -264,7 +264,7 @@ public class DBManager : MonoBehaviour
 
         if(PlayerManager.instance != null){
 
-            if(PlayerManager.instance.isMoving){
+            if(PlayerManager.instance.isMoving && !PlayerManager.instance.isInvincible){
                 if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
             }
         }

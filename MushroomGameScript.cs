@@ -29,7 +29,6 @@ public class MushroomGameScript : MonoBehaviour
             animator_main.SetBool("down",true);
 
             if(curOrder == correctOrder){
-                ResetPiano();
                 InventoryManager.instance.AddItem(13);
             }
             
@@ -38,6 +37,7 @@ public class MushroomGameScript : MonoBehaviour
     }
     IEnumerator PushMainCoroutine(){
         yield return new WaitForSeconds(1f);
+        ResetPiano();
 
         
         animator_main.SetBool("down",false);

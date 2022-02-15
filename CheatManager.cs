@@ -175,6 +175,22 @@ public class CheatManager : MonoBehaviour
                     break;
 
 
+                case "invincible" :
+
+                    if(temp[1]==null) return;
+
+                    //int getInt = int.Parse(temp[1]);
+
+                    if(temp[1]=="on"){
+                        PlayerManager.instance.isInvincible = true;
+                    }
+                    else{
+                        PlayerManager.instance.isInvincible = false;
+
+                    }
+
+                    break;
+
             }
 //EndingCollectionOver
 //DeleteSaveFile

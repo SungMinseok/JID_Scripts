@@ -58,6 +58,7 @@ public class PlayerManager : MonoBehaviour
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
     public float isSlowDown;
     public bool jumpDownFlag;
+    public bool isInvincible;
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -167,8 +168,6 @@ public class PlayerManager : MonoBehaviour
             
             //움직이는 중 체크
             isMoving = rb.velocity != Vector2.zero ? true : false;
-
-
         }
         else{
 
@@ -177,9 +176,16 @@ public class PlayerManager : MonoBehaviour
             jumpInput = false;
         }
 
+
+        // case 1 : 가만히 있거나 걸을 때(공중에 떠 있지 않을 때)
         if (isGrounded)
         {
             isJumping = false;
+            if(isFalling){
+                isFalling = false;
+                SoundManager.instance.PlaySound("lucky_land");
+            }
+
             animator.SetBool("jump", false);
 
             if(hInput<0 && !getLadder){
@@ -201,15 +207,20 @@ public class PlayerManager : MonoBehaviour
             }
 
         }
+
+        // case 2 : 공중에 떠 있을 때
         else
         {
             //점프안하고 추락 시 점프 가능한 것 방지
             if(!jumpDelay && !onLadder) Jump(0);
             animator.SetBool("jump", true);
             animator.SetBool("down", false);
+
+            isFalling = rb.velocity.y < 0 ? true : false;
+
         }
 
-//좌우 이동 중
+        // case 3 : 좌우 이동 중
         if ((wInput != 0 || wSet != 0 || isForcedRun) )   
         {
             if(!isForcedRun) animator.SetBool("run", true);
@@ -225,6 +236,7 @@ public class PlayerManager : MonoBehaviour
                     playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
             }
         }
+        // case 4 : 좌우로 이동 중이지 않을 때
         else
         {
             

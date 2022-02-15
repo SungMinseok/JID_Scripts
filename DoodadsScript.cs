@@ -117,7 +117,8 @@ public class DoodadsScript : MonoBehaviour
 
             case DoodadsType.Trap :
                 if(other.CompareTag("Player")){
-                    if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+                    //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+                    if(PlayerManager.instance.isFalling){
 
                         PlayerManager.instance.isGameOver = true;
                         PlayerManager.instance.canMove = false;
@@ -139,7 +140,7 @@ public class DoodadsScript : MonoBehaviour
                 
             case DoodadsType.Mushroom :
                 if(other.CompareTag("Player")){
-                    if(!PlayerManager.instance.isGrounded ){
+                    if(PlayerManager.instance.isFalling ){
                         if(mushroomNum != 4)
                             MushroomGameScript.instance.PushPiano(mushroomNum);
                         else{
@@ -219,14 +220,14 @@ public class DoodadsScript : MonoBehaviour
                     other.transform.parent.position = new Vector2(transform.position.x,other.transform.parent.position.y);
                 }
                 else{
-                    if(!PlayerManager.instance.isFalling){
+                    //if(!PlayerManager.instance.isFalling){
                             
                         for(int i=0;i<platformCollider.Length;i++){
                                 
                             Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], false);
                             Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
                         }
-                    }
+                    //}
                 }
             }
         }
