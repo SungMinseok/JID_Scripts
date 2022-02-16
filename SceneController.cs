@@ -25,9 +25,9 @@ public class SceneController : MonoBehaviour
         instance = this;
     }
 
-    public void SetConfiner(int num){
-        confiner2D.m_BoundingShape2D = mapBounds[num];
-        SetCurrentMapName(num);
+    public void SetConfiner(int mapNum){
+        confiner2D.m_BoundingShape2D = mapBounds[mapNum];
+        SetCurrentMapName(mapNum);
         
            // Debug.Log(num + " : 맵번호");
     }

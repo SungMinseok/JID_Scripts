@@ -191,6 +191,16 @@ public class CheatManager : MonoBehaviour
 
                     break;
 
+                case "completetrigger" :
+
+                    if(temp[1]==null) return;
+
+                   
+                    DBManager.instance.TrigOver(int.Parse(temp[1]));
+                    DM("Trigger Number "+temp[1]+" has been completed.");
+
+                    break;
+
             }
 //EndingCollectionOver
 //DeleteSaveFile

@@ -779,6 +779,81 @@ public class TriggerScript : MonoBehaviour
                 //FadeIn();
                 break;
 #endregion
+            
+//알번데기방 - 꼰대개미와 대화
+#region 24
+            case 24 :
+
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+                
+                CameraView(dialogues[1].talker);
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                SetSelect(selects[1]);
+                yield return waitSelecting;
+
+                CameraView(dialogues[2].talker);
+                SetDialogue(dialogues[2]);
+                yield return waitTalking;
+
+                
+                PlayerManager.instance.Look("left");
+
+                CameraView(dialogues[3].talker);
+                SetDialogue(dialogues[3]);
+                yield return waitTalking;
+
+                PlayerManager.instance.Look("right");
+
+                CameraView(dialogues[4].talker);
+                SetDialogue(dialogues[4]);
+                yield return waitTalking;
+
+                SetSelect(selects[2]);
+                yield return waitSelecting;
+                
+                CameraView(dialogues[5].talker);
+                SetDialogue(dialogues[5]);
+                yield return waitTalking;
+                
+                location.selectPhase = -1;
+
+                break;
+#endregion
+            
+//대왕일개미방 입구 
+#region 25
+            case 25 :
+
+                if(!DBManager.instance.CheckTrigOver(24)){
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else{
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                        PlayerManager.instance.transform.position = objects[1].transform.position;
+                        SceneController.instance.SetConfiner(11);
+                        objects[0].GetComponent<Location>().isLocked = false;
+
+
+                    }
+                    location.preserveTrigger = false;
+                }
+
+                break;
+#endregion
 
             
             default : 
@@ -801,6 +876,7 @@ public class TriggerScript : MonoBehaviour
 
         UIManager.instance.SetHUD(true);
 
+        CameraView(PlayerManager.instance.transform);
 
 //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동
         if(location.target != null){
