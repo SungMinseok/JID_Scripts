@@ -171,7 +171,9 @@ public class CheatManager : MonoBehaviour
 
                     int getInt = int.Parse(temp[1]);
 
-                    Debug.Log(InventoryManager.instance.CheckHaveItem(getInt));
+                    //Debug.Log(InventoryManager.instance.CheckHaveItem(getInt));
+                    
+                    DM("Check whether you have the itemID : " + getInt.ToString() + " : "+ InventoryManager.instance.CheckHaveItem(getInt).ToString());
                     break;
 
 
@@ -180,12 +182,15 @@ public class CheatManager : MonoBehaviour
                     if(temp[1]==null) return;
 
                     //int getInt = int.Parse(temp[1]);
+                    Debug.Log(temp[1]);
 
                     if(temp[1]=="on"){
                         PlayerManager.instance.isInvincible = true;
+                        DM("Soil is not consumed anymore");
                     }
                     else{
                         PlayerManager.instance.isInvincible = false;
+                        DM("Soil is consumed again");
 
                     }
 

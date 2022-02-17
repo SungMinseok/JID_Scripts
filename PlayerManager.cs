@@ -59,6 +59,7 @@ public class PlayerManager : MonoBehaviour
     public float isSlowDown;
     public bool jumpDownFlag;
     public bool isInvincible;
+    public bool transferDelay;  //텔레포트 시 딜레이(바로 이동 방지)
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;

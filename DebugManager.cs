@@ -86,6 +86,7 @@ public class DebugManager : MonoBehaviour
 
     public void PrintDebug(string text){
         if(isDebugMode){    
+            Debug.Log(text);
 
             if(alertDebugList.Count>50){
                 Destroy(alertDebugList[0].textObject.gameObject);

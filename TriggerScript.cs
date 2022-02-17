@@ -853,6 +853,58 @@ public class TriggerScript : MonoBehaviour
                 }
 
                 break;
+#endregion        
+
+//대왕일개미방 내부 
+#region 26
+            case 26 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+                
+                if(GetSelect()==0){
+                    for(int i=1;i<6;i++){
+                        SetDialogue(dialogues[i]);
+                        yield return waitTalking;
+                    }
+                    if(InventoryManager.instance.CheckHaveItem(3)){
+                                
+                        SetDialogue(dialogues[6]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[7]);
+                        yield return waitTalking;
+                        SetSelect(selects[1]);
+                        yield return waitSelecting;
+                        if(GetSelect()==0){
+                            for(int i=8;i<14;i++){
+                                SetDialogue(dialogues[i]);
+                                yield return waitTalking;
+                            }
+                        }
+                        else{
+                            //방나가짐
+                        }
+
+                    }
+                    else{
+                        //방나가짐
+                    }
+                }
+                else{
+                    SetDialogue(dialogues[14]);
+                    yield return waitTalking;
+
+                    //죽음
+                    UIManager.instance.SetGameOverUI(4);
+                }
+
+                location.selectPhase = -1;
+
+
+
+                break;
 #endregion
 
             

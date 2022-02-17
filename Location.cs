@@ -154,7 +154,8 @@ public class Location : MonoBehaviour
                     if(!isLocked){
 
                         if(other.CompareTag("Player")){
-                            if(desLoc!=null){
+                            if(desLoc!=null && !PlayerManager.instance.transferDelay){
+                                PlayerManager.instance.transferDelay = true;
                                 PlayerManager.instance.transform.position = desLoc.position;
                                 PlayerManager.instance.hInput = 1;
                                 PlayerManager.instance.hInput = 0;
@@ -163,6 +164,8 @@ public class Location : MonoBehaviour
                                 //SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
                                 //SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[desMapNum]);
                                 SceneController.instance.SetConfiner(desMapNum);
+                                Invoke("TeleportDelay",1f);
+                                
                             }
                             else{
 
@@ -386,7 +389,9 @@ public class Location : MonoBehaviour
         yield return wait1000ms;
         locFlag= false;
     }
-
+    void TeleportDelay(){
+        PlayerManager.instance.transferDelay = false;
+    }
 
 
 
