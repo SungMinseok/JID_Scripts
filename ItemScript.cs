@@ -12,7 +12,7 @@ public class ItemScript : MonoBehaviour
     public ItemType type;
     //[Header("Honey")]
     [Header("Honey ────────────────────")]
-    public float amount_honey;
+    public int amount_honey;
     [Header("Dirt ────────────────────")]
     public float amount_dirt;
     [Header("Item ────────────────────")]

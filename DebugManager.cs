@@ -88,21 +88,21 @@ public class DebugManager : MonoBehaviour
         if(isDebugMode){    
             Debug.Log(text);
 
-            if(alertDebugList.Count>50){
-                Destroy(alertDebugList[0].textObject.gameObject);
-                alertDebugList.Remove(alertDebugList[0]);
-            }
-            animator.SetTrigger("activate");
+            // if(alertDebugList.Count>50){
+            //     Destroy(alertDebugList[0].textObject.gameObject);
+            //     alertDebugList.Remove(alertDebugList[0]);
+            // }
+            // animator.SetTrigger("activate");
 
-            AlertDebug newAlertDebug = new AlertDebug();
-            newAlertDebug.text= "[" + DateTime.Now.ToString(("mm:ss:ff")) + "] " + text;
+            // AlertDebug newAlertDebug = new AlertDebug();
+            // newAlertDebug.text= "[" + DateTime.Now.ToString(("mm:ss:ff")) + "] " + text;
 
-            GameObject newText = Instantiate(textObject,alertPanel.transform);
-            newAlertDebug.textObject = newText.GetComponent<Text>();
-            newAlertDebug.textObject.text = newAlertDebug.text;
+            // GameObject newText = Instantiate(textObject,alertPanel.transform);
+            // newAlertDebug.textObject = newText.GetComponent<Text>();
+            // newAlertDebug.textObject.text = newAlertDebug.text;
 
 
-            alertDebugList.Add(newAlertDebug);
+            // alertDebugList.Add(newAlertDebug);
 
         }
         

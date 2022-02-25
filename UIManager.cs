@@ -131,7 +131,8 @@ public class UIManager : MonoBehaviour
     }
 #region GameOver
     public void SetGameOverUI(int num){
-        PlayerManager.instance.LockPlayer();
+        //PlayerManager.instance.LockPlayer();
+        PlayerManager.instance.isGameOver = true;
         StartCoroutine(SetGameOverUICoroutine(num));
     }
     public void ResetGameOverUI(){

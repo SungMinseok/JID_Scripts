@@ -48,7 +48,7 @@ public class CheatManager : MonoBehaviour
             switch(temp[0]){
                 case "t":
                     if(temp[1]!=null){
-                        if(checkPoint.GetChild(int.Parse(temp[1]))!=null){
+                        if(checkPoint.childCount>int.Parse(temp[1])){
                             
                             PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
                             SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
@@ -206,6 +206,30 @@ public class CheatManager : MonoBehaviour
 
                     break;
 
+                case "openshop" :
+
+                    //if(temp[1]==""||temp[2]==""||temp[3]=="") return;
+                    if(temp[1]=="") return;
+
+                    
+                    string[] tempList = temp[1].Split(',');
+                    int[] itemList = Array.ConvertAll(tempList, s => int.Parse(s));
+
+                    ShopManager.instance.OpenShopUI(1,"test",itemList);
+                   
+                    // DBManager.instance.TrigOver(int.Parse(temp[1]));
+                    DM("Openshop itemList : "+ String.Join(",", itemList));
+
+                    break;
+                case "addhoney" :
+
+                    if(temp[1]=="") return;
+
+                    DBManager.instance.curData.curHoneyAmount += int.Parse(temp[1]);
+
+                    //DM("Openshop itemList : "+ String.Join(",", itemList));
+
+                    break;
             }
 //EndingCollectionOver
 //DeleteSaveFile

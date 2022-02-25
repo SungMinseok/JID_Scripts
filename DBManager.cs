@@ -65,7 +65,7 @@ public class DBManager : MonoBehaviour
         public float curPlayTime;
         public int curPlayCount;
         public float curDirtAmount;
-        public float curHoneyAmount;
+        public int curHoneyAmount;
 
 
 
@@ -284,6 +284,7 @@ public class DBManager : MonoBehaviour
                 ,int.Parse(a[i]["resourceID"].ToString())
                 ,bool.Parse(a[i]["isStack"].ToString())
                 ,int.Parse(a[i]["price"].ToString())
+                ,int.Parse(a[i]["goldResourceID"].ToString())
             ));
         }
     }
@@ -342,13 +343,15 @@ public class Item{
     public int resourceID;
     public bool isStack;
     public Sprite icon;
-    public int price;
+    public int price;    
+    public int goldResourceID;
+    public Sprite goldIcon;
     //public bool isStack;
 
     public enum ItemType{
         equip,
     }
-    public Item(int a, string b, string c, byte d, int e, bool f, int g){
+    public Item(int a, string b, string c, byte d, int e, bool f, int g, int h){
         ID = a;
         name = b;
         description = c;
@@ -357,6 +360,8 @@ public class Item{
         icon = DBManager.instance.itemSprites[resourceID];
         isStack = f;
         price = g;
+        goldResourceID = h;
+        goldIcon = DBManager.instance.itemSprites[goldResourceID];
     }
 }
 

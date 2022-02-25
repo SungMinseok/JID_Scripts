@@ -14,6 +14,7 @@ public class TriggerScript : MonoBehaviour
 
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     WaitUntil waitSelecting = new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+    WaitUntil waitShopping = new WaitUntil(()=>!PlayerManager.instance.isShopping);
     
     void Awake()
     {
@@ -124,7 +125,10 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
-        UIManager.instance.SetHUD(false);
+        if(location.trigNum<100){
+            UIManager.instance.SetHUD(false);
+
+        }
 
         if(location.type == LocationType.Trigger){
            
@@ -141,6 +145,88 @@ public class TriggerScript : MonoBehaviour
                     MenuManager.instance.savePanel.SetActive(true);
                     yield return new WaitUntil(()=>!MenuManager.instance.savePanel.activeSelf);
                 }
+                break;
+#endregion
+
+//상점 - 지렁이 
+#region 101
+            case 101 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                ShopManager.instance.OpenShopUI(0,"지렁이 상점",new int[]{5,12});
+                yield return waitShopping;
+
+
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                break;
+#endregion
+
+//상점 - 귀뚜라미 
+#region 102
+            case 102 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                ShopManager.instance.OpenShopUI(0,"귀뚜라미 상점",new int[]{19,16,3});//붉은 산딸기 / 보라색 열매 / 사과 조각
+                yield return waitShopping;
+
+
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                break;
+#endregion
+//상점 - 벼룩 
+#region 103
+            case 103 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                ShopManager.instance.OpenShopUI(0,"벼룩 상점",new int[]{24,18,25});
+                yield return waitShopping;
+
+
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                break;
+#endregion
+//상점 - 땃쥐 
+#region 104
+            case 104 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                ShopManager.instance.OpenShopUI(0,"땃쥐 상점",new int[]{23,20});
+                yield return waitShopping;
+
+
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                break;
+#endregion
+//상점 - 두더지 
+#region 105
+            case 105 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                ShopManager.instance.OpenShopUI(0,"두더지 상점",new int[]{14,11});
+                yield return waitShopping;
+
+
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
                 break;
 #endregion
 
@@ -901,6 +987,34 @@ public class TriggerScript : MonoBehaviour
                 }
 
                 location.selectPhase = -1;
+
+
+
+                break;
+#endregion
+
+//박사개미에게 말 
+#region 27
+            case 27 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+                if(GetSelect()==0){
+                    SetDialogue(dialogues[2]);
+                    yield return waitTalking;
+                    SetDialogue(dialogues[3]);
+                    yield return waitTalking;
+                    SetDialogue(dialogues[4]);
+                    yield return waitTalking;
+                }
+                else{
+                }
+
+                //location.selectPhase = -1;
 
 
 

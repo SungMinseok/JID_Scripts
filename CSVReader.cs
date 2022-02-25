@@ -84,6 +84,30 @@ public class CSVReader : MonoBehaviour
                 if(data_dialogue.Count>index){
 
                     result = data_dialogue[index][curLanguage];
+                    string resultString = result.ToString();
+                                
+                    if(!resultString.Contains("</color>")){
+
+//                        Debug.Log(result);
+
+                        if(resultString.Length>20){
+                            resultString = resultString.Insert(20,"\n");
+                            //totalVisibleCharacters++;
+                        }
+                        if(resultString.Length>40){
+                            resultString = resultString.Insert(40,"\n");
+                            //totalVisibleCharacters++;
+                        }
+                        if(resultString.Length>60){
+                            resultString = resultString.Insert(60,"\n");
+                            //totalVisibleCharacters++;
+                        }
+                    }
+
+
+                    result = resultString;
+
+
 //                    Debug.Log(index+":"+result);
                 }
         //Debug.Log(data_dialogue[index][curLanguage]);

@@ -159,12 +159,18 @@ public class DialogueManager : MonoBehaviour
         WaitForSeconds _typingInterval = new WaitForSeconds(typingInterval);
         //Debug.Log("토탈문자갯수 : " + totalVisibleCharacters);
 
-        if(curSentence.Length>20){
-            curSentence = curSentence.Insert(20,"\n");
-        }
-        if(curSentence.Length>40){
-            curSentence = curSentence.Insert(40,"\n");
-        }
+        // if(curSentence.Length>20){
+        //     curSentence = curSentence.Insert(20,"\n");
+        //     totalVisibleCharacters++;
+        // }
+        // if(curSentence.Length>40){
+        //     curSentence = curSentence.Insert(40,"\n");
+        //     totalVisibleCharacters++;
+        // }
+        // if(curSentence.Length>60){
+        //     curSentence = curSentence.Insert(60,"\n");
+        //     totalVisibleCharacters++;
+        // }
 
         if(dialogue.isMonologue){
             tmp.text = "<color=white>" + curSentence;
@@ -254,12 +260,12 @@ public class DialogueManager : MonoBehaviour
 
     //스킵 불가능한 NPC 자체 랜덤 메시지 출력
     IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
-        talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
-        talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
+        talker.GetComponent<NPCScript>().talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
+        talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(true);
 
         yield return new WaitForSeconds(duration);
 
-        talker.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(false);
 
 
     }

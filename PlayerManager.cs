@@ -58,8 +58,9 @@ public class PlayerManager : MonoBehaviour
     public bool isForcedRun;    //강제로 달리기 애니메이션 실행 (미니게임 2)
     public float isSlowDown;
     public bool jumpDownFlag;
-    public bool isInvincible;
+    public bool isInvincible;   //on일 경우 흙 소모 안됨(테스트용)
     public bool transferDelay;  //텔레포트 시 딜레이(바로 이동 방지)
+    public bool isShopping;
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -150,6 +151,9 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
+        if(isGameOver){
+            canMove = false;
+        }
         if (canMove)
         {
             wSet = 0;
