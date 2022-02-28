@@ -48,13 +48,15 @@ public class NPCScript : MonoBehaviour
     [Header("랜덤 대화 설정")]
     //아무때나 랜덤 대화 활성화
     public bool alwaysRandomDialogue;
+    public bool onRandomDialogue;//자동 대사 사용 시 true
     //플레이어 근처에서만 랜덤 대화 활성화
     //public bool onlyNearPlayerRandomDialogue;
     //public bool activateRandomDialogue;
-    bool randomDialogueFlag;
+    public bool randomDialogueFlag;
     public float dialogueDuration;
-    public int dialogueInterval;
-    WaitForSeconds waitTime0, waitTime1, waitTime2;
+    public float dialogueInterval;
+    public bool noRandomDuration;
+    WaitForSeconds waitTime0, waitTime1, waitTime2, durationTime;
     public Dialogue[] dialogues;
     public Coroutine randomDialogueCrt;
 
@@ -62,7 +64,6 @@ public class NPCScript : MonoBehaviour
     public bool noFlip;
     [Space]
     [Header("Debug ───────────────────")]
-    public bool onRandomDialogue;
     public bool pauseRandomDialogue;
     
     public int patrolInput;
@@ -71,6 +72,7 @@ public class NPCScript : MonoBehaviour
     public bool isJumping;
     public bool jumpDelay;
     public Transform onTriggerCol;
+    public bool isTalkingWithPlayer;//플레이어와 대화 시 true
     Vector2 defaultScale;
 
     Rigidbody2D rb;
@@ -111,6 +113,7 @@ public class NPCScript : MonoBehaviour
         waitTime0 = new WaitForSeconds(dialogueInterval-0.5f);
         waitTime1 = new WaitForSeconds(dialogueInterval);
         waitTime2 = new WaitForSeconds(dialogueInterval+0.5f);
+        durationTime = new WaitForSeconds(dialogueDuration);
         // waitTime3 = new WaitForSeconds(randialogueDuration);
 
         if(dialogues !=null){
@@ -151,6 +154,13 @@ public class NPCScript : MonoBehaviour
         //랜덤대화
         if(alwaysRandomDialogue){
             onRandomDialogue = true;
+        }
+    }
+    void OnDisable(){
+
+        if(randomDialogueCrt !=null){
+            StopCoroutine(randomDialogueCrt);
+            randomDialogueFlag = false;
         }
     }
 
@@ -225,7 +235,12 @@ public class NPCScript : MonoBehaviour
             if(PlayerManager.instance.isActing || LoadManager.instance.reloadScene){
                 if(!pauseRandomDialogue){
                     pauseRandomDialogue = true;
-                    DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                    //DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                    
+                    if(randomDialogueCrt !=null){
+                        StopCoroutine(randomDialogueCrt);
+                        randomDialogueFlag = false;
+                    }
                     talkCanvas.gameObject.SetActive(false);
                 }
             }
@@ -239,7 +254,7 @@ public class NPCScript : MonoBehaviour
         if(onRandomDialogue && !pauseRandomDialogue){
             if(!randomDialogueFlag){
                 randomDialogueFlag = true;
-                StartCoroutine(SetRandomDialogueCoroutine());
+                randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine());
             }
         }
 #endregion
@@ -253,6 +268,22 @@ public class NPCScript : MonoBehaviour
             // isPaused = false;
             if(haveTalk&&animator!=null) animator.SetBool("talk", false);
         }
+
+
+#region 말풍선 활성화 예외처리: 자동 대사 중 플레이어와 대화
+        if(talkCanvas !=null){
+
+            if(isTalkingWithPlayer){
+                talkCanvas.gameObject.SetActive(true);
+            }
+            else if(!onRandomDialogue){
+                talkCanvas.gameObject.SetActive(false);
+
+            }
+        }
+#endregion
+
+
     }
 
     void FixedUpdate(){
@@ -318,14 +349,29 @@ public class NPCScript : MonoBehaviour
 
     IEnumerator SetRandomDialogueCoroutine(){
 
-        DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval);
-        //randomDialogueCrt = DialogueManager.instance.StartCoroutine(SetRandomDialogueCoroutine_(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval));
-
         int temp = Random.Range(0,3);
-        if(temp==0) yield return waitTime0;
-        else if(temp==1) yield return waitTime1;
-        else yield return waitTime2;
 
+        if(!noRandomDuration){
+
+            if(temp==0) yield return waitTime0;
+            else if(temp==1) yield return waitTime1;
+            else yield return waitTime2;
+        }
+        else{
+            yield return waitTime1;
+        }
+
+        //DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval);
+        int tempSentenceNum = Random.Range(0,dialogues[0].sentences.Length);
+
+        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogues[0].sentences[tempSentenceNum];
+        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().maxVisibleCharacters = dialogues[0].sentences[tempSentenceNum].Length;
+        talkCanvas.gameObject.SetActive(true);
+
+        yield return durationTime;
+
+        talkCanvas.gameObject.SetActive(false);
+        
         randomDialogueFlag = false;
 
     }
@@ -390,7 +436,12 @@ public class NPCScript : MonoBehaviour
         for(int i=0; i<dialogues.Length; i++){
             if(dialogues[i].comment == "발견"){
                 //StopCoroutine(randomDialogueCrt);
-                DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                //DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                
+                if(randomDialogueCrt !=null){
+                    StopCoroutine(randomDialogueCrt);
+                    randomDialogueFlag = false;
+                }
                 onRandomDialogue = false;
                 DialogueManager.instance.SetDialogue_NPC(dialogues[i]);
                 break;

@@ -35,6 +35,8 @@ public class Minigame4Script : MonoBehaviour
     public Transform mapViewPoint;
     public Image[] score_lucky_img, score_ant_img;
     public Image timerGauge;
+    public GameObject[] leftRedDots;
+    public GameObject[] rightRedDots;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -76,6 +78,11 @@ public class Minigame4Script : MonoBehaviour
         curTimer = maxTimerSet;
         setScore_lucky=0;
         setScore_ant=0;
+
+        leftRedDots[0].SetActive(false);
+        leftRedDots[1].SetActive(false);
+        rightRedDots[0].SetActive(false);
+        rightRedDots[1].SetActive(false);
     }
     void FixedUpdate(){
 
@@ -183,11 +190,13 @@ public class Minigame4Script : MonoBehaviour
 
 
             if(score_ant>score_lucky){
+                rightRedDots[setScore_ant].SetActive(true);
                 setScore_ant ++;
                 MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
                 yield return popUpOkayCheck;
             }
             else if(score_ant<score_lucky){
+                leftRedDots[setScore_lucky].SetActive(true);
                 setScore_lucky ++;
                 MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
                 yield return popUpOkayCheck;

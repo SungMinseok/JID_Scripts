@@ -279,14 +279,10 @@ public class InventoryManager : MonoBehaviour
 #region 아이템 별 사용 내용
                             switch(curItem.ID){
                                 case 5:
-
-
+        
+                                    AddDirt(5);
 
                                 
-                                    DBManager.instance.curData.curDirtAmount+=5;
-                                    if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
-                                        DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
-                                    }
                                     break;
                                 
                                 default :
@@ -331,5 +327,11 @@ public class InventoryManager : MonoBehaviour
     }
     public void ActivateToggleBtn(){
         toggleBtn.interactable = true;
+    }
+    public void AddDirt(float dirtAmount){
+        DBManager.instance.curData.curDirtAmount+=dirtAmount;
+        if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
+            DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
+        }
     }
 }

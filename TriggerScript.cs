@@ -24,6 +24,9 @@ public class TriggerScript : MonoBehaviour
         
     }
     public void PreAction(Location location){
+        Transform[] objects;
+        objects = location.poses;
+
         if(DBManager.instance.CheckTrigOver(location.trigNum)){
             switch(location.trigNum){
                 case 22 :
@@ -34,10 +37,17 @@ public class TriggerScript : MonoBehaviour
 
                     break;                
                 case 23 :
-                    var objects = location.poses;
+                    //objects = location.poses;
                     objects[17].GetComponent<Location>().isLocked = false;
                     for(int i=8;i<17;i++){
                         objects[i].gameObject.SetActive(false);
+                    }
+                    break;     
+                case 27 :
+                    objects[1].gameObject.SetActive(false);
+                    if(!DBManager.instance.CheckTrigOver(location.trigNum)){
+                        objects[0].gameObject.SetActive(true);
+
                     }
                     break;
                 default :
@@ -116,6 +126,16 @@ public class TriggerScript : MonoBehaviour
 
             //if(npc.animator!=null) npc.animator.SetBool("talk", true);
         }
+        else{
+            if(location.transform.position.x > PlayerManager.instance.transform.position.x){
+                PlayerManager.instance.Look("right");
+            }
+            else{
+                PlayerManager.instance.Look("left");
+
+            }
+            PlayerManager.instance.SetTalkCanvasDirection();
+        }
         if(!location.notZoom){
 
             if(GameManager.instance.mode_zoomWhenInteract){
@@ -125,10 +145,12 @@ public class TriggerScript : MonoBehaviour
             }
         }
 
+
+        //일반 트리거 1~100일 경우, 메인 HUD 비활성화
         if(location.trigNum<100){
             UIManager.instance.SetHUD(false);
-
         }
+
 
         if(location.type == LocationType.Trigger){
            
@@ -152,15 +174,16 @@ public class TriggerScript : MonoBehaviour
 #region 101
             case 101 :
 
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-
                 ShopManager.instance.OpenShopUI(0,"지렁이 상점",new int[]{5,12});
                 yield return waitShopping;
 
+                if(ShopManager.instance.lastBuyItemIndex != -1){
 
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+
+
 
                 break;
 #endregion
@@ -169,15 +192,16 @@ public class TriggerScript : MonoBehaviour
 #region 102
             case 102 :
 
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
 
                 ShopManager.instance.OpenShopUI(0,"귀뚜라미 상점",new int[]{19,16,3});//붉은 산딸기 / 보라색 열매 / 사과 조각
                 yield return waitShopping;
 
 
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
+                if(ShopManager.instance.lastBuyItemIndex != -1){
+
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
 
                 break;
 #endregion
@@ -185,15 +209,15 @@ public class TriggerScript : MonoBehaviour
 #region 103
             case 103 :
 
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-
                 ShopManager.instance.OpenShopUI(0,"벼룩 상점",new int[]{24,18,25});
                 yield return waitShopping;
 
+                if(ShopManager.instance.lastBuyItemIndex != -1){
 
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+
 
                 break;
 #endregion
@@ -208,8 +232,12 @@ public class TriggerScript : MonoBehaviour
                 yield return waitShopping;
 
 
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
+                if(ShopManager.instance.lastBuyItemIndex != -1){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                }
+
 
                 break;
 #endregion
@@ -945,6 +973,7 @@ public class TriggerScript : MonoBehaviour
 #region 26
             case 26 :
 
+
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 SetSelect(selects[0]);
@@ -996,32 +1025,189 @@ public class TriggerScript : MonoBehaviour
 //박사개미에게 말 
 #region 27
             case 27 :
+                var animator = objects[1].GetComponent<NPCScript>().mainBody.GetComponent<Animator>();
 
+                animator.SetBool("mess", false);
+                CameraView(dialogues[0].talker);
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
-                SetDialogue(dialogues[1]);
+                
+                if(InventoryManager.instance.CheckHaveItem(10)){
+                    CameraView(dialogues[1].talker);
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                        CameraView(dialogues[2].talker);
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        CameraView(dialogues[3].talker);
+                        SetDialogue(dialogues[3]);
+                        yield return waitTalking;
+                        animator.SetBool("mess", true);
+
+                        yield return wait2000ms;
+                        yield return wait500ms;
+                        yield return wait100ms;
+
+                        animator.SetBool("success", true);
+                        CameraView(dialogues[4].talker);
+                        SetDialogue(dialogues[4]);
+                        yield return waitTalking;
+                        animator.SetBool("success", false);
+                        
+                        animator.SetBool("mess", false);
+                        FadeOut();
+                        yield return wait2000ms;
+                        objects[0].gameObject.SetActive(true);
+                        objects[1].gameObject.SetActive(false);
+                        FadeIn();
+                    }
+                    else{
+                        animator.SetBool("mess", true);
+                    }
+                }
+                else{
+                    
+                    animator.SetBool("mess", true);
+                }
+
+
+                break;
+#endregion
+//박사개미의 완성품 획득 
+#region 28
+            case 28 :
+
+                SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 SetSelect(selects[0]);
                 yield return waitSelecting;
                 if(GetSelect()==0){
-                    SetDialogue(dialogues[2]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[3]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[4]);
-                    yield return waitTalking;
+                    location.selectPhase = -1;
+                    objects[0].gameObject.SetActive(false);
+                    InventoryManager.instance.AddItem(1);
                 }
                 else{
                 }
 
                 //location.selectPhase = -1;
 
+                break;
+#endregion
+//병원에 누워있는 병사 개미
+#region 29
+            case 29 :
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+
+                if(InventoryManager.instance.CheckHaveItem(8)){
+                    InventoryManager.instance.RemoveItem(8);
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                            
+                        for(int k=2;k<7;k++){
+                            CameraView(dialogues[k].talker);
+                            SetDialogue(dialogues[k]);
+                            yield return waitTalking;
+                        }
+                        InventoryManager.instance.AddItem(22);
+
+
+                        FadeOut();
+                        yield return wait2000ms;
+                        objects[0].gameObject.SetActive(false);
+                        FadeIn();
+
+
+                    }
+                    else{
+                        SetDialogue(dialogues[7]);
+                        yield return waitTalking;
+                    }
+
+                }
 
 
                 break;
 #endregion
+         
+//문지기 개미
+#region 30
+            case 30 :
 
-            
+                if(location.selectPhase==0){
+                    location.selectPhase = 1;
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else if(location.selectPhase==1){
+                    SetDialogue(dialogues[4]);
+                    yield return waitTalking;
+                }
+                if(DBManager.instance.curData.curHoneyAmount >= 1000){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                            
+                        for(int k=2;k<4;k++){
+                            SetDialogue(dialogues[k]);
+                            yield return waitTalking;
+                        }
+                    }
+                    else{
+                    }
+
+                }
+
+
+                break;
+#endregion
+              
+//지네상점, 쥐며느리상점
+#region 33, 34
+            case 33 :
+            case 34 :
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                break;
+#endregion 
+//거미상점
+#region 36
+            case 36 :
+
+                if(location.selectPhase == 0){
+                    location.selectPhase = 1;
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                    InventoryManager.instance.AddDirt(20);
+                }
+                else if(location.selectPhase == 1){
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                        InventoryManager.instance.AddDirt(20);
+
+                    }
+                }
+                break;
+#endregion 
             default : 
                 break;
         }

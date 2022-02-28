@@ -603,7 +603,7 @@ public class LocationEditor : Editor
             selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
             selected.notZoom = EditorGUILayout.ToggleLeft("카메라 줌 사용 안함", selected.notZoom);
             EditorGUILayout.Space();
-            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용", selected.preserveTrigger);
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지는 자동으로 반복 사용)", selected.preserveTrigger);
 
         }
         else if (selected.type == LocationType.Patrol_NPC)

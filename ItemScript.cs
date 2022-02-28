@@ -24,9 +24,13 @@ public class ItemScript : MonoBehaviour
     public bool useDialogue = true;
     public bool isDefaultDialogue = true;
     public Dialogue getItemDialogue;
+    
+    [Header("Setting ────────────────────")]
+    public bool isAvailable = true;
+    public bool disableAnimation;
     //[Header("Dirt")]
     //public float dirtAmount;
-    Animator animator;
+    public Animator animator;
     //public BoxCollider2D itemCol;
     //Vector2 itemVector;
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
@@ -72,17 +76,25 @@ public class ItemScript : MonoBehaviour
                 break;
         }
 
+        if(disableAnimation){
+            animator.speed = 0;
+        }
 
+        
     }
 
     void OnTriggerStay2D(Collider2D other) {
         
         if(other.CompareTag("Player")){
-            if(!getFlag) {
-                getFlag = true;
 
-                StartCoroutine(GetItemCoroutine());
+            if(isAvailable){
 
+                if(!getFlag) {
+                    getFlag = true;
+
+                    StartCoroutine(GetItemCoroutine());
+
+                }
             }
         }
 

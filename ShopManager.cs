@@ -33,7 +33,7 @@ public class ShopManager : MonoBehaviour
     public string curShopName;
     public int curItemPrice;
     public int[] curShopSalesItemIndexes;
-
+    public int lastBuyItemIndex;    //마지막 구매 아이템 체크용
 
 
 
@@ -167,6 +167,8 @@ public class ShopManager : MonoBehaviour
     //     return lastSelectedNum;
     // }
     public void ResetShopUI(){
+        lastBuyItemIndex = -1;//아무것도 구매하지 않음
+
         for(int i=1;i<shopSlotGrid.childCount;i++){
             shopSlotGrid.GetChild(i).gameObject.SetActive(false);
         }
@@ -218,11 +220,36 @@ public class ShopManager : MonoBehaviour
 
         curItemPrice = int.Parse(shopSlots[slotNum].itemPriceText.text);
 
-        if(curHoneyAmount >= curItemPrice){
-            DBManager.instance.curData.curHoneyAmount -= curItemPrice;
-            InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
-        }   
+        //골드로 구매가능한 아이템
+        if(DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID == 7){
+            if(curHoneyAmount >= curItemPrice){
+                DBManager.instance.curData.curHoneyAmount -= curItemPrice;
+                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
+                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+            }   
+            else{
+                DM("구매 실패 : 골드 부족");
+            }
+        }
+        //골드 제외 아이템으로 구매가능한 아이템
+        else{
+            var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID;
+
+            if(InventoryManager.instance.CheckHaveItem(goldTypeIndex)){
+                InventoryManager.instance.RemoveItem(goldTypeIndex);
+                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
+                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+            }
+            else{
+                DM("구매 실패 : "+goldTypeIndex+"번 아이템 부족");
+            }
+        }
+
 
 
     }
+
+    
+    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+
 }   
