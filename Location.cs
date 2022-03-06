@@ -52,6 +52,7 @@ public class Location : MonoBehaviour
     public Select[] selects_T;
     public bool waitKey;
     public int[] completedTriggerNums;
+    public int[] haveItemNums;
     public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     public bool notZoom; //카메라 줌 X
@@ -292,6 +293,20 @@ public class Location : MonoBehaviour
                             }
                         }
 
+                        //아이템 보유 여부 확인
+                        if(haveItemNums.Length>0){
+                            if(!DBManager.instance.CheckHaveItems(trigNum,haveItemNums)){
+                                StartCoroutine(ResetFlagDelayCoroutine());
+                                return;
+                            }
+                            // for(int i=0;i<haveItemNums.Length;i++){
+                            //     if(!InventoryManager.instance.CheckHaveItem(haveItemNums[i])){
+                            //         DM(trigNum +"번 트리거 실행 실패 : " + haveItemNums[i] + "번 아이템 미보유.");
+                            //         StartCoroutine(ResetFlagDelayCoroutine());
+                            //         return;
+                            //     }
+                            // }
+                        }
 
                         if(other.CompareTag("Player")){
                             if(trigNum>=0){
@@ -591,6 +606,8 @@ public class LocationEditor : Editor
             EditorGUILayout.LabelField("[Conditions]",EditorStyles.boldLabel);
             EditorGUILayout.LabelField("선행 트리거 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
+            EditorGUILayout.LabelField("필요 아이템 번호");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("haveItemNums"),GUIContent.none, true);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("[Actions]",EditorStyles.boldLabel);
             EditorGUILayout.LabelField("오브젝트");

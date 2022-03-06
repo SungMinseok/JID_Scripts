@@ -10,6 +10,7 @@ public class NPCScript : MonoBehaviour
     [Header("Set Animator")]
     public bool haveWalk = false;
     public bool haveTalk = false;
+    public string defaultAnimatorBoolVal;
     [Header("Setting")]
     //public bool canMove;
     //public bool canTalk;
@@ -154,6 +155,11 @@ public class NPCScript : MonoBehaviour
         //랜덤대화
         if(alwaysRandomDialogue){
             onRandomDialogue = true;
+        }
+
+        //기본 애니메이션 상태 설정(bool)
+        if(defaultAnimatorBoolVal!=""){
+            animator.SetBool(defaultAnimatorBoolVal,true);
         }
     }
     void OnDisable(){

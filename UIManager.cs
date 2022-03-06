@@ -30,6 +30,17 @@ public class UIManager : MonoBehaviour
     public GameObject gameOverBtns;
     public Sprite[] gameOverSprites;
     public Animator gameOverNewImage;
+    
+    [Header("UI_GameEnd")]
+    public GameObject ui_gameEnd;
+    public CanvasGroup gameEndImageCanvas, gameEndTextCanvas0, gameEndTextCanvas1;
+    public Image gameEndImage;
+    public TextMeshProUGUI gameEndText0;
+    public TextMeshProUGUI gameEndText1_0;
+    public TextMeshProUGUI gameEndText1_1;
+    public GameObject gameEndSkipBtn;
+    public GameObject gameEndNextBtn;
+    public bool gameEndCanSkip;
     [Header("UI_Fader")]
     public Animator ui_fader;
     [Header("UI_HUD")]
@@ -41,6 +52,13 @@ public class UIManager : MonoBehaviour
     // Vector3 offset = Vector3.zero;
 
     //WaitForSeconds waitTime = new WaitForSeconds(0.5f);
+    WaitForSeconds wait10ms = new WaitForSeconds(0.01f);
+    
+    WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
+    WaitForSeconds wait1000ms = new WaitForSeconds(1);
+    WaitForSeconds wait2000ms = new WaitForSeconds(2);
+    WaitForSeconds wait3000ms = new WaitForSeconds(3);
     void Awake()
     {
         instance = this;
@@ -140,6 +158,9 @@ public class UIManager : MonoBehaviour
         gameOverNewImage.gameObject.SetActive(false);
     }
     IEnumerator SetGameOverUICoroutine(int num){
+        
+        DBManager.instance.EndingCollectionOver(num);
+
         yield return new WaitForSeconds(1.5f);
         //SetFadeOut();
         LoadManager.instance.FadeOut();
@@ -155,9 +176,108 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
         gameOverBtns.gameObject.SetActive(true);
 
-        DBManager.instance.EndingCollectionOver(num);
+        
+        if(!DBManager.instance.CheckEndingCollectionOver(num)){
+
+            UIManager.instance.gameOverNewImage.gameObject.SetActive(true);
+        }
     }
 #endregion
+
+#region GameEnd
+    public void SetGameEndUI(int num){
+        PlayerManager.instance.isGameOver = true;
+        StartCoroutine(SetGameEndUICoroutine(num));
+    }
+    IEnumerator SetGameEndUICoroutine(int num){
+        GameEndList curGameEndList = DBManager.instance.cache_GameEndDataList[num];
+        DBManager.instance.EndingCollectionOver(curGameEndList.endingCollectionNum);
+
+        LoadManager.instance.FadeOut();
+        yield return wait2000ms;
+
+
+        gameEndImageCanvas.alpha = 0;
+        gameEndTextCanvas0.alpha = 0;
+        gameEndTextCanvas1.alpha = 0;
+        gameEndNextBtn.SetActive(false);
+        //gameEndSkipBtn.SetActive(false);
+
+        ui_gameEnd.SetActive(true);
+        LoadManager.instance.FadeIn();
+
+
+        //for(int i=0;i<curGameEndList.storySprites.Length;i++){
+
+        gameEndImage.sprite = curGameEndList.stories[0].sprite;
+
+        gameEndImageCanvas.alpha = 0;
+        while(gameEndImageCanvas.alpha < 1){
+            gameEndImageCanvas.alpha += 0.01f;
+            yield return wait10ms;
+        }
+
+        yield return wait500ms;
+        //}
+
+        for(int i=0;i<curGameEndList.stories.Length;i++){
+
+            if(curGameEndList.stories[i].sprite != null && i!=0){
+                gameEndImage.sprite = curGameEndList.stories[i].sprite;
+            }
+
+            gameEndText0.text = curGameEndList.stories[i].descriptions;
+
+            gameEndTextCanvas0.alpha = 0;
+            while(gameEndTextCanvas0.alpha < 1){
+                gameEndTextCanvas0.alpha += 0.01f;
+                yield return wait10ms;
+            }   
+
+            yield return wait1000ms;
+            gameEndCanSkip = true;
+            gameEndNextBtn.SetActive(true);
+            yield return new WaitUntil(()=>!gameEndCanSkip);
+            gameEndNextBtn.SetActive(false);
+
+        }
+
+
+        while(gameEndTextCanvas0.alpha > 0){
+            gameEndImageCanvas.alpha -= 0.01f;
+            gameEndTextCanvas0.alpha -= 0.01f;
+            yield return wait10ms;
+        }   
+
+        yield return wait500ms;
+
+        gameEndText1_0.text = "ending no."+curGameEndList.endingNum;
+        gameEndText1_1.text = curGameEndList.name;
+
+        while(gameEndTextCanvas1.alpha < 1){
+            gameEndTextCanvas1.alpha += 0.01f;
+            yield return wait10ms;
+        }
+        yield return wait2000ms;
+        while(gameEndTextCanvas1.alpha > 0){
+            gameEndTextCanvas1.alpha -= 0.01f;
+            yield return wait10ms;
+        }
+        yield return wait500ms;
+        
+        LoadManager.instance.LoadMain();
+    }
+    public void PushNextBtn(){
+        
+            gameEndCanSkip = false;
+    }
+#endregion
+
+
+
+
+
+
     public void SetHUD(bool active){
         hud_state.SetActive(active);
         hud_inventory.SetActive(active);

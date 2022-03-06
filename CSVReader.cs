@@ -17,6 +17,7 @@ public class CSVReader : MonoBehaviour
     public List<Dictionary<string,object>> data_collection;
     public List<Dictionary<string,object>> data_sysmsg;
     public List<Dictionary<string,object>> data_map;
+    public List<Dictionary<string,object>> data_story;
 
     public int itemAmount;
     void Awake() {
@@ -36,6 +37,7 @@ public class CSVReader : MonoBehaviour
         data_collection = CSVReader.Read ("data_collection");
         data_sysmsg = CSVReader.Read ("data_sysmsg");
         data_map = CSVReader.Read ("data_map");
+        data_story = CSVReader.Read ("data_story");
         
         itemAmount = data_item.Count;
         //print(data_dialogue[0]["text_kr"]);
@@ -78,7 +80,7 @@ public class CSVReader : MonoBehaviour
         //Dialogue
         //object temp = index;
         object result = "null_text";
-        string curLanguage = "text_kr";
+        string curLanguage = "text_"+DBManager.instance.language;
         switch(target){
             case "dialogue" :
                 if(data_dialogue.Count>index){
@@ -137,6 +139,11 @@ public class CSVReader : MonoBehaviour
                     result = data_map[index][curLanguage];
                 }
                 break;
+            // case "story" :
+            //     if(data_story.Count>index){
+            //         result = data_story[index][curLanguage];
+            //     }
+                //break;
             default : 
                 Debug.Log("해당 아이디 없음");
                 break;

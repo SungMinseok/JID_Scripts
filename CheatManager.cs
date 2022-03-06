@@ -41,9 +41,9 @@ public class CheatManager : MonoBehaviour
             string[] temp = cheat.text.Split('\x020');
             //Debug.Log(temp.Length);
             //int x = 0;
-            if(temp.Length == 1){
-                return;
-            }
+            // if(temp.Length == 1){
+            //     return;
+            // }
             
             switch(temp[0]){
                 case "t":
@@ -230,9 +230,27 @@ public class CheatManager : MonoBehaviour
                     //DM("Openshop itemList : "+ String.Join(",", itemList));
 
                     break;
+                case "gameend" :
+
+                    if(temp[1]=="") return;
+
+                    UIManager.instance.SetGameEndUI(int.Parse(temp[1]));
+                    break;
+                case "gameover" :
+
+                    if(temp[1]=="") return;
+
+                    UIManager.instance.SetGameOverUI(int.Parse(temp[1]));
+                    break;
+                case "deletelocal" :
+
+                    //if(temp[1]=="") return;
+                    DBManager.instance.ResetLocalData();
+                    break;
             }
 //EndingCollectionOver
 //DeleteSaveFile
+//SetGameEndUI
             for(var a=0;a<temp.Length;a++){
                 temp[a] = "";
             }

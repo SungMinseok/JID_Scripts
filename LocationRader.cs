@@ -8,7 +8,9 @@ public class LocationRader : MonoBehaviour
         if(other.CompareTag("Location") ){
             var curLocation = other.GetComponent<Location>();
             if(curLocation.activateTargetMark && !DBManager.instance.CheckTrigOver(curLocation.trigNum) 
-            && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums)){
+            && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums)
+            && DBManager.instance.CheckHaveItems(curLocation.trigNum,curLocation.haveItemNums)
+            ){
 
                 Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
                 //curLocation.targetMark.gameObject.SetActive(true);

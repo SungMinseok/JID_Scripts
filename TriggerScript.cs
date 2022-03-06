@@ -47,8 +47,10 @@ public class TriggerScript : MonoBehaviour
                     objects[1].gameObject.SetActive(false);
                     if(!DBManager.instance.CheckTrigOver(location.trigNum)){
                         objects[0].gameObject.SetActive(true);
-
-                    }
+                    } 
+                    break;
+                case 37 :
+                    objects[0].gameObject.SetActive(true);
                     break;
                 default :
                     break;
@@ -1204,8 +1206,93 @@ public class TriggerScript : MonoBehaviour
                         location.selectPhase = -1;
                         InventoryManager.instance.AddDirt(20);
 
+
                     }
                 }
+                break;
+#endregion 
+
+//연못앞
+#region 37
+            case 37 :
+                
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                if(InventoryManager.instance.CheckHaveItem(23)){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                        InventoryManager.instance.RemoveItem(23);
+
+                        FadeOut();
+                        yield return wait2000ms;
+                        objects[0].gameObject.SetActive(true);
+                        FadeIn();
+
+                    }
+                }
+
+                break;
+#endregion 
+
+
+//연못앞
+#region 38
+            case 38 :
+                
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                objects[0].GetComponent<Rigidbody2D>().mass = 30f;
+
+                break;
+#endregion 
+
+//[엔딩6-친구와 함께라면]
+#region 39
+            case 39 :
+        
+                FadeOut();
+                yield return wait2000ms;
+                objects[0].gameObject.SetActive(true);
+                FadeIn();
+
+                for(int k=0;k<3;k++){
+                    //CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+
+                if(GetSelect()==0){
+                    location.selectPhase = -1;
+                    InventoryManager.instance.RemoveItem(0);
+                    InventoryManager.instance.RemoveItem(14);
+
+                    objects[1].gameObject.SetActive(true);
+                    yield return wait1000ms;
+                    //뿌얘지는 효과
+
+                    for(int k=4;k<6;k++){
+                        //CameraView(dialogues[k].talker);
+                        SetDialogue(dialogues[k]);
+                        yield return waitTalking;
+                    }
+
+                    //럭키 문 나가기 & 노란젤리 문으로 걸어가기
+
+
+                }
+
                 break;
 #endregion 
             default : 

@@ -35,6 +35,7 @@ public class DBManager : MonoBehaviour
     [Header("[Cache]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public List<Item> cache_ItemDataList;
     public List<EndingCollection> cache_EndingCollectionDataList;
+    public List<GameEndList> cache_GameEndDataList;
     
     [Header("[Sprites Files]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public Sprite[] endingCollectionSprites;
@@ -177,6 +178,20 @@ public class DBManager : MonoBehaviour
         }
 
     }
+    public void ResetLocalData(){
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/LocalDataFile.dat");
+
+        if(fileCheck.Exists){
+            File.Delete(Application.persistentDataPath + "/LocalDataFile.dat");
+            localData.endingCollectionOverList.Clear();
+            Debug.Log("로컬 파일 초기화 성공");
+            //MenuManager.instance.ResetLoadSlots();
+
+            //file.Close();
+        }
+    }
 #endregion
 
 #region Triggers
@@ -211,6 +226,27 @@ public class DBManager : MonoBehaviour
             tempList.Clear();
             return true;
         }
+        
+    }
+    public bool CheckHaveItems(int trigNum, int[] haveItemNums){
+        List<int> tempList = new List<int>();
+
+        for(int i=0;i<haveItemNums.Length;i++){
+            if(!InventoryManager.instance.CheckHaveItem(haveItemNums[i])){
+                Debug.Log(trigNum +"번 트리거 실행 실패 : " + haveItemNums[i] + "번 아이템 미보유");
+                tempList.Add(haveItemNums[i]);
+            }
+        }
+
+        if(tempList.Count != 0){
+            tempList.Clear();
+            return false;
+        }
+        else{
+            tempList.Clear();
+            return true;
+        }
+        
     }
 #endregion
 
@@ -220,8 +256,7 @@ public class DBManager : MonoBehaviour
     public void EndingCollectionOver(int collectionNum){
         if(!CheckEndingCollectionOver(collectionNum)){
             localData.endingCollectionOverList.Add(collectionNum);
-            UIManager.instance.gameOverNewImage.gameObject.SetActive(true);
-            //CallLocalDataSave();
+            CallLocalDataSave();
         }
     }
     //엔딩 컬렉션 달성되었는지 확인
@@ -246,8 +281,11 @@ public class DBManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        CallLocalDataLoad();
+
         ApplyItemInfo();
         ApplyCollectionInfo();
+        ApplyStoryInfo();
         //CallLocalDataLoad();
     }
 
@@ -303,6 +341,20 @@ public class DBManager : MonoBehaviour
                 //int.Parse(a[i]["resourceID"].ToString()),
                 //bool.Parse(a[i]["isStack"].ToString())
             ));
+        }
+    }
+
+    public void ApplyStoryInfo(){
+        var reader0 = CSVReader.instance.data_collection;
+        var reader1 = CSVReader.instance.data_story;
+        for(int i=0;i<cache_GameEndDataList.Count;i++){
+            cache_GameEndDataList[i].name = reader0[cache_GameEndDataList[i].endingCollectionNum]["name_"+language].ToString();
+
+            for(int j=0;j<cache_GameEndDataList[i].stories.Length;j++){
+                Debug.Log(cache_GameEndDataList[i].stories.Length);
+                cache_GameEndDataList[i].stories[j].descriptions = reader1[int.Parse(cache_GameEndDataList[i].stories[j].descriptions)]["text_"+language].ToString();
+            }
+
         }
     }
 
@@ -402,4 +454,24 @@ public class ItemList{
         itemID = _itemID;
         itemAmount = _itemAmount;
     }
+}
+
+[System.Serializable]
+public class GameEndList{
+    public int endingCollectionNum; //컬렉션 내 엔딩 넘버(data_collection.csv)
+    public int endingNum; //찐엔딩 넘버(임의의 값)
+    public string name;
+    public Story[] stories;
+    //public Sprite[] storySprites;
+    //public string[] storyDescriptions;
+    // public ItemList(int _itemID, int _itemAmount){
+    //     itemID = _itemID;
+    //     itemAmount = _itemAmount;
+    // }
+}
+[System.Serializable]
+public class Story{
+    public Sprite sprite;
+    [TextArea(2,4)]
+    public string descriptions;
 }
