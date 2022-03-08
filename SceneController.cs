@@ -24,10 +24,17 @@ public class SceneController : MonoBehaviour
     {
         instance = this;
     }
+    void OnDisable(){
+        StopAllCoroutines();
+    }
 
     public void SetConfiner(int mapNum){
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
         confiner2D.m_BoundingShape2D = mapBounds[mapNum];
         SetCurrentMapName(mapNum);
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
         
            // Debug.Log(num + " : 맵번호");
     }
@@ -100,6 +107,15 @@ public class SceneController : MonoBehaviour
 
         SetLensOrthoSize(defaultZoomOutSize,0.1f);
     }
+    public void SetCameraNoised(float intensity, float duration){
+        StartCoroutine(SetCameraNoisedCoroutine(intensity, duration));
+    }
+    IEnumerator SetCameraNoisedCoroutine(float intensity, float duration){
+        virtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = intensity;
+        yield return new WaitForSeconds(duration);
+        virtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0;
+    }
+
 
 
     #region Main Control

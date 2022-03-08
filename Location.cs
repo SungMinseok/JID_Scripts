@@ -36,6 +36,7 @@ public class Location : MonoBehaviour
     public string orderDirection;
     public bool flipCheck;
     public bool isLocked;
+    public bool isDoor;//입/출구가 같이 있을 경우
     [Header("Dialogue")]
     //public int dialogueNum;
     public bool stopCheck;
@@ -156,16 +157,19 @@ public class Location : MonoBehaviour
 
                         if(other.CompareTag("Player")){
                             if(desLoc!=null && !PlayerManager.instance.transferDelay){
-                                PlayerManager.instance.transferDelay = true;
                                 PlayerManager.instance.transform.position = desLoc.position;
-                                PlayerManager.instance.hInput = 1;
-                                PlayerManager.instance.hInput = 0;
+                                //PlayerManager.instance.hInput = 1;
+                                //PlayerManager.instance.hInput = 0;
     //                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
                                 //SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
                                 //SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
                                 //SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[desMapNum]);
                                 SceneController.instance.SetConfiner(desMapNum);
-                                Invoke("TeleportDelay",1f);
+                                if(isDoor){
+                                    PlayerManager.instance.transferDelay = true;
+                                    Invoke("TeleportDelay",0.1f);
+
+                                }
                                 
                             }
                             else{
@@ -556,6 +560,8 @@ public class LocationEditor : Editor
             selected.desMapNum = EditorGUILayout.IntField("도착 맵 번호",selected.desMapNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+            EditorGUILayout.Space();
+            selected.isLocked = EditorGUILayout.ToggleLeft("출입구가 같음", selected.isDoor);
             EditorGUILayout.Space();
             selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();

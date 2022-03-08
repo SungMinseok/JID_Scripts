@@ -28,6 +28,10 @@ public class ItemScript : MonoBehaviour
     [Header("Setting ────────────────────")]
     public bool isAvailable = true;
     public bool disableAnimation;
+    public string getItemDefaultDialogue = "4";
+    [Tooltip("true일 경우, 인벤토리 내에 있을 경우 미노출")]
+    public bool isDisabledWhenHold;  //true일 경우, 인벤토리 내에 있을 경우 미노출
+    [Header("Debug ────────────────────")]
     //[Header("Dirt")]
     //public float dirtAmount;
     public Animator animator;
@@ -35,7 +39,6 @@ public class ItemScript : MonoBehaviour
     //Vector2 itemVector;
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     bool getFlag;
-    public string getItemDefaultDialogue = "4";
     [Space]
     public Transform itemObject;
     void Start(){
@@ -80,7 +83,11 @@ public class ItemScript : MonoBehaviour
             animator.speed = 0;
         }
 
-        
+        if(isDisabledWhenHold){
+            if(InventoryManager.instance.CheckHaveItem(itemID)){
+                gameObject.SetActive(false);
+            }
+        }
     }
 
     void OnTriggerStay2D(Collider2D other) {

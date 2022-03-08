@@ -10,7 +10,7 @@ using TMPro;
 public class ItemSlot{
     public Button itemSlotBtn;
     public GameObject equippedMark;
-    public TextMeshProUGUI itemAmount;
+    public Text itemAmount;
     public Image itemImage;
     public GameObject itemDescriptionWindow;
     public TextMeshProUGUI itemName;
@@ -51,7 +51,7 @@ public class InventoryManager : MonoBehaviour
             //itemSlot[i].equippedMark = PlayerManager.instance.gameObject;
             itemSlot[i].itemSlotBtn = itemSlotGrid.GetChild(i).GetComponent<Button>();
             itemSlot[i].equippedMark = itemSlotGrid.GetChild(i).GetChild(0).gameObject;
-            itemSlot[i].itemAmount = itemSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
+            itemSlot[i].itemAmount = itemSlotGrid.GetChild(i).GetChild(2).GetComponent<Text>();
             itemSlot[i].itemImage = itemSlotGrid.GetChild(i).GetChild(1).GetComponent<Image>();
             itemSlot[i].itemDescriptionWindow = itemSlotGrid.GetChild(i).GetChild(3).gameObject;
             itemSlot[i].itemName = itemSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();

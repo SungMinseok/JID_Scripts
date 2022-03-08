@@ -247,6 +247,13 @@ public class CheatManager : MonoBehaviour
                     //if(temp[1]=="") return;
                     DBManager.instance.ResetLocalData();
                     break;
+                    
+                case "resetendingcollection":
+                    DBManager.instance.ResetEndingCollection();
+                    MenuManager.instance.ResetCardOrder();
+                    DM("resetendingcollection");
+
+                    break;
             }
 //EndingCollectionOver
 //DeleteSaveFile

@@ -202,7 +202,7 @@ public class DialogueManager : MonoBehaviour
             }
             tmp.maxVisibleCharacters = i;
             //print(i);
-            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0) SoundManager.instance.PlaySound("talk_temp");
+            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0) SoundManager.instance.PlaySound("lucky_talk_0"+Random.Range(1,8));
             
             yield return _typingSpeed;
 

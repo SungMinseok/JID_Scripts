@@ -9,7 +9,7 @@ public class ButtonActScript : MonoBehaviour
         this.GetComponent<Button>().onClick.AddListener(()=>PlayDefaultBtnSound());
     }
     void PlayDefaultBtnSound(){
-        Debug.Log("@222");
+//        Debug.Log("@222");
         SoundManager.instance.PlaySound(SoundManager.instance.defaultBtnSoundName);
     }
 }

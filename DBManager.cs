@@ -268,6 +268,10 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
+    public void ResetEndingCollection(){
+        localData.endingCollectionOverList.Clear();
+        CallLocalDataSave();
+    }
 #endregion
     void Awake(){
         //Application.targetFrameRate = 60;
@@ -351,7 +355,7 @@ public class DBManager : MonoBehaviour
             cache_GameEndDataList[i].name = reader0[cache_GameEndDataList[i].endingCollectionNum]["name_"+language].ToString();
 
             for(int j=0;j<cache_GameEndDataList[i].stories.Length;j++){
-                Debug.Log(cache_GameEndDataList[i].stories.Length);
+//                Debug.Log(cache_GameEndDataList[i].stories.Length);
                 cache_GameEndDataList[i].stories[j].descriptions = reader1[int.Parse(cache_GameEndDataList[i].stories[j].descriptions)]["text_"+language].ToString();
             }
 
@@ -458,6 +462,7 @@ public class ItemList{
 
 [System.Serializable]
 public class GameEndList{
+    public string comment;
     public int endingCollectionNum; //컬렉션 내 엔딩 넘버(data_collection.csv)
     public int endingNum; //찐엔딩 넘버(임의의 값)
     public string name;

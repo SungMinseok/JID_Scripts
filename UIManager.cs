@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -187,7 +187,14 @@ public class UIManager : MonoBehaviour
 #region GameEnd
     public void SetGameEndUI(int num){
         PlayerManager.instance.isGameOver = true;
-        StartCoroutine(SetGameEndUICoroutine(num));
+        for(int i=0;i<DBManager.instance.cache_GameEndDataList.Count;i++){
+            if(DBManager.instance.cache_GameEndDataList[i].endingNum == num){
+                Debug.Log(i + "번 엔딩 코루틴 시작");
+                StartCoroutine(SetGameEndUICoroutine(i));
+                return;
+            }
+        }
+
     }
     IEnumerator SetGameEndUICoroutine(int num){
         GameEndList curGameEndList = DBManager.instance.cache_GameEndDataList[num];
@@ -283,6 +290,9 @@ public class UIManager : MonoBehaviour
         hud_inventory.SetActive(active);
     }
     public void SetFadeHUD(bool active){
+    }
+    public void ChangeSprite(Sprite sprite){
+        
     }
 
     // public Vector3 worldToUISpace(Canvas parentCanvas, Vector3 worldPos)

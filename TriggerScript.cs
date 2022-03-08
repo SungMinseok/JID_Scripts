@@ -21,7 +21,7 @@ public class TriggerScript : MonoBehaviour
             instance = this;
     }
     void Start(){
-        
+        //SoundManager.instance.PlaySound("button0");
     }
     public void PreAction(Location location){
         Transform[] objects;
@@ -49,8 +49,19 @@ public class TriggerScript : MonoBehaviour
                         objects[0].gameObject.SetActive(true);
                     } 
                     break;
+                case 9 :
                 case 37 :
                     objects[0].gameObject.SetActive(true);
+                    break;
+                default :
+                    break;
+            }
+        }
+        else{
+             switch(location.trigNum){
+                case 9 :
+                case 37 :
+                    objects[0].gameObject.SetActive(false);
                     break;
                 default :
                     break;
@@ -309,6 +320,7 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[3]);
                 nerd_ant.animator.SetTrigger("turn");
                 //CameraView(nerd_ant.transform);
+                ShakeCamera(1,2);
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = -1;
                 yield return waitTalking;
@@ -558,6 +570,10 @@ public class TriggerScript : MonoBehaviour
                     InventoryManager.instance.RemoveItem(6);
                     SetDialogue(dialogues[2]);
                     yield return waitTalking;
+
+                    objects[0].gameObject.SetActive(true);
+
+
                 }
                 else if(GetSelect()==1){
                     
@@ -1141,41 +1157,6 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
          
-//문지기 개미
-#region 30
-            case 30 :
-
-                if(location.selectPhase==0){
-                    location.selectPhase = 1;
-                    SetDialogue(dialogues[0]);
-                    yield return waitTalking;
-                }
-                else if(location.selectPhase==1){
-                    SetDialogue(dialogues[4]);
-                    yield return waitTalking;
-                }
-                if(DBManager.instance.curData.curHoneyAmount >= 1000){
-
-                    SetDialogue(dialogues[1]);
-                    yield return waitTalking;
-                    SetSelect(selects[0]);
-                    yield return waitSelecting;
-                    if(GetSelect()==0){
-                        location.selectPhase = -1;
-                            
-                        for(int k=2;k<4;k++){
-                            SetDialogue(dialogues[k]);
-                            yield return waitTalking;
-                        }
-                    }
-                    else{
-                    }
-
-                }
-
-
-                break;
-#endregion
               
 //지네상점, 쥐며느리상점
 #region 33, 34
@@ -1255,9 +1236,119 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion 
 
+
+//[엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
+#region 201
+            case 201 :
+                FadeOut();
+                yield return wait2000ms;
+                FadeIn();
+                PlayerManager.instance.Look("right");
+        
+                for(int k=0;k<14;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                ShakeCamera();
+                CameraView(dialogues[14].talker);
+                SetDialogue(dialogues[14]);
+                yield return waitTalking;
+
+                for(int k=15;k<dialogues.Length;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                UIManager.instance.SetGameEndUI(1);
+                break;
+#endregion 
+
+//[엔딩2 : 여왕의 방 - 사랑의 도피]
+#region 202
+            case 202 :
+                FadeOut();
+                yield return wait2000ms;
+                FadeIn();
+                PlayerManager.instance.Look("right");
+        
+                for(int k=0;k<11;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                ShakeCamera();
+                CameraView(dialogues[11].talker);
+                SetDialogue(dialogues[11]);
+                yield return waitTalking;
+
+                for(int k=12;k<dialogues.Length;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                UIManager.instance.SetGameEndUI(2);
+                break;
+#endregion 
+//[엔딩3 : 개미굴에서 젤리난다.]
+#region 203
+            case 203 :
+                FadeOut();
+                yield return wait2000ms;
+                FadeIn();
+                PlayerManager.instance.Look("right");
+        
+                for(int k=0;k<dialogues.Length;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                UIManager.instance.SetGameEndUI(3);
+                break;
+#endregion 
+//[엔딩4 : 살육의밤]
+#region 204
+            case 204 :
+                FadeOut();
+                yield return wait2000ms;
+                FadeIn();
+                PlayerManager.instance.Look("right");
+        
+                for(int k=0;k<dialogues.Length;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                UIManager.instance.SetGameEndUI(4);
+                break;
+#endregion 
+//[엔딩5 : 꼭두각시]
+#region 205
+            case 205 :
+                FadeOut();
+                yield return wait2000ms;
+                FadeIn();
+                PlayerManager.instance.Look("right");
+        
+                for(int k=0;k<dialogues.Length;k++){
+                    CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                UIManager.instance.SetGameEndUI(5);
+                break;
+#endregion 
+
 //[엔딩6-친구와 함께라면]
-#region 39
-            case 39 :
+#region 206
+            case 206 :
         
                 FadeOut();
                 yield return wait2000ms;
@@ -1290,11 +1381,94 @@ public class TriggerScript : MonoBehaviour
 
                     //럭키 문 나가기 & 노란젤리 문으로 걸어가기
 
+                    UIManager.instance.SetGameEndUI(6);
 
                 }
 
                 break;
 #endregion 
+
+//[엔딩7 - 여행가]
+#region 207
+            case 207 :
+        
+                FadeOut();
+                yield return wait1000ms;
+                FadeIn();
+
+                for(int k=0;k<2;k++){
+                    //CameraView(dialogues[k].talker);
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking;
+                }
+
+                SetSelect(selects[0]);
+                yield return waitSelecting;
+
+                if(GetSelect()==0){
+                    location.selectPhase = -1;
+                    InventoryManager.instance.RemoveItem(0);
+                    InventoryManager.instance.RemoveItem(14);
+
+                    objects[0].gameObject.SetActive(true);
+                    yield return wait1000ms;
+                    //뿌얘지는 효과
+
+                    SetDialogue(dialogues[2]);
+                    yield return waitTalking;
+                    
+
+                    //럭키 문 나가기 & 노란젤리 문으로 걸어가기
+
+                    UIManager.instance.SetGameEndUI(7);
+
+                }
+
+                break;
+#endregion 
+//[엔딩8 - 산제물]
+#region 208
+            case 208 :
+
+                if(location.selectPhase==0){
+                    location.selectPhase = 1;
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else if(location.selectPhase==1){
+                    SetDialogue(dialogues[4]);
+                    yield return waitTalking;
+                }
+                if(DBManager.instance.curData.curHoneyAmount >= 1000){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        location.selectPhase = -1;
+                            
+                        for(int k=2;k<4;k++){
+                            SetDialogue(dialogues[k]); 
+                            yield return waitTalking;
+                            
+                            FadeOut();
+                            yield return wait1000ms;
+                            yield return wait500ms;
+                            FadeIn();
+                            //오른쪽으로 이동
+
+                            UIManager.instance.SetGameEndUI(8);
+                        }
+                    }
+                    else{
+                    }
+
+                }
+
+
+                break;
+#endregion
             default : 
                 break;
         }
@@ -1404,7 +1578,9 @@ public class TriggerScript : MonoBehaviour
             SceneController.instance.virtualCamera.Follow = target;//ObjectController.instance.npcs[0].transform;
         }
         else{
-            DM("Error : no pos");
+            SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;//ObjectController.instance.npcs[0].transform;
+
+            //DM("Error : no pos");
         }
     }
     public void ActivateEffect(int num,float timer,bool bgOn = true){
@@ -1503,5 +1679,6 @@ public class TriggerScript : MonoBehaviour
 
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 
+    public void ShakeCamera(float intensity = 1, float duration = 1) => SceneController.instance.SetCameraNoised(intensity,duration);
 
 }
