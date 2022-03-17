@@ -66,6 +66,7 @@ public class DebugManager : MonoBehaviour
         if(isDebugMode){
             if(Input.GetKeyDown(KeyCode.Return)){
                 cheatPanel.SetActive(!cheatPanel.activeSelf);
+                //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
                 CheatManager.instance.cheat.Select();
                 CheatManager.instance.cheat.ActivateInputField();
                 

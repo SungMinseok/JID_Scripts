@@ -199,6 +199,9 @@ public class UIManager : MonoBehaviour
     IEnumerator SetGameEndUICoroutine(int num){
         GameEndList curGameEndList = DBManager.instance.cache_GameEndDataList[num];
         DBManager.instance.EndingCollectionOver(curGameEndList.endingCollectionNum);
+        var reader0 = CSVReader.instance.data_collection;
+        var reader1 = CSVReader.instance.data_story;
+        string language = DBManager.instance.language;
 
         LoadManager.instance.FadeOut();
         yield return wait2000ms;
@@ -233,7 +236,8 @@ public class UIManager : MonoBehaviour
                 gameEndImage.sprite = curGameEndList.stories[i].sprite;
             }
 
-            gameEndText0.text = curGameEndList.stories[i].descriptions;
+            //gameEndText0.text = curGameEndList.stories[i].descriptions;
+            gameEndText0.text = reader1[int.Parse(curGameEndList.stories[i].descriptions)]["text_"+language].ToString();//curGameEndList.stories[i].descriptions;
 
             gameEndTextCanvas0.alpha = 0;
             while(gameEndTextCanvas0.alpha < 1){
@@ -259,7 +263,8 @@ public class UIManager : MonoBehaviour
         yield return wait500ms;
 
         gameEndText1_0.text = "ending no."+curGameEndList.endingNum;
-        gameEndText1_1.text = curGameEndList.name;
+        //gameEndText1_1.text = curGameEndList.name;
+        gameEndText1_1.text = reader0[curGameEndList.endingCollectionNum]["name_"+language].ToString();
 
         while(gameEndTextCanvas1.alpha < 1){
             gameEndTextCanvas1.alpha += 0.01f;

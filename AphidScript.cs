@@ -52,7 +52,7 @@ public class AphidScript : MonoBehaviour
                 LifeCoroutine = StartCoroutine(LifeTimeCoroutine());
                 break;
             case UnitType.ant :
-                Debug.Log("b");
+//                Debug.Log("b");
                 break;
             case UnitType.lucky :
                 break;

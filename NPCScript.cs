@@ -48,7 +48,7 @@ public class NPCScript : MonoBehaviour
     public bool noCollision = true;
     [Header("랜덤 대화 설정")]
     //아무때나 랜덤 대화 활성화
-    public bool alwaysRandomDialogue;
+    //public bool alwaysRandomDialogue;
     public bool onRandomDialogue;//자동 대사 사용 시 true
     //플레이어 근처에서만 랜덤 대화 활성화
     //public bool onlyNearPlayerRandomDialogue;
@@ -120,7 +120,7 @@ public class NPCScript : MonoBehaviour
         if(dialogues !=null){
 
             if(CSVReader.instance!=null){
-                LoadText();
+                //LoadText();
             }
         }
         //기본세팅
@@ -153,9 +153,9 @@ public class NPCScript : MonoBehaviour
         else defaultScale = transform.localScale;
 
         //랜덤대화
-        if(alwaysRandomDialogue){
-            onRandomDialogue = true;
-        }
+        // if(alwaysRandomDialogue){
+        //     onRandomDialogue = true;
+        // }
 
         //기본 애니메이션 상태 설정(bool)
         if(defaultAnimatorBoolVal!=""){
@@ -236,7 +236,7 @@ public class NPCScript : MonoBehaviour
             }
         }
 #region 랜덤대화 관련 설정
-        if(onRandomDialogue && !alwaysRandomDialogue){
+        if(onRandomDialogue ){
 
             if(PlayerManager.instance.isActing || LoadManager.instance.reloadScene){
                 if(!pauseRandomDialogue){
@@ -441,6 +441,7 @@ public class NPCScript : MonoBehaviour
     public void GetInRader(){
         for(int i=0; i<dialogues.Length; i++){
             if(dialogues[i].comment == "발견"){
+                isTalkingWithPlayer = true;
                 //StopCoroutine(randomDialogueCrt);
                 //DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
                 

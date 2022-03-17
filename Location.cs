@@ -53,6 +53,7 @@ public class Location : MonoBehaviour
     public Select[] selects_T;
     public bool waitKey;
     public int[] completedTriggerNums;
+    public int[] incompletedTriggerNums;
     public int[] haveItemNums;
     public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
@@ -72,7 +73,7 @@ public class Location : MonoBehaviour
 
         if(CSVReader.instance!=null){
             //Debug.Log(TextLoader.instance.transform.parent.name);
-            LoadText();
+            //LoadText();
         }
 
         if(type==LocationType.Trigger || type==LocationType.Dialogue){
@@ -115,7 +116,8 @@ public class Location : MonoBehaviour
                     if(Input.GetButton("Interact_OnlyKey")){
                         locFlag = true;
                         if(type == LocationType.Trigger)
-                            Debug.Log(trigNum +"번 트리거 실행 시도");
+                            //Debug.Log(trigNum +"번 트리거 (" + trigComment + ") 실행 시도");
+                            Debug.Log(string.Format("TrigNum.{0} - [{1}] 실행 시도",trigNum,trigComment));
                         //PlayerManager.instance.ActivateWaitInteract(1);
                         LocationScript(other);
                     }
@@ -131,7 +133,7 @@ public class Location : MonoBehaviour
                 if(!waitKey && !locFlag&&!PlayerManager.instance.isActing){
                     locFlag = true;
                     if(type == LocationType.Trigger)
-                        Debug.Log(trigNum +"번 트리거 실행 시도");
+                        Debug.Log(string.Format("TrigNum.{0} - [{1}] 실행 시도",trigNum,trigComment));
                     //PlayerManager.instance.ActivateWaitInteract(1);
                     LocationScript(other);
                     //Debug.Log(gameObject.name +" : " + type +"트리거 실행 시도");
@@ -148,7 +150,7 @@ public class Location : MonoBehaviour
         }
 
     }
-    void LocationScript(Collider2D other){
+    public void LocationScript(Collider2D other){
         
                     //Debug.Log("3");
             switch(type){
@@ -167,7 +169,7 @@ public class Location : MonoBehaviour
                                 SceneController.instance.SetConfiner(desMapNum);
                                 if(isDoor){
                                     PlayerManager.instance.transferDelay = true;
-                                    Invoke("TeleportDelay",0.1f);
+                                    Invoke("TeleportDelay",1f);
 
                                 }
                                 
@@ -296,7 +298,13 @@ public class Location : MonoBehaviour
                                 return;
                             }
                         }
-
+                        //선행 트리거 미실행 여부 확인
+                        if(incompletedTriggerNums.Length>0){
+                            if(!DBManager.instance.CheckIncompletedTrigs(trigNum,incompletedTriggerNums)){
+                                StartCoroutine(ResetFlagDelayCoroutine());
+                                return;
+                            }
+                        }
                         //아이템 보유 여부 확인
                         if(haveItemNums.Length>0){
                             if(!DBManager.instance.CheckHaveItems(trigNum,haveItemNums)){
@@ -367,9 +375,9 @@ public class Location : MonoBehaviour
         
     }
 
-    public void SetTalk(){
-        DialogueManager.instance.SetFullDialogue(dialogues_T);
-    }
+    // public void SetTalk(){
+    //     DialogueManager.instance.SetFullDialogue(dialogues_T);
+    // }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
     
 
@@ -561,7 +569,7 @@ public class LocationEditor : Editor
             EditorGUILayout.Space();
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
             EditorGUILayout.Space();
-            selected.isLocked = EditorGUILayout.ToggleLeft("출입구가 같음", selected.isDoor);
+            selected.isDoor = EditorGUILayout.ToggleLeft("출입구가 같음", selected.isDoor);
             EditorGUILayout.Space();
             selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();
@@ -612,6 +620,8 @@ public class LocationEditor : Editor
             EditorGUILayout.LabelField("[Conditions]",EditorStyles.boldLabel);
             EditorGUILayout.LabelField("선행 트리거 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("completedTriggerNums"),GUIContent.none, true);
+            EditorGUILayout.LabelField("미선행 트리거 번호");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("incompletedTriggerNums"),GUIContent.none, true);
             EditorGUILayout.LabelField("필요 아이템 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("haveItemNums"),GUIContent.none, true);
             EditorGUILayout.Space();

@@ -287,7 +287,7 @@ public class LoadManager : MonoBehaviour
     public void ResetSaveSlots(){
         for(int i=0; i<saveSlotGrid.childCount; i++){
             if(DBManager.instance.CheckSaveFile(i)){
-                saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
                 saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
             }
             else{
@@ -299,7 +299,7 @@ public class LoadManager : MonoBehaviour
     public void ResetLoadSlots(){
         for(int i=0; i<loadSlotGrid.childCount; i++){
             if(DBManager.instance.CheckSaveFile(i)){
-                loadSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
                 loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
             }
             else{
@@ -310,7 +310,7 @@ public class LoadManager : MonoBehaviour
     }
     public void Save(int curSaveNum){
         DBManager.instance.CallSave(curSaveNum);
-        saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
+        saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");//DBManager.instance.curData.curMapName;
         saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
     }
     public void Load(int curLoadNum){

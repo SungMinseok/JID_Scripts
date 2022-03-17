@@ -1,76 +1,182 @@
-﻿// using System.Collections;
-// using System.Collections.Generic;
-// using UnityEngine;
-// using UnityEngine.UI;
-// using System;
-// //Level, Stage  : Level이 상위 개념
-// //Level : 총 3레벨
-// //Stage : 레벨 당 3스테이지
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Linq;
+using UnityEngine.UI;
 
-// //냉동굴 미니게임
+public class Minigame3Script : MonoBehaviour
+{
+    public static Minigame3Script instance;
 
-// public class Minigame3Script : MonoBehaviour
-// {
-//     [Header("[Game Settings]─────────────────")]
-//     [Range(0.1f, 3f)] public float mapScrollSpeed = 0.1f;
-//     [Range(0.1f, 3f)] public float runningMadAntSpeed = 1f;
-//     [Range(0.1f, 3f)] public float flyingMadAntSpeed = 1.2f;
-//     public int runningMadAntThrowCount;
-//     public int flyingMadAntThrowCount;
-//     public float gameTimer;
-//     public GameObject destinationMap;
-//     public Location exitLocation;
-//     public Transform flyingBottle;
-//     [Range(0.1f, 3f)] public float flyingBottleSpeed = 0.2f;
-//     [Space]
-//     [Header("[Game Objects]─────────────────")]
-//     public NPCScript runningMadAnt;
-//     public NPCScript flyingMadAnt;
-//     public Transform defaultPos0;
-//     public Transform createPos0;
-//     public Transform defaultPos1;
-//     public Transform createPos1;
+    //x : 7.5  y : 4
+    [Header("[Game Settings]─────────────────")]
+    public string[] recipes = new string[3];
 
-//     [Space]
 
-//     public Transform[] spriteSets;
-//     public Transform startPoint;
-//     public PolygonCollider2D mapCollider;
-//     [Space]
-
-//     [Header("[Debug]─────────────────")]
-//     public float curMapScrollSpeed = 0 ;
-//     Coroutine minigameCoroutine;
-//     public bool isActive;
-
-//     WaitForSeconds wait1s = new WaitForSeconds(1f);
-//     WaitForSeconds wait2s = new WaitForSeconds(2f);
-//     WaitForSeconds wait3s = new WaitForSeconds(3f);
-//     Vector3 flyingBottlePos;
-//     public Transform test;
-
-//     public float wInput;
-//     public float hInput;
-//     public float correctionValue;
     
-//     private void OnEnable() {
-//         minigameCoroutine = StartCoroutine(MinigameCoroutine());
-//     }
-//     void Update(){
+    [Space]
+    [Header("[Game Objects]─────────────────")]
+    public GameObject[] valves;
+    public GameObject[] materials;
+    public GameObject emptyBottle;
+    public GameObject failedBottle;
+    public GameObject[] madePotions;
+    public GameObject note;
+    public GameObject notePage;
+    public GameObject mushroom;
+    public GameObject openedCapsule;
+    public GameObject closedCapsule;
+    public Animator madeEffect;
+    
+    [Space]
+
+    [Header("[Debug]─────────────────")]
+    public string curValveOrder;
+    public bool checkedMushroom;
+
+
+
+
+
+
+
+    void Awake(){
+        instance = this;
+    }
+    void Start(){
+        //waitAphidCreationCycle = new WaitForSeconds(aphidCreationCycle);
+    }
+    void ResetGameSettings(){
+        ResetValves();
+
+    }
+    public void ResetValves(){
+        curValveOrder = "";
+        emptyBottle.SetActive(true);
+        failedBottle.SetActive(false);
+        for(int i=0;i<madePotions.Length;i++){
+            madePotions[i].SetActive(false);
+        }
+
+        for(int i=0;i<materials.Length;i++){
+            materials[i].SetActive(true);
+            valves[i].GetComponent<Animator>().SetBool("rotate",false);
+            valves[i].GetComponent<Button>().enabled = true;
+        }
+    }
+    public void OpenValve(int valveNum){
+        valves[valveNum].GetComponent<Button>().enabled = false;
+        materials[valveNum].SetActive(false);
+        valves[valveNum].GetComponent<Animator>().SetBool("rotate",true);
+        curValveOrder += valveNum.ToString();
+    }
+    public void MakePotion(){
+        if(checkedMushroom){
+            checkedMushroom = false;
+            InventoryManager.instance.RemoveItem(13);
+
+            emptyBottle.SetActive(false);
+            switch(curValveOrder){
+                case var value when value == recipes[0]:
+                    madeEffect.SetTrigger("success");
+                    madePotions[0].SetActive(true);
+                    break;
+                case var value when value == recipes[1]:
+                    madeEffect.SetTrigger("success");
+                    madePotions[1].SetActive(true);
+                    break;
+                default :
+                    madeEffect.SetTrigger("fail");
+                    failedBottle.SetActive(true);
+                    break;
+            }
+        }
+    }
+    public void GetPotion(){
         
-//         wInput = Input.GetAxisRaw("Horizontal");
-//         hInput = Input.GetAxisRaw("Vertical");
+        emptyBottle.SetActive(true);
+        for(int i=0;i<madePotions.Length;i++){
+            madePotions[i].SetActive(false);
+        }
 
         
-//     }    
-//     void FixedUpdate(){
-//         if(wInput!=0 || hInput!=0){
-//             test.Translate(new Vector2(wInput * correctionValue,hInput * correctionValue));
-//         }
-//     }
-//     IEnumerator MinigameCoroutine(){
-//         yield return null;
+        switch(curValveOrder){
+            case var value when value == recipes[0]:
+                InventoryManager.instance.AddItem(4);
+                break;
+            case var value when value == recipes[1]:
+                InventoryManager.instance.AddItem(2);
+                break;
+            default :
+                InventoryManager.instance.AddItem(32);
+                break;
+        }
+    }
+    public void OpenNote(){
+        notePage.SetActive(true);
+
+        if(InventoryManager.instance.CheckHaveItem(13)){
+            mushroom.SetActive(true);
+        }
+        else{
+            mushroom.SetActive(false);
+        }
+    }
+    public void PutMushroom(){
+        notePage.SetActive(false);
+
+        openedCapsule.SetActive(true);
+        closedCapsule.SetActive(false);
+
+        checkedMushroom = true;
+    }
+    // void FixedUpdate(){
+
+    //     if(!PlayerManager.instance.isGameOver &&PlayerManager.instance.isPlayingMinigame && !isPaused){
+    //         if(curTimer>0){
+    //             curTimer -= Time.fixedDeltaTime;
+    //         }
+    //         else{
+    //             isPaused = true;
+    //             // if(score_ant>score_lucky){
+    //             //     setScore_ant ++;
+    //             // }
+    //             // else{
+
+    //             // }
+
+
+
+
+    //             // MinigameManager.instance.SuccessMinigame();
+    //         }
+    //         timerGauge.fillAmount = curTimer / maxTimerSet;
+    //     }
+    // }
+    void GameSet(){
         
+    }
+    private void OnEnable() {
+        PlayerManager.instance.LockPlayer();
+        ResetGameSettings();
+
+        openedCapsule.SetActive(false);
+        closedCapsule.SetActive(true);
+
+        checkedMushroom = false;
+        //minigameCoroutine = StartCoroutine(MinigameCoroutine());
+
+        //SceneController.instance.SetSomeConfiner(mapCollider,true);
+        //SceneController.instance.virtualCamera.Follow = mapViewPoint;
+
+        //UIManager.instance.SetHUD(false);
+    }
+    void OnDisable(){
+        //SceneController.instance.SetConfiner(DBManager.instance.curData.curMapNum);
+        //SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
         
-//     }
-// }
+        PlayerManager.instance.UnlockPlayer();
+        UIManager.instance.SetHUD(true);
+        StopAllCoroutines();
+    }
+}

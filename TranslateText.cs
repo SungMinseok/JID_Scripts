@@ -13,7 +13,10 @@ public class TranslateText : MonoBehaviour
         //curText = GetComponent<TextMeshProUGUI>();
         if(key!=-1) ApplyTranslation();
     }
-    void ApplyTranslation(){
+    void OnEnable(){
+        ApplyTranslation();
+    }
+    public void ApplyTranslation(){
         Text curText = GetComponent<Text>();
         string language = DBManager.instance.language;
         curText.text = CSVReader.instance.data_sysmsg[key]["text_"+language].ToString();

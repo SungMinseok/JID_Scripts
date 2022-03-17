@@ -20,9 +20,22 @@ public class SceneController : MonoBehaviour
     public Transform[] objects;
     // Start is called before the first frame update
     public Collider2D temp;
+    public TranslateText[] translateTexts;
+    public GameObject[] textObjs;
     void Awake()
     {
         instance = this;
+    }
+    void Start(){   
+        // Debug.Log("11");     
+        // //GameObject[] a = GameObject.FindGameObjectsWithTag("TranslateText");
+        // textObjs = GameObject.FindObjectsOfTypeAll("TranslateText");
+        // for(int i=0;i<textObjs.Length;i++){
+        // Debug.Log("33");     
+        //     translateTexts[i] = textObjs[i].GetComponent<TranslateText>();
+        // }
+        // Debug.Log("22");     
+
     }
     void OnDisable(){
         StopAllCoroutines();
@@ -56,7 +69,7 @@ public class SceneController : MonoBehaviour
     }
     public void SetCurrentMapName(int mapNum){
         //Debug.Log(DBManager.instance);
-        DBManager.instance.curData.curMapName = CSVReader.instance.GetIndexToString(mapNum, "map");
+        //DBManager.instance.curData.curMapName = CSVReader.instance.GetIndexToString(mapNum, "map");
         DBManager.instance.curData.curMapNum = mapNum;
     }
     public void SetPlayerPosition(){

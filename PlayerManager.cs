@@ -719,24 +719,38 @@ public class PlayerManager : MonoBehaviour
                 break;
         }
     }
-    public void SetTalkCanvasDirection(){
+    public void SetTalkCanvasDirection(string direction = ""){
         if(talkCanvas!=null){
             //var v = 1;
-            Debug.Log("A");
-            
-            var v = playerBody.localScale.x > 0 ? 1 : -1;
-            
-            // else{
-            //     var v = 1;
-            // }
+//            Debug.Log("A");
+            if(direction == ""){
 
+                var v = playerBody.localScale.x > 0 ? 1 : -1;
+                
+                var tempRect = talkCanvas.GetComponent<RectTransform>();
+                tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
+                tempRect.localScale = new Vector2(v, tempRect.localScale.y);
+                
+                var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
+                tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
+            }
+            else if(direction == "left"){
+                var tempRect = talkCanvas.GetComponent<RectTransform>();
+                tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * 1 , tempRect.localPosition.y);
+                tempRect.localScale = new Vector2(1, tempRect.localScale.y);
+                
+                var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
+                tempRect1.localScale = new Vector2(1, tempRect.localScale.y);
+            }
+            else if(direction == "right"){
+                var tempRect = talkCanvas.GetComponent<RectTransform>();
+                tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * -1 , tempRect.localPosition.y);
+                tempRect.localScale = new Vector2(-1, tempRect.localScale.y);
+                
+                var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
+                tempRect1.localScale = new Vector2(-1, tempRect.localScale.y);
 
-            var tempRect = talkCanvas.GetComponent<RectTransform>();
-            tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
-            tempRect.localScale = new Vector2(v, tempRect.localScale.y);
-            
-            var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
-            tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
+            }
         }
     }
 

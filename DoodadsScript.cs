@@ -7,7 +7,8 @@ public enum DoodadsType{
     Trap,
     SlowDown,
     Bullet,
-    Mushroom
+    Mushroom,
+    Water
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -148,6 +149,19 @@ public class DoodadsScript : MonoBehaviour
 
                         }
                     }
+                }
+                break;
+
+            case DoodadsType.Water :
+                if(other.CompareTag("Player")){
+                    //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+                    //if(PlayerManager.instance.isFalling){
+
+                        PlayerManager.instance.isGameOver = true;
+                        PlayerManager.instance.canMove = false;
+                        PlayerManager.instance.animator.SetBool("dead0",true);
+                        UIManager.instance.SetGameOverUI(0);
+                    //}
                 }
                 break;
 

@@ -32,6 +32,11 @@ public class MenuManager : MonoBehaviour
     public SaveLoadSlot[] saveSlots;
     public Transform loadSlotGrid;
     public SaveLoadSlot[] loadSlots;
+    [Header("UI_Settings")]
+    public GameObject settingPanel;
+    public GameObject[] settingPages;
+    public Button[] settingMenuBtns;
+    public Transform setting_languagePage;
     [System.Serializable]
     public class SaveLoadSlot{
         public TextMeshProUGUI saveNameText;
@@ -217,7 +222,7 @@ public class MenuManager : MonoBehaviour
     public void ResetSaveSlots(){
         for(int i=0; i<saveSlotGrid.childCount; i++){
             if(DBManager.instance.CheckSaveFile(i)){
-                saveSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
                 saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
                 saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
                 saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
@@ -233,7 +238,7 @@ public class MenuManager : MonoBehaviour
     public void ResetLoadSlots(){
         for(int i=0; i<loadSlotGrid.childCount; i++){
             if(DBManager.instance.CheckSaveFile(i)){
-                loadSlots[i].saveNameText.text = DBManager.instance.GetData(i).curMapName;
+                loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
                 loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
                 loadSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
                 loadSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
@@ -364,7 +369,7 @@ public class MenuManager : MonoBehaviour
     }
     public void Save(int curSaveNum){
         DBManager.instance.CallSave(curSaveNum);
-        saveSlots[curSaveNum].saveNameText.text = DBManager.instance.curData.curMapName;
+        saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");
         saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
     }
     public void Load(int curLoadNum){
@@ -416,5 +421,39 @@ public class MenuManager : MonoBehaviour
     }
 #endregion
 
+#region Settings
+    public void OpenSettingPage(int pageNum){
+        foreach(GameObject page in settingPages){
+            page.SetActive(false);
+        }
+        foreach(Button btn in settingMenuBtns){
+            btn.interactable = true;
+        }
 
+        settingPages[pageNum].SetActive(true);
+        settingMenuBtns[pageNum].interactable = false;
+    }
+
+    public void ChangeLanguage(int languageNum){
+        for(int i=0;i<setting_languagePage.childCount;i++){
+            setting_languagePage.GetChild(i).GetComponent<Button>().interactable = true;
+        }
+
+        setting_languagePage.GetChild(languageNum).GetComponent<Button>().interactable = false;
+
+        switch(languageNum){
+            case 0 :    
+                DBManager.instance.language = "kr";
+                break;
+            case 1 :    
+                DBManager.instance.language = "en";
+                break;
+            case 2 :    
+                DBManager.instance.language = "jp";
+                break;
+        }
+        DBManager.instance.ApplyNewLanguage();
+    }
+
+#endregion
 }

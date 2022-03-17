@@ -47,10 +47,10 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    public void SetFullDialogue(Dialogue[] dialogues,bool stopCheck = false)
-    {
-        StartCoroutine(DialogueCoroutine0(dialogues,stopCheck));
-    }
+    // public void SetFullDialogue(Dialogue[] dialogues,bool stopCheck = false)
+    // {
+    //     StartCoroutine(DialogueCoroutine0(dialogues,stopCheck));
+    // }
     public void SetDialogue(Dialogue dialogue)
     {
         PlayerManager.instance.isTalking = true;
@@ -63,29 +63,29 @@ public class DialogueManager : MonoBehaviour
         //PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine_NPC(dialogue));
     }
-    public void SetRandomDialogue_NPC(string dialogueText,Transform talker,float duration, int interval){
+    // public void SetRandomDialogue_NPC(string dialogueText,Transform talker,float duration, int interval){
         
-        //talker.GetComponent<NPCScript>().randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-        StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-    }
-    public void StopRandomDialogue_NPC(Coroutine coroutine){
-        if(coroutine !=null) StopCoroutine(coroutine);
-    }
+    //     //talker.GetComponent<NPCScript>().randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
+    //     StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
+    // }
+    // public void StopRandomDialogue_NPC(Coroutine coroutine){
+    //     if(coroutine !=null) StopCoroutine(coroutine);
+    // }
 
-    IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
-    {
-        //Debug.Log("A");
-        PlayerManager.instance.canMove = false;
-        for(int i=0;i<dialogues.Length;i++){
+    // IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
+    // {
+    //     //Debug.Log("A");
+    //     PlayerManager.instance.canMove = false;
+    //     for(int i=0;i<dialogues.Length;i++){
             
-            StartCoroutine(DialogueCoroutine1(dialogues[i]));
-            yield return new WaitUntil(()=>!dialogueFlag);
+    //         StartCoroutine(DialogueCoroutine1(dialogues[i]));
+    //         yield return new WaitUntil(()=>!dialogueFlag);
 
-        }
+    //     }
 
-        PlayerManager.instance.isTalking = false;
-        PlayerManager.instance.canMove = true;
-    }
+    //     PlayerManager.instance.isTalking = false;
+    //     PlayerManager.instance.canMove = true;
+    // }
 
     //스킵 가능한 메시지 출력
     IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
@@ -115,7 +115,19 @@ public class DialogueManager : MonoBehaviour
         for(int i=0; i<dialogue.sentences.Length;i++){
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
-            curSentence = dialogue.sentences[i];
+
+            // if(dialogues_T!=null){
+            //     for(int i=0; i<dialogues_T.Length;i++){
+            //         for(int j=0; j<dialogues_T[i].sentences.Length;j++){
+            //             int temp = int.Parse(dialogues_T[i].sentences[j]);
+            //             //dialogues_T[i].sentences[j] = TextLoader.instance.ApplyText(temp);
+            //             dialogues_T[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
+            //         }
+            //     }
+            // }
+
+            //curSentence = dialogue.sentences[i];
+            curSentence = CSVReader.instance.GetIndexToString(int.Parse(dialogue.sentences[i]),"dialogue");
             if(!oneTime) nowDialogueCoroutine = StartCoroutine(RevealText(dialogue, tmp, DBManager.instance.waitTime_dialogueTypingInterval, DBManager.instance.waitTime_dialogueInterval));
              
             yield return new WaitUntil(()=>!revealTextFlag);
@@ -145,7 +157,8 @@ public class DialogueManager : MonoBehaviour
         for(int i=0; i<dialogue.sentences.Length;i++){
             
             var tmp = dialogue.talker.GetComponent<NPCScript>().talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>();
-            curSentence = dialogue.sentences[i];
+            //curSentence = dialogue.sentences[i];
+            curSentence = CSVReader.instance.GetIndexToString(int.Parse(dialogue.sentences[i]),"dialogue");
             if(!oneTime) StartCoroutine(RevealText_NPC(dialogue, tmp, typingSpeed, typingInterval));
              
             yield return new WaitUntil(()=>!revealTextFlag_NPC);
@@ -241,12 +254,12 @@ public class DialogueManager : MonoBehaviour
 #endregion
 
     }
-    public IEnumerator WaitSkipCoroutine(){
-        yield return wait500ms;
-        yield return wait500ms;
+    // public IEnumerator WaitSkipCoroutine(){
+    //     yield return wait500ms;
+    //     yield return wait500ms;
         
-        canSkip = true;
-    }
+    //     canSkip = true;
+    // }
 
     //스킵 불가능한 NPC 자체 메시지 출력
     IEnumerator RevealText_NPC(Dialogue dialogue, TextMeshProUGUI tmp, float typingSpeed, float typingInterval){
@@ -269,16 +282,16 @@ public class DialogueManager : MonoBehaviour
     }
 
     //스킵 불가능한 NPC 자체 랜덤 메시지 출력
-    IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
-        talker.GetComponent<NPCScript>().talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
-        talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(true);
+    // IEnumerator SetRandomDialogueCoroutine(string dialogueText, Transform talker, float duration, int interval){
+    //     talker.GetComponent<NPCScript>().talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogueText;
+    //     talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(true);
 
-        yield return new WaitForSeconds(duration);
+    //     yield return new WaitForSeconds(duration);
 
-        talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(false);
+    //     talker.GetComponent<NPCScript>().talkCanvas.gameObject.SetActive(false);
 
 
-    }
+    // }
 
     void Update(){
         if(canSkip){
@@ -296,14 +309,14 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    public class DialogueData{
-        public int index { get; set; }
-        public string sentences { get; set; }
-    }
+    // public class DialogueData{
+    //     public int index { get; set; }
+    //     public string sentences { get; set; }
+    // }
 
-    public void SetDialogueData(){
-        TextAsset dialogueData= Resources.Load<TextAsset>("Dialogue");
-        string content = dialogueData.text;
-    }
+    // public void SetDialogueData(){
+    //     TextAsset dialogueData= Resources.Load<TextAsset>("Dialogue");
+    //     string content = dialogueData.text;
+    // }
 }
 

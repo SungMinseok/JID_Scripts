@@ -60,7 +60,7 @@ public class DBManager : MonoBehaviour
         //public List<int> endingCollectionOverList = new List<int>();
 
         public float playerX, playerY;
-        public string curMapName;
+        //public int curMapIndex;
         public int curMapNum;
         public string curPlayDate;
         public float curPlayTime;
@@ -105,6 +105,8 @@ public class DBManager : MonoBehaviour
         
             if(file != null && file.Length >0){
                 curData =(Data)bf.Deserialize(file);
+
+                curData.curPlayCount ++;
             }
             
             file.Close();
@@ -208,13 +210,14 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
-    public bool CheckCompletedTrigs(int trigNum, int[] completedTriggerNums){
+    public bool CheckCompletedTrigs(int trigNum, int[] triggerNums, bool printDebug = true){
         List<int> tempList = new List<int>();
 
-        for(int i=0;i<completedTriggerNums.Length;i++){
-            if(!DBManager.instance.CheckTrigOver(completedTriggerNums[i])){
-                Debug.Log(trigNum +"번 트리거 실행 실패 : " + completedTriggerNums[i] + "번 트리거 완료되지 않음");
-                tempList.Add(completedTriggerNums[i]);
+        for(int i=0;i<triggerNums.Length;i++){
+            if(!DBManager.instance.CheckTrigOver(triggerNums[i])){
+               // Debug.Log(trigNum +"번 트리거 실행 실패 : " + triggerNums[i] + "번 트리거 완료되지 않음");
+               if(printDebug) Debug.Log(string.Format("TrigNum.{0} 실행 실패 : TrigNum.{1} 실행 미완료",trigNum, triggerNums[i]));
+                tempList.Add(triggerNums[i]);
             }
         }
 
@@ -228,12 +231,36 @@ public class DBManager : MonoBehaviour
         }
         
     }
-    public bool CheckHaveItems(int trigNum, int[] haveItemNums){
+    public bool CheckIncompletedTrigs(int trigNum, int[] triggerNums, bool printDebug = true){
+        List<int> tempList = new List<int>();
+
+        for(int i=0;i<triggerNums.Length;i++){
+            if(DBManager.instance.CheckTrigOver(triggerNums[i])){
+                //Debug.Log(trigNum +"번 트리거 실행 실패 : " + triggerNums[i] + "번 트리거 완료됨");
+                if(printDebug) Debug.Log(string.Format("TrigNum.{0} 실행 실패 : TrigNum.{1} 실행 완료",trigNum, triggerNums[i]));
+
+                tempList.Add(triggerNums[i]);
+            }
+        }
+
+        if(tempList.Count != 0){
+            tempList.Clear();
+            return false;
+        }
+        else{
+            tempList.Clear();
+            return true;
+        }
+        
+    }
+    public bool CheckHaveItems(int trigNum, int[] haveItemNums, bool printDebug = true){
         List<int> tempList = new List<int>();
 
         for(int i=0;i<haveItemNums.Length;i++){
             if(!InventoryManager.instance.CheckHaveItem(haveItemNums[i])){
-                Debug.Log(trigNum +"번 트리거 실행 실패 : " + haveItemNums[i] + "번 아이템 미보유");
+                //Debug.Log(trigNum +"번 트리거 실행 실패 : " + haveItemNums[i] + "번 아이템 미보유");
+                if(printDebug) Debug.Log(string.Format("TrigNum.{0} 실행 실패 : itemID.{1}({2}) 미보유",trigNum, haveItemNums[i], DBManager.instance.cache_ItemDataList[haveItemNums[i]].name));
+
                 tempList.Add(haveItemNums[i]);
             }
         }
@@ -287,10 +314,30 @@ public class DBManager : MonoBehaviour
 
         CallLocalDataLoad();
 
+        //ApplyNewLanguage();
+        
         ApplyItemInfo();
         ApplyCollectionInfo();
-        ApplyStoryInfo();
+        //ApplyStoryInfo();
         //CallLocalDataLoad();
+    }
+    public void ApplyNewLanguage(){
+
+        ApplyItemInfo();
+        ApplyCollectionInfo();
+        MenuManager.instance.ResetSaveSlots();
+        MenuManager.instance.ResetLoadSlots();
+        //ApplyStoryInfo();
+        //ApplySysMsgText();
+
+        if(InventoryManager.instance != null) InventoryManager.instance.ResetInventory();
+        if(MenuManager.instance != null){
+            MenuManager.instance.ResetCardOrder();
+            MenuManager.instance.menuPanel.SetActive(false);
+            MenuManager.instance.settingPanel.SetActive(false);
+            MenuManager.instance.menuPanel.SetActive(true);
+            MenuManager.instance.settingPanel.SetActive(true);
+        }
     }
 
     void Start()
@@ -315,7 +362,7 @@ public class DBManager : MonoBehaviour
     void ApplyItemInfo(){
         //var a = TextLoader.instance.dictionaryItemText;
         var a = CSVReader.instance.data_item;
-
+        cache_ItemDataList.Clear();
         for(int i=0; i<a.Count; i++){
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             cache_ItemDataList.Add(new Item(
@@ -334,6 +381,7 @@ public class DBManager : MonoBehaviour
     void ApplyCollectionInfo(){
         //var a = TextLoader.instance.dictionaryItemText;
         var a = CSVReader.instance.data_collection;
+        cache_EndingCollectionDataList.Clear();
 
         for(int i=0; i<a.Count; i++){
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
@@ -351,6 +399,7 @@ public class DBManager : MonoBehaviour
     public void ApplyStoryInfo(){
         var reader0 = CSVReader.instance.data_collection;
         var reader1 = CSVReader.instance.data_story;
+        //cache_GameEndDataList.Clear();
         for(int i=0;i<cache_GameEndDataList.Count;i++){
             cache_GameEndDataList[i].name = reader0[cache_GameEndDataList[i].endingCollectionNum]["name_"+language].ToString();
 
@@ -362,6 +411,15 @@ public class DBManager : MonoBehaviour
         }
     }
 
+    // public void ApplySysMsgText(){
+    //     // for(int i=0;i<SceneController.instance.translateTexts.Count;i++){
+    //     //     SceneController.instance.translateTexts[i].tra
+    //     // }
+    //     foreach(TranslateText t in SceneController.instance.translateTexts){
+    //         t.ApplyTranslation();
+    //     }
+    
+    // }
 
     // void OnApplicationQuit(){
         

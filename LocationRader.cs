@@ -7,12 +7,14 @@ public class LocationRader : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         if(other.CompareTag("Location") ){
             var curLocation = other.GetComponent<Location>();
-            if(curLocation.activateTargetMark && !DBManager.instance.CheckTrigOver(curLocation.trigNum) 
-            && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums)
-            && DBManager.instance.CheckHaveItems(curLocation.trigNum,curLocation.haveItemNums)
+            if(curLocation.activateTargetMark 
+            && !DBManager.instance.CheckTrigOver(curLocation.trigNum) 
+            && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums,printDebug:false)
+            && DBManager.instance.CheckIncompletedTrigs(curLocation.trigNum,curLocation.incompletedTriggerNums,false)
+            && DBManager.instance.CheckHaveItems(curLocation.trigNum,curLocation.haveItemNums,false)
             ){
 
-                Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
+//                Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
                 //curLocation.targetMark.gameObject.SetActive(true);
                 curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");
             }

@@ -50,7 +50,7 @@ public class SelectManager : MonoBehaviour
         curSelectedNum = 0;
     }
 
-    public void SetSelect(Select select){
+    public void SetSelect(Select select, string[] argument){
 
         //PlayerManager.instance.LockPlayer();
 
@@ -58,8 +58,28 @@ public class SelectManager : MonoBehaviour
 
         for(int i=0;i<select.answers.Length;i++){
             UIManager.instance.ui_select_grid.GetChild(i).gameObject.SetActive(true);
-            UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = select.answers[i];
+            int temp = int.Parse(select.answers[i]);
+
+            if(argument != null){
+
+                UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text //= CSVReader.instance.GetIndexToString(temp,"select");//select.answers[i];
+                = string.Format(CSVReader.instance.GetIndexToString(temp,"select"), argument[i]);
+            }
+            else{
+                
+                UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = CSVReader.instance.GetIndexToString(temp,"select");
+            }
+
+            // if(temp == 12){
+            //     UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = 
+            //     string.Format(UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text, argument0);
+            // }
+            // else if(temp == 13){
+            //     UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = 
+            //     string.Format(UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text, argument1);
+            // }
         }
+
 
         maxSelectedNum = select.answers.Length;
 
