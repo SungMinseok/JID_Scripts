@@ -52,10 +52,11 @@ public class CheatManager : MonoBehaviour
                             
                             PlayerManager.instance.transform.position = checkPoint.GetChild(int.Parse(temp[1])).position;
                             SceneController.instance.SetConfiner(int.Parse(temp[1])/2);
+                            SoundManager.instance.SetBgmByMapNum(int.Parse(temp[1])/2);
                             DM("Activate teleport to location "+temp[1].ToString());
                         }   
                         else{
-                            DM("Error : Empty location "+temp[1].ToString());
+                            Debug.LogError("Error : Empty location "+temp[1].ToString());
 
                         }
                     }
@@ -253,6 +254,28 @@ public class CheatManager : MonoBehaviour
                     MenuManager.instance.ResetCardOrder();
                     DM("resetendingcollection");
 
+                    break;
+                    
+                case "additems":
+                    for(int i=1;i<temp.Length;i++){
+                        InventoryManager.instance.AddItem(int.Parse(temp[i]),1);
+                    }
+
+                    break;
+                case "completetriggers":
+                    for(int i=1;i<temp.Length;i++){
+                            
+                        DBManager.instance.TrigOver(int.Parse(temp[i]));
+                        DM("Trigger Number "+temp[i]+" has been completed.");
+                    }
+
+                    break;
+                    
+                case "super":
+                    InventoryManager.instance.AddHoney(100000);
+                    InventoryManager.instance.AddDirt(10000);
+                    InventoryManager.instance.AddItem(5, 100);
+                    InputCheat("additems 2 21 26 18 24 25");
                     break;
             }
 //EndingCollectionOver

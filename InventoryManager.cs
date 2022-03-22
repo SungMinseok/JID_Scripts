@@ -69,17 +69,33 @@ public class InventoryManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        for(int i=1;i<11;i++){
+            if(Input.GetKeyDown((KeyCode)(48+i))){
+                PushItemBtn(i-1);
+            }
+        }
     }
     public void ResetInventory(){
 
         curPage = 0;
         RefreshInventory(0);
     }
-
+    
     public void AddItem(int ID, int amount = 1){
         if(amount<1) return;
-        SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
+
+        switch(ID){
+            case 15 : 
+                SoundManager.instance.PlaySound("paperflip");
+                break;
+            case 30 : 
+            case 31 : 
+                SoundManager.instance.PlaySound("get_item_ice");
+                break;
+            default :   
+                SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
+                break;
+        }
         //DBManager.instance.curData.itemList.Add(ID);
         //스택형 아이템이면
         if(DBManager.instance.cache_ItemDataList[ID].isStack){
@@ -163,13 +179,17 @@ public class InventoryManager : MonoBehaviour
                 ||theDB.cache_ItemDataList[itemID].type == 2
                 ||theDB.cache_ItemDataList[itemID].type == 3              
                 ){
-                    for(var j=0;j<PlayerManager.instance.equipments.Length;j++){
-                        if(PlayerManager.instance.equipments[j]==itemID){
+                    for(var j=0;j<PlayerManager.instance.equipments_id.Length;j++){
+                        if(PlayerManager.instance.equipments_id[j]==itemID){
                             itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);
                             break;
                         }
                         itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
                     }
+                }
+                else{
+                    itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
+
                 }
 
                 //아이템 버튼 활성화
@@ -258,11 +278,13 @@ public class InventoryManager : MonoBehaviour
         
         switch(curItem.type){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
             case 1 : 
-                PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
-                break;
+            case 2 : 
             case 3 : 
                 PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
                 break;
+            // case 3 : 
+            //     PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
+            //     break;
             case 4 :
                 if(curItem.isStack){
                     for(var i=0;i< theDB.curData.itemList.Count;i++){
@@ -307,7 +329,7 @@ public class InventoryManager : MonoBehaviour
                 break;
         }
 
-        
+        SoundManager.instance.PlaySound("item_use");
         RefreshInventory(curPage);
 
     }
@@ -333,5 +355,8 @@ public class InventoryManager : MonoBehaviour
         if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
             DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
         }
+    }
+    public void AddHoney(int honeyAmount){
+        DBManager.instance.curData.curHoneyAmount += honeyAmount;
     }
 }

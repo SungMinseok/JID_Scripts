@@ -49,7 +49,6 @@ public class DBManager : MonoBehaviour
 
     
     [Header("[Empty Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
-
     public Data emptyData;
 
 
@@ -67,6 +66,7 @@ public class DBManager : MonoBehaviour
         public int curPlayCount;
         public float curDirtAmount;
         public int curHoneyAmount;
+        public int[] curEquipmentsID = new int[3];
 
 
 
@@ -76,11 +76,53 @@ public class DBManager : MonoBehaviour
         [Space]
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
+
+        public Data DeepCopy(){
+            Data newCopy = new Data();
+            newCopy.playerX = this.playerX;
+            newCopy.playerY = this.playerY;
+            newCopy.curMapNum = this.curMapNum;
+            newCopy.curPlayDate = this.curPlayDate;
+            newCopy.curPlayTime = this.curPlayTime;
+            newCopy.curPlayCount = this.curPlayCount;
+            newCopy.curDirtAmount = this.curDirtAmount;
+            newCopy.curHoneyAmount = this.curHoneyAmount;
+            newCopy.curEquipmentsID = this.curEquipmentsID;
+            newCopy.itemList = this.itemList;
+            newCopy.trigOverList = this.trigOverList;
+            return newCopy;
+        }
     }
     
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
     public class LocalData{
         public List<int> endingCollectionOverList = new List<int>();
+    }
+    public void SaveDefaultData(){
+
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/SaveFileDefault.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+
+        Debug.Log(Application.persistentDataPath);
+        bf.Serialize(file, emptyData);
+        file.Close();
+    }
+    public void LoadDefaultData(){
+        
+        BinaryFormatter bf = new BinaryFormatter();
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFileDefault.dat");
+
+        if(fileCheck.Exists){
+            FileStream file = File.Open(Application.persistentDataPath + "/SaveFileDefault.dat", FileMode.Open);
+        
+            if(file != null && file.Length >0){
+                curData =(Data)bf.Deserialize(file);
+
+                curData.curPlayCount ++;
+            }
+            
+            file.Close();
+        }
     }
     public void CallSave(int fileNum){
 
@@ -90,6 +132,7 @@ public class DBManager : MonoBehaviour
         //curData.
         curData.playerX = PlayerManager.instance.transform.position.x;
         curData.playerY = PlayerManager.instance.transform.position.y;
+        curData.curEquipmentsID = PlayerManager.instance.equipments_id;
 
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, curData);
@@ -311,7 +354,7 @@ public class DBManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-
+        SaveDefaultData();
         CallLocalDataLoad();
 
         //ApplyNewLanguage();
@@ -350,6 +393,7 @@ public class DBManager : MonoBehaviour
 
     void FixedUpdate(){
         curData.curPlayTime += Time.fixedDeltaTime;
+        
 
         if(PlayerManager.instance != null){
 
@@ -521,7 +565,7 @@ public class ItemList{
 [System.Serializable]
 public class GameEndList{
     public string comment;
-    public int endingCollectionNum; //컬렉션 내 엔딩 넘버(data_collection.csv)
+    public int endingCollectionNum; //컬렉션 내 엔딩 넘버(data_collection.csv) 컬렉션 UI 내 순서
     public int endingNum; //찐엔딩 넘버(임의의 값)
     public string name;
     public Story[] stories;
@@ -535,6 +579,7 @@ public class GameEndList{
 [System.Serializable]
 public class Story{
     public Sprite sprite;
-    [TextArea(2,4)]
+    //[TextArea(2,4)]
+    public string soundFileName;
     public string descriptions;
 }

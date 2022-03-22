@@ -6,7 +6,9 @@ using TMPro;
 [RequireComponent (typeof (CircleCollider2D))]
 public class NPCScript : MonoBehaviour
 {
-    
+    //public bool isNearPlayer;//플레이어 근처에서 발걸음 소리 on/off용
+    public bool isMerchant;//대사 소리 분리용
+    public bool isKid;//대사 소리 분리용
     [Header("Set Animator")]
     public bool haveWalk = false;
     public bool haveTalk = false;
@@ -369,9 +371,10 @@ public class NPCScript : MonoBehaviour
 
         //DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval);
         int tempSentenceNum = Random.Range(0,dialogues[0].sentences.Length);
+        string curDialogueText = CSVReader.instance.GetIndexToString(int.Parse(dialogues[0].sentences[tempSentenceNum]),"dialogue");
 
-        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = dialogues[0].sentences[tempSentenceNum];
-        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().maxVisibleCharacters = dialogues[0].sentences[tempSentenceNum].Length;
+        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().text = curDialogueText;//dialogues[0].sentences[tempSentenceNum];
+        talkCanvas.GetChild(0).GetComponent<TextMeshProUGUI>().maxVisibleCharacters = curDialogueText.Length;
         talkCanvas.gameObject.SetActive(true);
 
         yield return durationTime;

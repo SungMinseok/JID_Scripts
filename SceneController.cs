@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Cinemachine;
 
 public class SceneController : MonoBehaviour
@@ -27,6 +28,13 @@ public class SceneController : MonoBehaviour
         instance = this;
     }
     void Start(){   
+        if(SceneManager.GetActiveScene().name == "Main"){
+            SoundManager.instance.PlayBGM("jelly in the dark");
+        }
+        else if(SceneManager.GetActiveScene().name == "Level"){
+            SoundManager.instance.ChangeBgm("juicy drug");
+        }
+
         // Debug.Log("11");     
         // //GameObject[] a = GameObject.FindGameObjectsWithTag("TranslateText");
         // textObjs = GameObject.FindObjectsOfTypeAll("TranslateText");
@@ -41,15 +49,32 @@ public class SceneController : MonoBehaviour
         StopAllCoroutines();
     }
 
-    public void SetConfiner(int mapNum){
-        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
-        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
-        confiner2D.m_BoundingShape2D = mapBounds[mapNum];
-        SetCurrentMapName(mapNum);
-        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
-        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
+    public void SetConfiner(int mapNum, bool isDirect = false){
+        if(isDirect){
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
+            confiner2D.m_BoundingShape2D = mapBounds[mapNum];
+            SetCurrentMapName(mapNum);
+            Invoke("RecoverConfinerDamping",1f);
+
+        }
+        else{
+            
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+            virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
+            
+            confiner2D.m_BoundingShape2D = mapBounds[mapNum];
+            SetCurrentMapName(mapNum);
+        }
+        //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+        //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
         
            // Debug.Log(num + " : 맵번호");
+    }
+    public void RecoverConfinerDamping(){
+        
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+        virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
     }
     public void SetSomeConfiner(Collider2D boundCollider = null, bool isDirect = false){
         if(isDirect){
@@ -74,6 +99,14 @@ public class SceneController : MonoBehaviour
     }
     public void SetPlayerPosition(){
         PlayerManager.instance.transform.position = new Vector2(DBManager.instance.curData.playerX,DBManager.instance.curData.playerY);
+    }
+    public void SetPlayerEquipments(){
+        if(DBManager.instance.curData.curEquipmentsID!=null){
+
+            PlayerManager.instance.equipments_id = DBManager.instance.curData.curEquipmentsID;
+        }
+        PlayerManager.instance.ApplyEquipments();
+
     }
     public void SetFirstLoad(){
         

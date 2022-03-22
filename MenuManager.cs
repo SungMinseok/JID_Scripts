@@ -37,6 +37,8 @@ public class MenuManager : MonoBehaviour
     public GameObject[] settingPages;
     public Button[] settingMenuBtns;
     public Transform setting_languagePage;
+    public Slider slider_sound;
+    public Slider slider_bgm;
     [System.Serializable]
     public class SaveLoadSlot{
         public TextMeshProUGUI saveNameText;
@@ -117,6 +119,10 @@ public class MenuManager : MonoBehaviour
 
         ResetSaveSlots();
         ResetLoadSlots();
+#endregion
+#region Settings
+        slider_bgm.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeBGM();});
+        slider_sound.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeSFX();});
 #endregion
     
     }
@@ -283,6 +289,10 @@ public class MenuManager : MonoBehaviour
 
         OpenPopUpPanel("goMain");
     }
+    public void TryQuitGame(){
+
+        OpenPopUpPanel("quitGame");
+    }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
         //확인
@@ -304,6 +314,10 @@ public class MenuManager : MonoBehaviour
                 break;
             case "goMain" :
                 popUpText[0].text = "6";
+                popUpText[1].text = "";
+                break;
+            case "quitGame" :
+                popUpText[0].text = "2";
                 popUpText[1].text = "";
                 break;
             default :
@@ -353,9 +367,13 @@ public class MenuManager : MonoBehaviour
             case "goMain" :
                 LoadManager.instance.LoadMain();
                 break;
+            case "quitGame" :
+                Application.Quit();
+                //LoadManager.instance.LoadMain();
+                break;
 
             default:
-                Debug.Log(curPopUpType);
+//                Debug.Log(curPopUpType);
                 popUpOkayCheck = true;
                 Invoke("ResetPopUpOkayCheck",0.05f);
                 break;

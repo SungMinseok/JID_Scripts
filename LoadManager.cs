@@ -58,7 +58,7 @@ public class LoadManager : MonoBehaviour
     public void StartBtn()
     {
         StartCoroutine(MainToGameCoroutine());
-        Debug.Log("33");
+//        Debug.Log("33");
     }
     IEnumerator MainToGameCoroutine(){
         //SceneController.instance.objects[0].GetComponent<Animator>().SetTrigger("go");
@@ -89,6 +89,7 @@ public class LoadManager : MonoBehaviour
         
         TriggerScript.instance.StopAllCoroutines();
         PlayerManager.instance.StopAllCoroutines();
+        SoundManager.instance.SoundOff();
 
         StartCoroutine(LoadCoroutine("Main"));
 
@@ -106,7 +107,7 @@ public class LoadManager : MonoBehaviour
         SceneManager.LoadScene("Loading");
         yield return null;
 
-//인게임 로드 시 데이터 불러오기
+        //인게임 로드 시 데이터 불러오기
         if(isLoadingInGame){
             DBManager.instance.CallLoad(lastLoadFileNum);
 
@@ -115,11 +116,12 @@ public class LoadManager : MonoBehaviour
             
             Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
         }
-//인게임 로드 시 데이터 불러오기(마지막 저장지점)
+        //인게임 로드 시 데이터 불러오기(마지막 저장지점)
         else if(isLoadingInGameToLastPoint){
             if(lastLoadFileNum == -1){
-                DBManager.instance.curData = DBManager.instance.emptyData;
-                Debug.Log("빈 데이터 불러오기 성공");
+                //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
+                DBManager.instance.LoadDefaultData();
+                Debug.Log("기본 데이터 불러오기 성공");
 
             }
             else{
@@ -130,13 +132,15 @@ public class LoadManager : MonoBehaviour
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
         }
+        //인게임 > 메인화면 복귀
         else if(nextScene == "Main"){
                 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
         }
         else{
-            DBManager.instance.curData = DBManager.instance.emptyData;
+            DBManager.instance.LoadDefaultData();
+            //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
         }
 
         AsyncOperation asyncScene = SceneManager.LoadSceneAsync(nextScene);
@@ -181,7 +185,11 @@ public class LoadManager : MonoBehaviour
             //StartCoroutine(SetCameraPos(tempData.curMapNum));
             SceneController.instance.CameraView(PlayerManager.instance.transform);
             SceneController.instance.SetPlayerPosition();
+            SceneController.instance.SetPlayerEquipments();
+            InventoryManager.instance.ResetInventory();
             SceneController.instance.SetConfiner(tempData.curMapNum);
+            SoundManager.instance.SoundOff();
+            SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
 
         }
@@ -198,14 +206,22 @@ public class LoadManager : MonoBehaviour
                 //SceneController.instance.SetFirstLoad();
                 SceneController.instance.CameraView(PlayerManager.instance.transform);
                 SceneController.instance.SetPlayerPosition();
+                SceneController.instance.SetPlayerEquipments();
+                InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
+            SoundManager.instance.SoundOff();
+                SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log("빈 파일 로드 완료");
             }
             else{
                     
                 SceneController.instance.CameraView(PlayerManager.instance.transform);
                 SceneController.instance.SetPlayerPosition();
+                SceneController.instance.SetPlayerEquipments();
+                InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
+            SoundManager.instance.SoundOff();
+                SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
             }
 

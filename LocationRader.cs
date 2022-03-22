@@ -19,6 +19,16 @@ public class LocationRader : MonoBehaviour
                 curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");
             }
         }
+        else if(other.CompareTag("NPC")) {
+            if(other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = true;
+            }
+        }
+        else if(other.CompareTag("Box")) {
+            if(other.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = true;
+            }
+        }
     }
     void OnTriggerExit2D(Collider2D other) {
         if(other.CompareTag("Location")){
@@ -28,6 +38,16 @@ public class LocationRader : MonoBehaviour
                 //Debug.Log(curLocation.trigNum + "번 트리거 느낌표 비활성화");
                 //curLocation.targetMark.gameObject.SetActive(false);
                 curLocation.targetMark.GetComponent<Animator>().SetTrigger("off");
+            }
+        }
+        else if(other.CompareTag("NPC")) {
+            if(other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = false;
+            }
+        }
+        else if(other.CompareTag("Box")) {
+            if(other.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = false;
             }
         }
     }

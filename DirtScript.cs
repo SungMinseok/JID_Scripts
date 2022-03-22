@@ -13,6 +13,8 @@ public class DirtScript : MonoBehaviour
     public GameObject[] dirtPhases;
     //public bool pieceOn;
     public Transform[] dirtPieces;
+    public int innerItemIndex = -1;
+    public int innerHoneyAmount = 0;
     public float maxHp = 6;
     public int remainPieceCount;
     WaitForSeconds wait180ms = new WaitForSeconds(0.18f);
@@ -56,7 +58,14 @@ public class DirtScript : MonoBehaviour
                 dirtPhases[0].SetActive(false);
                 CreatePiece(0);
 
-                if(bundleType == BundleType.Icicle) InventoryManager.instance.AddItem(31);
+                if(bundleType == BundleType.Icicle){
+                    if(innerItemIndex != -1){
+                        InventoryManager.instance.AddItem(innerItemIndex);
+                    }
+                    if(innerHoneyAmount != 0){
+                        DBManager.instance.curData.curHoneyAmount += innerHoneyAmount;
+                    }
+                }
 
             }
             else if(curHp/maxHp<0.334f && remainPieceCount==2){
@@ -76,7 +85,12 @@ public class DirtScript : MonoBehaviour
         remainPieceCount -- ;
         dirtPieces[num].gameObject.SetActive(true);
         if(bundleType == BundleType.Dirt) dirtPieces[num].GetComponent<Rigidbody2D>().AddForce(new Vector2(Random.Range(-2f,2f),1) * (1), ForceMode2D.Impulse);
+        else if(bundleType == BundleType.Icicle){
+            if(curHp == 0){
+                SoundManager.instance.PlaySound("ice_broken_0"+Random.Range(1,3));
 
+            }
+        }
         if(curHp <=0){
             GetComponent<BoxCollider2D>().enabled =false;
         }

@@ -78,6 +78,8 @@ public class UIManager : MonoBehaviour
         }
 
         if(honeyText.text != DBManager.instance.curData.curHoneyAmount.ToString()){
+            
+            
             honeyText.text = DBManager.instance.curData.curHoneyAmount.ToString();
         }
 
@@ -151,6 +153,7 @@ public class UIManager : MonoBehaviour
     public void SetGameOverUI(int num){
         //PlayerManager.instance.LockPlayer();
         PlayerManager.instance.isGameOver = true;
+        SoundManager.instance.BgmOff();
         StartCoroutine(SetGameOverUICoroutine(num));
     }
     public void ResetGameOverUI(){
@@ -161,10 +164,24 @@ public class UIManager : MonoBehaviour
         
         DBManager.instance.EndingCollectionOver(num);
 
-        yield return new WaitForSeconds(1.5f);
+        yield return wait1000ms;
+        yield return wait500ms;
         //SetFadeOut();
         LoadManager.instance.FadeOut();
-        yield return new WaitForSeconds(1.5f);
+        yield return wait1000ms;
+        yield return wait500ms;
+
+        switch(num){
+            case 1 :
+                SoundManager.instance.PlaySound("spear_death");
+                yield return wait3000ms;
+                yield return wait500ms;
+                break;
+            case 2 : 
+                SoundManager.instance.PlaySound("ending_minigamefail");
+                break;
+        }
+
 
         if(MinigameManager.instance.nowMinigameNum!=-1) MinigameManager.instance.minigameScriptTransforms[MinigameManager.instance.nowMinigameNum].gameObject.SetActive(false);
         ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[num];
@@ -172,7 +189,7 @@ public class UIManager : MonoBehaviour
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();
 
-        SoundManager.instance.PlaySound("gameover"+Random.Range(0,3));
+        SoundManager.instance.PlaySound("gameover2");//+Random.Range(0,3));
         yield return new WaitForSeconds(2f);
         gameOverBtns.gameObject.SetActive(true);
 

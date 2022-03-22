@@ -152,6 +152,7 @@ public class Minigame1Script : MonoBehaviour
     {
         if(canSelect){
             if(Input.GetButtonDown("Interact_OnlyKey")){
+                canSelect = false;
                 StartCoroutine(CheckPointerPostion());
             }
         }
@@ -186,7 +187,7 @@ public class Minigame1Script : MonoBehaviour
     IEnumerator CheckPointerPostion(){
 
         mainBottle.SetTrigger("tilt");
-        canSelect = false;
+        SoundManager.instance.PlaySound("minigame_bottleclick");
 
         yield return new WaitForSeconds(1.8f);
         float minErrorValue = randomCenterPosVar - acceptableIntervals[curStage]/2f;
@@ -210,6 +211,7 @@ public class Minigame1Script : MonoBehaviour
                 bubbleObjects.GetChild(curStage+1).gameObject.SetActive(true);        
                 yield return wait500ms;
 
+        SoundManager.instance.PlaySound("minigame_lomechusedone");
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("finish");
                 yield return wait1000ms;
                 emptyBottles[curLevel].SetActive(false);

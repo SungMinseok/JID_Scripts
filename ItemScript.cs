@@ -119,11 +119,13 @@ public class ItemScript : MonoBehaviour
             StartCoroutine(GetItemAndRemoveCoroutine());
             //DM("꿀 충전 : "+amount_honey);
             DBManager.instance.curData.curHoneyAmount+=amount_honey;
+            SoundManager.instance.PlaySound("get_honeydrop");
         }
         else if(type == ItemType.Dirt){
             StartCoroutine(GetItemAndRemoveCoroutine());
             
             InventoryManager.instance.AddItem(5,3);
+            SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
 
             //DM("흙 충전 : "+amount_dirt);
             
@@ -137,6 +139,8 @@ public class ItemScript : MonoBehaviour
             DM(itemID+"번 아이템 "+amount_item+"개 획득");
             
             InventoryManager.instance.AddItem(itemID);
+
+            
         }
 
 

@@ -28,13 +28,13 @@ public class MinigameManager : MonoBehaviour
     
 #if UNITY_EDITOR || alpha
     void Update(){
-        if(PlayerManager.instance.isPlayingMinigame){
-            successBtn.SetActive(true);
-        }
-        else{
-            successBtn.SetActive(false);
+        // if(PlayerManager.instance.isPlayingMinigame){
+        //     successBtn.SetActive(true);
+        // }
+        // else{
+        //     successBtn.SetActive(false);
 
-        }
+        // }
     }
 #endif
     public void SuccessMinigame(){
@@ -42,6 +42,7 @@ public class MinigameManager : MonoBehaviour
         //PlayerManager.instance.isPlayingMinigame = false;
         //minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
+                SoundManager.instance.PlaySound("minigame_complete");
         StartCoroutine(FinishMinigameCoroutine());
     }
     //-1이면 setgameoverui 실행 x
@@ -68,7 +69,7 @@ public class MinigameManager : MonoBehaviour
         //success = true;
         PlayerManager.instance.isPlayingMinigame = false;
         Debug.Log(nowMinigameNum + "번 미니게임 강제 종료 : (테스트)");
-        ResetMinigameResult();
+        //ResetMinigameResult();
 
         // if(nowMinigameNum == 2){
         //     TriggerScript.instance.Action(16);
@@ -93,7 +94,7 @@ public class MinigameManager : MonoBehaviour
     }
 
     IEnumerator StartMinigameCoroutine(int gameNum){
-
+        ResetMinigameResult();
         nowMinigameNum = gameNum;
 
         LoadManager.instance.FadeOut();
@@ -123,7 +124,7 @@ public class MinigameManager : MonoBehaviour
         LoadManager.instance.FadeIn();
         nowMinigameNum = -1;
         PlayerManager.instance.isPlayingMinigame = false;
-        ResetMinigameResult();
+        //ResetMinigameResult();
     }
     public void ResetMinigameResult(){
         success = false;

@@ -65,6 +65,7 @@ public class Minigame3Script : MonoBehaviour
         }
     }
     public void OpenValve(int valveNum){
+        SoundManager.instance.PlaySound("potion_valve");
         valves[valveNum].GetComponent<Button>().enabled = false;
         materials[valveNum].SetActive(false);
         valves[valveNum].GetComponent<Animator>().SetBool("rotate",true);
@@ -73,6 +74,7 @@ public class Minigame3Script : MonoBehaviour
     public void MakePotion(){
         if(checkedMushroom){
             checkedMushroom = false;
+            SoundManager.instance.PlaySound("waterdrop");
             InventoryManager.instance.RemoveItem(13);
 
             emptyBottle.SetActive(false);
@@ -94,6 +96,7 @@ public class Minigame3Script : MonoBehaviour
     }
     public void GetPotion(){
         
+        SoundManager.instance.PlaySound("glass");
         emptyBottle.SetActive(true);
         for(int i=0;i<madePotions.Length;i++){
             madePotions[i].SetActive(false);

@@ -1,19 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
+public class EquipmentSprite{
+    public int id;
+    public Sprite sprite;
+}
 public class PlayerManager : MonoBehaviour
 {
 
     public static PlayerManager instance;
+    [Header("Objects━━━━━━━━━━━━━━━━━━━")]
+    public SpriteRenderer sr_helmet;
+    public SpriteRenderer sr_armor;
+    // public SpriteRenderer sr_shovel;
+    // public SpriteRenderer sr_pick;
     [Header("Current Status")]
     public float curSpeed;
-    public float curDirtAmount;
-    public float curHoneyAmount;
+    //public float curDirtAmount;
+    //public float curHoneyAmount;
     [Header("Current Equipment : Helmet/Armor/Weapon")]
-    public int[] equipments;
+    public int[] equipments_id;
+    // public int equip_helmet_id;
+    // public int equip_armor_id;
+    // public int equip_weapon_id;
     //public byte armorNum;
     //public uint weaponNum;
+    [Header("Equipment Sprites ( Need Set ) ━━━━━━━━━━━━━━")]
+    public EquipmentSprite[] equipmentSprites;
     [Header("Set Default Status")]
     [SerializeField] [Range(2f, 10f)] public float speed;
     [SerializeField] [Range(10f, 50f)] public float jumpPower;
@@ -23,7 +37,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Wearable Objects")]
     public SpriteRenderer[] helmets;
-    public SpriteRenderer[] wearables;
+    public SpriteRenderer[] weapons;//장착 무기 별로 애니메이션 달라서 개별설정 필요
     Coroutine animationCoroutine;
     WaitForSeconds animDelay0 = new WaitForSeconds(0.833f);
     WaitForSeconds animDelay1 = new WaitForSeconds(0.82f);
@@ -89,7 +103,7 @@ public class PlayerManager : MonoBehaviour
 
 
     public DebugManager d;
-    [Header("Animation─────────────────────")]
+    [Header("Animatior─────────────────────")]
     public Animator animator;
     public Animator animator_back;
 
@@ -99,11 +113,12 @@ public class PlayerManager : MonoBehaviour
     public Transform onTriggerCol;//onTrigger 콜라이더
     public Transform orderDestinationCol;
     public Collider2D footCol;
-    public GameObject curEquipment;
+    //public GameObject curEquipment;
     public GameObject[] tempHelmet;
-    [Header("ETC─────────────────────")]
+    [Header("Vignette━━━━━━━━━━━━━━━━━━")]
     public GameObject vignette;
     public GameObject darkerVignette;
+    public GameObject redVignette;
     public GameObject[] redEyes;
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
@@ -123,7 +138,7 @@ public class PlayerManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        equipments = new int[3]{-1,-1,-1};
+        equipments_id = new int[3]{-1,-1,-1};
     }
     public AnimationClip animation0;
     Color hideColor = new Color(1,1,1,0);
@@ -146,6 +161,18 @@ public class PlayerManager : MonoBehaviour
 
         // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
         // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
+
+
+        spriteRenderers = animator.gameObject.GetComponentsInChildren<SpriteRenderer>();
+        foreach(SpriteRenderer s in spriteRenderers){
+            s.sortingLayerName = "Player";
+        }
+        
+        for(int i=0;i<weapons.Length;i++){
+            weapons[i].gameObject.SetActive(false);
+        }
+        animator_back.speed = 0;
+        ApplyEquipments();
     }
 
 
@@ -250,7 +277,7 @@ public class PlayerManager : MonoBehaviour
             if(interactInput){
                 //InteractAction();
                 if(getDirt){
-                    if(equipments[2]==21){
+                    if(equipments_id[2]==21){
 
                     //if()
                         //interactInput = false;
@@ -266,7 +293,7 @@ public class PlayerManager : MonoBehaviour
                     }
                 }
                 else if(getIcicle){
-                    if(equipments[2]==26){
+                    if(equipments_id[2]==26){
                         animator.SetBool("icebreak", true);
                         if(!digFlag){
                             digFlag = true;
@@ -286,7 +313,13 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        
+        if(DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount <= 0.1f){
+            redVignette.SetActive(true);
+        }
+        else{
+            redVignette.SetActive(false);
+
+        }
     }
 
     void FixedUpdate()
@@ -374,13 +407,11 @@ public class PlayerManager : MonoBehaviour
                 animator_back.speed = 1;
             }
             else{
-
                 animator_back.speed = 0;
             }
 
         }
         else{
-            
             rb.gravityScale = gravityScale;
             ToggleBodyMode(1);
             //animator.gameObject.SetActive(true);
@@ -422,6 +453,7 @@ public class PlayerManager : MonoBehaviour
         }
         else{
 
+            animator_back.speed = 0;
             for(int i=0; i<spriteRenderers.Length;i++){
                 spriteRenderers[i].color = unhideColor;
             }
@@ -591,10 +623,10 @@ public class PlayerManager : MonoBehaviour
 
         switch(animNum){
             case 0 : 
-                _spriteRenderer = wearables[0];
+                _spriteRenderer = weapons[0];
                 break;
             case 1 : 
-                _spriteRenderer = wearables[1];
+                _spriteRenderer = weapons[1];
                 break;
             default :
                 _spriteRenderer = null;
@@ -640,6 +672,25 @@ public class PlayerManager : MonoBehaviour
         PlayerManager.instance.isForcedRun = false;
         
     }
+    public void KillPlayer(int endingCollectionNum, string animationName = "dead0"){
+        PlayerManager.instance.isGameOver = true;
+        PlayerManager.instance.canMove = false;
+        PlayerManager.instance.animator.SetBool(animationName,true);
+        switch(animationName){
+            case "dead0" :
+                SoundManager.instance.PlaySound("lucky_die_0"+Random.Range(1,3));
+                //SoundManager.instance.PlaySound("lucky_die_02");
+                break;
+            case "drowning" :
+                SoundManager.instance.PlaySound("waterdrop_0"+Random.Range(1,3));
+                //SoundManager.instance.PlaySound("lucky_die_02");
+                break;
+            default :
+                break;
+
+        }
+        UIManager.instance.SetGameOverUI(endingCollectionNum);
+    }
 
     public void LockPlayer(){
         PlayerManager.instance.canMove = false;
@@ -658,66 +709,101 @@ public class PlayerManager : MonoBehaviour
     public void DeactivateWaitInteract(){
         isWaitingInteract = false;
     }
-    public void SetEquipment(byte type, int itemID){// 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
-        switch(itemID){
-            //개미탈
-            case 2 :
-                tempHelmet[0] = helmets[0].gameObject;
-                tempHelmet[1] = helmets[1].gameObject;
-                //curEquipment = helmets[0].gameObject;
-                break;
-        }
+    public void SetEquipment(byte type, int itemID){//itemType 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
 
         switch(type){
             case 1:
-                if(equipments[0]!=itemID){
-                    equipments[0] = itemID;
-                    for(int i=0;i<2;i++){
-                        tempHelmet[i].SetActive(true);
+                if(equipments_id[0]!=itemID){
+                    equipments_id[0] = itemID;
+                    for(int i=0;i<equipmentSprites.Length;i++){
+                        if(equipmentSprites[i].id==itemID){
+                            Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                            break;
+                        }
                     }
-                    Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                    Debug.Log("fail equip : no item");
+                    
                 }
                 else{
-                    equipments[0] = -1;
-                    for(int i=0;i<2;i++){
-                        tempHelmet[i].SetActive(false);
-                    }
-                    Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                    equipments_id[0] = -1;
+                    Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
-                break;            
+                break;   
+            case 2: //옷
+                if(equipments_id[1]!=itemID){
+                    equipments_id[1] = itemID;
+                    for(int i=0;i<equipmentSprites.Length;i++){
+                        if(equipmentSprites[i].id==itemID){
+                            Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                            break;
+                        }
+                    }
+                    Debug.Log("fail equip : no item");
+                    
+                }
+                else{
+                    equipments_id[1] = -1;
+                    Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                }
+                break;
+         
             case 3:
-                if(equipments[2]!=itemID){
-                    equipments[2] = itemID;
-                    //curEquipment.gameObject.SetActive(true);
-                    Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                // if(equipments_id[2]!=itemID){
+                //     equipments_id[2] = itemID;
+                //     Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                // }
+                // else{
+                //     equipments_id[2] = -1;
+                //     Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                // }
+                
+                if(equipments_id[2]!=itemID){
+                    equipments_id[2] = itemID;
+                    for(int i=0;i<equipmentSprites.Length;i++){
+                        if(equipmentSprites[i].id==itemID){
+                            Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                            break;
+                        }
+                    }
+                    Debug.Log("fail equip : no item");
+                    
                 }
                 else{
-                    equipments[2] = -1;
-                    //curEquipment.gameObject.SetActive(false);
-                    Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
+                    equipments_id[2] = -1;
+                    Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;
 
-
-
-                // switch(itemID){
-                //     case 2:
-                //         if(equipments[0]!=itemID){
-                //             equipments[0] = itemID;
-                //             helmets[0].gameObject.SetActive(true);
-                //             Debug.Log("헬멧 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
-                //         }
-                //         else{
-                //             equipments[0] = -1;
-                //             helmets[0].gameObject.SetActive(false);
-                //             Debug.Log("헬멧 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.itemDataList[itemID].itemName);
-                //         }
-                        
-                //         break;
-                // }
             default :
                 break;
         }
+        ApplyEquipments();
+    }
+    public void ApplyEquipments(){
+        for(int i=0;i<equipmentSprites.Length;i++){
+            if(equipmentSprites[i].id == equipments_id[0]){
+                sr_helmet.sprite = equipmentSprites[i].sprite;
+                break;
+            }
+            sr_helmet.sprite = null;
+            
+        }
+        for(int i=0;i<equipmentSprites.Length;i++){
+            if(equipmentSprites[i].id == equipments_id[1]){
+                sr_armor.sprite = equipmentSprites[i].sprite;
+                break;
+            }
+            sr_armor.sprite = null;
+            
+        }
+        // for(int i=0;i<equipmentSprites.Length;i++){
+        //     if(equipmentSprites[i].id == equipments_id[2]){
+        //         sr_shovel.sprite = equipmentSprites[i].sprite;
+        //         break;
+        //     }
+        //     sr_weapon.sprite = null;
+        // }
+
     }
     public void SetTalkCanvasDirection(string direction = ""){
         if(talkCanvas!=null){
@@ -760,6 +846,7 @@ public class PlayerManager : MonoBehaviour
         SceneController.instance.SetLensOrthoSize(3.5f,0.04f);            
         SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
         animator.SetBool("shake", true);
+        SoundManager.instance.PlayLoopSound("lucky_afraid");
         //SceneController.instance.confiner2D.m_BoundingShape2D = null;//SceneController.instance.temp;
         yield return wait1000ms;
         yield return wait125ms;
@@ -773,6 +860,7 @@ public class PlayerManager : MonoBehaviour
             yield return wait125ms;
         }
         yield return wait1000ms;
+        SoundManager.instance.StopLoopSound();
         UIManager.instance.SetGameOverUI(2);
     }
 

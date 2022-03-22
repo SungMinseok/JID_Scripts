@@ -140,13 +140,19 @@ public class Minigame0Script : MonoBehaviour
 
 
                 if(curStage==10){
+                    SoundManager.instance.PlaySound("cut_paper");
                     curLevelFlag = false;
                     curStage = 0;
+                }
+                else{
+                    
+                    SoundManager.instance.PlaySound("button_01");
                 }
             }
         }
         else{
 
+                    SoundManager.instance.PlaySound("cutting_wrongkey");
             AddTimer(-timerPanelty);
         }
     }
@@ -176,6 +182,7 @@ public class Minigame0Script : MonoBehaviour
         
         isPaused = true;
         MinigameManager.instance.SuccessMinigame();
+        
 
 
 

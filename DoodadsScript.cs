@@ -79,12 +79,13 @@ public class DoodadsScript : MonoBehaviour
                 if(other.gameObject.CompareTag("Player")){
                     
                     if(!PlayerManager.instance.isGameOver){
+                        SoundManager.instance.PlaySound("minigame_bottlecrash");
+                        PlayerManager.instance.KillPlayer(4, "dead0");
 
-                        PlayerManager.instance.isGameOver = true;
-                        PlayerManager.instance.canMove = false;
-                        PlayerManager.instance.animator.SetBool("dead0",true);
-                        MinigameManager.instance.FailMinigame(4);
-                        //UIManager.instance.SetGameOverUI(4);
+                        // PlayerManager.instance.isGameOver = true;
+                        // PlayerManager.instance.canMove = false;
+                        // PlayerManager.instance.animator.SetBool("dead0",true);
+                        // MinigameManager.instance.FailMinigame(4);
                     }
                 }
                 else if(other.gameObject.CompareTag("MainGround") || other.gameObject.CompareTag("Collider_Player")){
@@ -121,10 +122,7 @@ public class DoodadsScript : MonoBehaviour
                     //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
                     if(PlayerManager.instance.isFalling){
 
-                        PlayerManager.instance.isGameOver = true;
-                        PlayerManager.instance.canMove = false;
-                        PlayerManager.instance.animator.SetBool("dead0",true);
-                        UIManager.instance.SetGameOverUI(0);
+                        PlayerManager.instance.KillPlayer(0, "dead0");
                     }
                 }
                 break;
@@ -156,11 +154,7 @@ public class DoodadsScript : MonoBehaviour
                 if(other.CompareTag("Player")){
                     //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
                     //if(PlayerManager.instance.isFalling){
-
-                        PlayerManager.instance.isGameOver = true;
-                        PlayerManager.instance.canMove = false;
-                        PlayerManager.instance.animator.SetBool("dead0",true);
-                        UIManager.instance.SetGameOverUI(0);
+                    PlayerManager.instance.KillPlayer(0, "drowning");
                     //}
                 }
                 break;

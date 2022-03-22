@@ -28,6 +28,7 @@ public class TriggerScript : MonoBehaviour
         Transform[] objects;
         objects = location.poses;
 
+//트리거 이미 완료됐을 때,
         if(DBManager.instance.CheckTrigOver(location.trigNum)){
             switch(location.trigNum){
                 case 22 :
@@ -57,6 +58,9 @@ public class TriggerScript : MonoBehaviour
                 case 38 :
                     objects[0].GetComponent<Rigidbody2D>().mass = 30f;
                     break;
+                case 29 :
+                    objects[0].gameObject.SetActive(false);
+                    break;
                 default :
                     break;
             }
@@ -66,6 +70,10 @@ public class TriggerScript : MonoBehaviour
                 case 9 :
                 case 37 :
                     objects[0].gameObject.SetActive(false);
+                    break;
+                case 201 :
+                    objects[0].gameObject.SetActive(false);
+                    objects[1].gameObject.SetActive(false);
                     break;
                 default :
                     break;
@@ -91,7 +99,6 @@ public class TriggerScript : MonoBehaviour
 
     //IEnumerator ActionCoroutine(int trigNum, Dialogue[] dialogues, Select[] selects, Transform[] objects){
     IEnumerator ActionCoroutine(Location location){
-        PlayerManager.instance.canMove =false;
 
         Dialogue[] dialogues = null;
         Select[] selects = null;
@@ -116,61 +123,71 @@ public class TriggerScript : MonoBehaviour
             objects = null;
         }
 
-//타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 중 움직이지 않고, 바라보도록 함
-        if(location.target != null){
-            
-            var npc = location.target.GetComponent<NPCScript>();
-            npc.isPaused = true;
-            npc.patrolInput = 0;
+        
+        if(dialogues != null){
 
-            if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
-                PlayerManager.instance.Look("right");
-            }
-            else{
-                PlayerManager.instance.Look("left");
+            PlayerManager.instance.canMove =false;
 
-            }
-            if(npc.lookPlayer){
+    //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 중 움직이지 않고, 바라보도록 함
+            if(location.target != null){
+                
+                var npc = location.target.GetComponent<NPCScript>();
+                npc.isPaused = true;
+                npc.patrolInput = 0;
+
                 if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
-                    npc.Look("left");
+                    PlayerManager.instance.Look("right");
                 }
                 else{
-                    npc.Look("right");
+                    PlayerManager.instance.Look("left");
 
+                }
+                if(npc.lookPlayer){
+                    if(npc.mainBody.position.x > PlayerManager.instance.transform.position.x){
+                        npc.Look("left");
+                    }
+                    else{
+                        npc.Look("right");
+
+                    }
+                }
+
+
+                //if(npc.animator!=null) npc.animator.SetBool("talk", true);
+            }
+            else{
+                if(location.transform.position.x > PlayerManager.instance.transform.position.x){
+                    PlayerManager.instance.Look("right");
+                }
+                else{
+                    PlayerManager.instance.Look("left");
+
+                }
+                PlayerManager.instance.SetTalkCanvasDirection();
+            }
+            if(!location.notZoom){
+
+                if(GameManager.instance.mode_zoomWhenInteract){
+
+                    SceneController.instance.SetCameraDefaultZoomIn();
+                    SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
                 }
             }
 
 
-            //if(npc.animator!=null) npc.animator.SetBool("talk", true);
-        }
-        else{
-            if(location.transform.position.x > PlayerManager.instance.transform.position.x){
-                PlayerManager.instance.Look("right");
+
+            // 메인 HUD 비활성화
+            if(location.trigNum<300){
+                UIManager.instance.SetHUD(false);
             }
-            else{
-                PlayerManager.instance.Look("left");
 
-            }
-            PlayerManager.instance.SetTalkCanvasDirection();
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
+            //트리거 시작시 배경음 감소
+            SoundManager.instance.bgmPlayer.volume = SoundManager.instance.bgmPlayer.volume * 0.3f;
+
+        
         }
-        if(!location.notZoom){
-
-            if(GameManager.instance.mode_zoomWhenInteract){
-
-                SceneController.instance.SetCameraDefaultZoomIn();
-                SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
-            }
-        }
-
-
-        //일반 트리거 1~100일 경우, 메인 HUD 비활성화
-        if(location.trigNum<300){
-            UIManager.instance.SetHUD(false);
-        }
-
-
-        SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
-        SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
 
 
         if(location.type == LocationType.Trigger){
@@ -235,6 +252,10 @@ public class TriggerScript : MonoBehaviour
 
                 if(ShopManager.instance.lastBuyItemIndex != -1){
 
+                    //dialogues[0].talker.GetComponent<NPCScript>().mainBody.GetComponent<Animator>().SetBool("talk", false);
+                    yield return new WaitUntil(()=>dialogues[0].talker.GetComponent<NPCScript>().
+                    mainBody.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("flea_idle"));
+
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
                 }
@@ -265,35 +286,52 @@ public class TriggerScript : MonoBehaviour
 //상점 - 두더지 
 #region 105
             case 105 :
-
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-
-                ShopManager.instance.OpenShopUI(0,"두더지 상점",new int[]{14,11});
-                yield return waitShopping;
-
-                if(ShopManager.instance.lastBuyItemIndex == 0){
-
-                    SetDialogue(dialogues[1]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[2]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[3]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[4]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[5]);
-                    yield return waitTalking;
+                //병원 방문 후
+                if(DBManager.instance.curData.trigOverList.Contains(40)){
+                    if(location.selectPhase ==0 ){
+                        location.selectPhase = 1;
+                        CameraView(dialogues[8].talker);
+                        SetDialogue(dialogues[8]);
+                        yield return waitTalking;
+                    }
+                    else{
+                        CameraView(dialogues[9].talker);
+                        SetDialogue(dialogues[9]);
+                        yield return waitTalking;
+                    }
                 }
-                else if(ShopManager.instance.lastBuyItemIndex == 1){
+                else{
 
-                    SetDialogue(dialogues[1]);
+                    SetDialogue(dialogues[0]);
                     yield return waitTalking;
-                    SetDialogue(dialogues[2]);
-                    yield return waitTalking;
-                    SetDialogue(dialogues[6]);
-                    yield return waitTalking;
+
+                    ShopManager.instance.OpenShopUI(0,"두더지 상점",new int[]{14,11});
+                    yield return waitShopping;
+
+                    if(ShopManager.instance.lastBuyItemIndex == 14){
+
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[3]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[4]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[5]);
+                        yield return waitTalking;
+                    }
+                    else if(ShopManager.instance.lastBuyItemIndex == 11){
+
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[6]);
+                        yield return waitTalking;
+                    }
                 }
+
 
                 break;
 #endregion
@@ -358,7 +396,7 @@ public class TriggerScript : MonoBehaviour
                 objects[1].gameObject.SetActive(false);
                 nerd_ant.gameObject.SetActive(false);
                 PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetConfiner(objects[0].parent.transform.GetSiblingIndex());
+                SceneController.instance.SetConfiner(1,true);
                 yield return new WaitForSeconds(0.1f);
                 SetHUD(true);
                 CameraView(PlayerManager.instance.transform);
@@ -405,7 +443,8 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 //SceneController.instance.npcs[1].gameObject.SetActive(true);
                 //SceneController.instance.npcs[2].gameObject.SetActive(true);
-                yield return wait3000ms;
+                yield return wait1000ms;
+                yield return wait500ms;
 
                 FadeOut();
                 yield return wait1000ms;
@@ -544,9 +583,9 @@ public class TriggerScript : MonoBehaviour
                 //CheatManager.instance.InputCheat("minigame 0");
                 MinigameManager.instance.StartMinigame(0);
                 yield return new WaitUntil(()=>MinigameManager.instance.success);
-                MinigameManager.instance.success = false;
+                //MinigameManager.instance.success = false;
                 
-                PlayerManager.instance.canMove =true;   
+                //PlayerManager.instance.canMove =true;   
                 SetDialogue(dialogues[10]);
                 yield return waitTalking;
                 SetDialogue(dialogues[11]);
@@ -792,8 +831,10 @@ public class TriggerScript : MonoBehaviour
                 SetSelect(selects[0]);
                 yield return waitSelecting;
                 
+                SoundManager.instance.PlaySound("book_open");
                 SetDialogue(dialogues[GetSelect()]);
                 yield return waitTalking;
+                SoundManager.instance.PlaySound("book_close");
                 
                     
                 
@@ -832,6 +873,7 @@ public class TriggerScript : MonoBehaviour
                         
                         objects[14].GetChild(1).GetComponent<Animator>().SetBool("hang", false);
                         objects[14].gameObject.SetActive(true);
+                        SoundManager.instance.PlaySound("water_pour");
                         yield return wait2000ms;
                         FadeIn();
 
@@ -864,7 +906,7 @@ public class TriggerScript : MonoBehaviour
                 SetHUD(false);
                 PlayerManager.instance.vignette.SetActive(false);
                 
-                SceneController.instance.SetConfiner(15);
+                SceneController.instance.SetConfiner(15,true);
                 PlayerManager.instance.transform.position = objects[5].position;
                 yield return wait100ms;
 
@@ -904,41 +946,46 @@ public class TriggerScript : MonoBehaviour
                 for(int i=8;i<17;i++){
                     objects[i].gameObject.SetActive(false);
                 }
-                PlayerManager.instance.transform.position = objects[6].position;
-                PlayerManager.instance.Look("right");
-                objects[7].gameObject.SetActive(true);
-                SceneController.instance.SetCameraDefaultZoomIn();
-
-
-                SetHUD(false);
-
-                yield return wait500ms;
-                if(GetSelect()==0){
-                    SetDialogue(dialogues[9]);
-                    yield return waitTalking;
-                }
-                else if(GetSelect()==1){
-                    
-                    SetDialogue(dialogues[10]);
-                    yield return waitTalking;
-                }
-
-                FadeOut();
-
-                if(GetSelect()==0){
-                    InventoryManager.instance.AddItem(17);
-                }
-                else if(GetSelect()==1){
-                    
-                    InventoryManager.instance.AddItem(0);
-                }
-                yield return wait2000ms;
-                objects[7].gameObject.SetActive(false);
-
-                FadeIn();
 
                 objects[17].GetComponent<Location>().isLocked = false;
+                    PlayerManager.instance.transform.position = objects[6].position;
+                    PlayerManager.instance.Look("right");
+                //게임 성공 시
+                if(MinigameManager.instance.success){
 
+                    objects[7].gameObject.SetActive(true);
+                    SceneController.instance.SetCameraDefaultZoomIn();
+
+
+                    SetHUD(false);
+
+                    yield return wait500ms;
+                    if(GetSelect()==0){
+                        SetDialogue(dialogues[9]);
+                        yield return waitTalking;
+                    }
+                    else if(GetSelect()==1){
+                        
+                        SetDialogue(dialogues[10]);
+                        yield return waitTalking;
+                    }
+
+                    FadeOut();
+
+                    if(GetSelect()==0){
+                        InventoryManager.instance.AddItem(17);
+                    }
+                    else if(GetSelect()==1){
+                        
+                        InventoryManager.instance.AddItem(0);
+                    }
+                    yield return wait2000ms;
+                    objects[7].gameObject.SetActive(false);
+
+                    FadeIn();
+
+
+                }
 
                 //FadeIn();
                 break;
@@ -996,6 +1043,8 @@ public class TriggerScript : MonoBehaviour
             case 25 :
 
                 if(!DBManager.instance.CheckTrigOver(24)){
+                    SoundManager.instance.PlaySound("locked_door");
+
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
                 }
@@ -1030,71 +1079,74 @@ public class TriggerScript : MonoBehaviour
 //대왕일개미방 내부 
 #region 26
             case 26 :
+                if(PlayerManager.instance.equipments_id[1] == -1){
+                        UIManager.instance.SetGameOverUI(4);
 
-
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-                SetSelect(selects[0]);
-                yield return waitSelecting;
-                
-                if(GetSelect()==0){
-                    for(int i=1;i<6;i++){
-                        SetDialogue(dialogues[i]);
-                        yield return waitTalking;
-                    }
-                    if(InventoryManager.instance.CheckHaveItem(3)
-                    ||InventoryManager.instance.CheckHaveItem(16)
-                    ||InventoryManager.instance.CheckHaveItem(19)
-                    ){
-                                
-                        SetDialogue(dialogues[6]);
-                        yield return waitTalking;
-                        SetDialogue(dialogues[7]);
-                        yield return waitTalking;
-                        SetSelect(selects[1]);
-                        yield return waitSelecting;
-                        if(GetSelect()==0){
-                            for(int i=8;i<14;i++){
-                                SetDialogue(dialogues[i]);
-                                yield return waitTalking;
-                            }
-                        }
-                        else{
-                            SetDialogue(dialogues[15]);
-                            yield return waitTalking;
-                            FadeOut();
-                            yield return wait1000ms;
-                            SceneController.instance.SetConfiner(25);
-                            PlayerManager.instance.transform.position = objects[0].transform.position;
-                            FadeIn();
-                            
-                            SetDialogue(dialogues[16]);
-                            yield return waitTalking;
-
-                            //방나가짐
-                        }
-
-                    }
-                    else{
-                        //방나가짐
-                            FadeOut();
-                            yield return wait1000ms;
-                            SceneController.instance.SetConfiner(25);
-                            PlayerManager.instance.transform.position = objects[0].transform.position;
-                            FadeIn();
-                    }
                 }
                 else{
-                    SetDialogue(dialogues[14]);
+                    SetDialogue(dialogues[0]);
                     yield return waitTalking;
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    
+                    if(GetSelect()==0){
+                        for(int i=1;i<6;i++){
+                            SetDialogue(dialogues[i]);
+                            yield return waitTalking;
+                        }
+                        if(InventoryManager.instance.CheckHaveItem(3)
+                        ||InventoryManager.instance.CheckHaveItem(16)
+                        ||InventoryManager.instance.CheckHaveItem(19)
+                        ){
+                                    
+                            SetDialogue(dialogues[6]);
+                            yield return waitTalking;
+                            SetDialogue(dialogues[7]);
+                            yield return waitTalking;
+                            SetSelect(selects[1]);
+                            yield return waitSelecting;
+                            if(GetSelect()==0){
+                                for(int i=8;i<14;i++){
+                                    SetDialogue(dialogues[i]);
+                                    yield return waitTalking;
+                                }
+                                location.selectPhase = -1;
+                            }
+                            else{
+                                SetDialogue(dialogues[15]);
+                                yield return waitTalking;
+                                FadeOut();
+                                yield return wait1000ms;
+                                SceneController.instance.SetConfiner(25);
+                                PlayerManager.instance.transform.position = objects[0].transform.position;
+                                FadeIn();
+                                
+                                SetDialogue(dialogues[16]);
+                                yield return waitTalking;
 
-                    //죽음
-                    UIManager.instance.SetGameOverUI(4);
+                                //방나가짐
+                            }
+
+                        }
+                        else{
+                            //방나가짐
+                                FadeOut();
+                                yield return wait1000ms;
+                                SceneController.instance.SetConfiner(25);
+                                PlayerManager.instance.transform.position = objects[0].transform.position;
+                                FadeIn();
+                        }
+                    }
+                    else{
+                        SetDialogue(dialogues[14]);
+                        yield return waitTalking;
+
+                        //죽음
+                        UIManager.instance.SetGameOverUI(4);
+                    }
+
+
                 }
-
-                location.selectPhase = -1;
-
-
 
                 break;
 #endregion
@@ -1102,67 +1154,85 @@ public class TriggerScript : MonoBehaviour
 //박사개미에게 말 
 #region 27
             case 27 :
-                PlayerManager.instance.SetTalkCanvasDirection();
 
-                var animator = objects[1].GetComponent<NPCScript>().mainBody.GetComponent<Animator>();
-
-                if(location.selectPhase == 0){
-                    location.selectPhase = 1;
-                    
-                    CameraView(dialogues[0].talker);
-                    //yield return new WaitUntil(()=>animator.GetCurrentAnimatorStateInfo(0).IsName("Ant_Scientist_idle"));
-                    SetDialogue(dialogues[0]);
-                    yield return waitTalking;
-                }
-
-                
-                if(InventoryManager.instance.CheckHaveItem(10)){
-                    //PlayerManager.instance.SetTalkCanvasDirection("left");
-                    CameraView(dialogues[1].talker);
-                    //yield return new WaitUntil(()=>animator.GetCurrentAnimatorStateInfo(0).IsName("Ant_Scientist_idle"));
-                    SetDialogue(dialogues[1]);
-                    yield return waitTalking;
-                    SetSelect(selects[0]);
-                    yield return waitSelecting;
-                    if(GetSelect()==0){
-                        location.selectPhase = -1;
-                        InventoryManager.instance.RemoveItem(10);
-                        CameraView(dialogues[2].talker);
-                        SetDialogue(dialogues[2]);
+                //병원 방문 후
+                if(DBManager.instance.curData.trigOverList.Contains(40)){
+                    if(location.selectPhase ==0 ){
+                        location.selectPhase = 1;
+                        CameraView(dialogues[6].talker);
+                        SetDialogue(dialogues[6]);
                         yield return waitTalking;
-                        CameraView(dialogues[3].talker);
-                        SetDialogue(dialogues[3]);
-                        yield return waitTalking;
-                        animator.SetBool("mess", true);
-                        SoundManager.instance.PlaySound("makingsound");
-
-                        yield return new WaitForSeconds(5.3f);
-
-                        animator.SetBool("success", true);
-
-                        yield return wait100ms;
-                        objects[0].gameObject.SetActive(true);
-                        CameraView(dialogues[4].talker);
-                        SetDialogue(dialogues[4]);
-                        yield return waitTalking;
-                        animator.SetBool("success", false);
-                        
-                        SetDialogue(dialogues[5]);
-                        yield return waitTalking;
-                        FadeOut();
-                        yield return wait1000ms;
-                        //objects[0].gameObject.SetActive(true);
-                        objects[1].gameObject.SetActive(false);
-                        yield return wait1000ms;
-                        FadeIn();
                     }
                     else{
+                        CameraView(dialogues[7].talker);
+                        SetDialogue(dialogues[7]);
+                        yield return waitTalking;
                     }
                 }
                 else{
-                    
-                }
 
+                    PlayerManager.instance.SetTalkCanvasDirection();
+
+                    var animator = objects[1].GetComponent<NPCScript>().mainBody.GetComponent<Animator>();
+
+                    if(location.selectPhase == 0){
+                        location.selectPhase = 1;
+                        
+                        CameraView(dialogues[0].talker);
+                        //yield return new WaitUntil(()=>animator.GetCurrentAnimatorStateInfo(0).IsName("Ant_Scientist_idle"));
+                        SetDialogue(dialogues[0]);
+                        yield return waitTalking;
+                    }
+
+                    
+                    if(InventoryManager.instance.CheckHaveItem(10)){
+                        //PlayerManager.instance.SetTalkCanvasDirection("left");
+                        CameraView(dialogues[1].talker);
+                        //yield return new WaitUntil(()=>animator.GetCurrentAnimatorStateInfo(0).IsName("Ant_Scientist_idle"));
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                        SetSelect(selects[0]);
+                        yield return waitSelecting;
+                        if(GetSelect()==0){
+                            location.selectPhase = -1;
+                            InventoryManager.instance.RemoveItem(10);
+                            CameraView(dialogues[2].talker);
+                            SetDialogue(dialogues[2]);
+                            yield return waitTalking;
+                            CameraView(dialogues[3].talker);
+                            SetDialogue(dialogues[3]);
+                            yield return waitTalking;
+                            animator.SetBool("mess", true);
+                            SoundManager.instance.PlaySound("makingsound");
+
+                            yield return new WaitForSeconds(5.3f);
+
+                            animator.SetBool("success", true);
+
+                            yield return wait100ms;
+                            objects[0].gameObject.SetActive(true);
+                            CameraView(dialogues[4].talker);
+                            SetDialogue(dialogues[4]);
+                            yield return waitTalking;
+                            animator.SetBool("success", false);
+                            
+                            SetDialogue(dialogues[5]);
+                            yield return waitTalking;
+                            FadeOut();
+                            yield return wait1000ms;
+                            //objects[0].gameObject.SetActive(true);
+                            objects[1].gameObject.SetActive(false);
+                            yield return wait1000ms;
+                            FadeIn();
+                        }
+                        else{
+                        }
+                    }
+                    else{
+                        
+                    }
+
+                }
 
                 break;
 #endregion
@@ -1190,6 +1260,8 @@ public class TriggerScript : MonoBehaviour
 #region 29
             case 29 :
 
+
+
                 if(location.selectPhase == 0){
                     location.selectPhase = 1;
                     SetDialogue(dialogues[0]);
@@ -1199,17 +1271,36 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
 
                 if(InventoryManager.instance.CheckHaveItem(8)){
-                    InventoryManager.instance.RemoveItem(8);
                     SetSelect(selects[0]);
                     yield return waitSelecting;
                     if(GetSelect()==0){
                         location.selectPhase = -1;
-                            
-                        for(int k=2;k<7;k++){
-                            CameraView(dialogues[k].talker);
-                            SetDialogue(dialogues[k]);
-                            yield return waitTalking;
-                        }
+                        InventoryManager.instance.RemoveItem(8);
+                                
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[3]);
+                        yield return waitTalking;
+                        FadeOut();
+                        yield return wait1000ms;
+                        SoundManager.instance.PlaySound("drinking_01");
+                        yield return wait500ms;
+                        yield return wait100ms;
+                        SoundManager.instance.PlaySound("healing_bubble");
+                        yield return wait500ms;
+                        SoundManager.instance.PlaySound("drinking_02");
+                        yield return wait1000ms;
+                        FadeIn();
+
+                        
+                        SetDialogue(dialogues[8]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[4]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[5]);
+                        yield return waitTalking;
+                        SetDialogue(dialogues[6]);
+                        yield return waitTalking;
                         InventoryManager.instance.AddItem(22);
 
 
@@ -1230,6 +1321,41 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion
+//병원 입장여부 체크
+#region 30
+            case 30 :
+
+                if(objects[0].GetComponent<Location>().isLocked ){
+
+                    if(location.selectPhase == 0){
+
+                        CameraView(dialogues[0].talker);
+                        SetDialogue(dialogues[0]);
+                        yield return waitTalking;
+                        location.selectPhase = 1;
+                    }
+
+                    //히든월드 입장했을 경우
+                    if(DBManager.instance.curData.trigOverList.Contains(39)){
+                        
+                        CameraView(dialogues[1].talker);
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                    }
+                    else{
+
+                        CameraView(dialogues[2].talker);
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
+                        objects[0].GetComponent<Location>().isLocked = false;
+                        location.GetComponent<BoxCollider2D>().enabled = false;
+                    }
+                }
+                
+                
+                
+                break;
+#endregion 
 //룰렛 ( 미니게임 5 )
 #region 31
             case 31 :
@@ -1338,6 +1464,8 @@ public class TriggerScript : MonoBehaviour
                         objects[0].gameObject.SetActive(true);
                         FadeIn();
 
+                        SetDialogue(dialogues[2]);
+                        yield return waitTalking;
                     }
                 }
 
@@ -1357,6 +1485,13 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion 
+//연못앞
+#region 39
+            case 39 :
+                objects[0].GetComponent<BoxCollider2D>().enabled = true;
+                objects[1].GetComponent<Location>().isLocked = true;
+                break;
+#endregion 
 
 
 //[엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
@@ -1364,10 +1499,25 @@ public class TriggerScript : MonoBehaviour
             case 201 :
                 FadeOut();
                 yield return wait2000ms;
-                FadeIn();
                 PlayerManager.instance.Look("right");
+                PlayerManager.instance.SetTalkCanvasDirection();
+                FadeIn();
+
+                //노개미 등장
+                objects[1].gameObject.SetActive(true);
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                CameraView(dialogues[1].talker);
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
         
-                for(int k=0;k<14;k++){
+                FadeOut();
+                yield return wait1000ms;
+                FadeIn();
+                //퀸 등장
+                objects[0].gameObject.SetActive(true);
+                for(int k=2;k<14;k++){
                     CameraView(dialogues[k].talker);
                     SetDialogue(dialogues[k]);
                     yield return waitTalking;
@@ -1398,7 +1548,21 @@ public class TriggerScript : MonoBehaviour
                 yield return wait1000ms;
                 FadeIn();
         
-                for(int k=0;k<11;k++){
+                //노개미 등장
+                objects[1].gameObject.SetActive(true);
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                CameraView(dialogues[1].talker);
+                SetDialogue(dialogues[1]);
+                yield return waitTalking;
+        
+                FadeOut();
+                yield return wait1000ms;
+                FadeIn();
+                //퀸 등장
+                objects[0].gameObject.SetActive(true);
+                for(int k=2;k<11;k++){
                     CameraView(dialogues[k].talker);
                     SetDialogue(dialogues[k]);
                     yield return waitTalking;
@@ -1665,11 +1829,15 @@ public class TriggerScript : MonoBehaviour
         }
 
 
-        yield return null;    
+        //yield return null;    
 
         UIManager.instance.SetHUD(true);
 
         CameraView(PlayerManager.instance.transform);
+
+//트리거 종료 후 배경음 볼륨 복구
+        SoundManager.instance.bgmPlayer.volume = MenuManager.instance.slider_bgm.value;
+
 
 //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동
         if(location.target != null){
@@ -1794,7 +1962,7 @@ public class TriggerScript : MonoBehaviour
         
         if(!location.stopCheck) PlayerManager.instance.canMove = true;
         else{
-            Debug.Log("3333333333");
+//            Debug.Log("3333333333");
             PlayerManager.instance.wSet = 0;
         }
 

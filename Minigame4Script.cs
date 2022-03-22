@@ -173,6 +173,8 @@ public class Minigame4Script : MonoBehaviour
 
             SetRandomPosition();
 
+//게임 진행 ( 진딧물 생성 )
+
             //Coroutine StageCoroutine = StartCoroutine(CreateAphids());
             //for(int i=0;i<aphidCreationCount;i++){
             while(curTimer>0 && !isPaused){
@@ -184,11 +186,12 @@ public class Minigame4Script : MonoBehaviour
                 }
 
                 aphids[Random.Range(0,aphids.Length)].SetActive(true);
+                SoundManager.instance.PlaySound("generating_aphid_0"+Random.Range(1,4));
                 CalculateDistance();
                 yield return waitAphidCreationCycle;
             }
 
-
+//결과
             if(score_ant>score_lucky){
                 rightRedDots[setScore_ant].SetActive(true);
                 setScore_ant ++;

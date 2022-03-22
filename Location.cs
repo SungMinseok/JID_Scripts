@@ -13,7 +13,8 @@ public enum LocationType{
     Dialogue,
     Trigger,
     Patrol_NPC,
-    Comment
+    Comment,
+    PlaySound,
 }
 public enum TargetType{
     Player,
@@ -37,6 +38,9 @@ public class Location : MonoBehaviour
     public bool flipCheck;
     public bool isLocked;
     public bool isDoor;//입/출구가 같이 있을 경우
+    public string doorSoundFileName;
+    public bool useTrigger;//트리거 사용 시 체크
+    public Location teleportTriggerlocation;
     [Header("Dialogue")]
     //public int dialogueNum;
     public bool stopCheck;
@@ -65,6 +69,12 @@ public class Location : MonoBehaviour
     [Header("Comment")]
     //Just 주석 (에디터 표시용)
     public string commentStr;
+
+    [Header("PlaySound")]
+    public string soundFileName;
+    public int soundRandomCount;
+    public float soundDelay;
+
     [HideInInspector] public bool locFlag;
     TriggerScript triggerScript;
     void Start(){
@@ -100,7 +110,7 @@ public class Location : MonoBehaviour
         }
 
         
-        if(type!=LocationType.Trigger && type!=LocationType.Teleport && type!=LocationType.Dialogue){
+        if(type!=LocationType.Trigger && type!=LocationType.Teleport && type!=LocationType.Dialogue && type!=LocationType.PlaySound){
             waitKey = false;
         }
     }
@@ -159,15 +169,20 @@ public class Location : MonoBehaviour
 
                         if(other.CompareTag("Player")){
                             if(desLoc!=null && !PlayerManager.instance.transferDelay){
+
                                 PlayerManager.instance.transform.position = desLoc.position;
-                                //PlayerManager.instance.hInput = 1;
-                                //PlayerManager.instance.hInput = 0;
-    //                            Debug.Log(desLoc.parent.transform.GetSiblingIndex());
-                                //SceneController.instance.SetConfiner(desLoc.parent.transform.parent.transform.GetSiblingIndex());
-                                //SceneController.instance.SetSomeConfiner(desLoc.parent.parent.GetChild(0).GetComponent<Collider2D>());
-                                //SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[desMapNum]);
-                                SceneController.instance.SetConfiner(desMapNum);
+                                SceneController.instance.SetConfiner(desMapNum,true);
+                                SoundManager.instance.SetBgmByMapNum(desMapNum);
+
                                 if(isDoor){
+                                    if(doorSoundFileName == ""){
+                                        SoundManager.instance.PlaySound(SoundManager.instance.defaultDoorSoundName);
+
+                                    }
+                                    else{
+                                        SoundManager.instance.PlaySound(doorSoundFileName);
+
+                                    }
                                     PlayerManager.instance.transferDelay = true;
                                     Invoke("TeleportDelay",1f);
 
@@ -183,7 +198,19 @@ public class Location : MonoBehaviour
                         if(preserveTrigger) locFlag = false;
                     }
                     else{
-                        locFlag = false;
+
+                        // if(useTrigger){
+                        //     triggerScript.Action(teleportTriggerlocation);
+                        // }
+                        // else{
+
+                        //     locFlag = false;
+                        // }
+
+                            locFlag = false;
+
+
+
                     }
                     
 
@@ -366,6 +393,16 @@ public class Location : MonoBehaviour
                         }
                     }
                     break;
+                    
+                case LocationType.PlaySound :
+                    Invoke("SoundDelay",soundDelay);
+                    if(soundRandomCount == 0){
+                        SoundManager.instance.PlaySound(soundFileName);
+                    }
+                    else{
+                        SoundManager.instance.PlaySound(soundFileName + Random.Range(0,soundRandomCount));
+                    }
+                    break;
                 default :
                     DebugManager.instance.PrintDebug("로케이션 오류");
                     break;
@@ -415,6 +452,10 @@ public class Location : MonoBehaviour
     IEnumerator ResetFlagDelayCoroutine(){
         yield return wait1000ms;
         locFlag= false;
+    }
+    void SoundDelay(){
+        locFlag = false;
+        Debug.Log("33");
     }
     void TeleportDelay(){
         PlayerManager.instance.transferDelay = false;
@@ -499,7 +540,7 @@ public class Location : MonoBehaviour
                 break;
             case LocationType.Trigger :
                 Gizmos.color = Color.cyan;   
-                Gizmos.DrawWireCube(transform.position, transform.localScale);
+                Gizmos.DrawWireCube(transform.position, transform.GetComponent<BoxCollider2D>().size);
 
                 //GUIStyle style = new GUIStyle();
                 style.fontSize = 20;
@@ -567,9 +608,13 @@ public class LocationEditor : Editor
             EditorGUILayout.Space();
             selected.desMapNum = EditorGUILayout.IntField("도착 맵 번호",selected.desMapNum,EditorStyles.toolbarTextField);
             EditorGUILayout.Space();
+            selected.useTrigger = EditorGUILayout.ToggleLeft("트리거 사용", selected.useTrigger);
+            selected.teleportTriggerlocation =  EditorGUILayout.ObjectField("도착지", selected.teleportTriggerlocation, typeof(Location), true) as Location;
+            EditorGUILayout.Space();
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
             EditorGUILayout.Space();
             selected.isDoor = EditorGUILayout.ToggleLeft("출입구가 같음", selected.isDoor);
+            selected.doorSoundFileName = EditorGUILayout.TextField("출입구 소리", selected.doorSoundFileName);
             EditorGUILayout.Space();
             selected.isLocked = EditorGUILayout.ToggleLeft("비활성화(잠금)", selected.isLocked);
             EditorGUILayout.Space();
@@ -636,7 +681,7 @@ public class LocationEditor : Editor
             selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
             selected.notZoom = EditorGUILayout.ToggleLeft("카메라 줌 사용 안함", selected.notZoom);
             EditorGUILayout.Space();
-            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지는 자동으로 반복 사용)", selected.preserveTrigger);
+            selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지 있으면 해제)", selected.preserveTrigger);
 
         }
         else if (selected.type == LocationType.Patrol_NPC)
@@ -649,6 +694,13 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.Comment)
         {
             selected.commentStr =  EditorGUILayout.TextField("주석",selected.commentStr);
+        }
+        else if (selected.type == LocationType.PlaySound)
+        {
+            selected.soundFileName =  EditorGUILayout.TextField("사운드명",selected.soundFileName);
+            selected.soundRandomCount = EditorGUILayout.IntField("사운드 랜덤 개수", selected.soundRandomCount);
+            selected.soundDelay = EditorGUILayout.FloatField("사운드 딜레이", selected.soundDelay);
+            selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
         }
         //EditorGUILayout.EndHorizontal();
 

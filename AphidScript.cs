@@ -132,11 +132,12 @@ public class AphidScript : MonoBehaviour
     void GetAphid(GameObject target){
         target.SetActive(false);
         if(unitType ==  UnitType.lucky){
-
+            SoundManager.instance.PlaySound("get_aphid_0"+Random.Range(1,3));
             Minigame4Script.instance.score_lucky ++ ;
         }
         else{
 
+            SoundManager.instance.PlaySound("ant_get_aphid_0"+Random.Range(1,4));
             Minigame4Script.instance.score_ant ++ ;
         }
         Minigame4Script.instance.SetScoreImage();

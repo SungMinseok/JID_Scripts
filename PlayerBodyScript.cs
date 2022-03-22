@@ -7,6 +7,7 @@ public class PlayerBodyScript : MonoBehaviour
     public PlayerManager thePlayer;
     [Header ("push 애니메이션 용, 본체 애니메이터 연결")]
     public Animator animator;
+    public bool cantPushSoundFlag;
     void OnCollisionStay2D(Collision2D other){
         // // foreach(ContactPoint2D contact in other.contacts){
         // //     var colName = contact.collider.name;
@@ -21,9 +22,16 @@ public class PlayerBodyScript : MonoBehaviour
         if(other.gameObject.CompareTag("Box")){
             if(animator.GetBool("run")){
                 animator.SetBool("push", true);
+                if(other.transform.TryGetComponent<Rigidbody2D>(out Rigidbody2D rigidbody2D)){
+                    if(rigidbody2D.mass >= 3000 && !cantPushSoundFlag){
+                        cantPushSoundFlag = true;
+                        SoundManager.instance.PlaySound("pot_touch");
+                    }
+                }
             }
             else{
                 animator.SetBool("push", false);
+                cantPushSoundFlag = false;
 
             }
         }
@@ -34,6 +42,7 @@ public class PlayerBodyScript : MonoBehaviour
                 
         if(other.gameObject.CompareTag("Box")){
             animator.SetBool("push", false);
+            cantPushSoundFlag = false;
             
         }
             // if(other.gameObject.CompareTag("Ground")||other.gameObject.CompareTag("Box")){
