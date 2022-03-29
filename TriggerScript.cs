@@ -46,7 +46,12 @@ public class TriggerScript : MonoBehaviour
                     }
                     break;     
                 case 27 :
-                    objects[1].gameObject.SetActive(false);
+                    //objects[1].gameObject.SetActive(false);
+                    objects[1].GetComponent<NPCScript>().mainBody.GetComponent<Animator>().SetBool("sleep", true);
+
+                    if(!InventoryManager.instance.CheckHaveItem(1)){
+                        objects[0].gameObject.SetActive(true);
+                    }
                     //if(!DBManager.instance.CheckTrigOver(location.trigNum)){
                     //    objects[0].gameObject.SetActive(true);
                     //} 
@@ -60,6 +65,10 @@ public class TriggerScript : MonoBehaviour
                     break;
                 case 29 :
                     objects[0].gameObject.SetActive(false);
+                    break;
+                case 43 :
+                    objects[0].GetComponent<Location>().isLocked = false;
+                    location.selectPhase = -1;
                     break;
                 default :
                     break;
@@ -194,17 +203,57 @@ public class TriggerScript : MonoBehaviour
            
             switch(location.trigNum){
 
-//저장개미
-#region 999
+
+#region 999 저장개미 첫만남
             case 999 :
+                CameraView(dialogues[0].talker);
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 SetSelect(selects[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(GetSelect()==0){
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                }
+                else{
+                    SetDialogue(dialogues[2]);
+                    yield return waitTalking;
+                }
+                SetDialogue(dialogues[3]);
+                yield return waitTalking;
+
+                SetSelect(selects[1]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(GetSelect()==0){
                     MenuManager.instance.savePanel.SetActive(true);
                     yield return new WaitUntil(()=>!MenuManager.instance.savePanel.activeSelf);
                 }
+
+                SetDialogue(dialogues[4]);
+                yield return waitTalking;
+
+                location.selectPhase = -1;
+                break;
+#endregion
+#region 998 저장개미 두번째 만남 이후
+            case 998 :
+                CameraView(dialogues[0].talker);
+                SetDialogue(dialogues[Random.Range(0,3)]);
+                yield return waitTalking;
+
+                SetDialogue(dialogues[3]);
+                yield return waitTalking;
+
+                SetSelect(selects[0]);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                
+                if(GetSelect()==0){
+                    MenuManager.instance.savePanel.SetActive(true);
+                    yield return new WaitUntil(()=>!MenuManager.instance.savePanel.activeSelf);
+                }
+
+                SetDialogue(dialogues[Random.Range(4,9)]);
+                yield return waitTalking;
                 break;
 #endregion
 
@@ -668,34 +717,49 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-//수레개미에게 말을 건다.
-#region 11
+#region 11 수개미방 직전 수레개미 말 걸기
             case 11 :
                 
+                CameraView(dialogues[0].talker);
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 InventoryManager.instance.AddItem(7);
                 break;
 #endregion
 
-//[미니게임1 - 로메슈제 제조] 술먹는 개미에게 말을 건다.
-#region 12
+#region 12th [미니게임1 - 로메슈제 제조] 술먹는 개미에게 말을 건다.
             case 12 :   
                 
-                SetDialogue(dialogues[0]);
-                yield return waitTalking;
-                InventoryManager.instance.RemoveItem(8);
-                SetDialogue(dialogues[1]);
-                yield return waitTalking;
-                SetDialogue(dialogues[2]);
-                yield return waitTalking;
-                SetDialogue(dialogues[3]);
-                yield return waitTalking;
+                InventoryManager.instance.RemoveItem(7);
 
+                for(int i=0;i<4;i++){
+                    CameraView(dialogues[i].talker);
+                    SetDialogue(dialogues[i]);
+                    yield return waitTalking;
+                }
                 
                 MinigameManager.instance.StartMinigame(1);
-                // CheatManager.instance.InputCheat("minigame 1");
-                yield return new WaitUntil(()=>MinigameManager.instance.success);
+                yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
+
+                if(MinigameManager.instance.success){
+
+                    DBManager.instance.TrigOver(41);
+                    CameraView(dialogues[4].talker);
+                    SetDialogue(dialogues[4]);
+                    yield return waitTalking;
+                    CameraView(dialogues[5].talker);
+                    SetDialogue(dialogues[5]);
+                    yield return waitTalking;
+                    InventoryManager.instance.AddItem(10);
+                }
+                else{
+
+                    CameraView(dialogues[6].talker);
+                    SetDialogue(dialogues[6]);
+                    yield return waitTalking;
+                }
+
+
                 break;
 #endregion
 
@@ -896,9 +960,8 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion
-            
-//진딧물농장 미니게임4
-#region 23
+           
+#region 23th 진딧물농장 미니게임4
             case 23 :
 
                 FadeOut();
@@ -1151,8 +1214,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-//박사개미에게 말 
-#region 27
+#region t27 박사개미와 대화
             case 27 :
 
                 //병원 방문 후
@@ -1208,6 +1270,7 @@ public class TriggerScript : MonoBehaviour
                             yield return new WaitForSeconds(5.3f);
 
                             animator.SetBool("success", true);
+                            animator.SetBool("mess", false);
 
                             yield return wait100ms;
                             objects[0].gameObject.SetActive(true);
@@ -1221,7 +1284,8 @@ public class TriggerScript : MonoBehaviour
                             FadeOut();
                             yield return wait1000ms;
                             //objects[0].gameObject.SetActive(true);
-                            objects[1].gameObject.SetActive(false);
+                            animator.SetBool("sleep", true);
+                            //objects[1].gameObject.SetActive(false);
                             yield return wait1000ms;
                             FadeIn();
                         }
@@ -1321,8 +1385,8 @@ public class TriggerScript : MonoBehaviour
 
                 break;
 #endregion
-//병원 입장여부 체크
-#region 30
+
+#region 30  병원 입장여부 체크
             case 30 :
 
                 if(objects[0].GetComponent<Location>().isLocked ){
@@ -1398,7 +1462,7 @@ public class TriggerScript : MonoBehaviour
 #endregion 
              
 //물약제조 ( 미니게임 3 )
-#region 32
+#region t32 물약제조 ( 미니게임 3 )
             case 32 :
                 MinigameManager.instance.minigameScriptTransforms[3].gameObject.SetActive(true);
                 yield return waitMoving;
@@ -1424,6 +1488,7 @@ public class TriggerScript : MonoBehaviour
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
                     InventoryManager.instance.AddDirt(20);
+                    SoundManager.instance.PlaySound("dirt_charge");
                 }
                 else if(location.selectPhase == 1){
                     SetDialogue(dialogues[1]);
@@ -1434,6 +1499,7 @@ public class TriggerScript : MonoBehaviour
                     if(GetSelect()==0){
                         location.selectPhase = -1;
                         InventoryManager.instance.AddDirt(20);
+                        SoundManager.instance.PlaySound("dirt_charge");
 
 
                     }
@@ -1493,9 +1559,104 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion 
 
+#region t41 로메슈제 미니게임1 재시작
+            case 41 :
+                if(!InventoryManager.instance.CheckHaveItem(7)){
+                    CameraView(dialogues[0].talker);
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else{
+                    int temp41 = Random.Range(1,4);
+                    CameraView(dialogues[1].talker);
+                    SetDialogue(dialogues[temp41]);
+                    yield return waitTalking;
+                    InventoryManager.instance.RemoveItem(7);
+                    MinigameManager.instance.StartMinigame(1);
+                    yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
 
-//[엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
-#region 201
+                    if(MinigameManager.instance.success){
+
+                        CameraView(dialogues[4].talker);
+                        SetDialogue(dialogues[4]);
+                        yield return waitTalking;
+                        CameraView(dialogues[5].talker);
+                        SetDialogue(dialogues[5]);
+                        yield return waitTalking;
+                        InventoryManager.instance.AddItem(10);
+                        location.preserveTrigger = false;
+                    }
+                    else{
+
+                        CameraView(dialogues[6].talker);
+                        SetDialogue(dialogues[6]);
+                        yield return waitTalking;
+                    }
+                }
+                break;
+#endregion 
+#region t42 수레개미 꿀방울 재획득
+            case 42 :
+                if(InventoryManager.instance.CheckHaveItem(7)){
+                    CameraView(dialogues[0].talker);
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else{
+                    CameraView(dialogues[1].talker);
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                        InventoryManager.instance.AddItem(7);
+                    
+                }
+                break;
+#endregion 
+#region t43 여왕개미방 입장여부 체크 // 최초 통과 후 더이상 진행 X ,
+            case 43 :
+                if(objects[0].GetComponent<Location>().isLocked ){
+
+                    //if(location.selectPhase == 0){
+
+                        CameraView(dialogues[0].talker);
+                        SetDialogue(dialogues[0]);
+                        yield return waitTalking;
+                        
+                        //location.selectPhase = 1;
+                    //}
+
+                    SetSelect(selects[0]);
+                    yield return waitSelecting;
+                    if(GetSelect()==0){
+                        CameraView(dialogues[1].talker);
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                    }
+                    else{
+                        
+                        if(InventoryManager.instance.CheckHaveItem(17)){
+                            
+                            CameraView(dialogues[2].talker);
+                            SetDialogue(dialogues[2]);
+                            yield return waitTalking;
+
+
+                            objects[0].GetComponent<Location>().isLocked = false;
+                            location.selectPhase = -1;
+                        }
+                        else{
+                            
+                            CameraView(dialogues[3].talker);
+                            SetDialogue(dialogues[3]);
+                            yield return waitTalking;
+                        }
+                    }
+
+                    
+                }
+                break;
+#endregion 
+
+#region 201st [엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
             case 201 :
                 FadeOut();
                 yield return wait2000ms;
@@ -1620,8 +1781,8 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.SetGameEndUI(4);
                 break;
 #endregion 
-//[엔딩5 : 꼭두각시]
-#region 205
+//
+#region t205 [엔딩5 : 꼭두각시]
             case 205 :
                 FadeOut();
                 yield return wait1000ms;

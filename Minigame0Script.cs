@@ -45,6 +45,10 @@ public class Minigame0Script : MonoBehaviour
 
         StartCoroutine(MinigameCoroutine());
         UIManager.instance.SetHUD(false);
+
+#if UNITY_EDITOR || alpha
+        MinigameManager.instance.successBtn.SetActive(true);
+#endif
     }
     void OnDisable(){
         PlayerManager.instance.UnlockPlayer();
@@ -52,6 +56,9 @@ public class Minigame0Script : MonoBehaviour
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();
 
+#if UNITY_EDITOR || alpha
+        MinigameManager.instance.successBtn.SetActive(false);
+#endif
     }
     // Start is called before the first frame update
     void Start()

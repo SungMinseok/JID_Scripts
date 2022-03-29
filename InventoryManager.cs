@@ -281,6 +281,7 @@ public class InventoryManager : MonoBehaviour
             case 2 : 
             case 3 : 
                 PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
+                SoundManager.instance.PlaySound("item_use");
                 break;
             // case 3 : 
             //     PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
@@ -303,11 +304,13 @@ public class InventoryManager : MonoBehaviour
                                 case 5:
         
                                     AddDirt(5);
+                                    SoundManager.instance.PlaySound("dirt_charge");
 
                                 
                                     break;
                                 
                                 default :
+                                    SoundManager.instance.PlaySound("item_use");
                                     break;
                             }
 #endregion
@@ -329,7 +332,6 @@ public class InventoryManager : MonoBehaviour
                 break;
         }
 
-        SoundManager.instance.PlaySound("item_use");
         RefreshInventory(curPage);
 
     }

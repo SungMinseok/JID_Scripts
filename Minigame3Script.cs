@@ -81,14 +81,17 @@ public class Minigame3Script : MonoBehaviour
             switch(curValveOrder){
                 case var value when value == recipes[0]:
                     madeEffect.SetTrigger("success");
+                    SoundManager.instance.PlaySound("potion_success");
                     madePotions[0].SetActive(true);
                     break;
                 case var value when value == recipes[1]:
                     madeEffect.SetTrigger("success");
+                    SoundManager.instance.PlaySound("potion_success");
                     madePotions[1].SetActive(true);
                     break;
                 default :
                     madeEffect.SetTrigger("fail");
+                    SoundManager.instance.PlaySound("potion_fail");
                     failedBottle.SetActive(true);
                     break;
             }

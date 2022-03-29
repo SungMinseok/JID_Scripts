@@ -5,6 +5,7 @@ using UnityEngine;
 public class EquipmentSprite{
     public int id;
     public Sprite sprite;
+    public Sprite sprite_back;
 }
 public class PlayerManager : MonoBehaviour
 {
@@ -12,14 +13,16 @@ public class PlayerManager : MonoBehaviour
     public static PlayerManager instance;
     [Header("Objects━━━━━━━━━━━━━━━━━━━")]
     public SpriteRenderer sr_helmet;
+    public SpriteRenderer sr_back_helmet;
     public SpriteRenderer sr_armor;
+    public SpriteRenderer sr_back_armor;
     // public SpriteRenderer sr_shovel;
     // public SpriteRenderer sr_pick;
     [Header("Current Status")]
     public float curSpeed;
     //public float curDirtAmount;
     //public float curHoneyAmount;
-    [Header("Current Equipment : Helmet/Armor/Weapon")]
+    [Header("Current Equipment : 0 Helmet/1 Armor/2 Weapon")]
     public int[] equipments_id;
     // public int equip_helmet_id;
     // public int equip_armor_id;
@@ -127,7 +130,8 @@ public class PlayerManager : MonoBehaviour
     Coroutine getLadderDelayCoroutine;
     void Awake()
     {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 120;
+        animator_back.speed = 0;
         if (null == instance)
         {
             instance = this;
@@ -140,7 +144,7 @@ public class PlayerManager : MonoBehaviour
 
         equipments_id = new int[3]{-1,-1,-1};
     }
-    public AnimationClip animation0;
+    //public AnimationClip animation0;
     Color hideColor = new Color(1,1,1,0);
     Color unhideColor = new Color(1,1,1,1);
     void Start()
@@ -167,11 +171,13 @@ public class PlayerManager : MonoBehaviour
         foreach(SpriteRenderer s in spriteRenderers){
             s.sortingLayerName = "Player";
         }
-        
+        spriteRenderers_back = animator_back.gameObject.GetComponentsInChildren<SpriteRenderer>();
+        foreach(SpriteRenderer s in spriteRenderers_back){
+            s.sortingLayerName = "Player";
+        }
         for(int i=0;i<weapons.Length;i++){
             weapons[i].gameObject.SetActive(false);
         }
-        animator_back.speed = 0;
         ApplyEquipments();
     }
 
@@ -783,6 +789,7 @@ public class PlayerManager : MonoBehaviour
         for(int i=0;i<equipmentSprites.Length;i++){
             if(equipmentSprites[i].id == equipments_id[0]){
                 sr_helmet.sprite = equipmentSprites[i].sprite;
+                sr_back_helmet.sprite = equipmentSprites[i].sprite_back;
                 break;
             }
             sr_helmet.sprite = null;
@@ -791,9 +798,11 @@ public class PlayerManager : MonoBehaviour
         for(int i=0;i<equipmentSprites.Length;i++){
             if(equipmentSprites[i].id == equipments_id[1]){
                 sr_armor.sprite = equipmentSprites[i].sprite;
+                sr_back_armor.sprite = equipmentSprites[i].sprite_back;
                 break;
             }
             sr_armor.sprite = null;
+            sr_back_armor.sprite = null;
             
         }
         // for(int i=0;i<equipmentSprites.Length;i++){

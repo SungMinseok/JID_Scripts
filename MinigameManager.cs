@@ -8,6 +8,7 @@ public class MinigameManager : MonoBehaviour
     public int nowMinigameNum;
     public Transform minigameParent;
     public GameObject successBtn;
+    public GameObject failBtn;
     public Transform[] minigameScriptTransforms;
     //public bool minigameFlag;
     
@@ -68,13 +69,17 @@ public class MinigameManager : MonoBehaviour
         }
         //success = true;
         PlayerManager.instance.isPlayingMinigame = false;
-        Debug.Log(nowMinigameNum + "번 미니게임 강제 종료 : (테스트)");
-        //ResetMinigameResult();
-
-        // if(nowMinigameNum == 2){
-        //     TriggerScript.instance.Action(16);
-        // }
-        
+        success = true;
+        Debug.Log(nowMinigameNum + "번 미니게임 강제 성공 (테스트)");
+    }
+    public void FailMinigameTest(){
+        for(int i=0;i<instance.transform.childCount;i++){
+            instance.transform.GetChild(i).gameObject.SetActive(false);
+        }
+        //success = true;
+        PlayerManager.instance.isPlayingMinigame = false;
+        fail = true;
+        Debug.Log(nowMinigameNum + "번 미니게임 강제 실패 (테스트)");
     }
     public void GiveReward(int gameNum){
         switch(gameNum){

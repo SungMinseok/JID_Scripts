@@ -77,6 +77,10 @@ public class Minigame1Script : MonoBehaviour
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
         //StartSliderMoving();
         UIManager.instance.SetHUD(false);
+#if UNITY_EDITOR || alpha
+        MinigameManager.instance.successBtn.SetActive(true);
+        MinigameManager.instance.failBtn.SetActive(true);
+#endif
     }
     void OnDisable(){
         PlayerManager.instance.UnlockPlayer();
@@ -84,6 +88,10 @@ public class Minigame1Script : MonoBehaviour
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();
 
+#if UNITY_EDITOR || alpha
+        MinigameManager.instance.successBtn.SetActive(false);
+        MinigameManager.instance.failBtn.SetActive(false);
+#endif
     }
     IEnumerator MinigameCoroutine(){
         //bubbleObjects.GetChild(0).gameObject.SetActive(true);

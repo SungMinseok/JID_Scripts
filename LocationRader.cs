@@ -29,6 +29,11 @@ public class LocationRader : MonoBehaviour
                 bodySoundScript.isNearPlayer = true;
             }
         }
+        else if(other.CompareTag("Speaker")) {
+            if(other.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = true;
+            }
+        }
     }
     void OnTriggerExit2D(Collider2D other) {
         if(other.CompareTag("Location")){
@@ -46,6 +51,11 @@ public class LocationRader : MonoBehaviour
             }
         }
         else if(other.CompareTag("Box")) {
+            if(other.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                bodySoundScript.isNearPlayer = false;
+            }
+        }
+        else if(other.CompareTag("Speaker")) {
             if(other.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
                 bodySoundScript.isNearPlayer = false;
             }

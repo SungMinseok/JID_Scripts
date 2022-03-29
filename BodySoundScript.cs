@@ -7,13 +7,13 @@ public class BodySoundScript : MonoBehaviour
     public enum BodyType{
         lucky,
         lucky_back,
-        pushable,
-        ant,
+        pushable,//속도 1 이상일 때, 플레이어 근처일 때 소리재생
+        ant,//플레이어 근처일때 걷는 소리 재생
         none
     }
     public BodyType bodyType;
-    [Header("pushable━━━━━━━━━━━━━━━━━━━━")]
     public bool isNearPlayer;
+    [Header("pushable━━━━━━━━━━━━━━━━━━━━")]
     //public bool isPushed;
     public MovingSound[] movingSounds;
     [System.Serializable]
@@ -78,6 +78,11 @@ public class BodySoundScript : MonoBehaviour
             if(DBManager.instance.curData.curMapNum == 14){
                 SoundManager.instance.PlaySound(fileName);
             }
+        }
+    }
+    public void PlaySoundOnlyNearPlayer(string fileName){
+        if(isNearPlayer){
+            SoundManager.instance.PlaySound(fileName);
         }
     }
     public void test(string a, int b){

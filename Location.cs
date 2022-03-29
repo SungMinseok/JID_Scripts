@@ -222,7 +222,7 @@ public class Location : MonoBehaviour
                         if(targetType == TargetType.Player){
                             if(other.CompareTag("Player")){
 
-                                Debug.Log("1");
+//                                Debug.Log("1");
                                 if(desLoc!=null){
                                     StartCoroutine(TriggerScript.instance.OrderCoroutine(this,PlayerManager.instance.transform,desLoc));
                                 }
@@ -245,9 +245,9 @@ public class Location : MonoBehaviour
 //                         }
 //                     }
                         else if(targetType == TargetType.NPC){
-                         Debug.Log("2");
+//                         Debug.Log("2");
                             if(other.CompareTag("NPC")){
-                                Debug.Log("3");
+//                                Debug.Log("3");
                                 if(desLoc!=null){
                                     StartCoroutine(TriggerScript.instance.OrderCoroutine_NPC(this,other.transform.GetComponent<NPCScript>(),desLoc));
                                 }

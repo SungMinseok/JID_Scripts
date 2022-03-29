@@ -161,8 +161,15 @@ public class UIManager : MonoBehaviour
         gameOverNewImage.gameObject.SetActive(false);
     }
     IEnumerator SetGameOverUICoroutine(int num){
+        bool endingAlreadyOver;
         
-        DBManager.instance.EndingCollectionOver(num);
+        if(!DBManager.instance.CheckEndingCollectionOver(num)){
+            DBManager.instance.EndingCollectionOver(num);
+            endingAlreadyOver = false;
+        }
+        else{
+            endingAlreadyOver = true;
+        }
 
         yield return wait1000ms;
         yield return wait500ms;
@@ -194,7 +201,7 @@ public class UIManager : MonoBehaviour
         gameOverBtns.gameObject.SetActive(true);
 
         
-        if(!DBManager.instance.CheckEndingCollectionOver(num)){
+        if(!endingAlreadyOver){
 
             UIManager.instance.gameOverNewImage.gameObject.SetActive(true);
         }
