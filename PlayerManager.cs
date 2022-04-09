@@ -78,6 +78,7 @@ public class PlayerManager : MonoBehaviour
     public bool isInvincible;   //on일 경우 흙 소모 안됨(테스트용)
     public bool transferDelay;  //텔레포트 시 딜레이(바로 이동 방지)
     public bool isShopping;
+    public int bodyMode;    //0 : 후면, 1 : 정면
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -149,11 +150,6 @@ public class PlayerManager : MonoBehaviour
     Color unhideColor = new Color(1,1,1,1);
     void Start()
     {
-        //rb = GetComponent<Rigidbody2D>();
-
-        //animator = GetComponent<Animator>();
-        //spriteRenderer = GetComponent<SpriteRenderer>();
-
         d = DebugManager.instance;
         defaultScale = playerBody.transform.localScale;
 
@@ -162,10 +158,6 @@ public class PlayerManager : MonoBehaviour
         talkCanvas = transform.GetChild(0).GetChild(0);
         talkCanvas.gameObject.SetActive(false);
         defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
-
-        // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
-        // Physics2D.IgnoreCollision(ObjectController.instance.npcs[0].gameObject.GetComponent<CircleCollider2D>(), boxCollider2D, true);
-
 
         spriteRenderers = animator.gameObject.GetComponentsInChildren<SpriteRenderer>();
         foreach(SpriteRenderer s in spriteRenderers){
@@ -187,12 +179,14 @@ public class PlayerManager : MonoBehaviour
         if(isGameOver){
             canMove = false;
         }
+        // if(MenuManager.instance != null){
+        //     canMove = MenuManager.instance.menuPanel.activeSelf ? false : true;
+        // }
         if (canMove)
         {
             wSet = 0;
             wInput = Input.GetAxisRaw("Horizontal");
             hInput = Input.GetAxisRaw("Vertical");
-            //jumpInput = Input.GetButton("Jump") ? true : false;
             jumpInput = Input.GetButton("Jump") ? true : false;
             interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
 
@@ -215,7 +209,7 @@ public class PlayerManager : MonoBehaviour
         }
 
 
-        // case 1 : 가만히 있거나 걸을 때(공중에 떠 있지 않을 때)
+#region case 1 : 가만히 있거나 걸을 때(공중에 떠 있지 않을 때)
         if (isGrounded)
         {
             isJumping = false;
@@ -229,7 +223,6 @@ public class PlayerManager : MonoBehaviour
             if(hInput<0 && !getLadder){
                 
                 animator.SetBool("down", true);
-                //bodyCollider2D.gameObject.SetActive(false);
                 bodyCollider2D.enabled = false;
 
                 if(jumpInput && !jumpDownFlag){
@@ -239,14 +232,14 @@ public class PlayerManager : MonoBehaviour
             }
             else{
                 animator.SetBool("down", false);
-                //bodyCollider2D.gameObject.SetActive(true);
                 bodyCollider2D.enabled = true;
 
             }
 
         }
+#endregion
 
-        // case 2 : 공중에 떠 있을 때
+#region case 2 : 공중에 떠 있을 때
         else
         {
             //점프안하고 추락 시 점프 가능한 것 방지
@@ -257,42 +250,38 @@ public class PlayerManager : MonoBehaviour
             isFalling = rb.velocity.y < 0 ? true : false;
 
         }
+#endregion
 
-        // case 3 : 좌우 이동 중
+#region case 3 : 좌우 이동 중
         if ((wInput != 0 || wSet != 0 || isForcedRun) )   
         {
             if(!isForcedRun) animator.SetBool("run", true);
             if (wInput > 0|| wSet > 0)
             {
-                //spriteRenderer.flipX = false;
                 playerBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
             }
             else if (wInput < 0|| wSet < 0)
             {
-                //spriteRenderer.flipX = true;
                 if(!isForcedRun)
                     playerBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
             }
         }
-        // case 4 : 좌우로 이동 중이지 않을 때
+#endregion
+
+#region case 4 : 좌우로 이동 중이지 않을 때
         else
         {
             
             animator.SetBool("run", false);
             
             if(interactInput){
-                //InteractAction();
                 if(getDirt){
                     if(equipments_id[2]==21){
 
-                    //if()
-                        //interactInput = false;
                         animator.SetBool("shoveling1", true);
-                        //if(!animator.GetCurrentAnimatorStateInfo(0).IsName("shoveling")){
                         if(!digFlag){
                             digFlag = true;
                             if(animationCoroutine!=null) StopCoroutine(animationCoroutine);
-    //                        Debug.Log("진행중이 아니여서 시작");
                             animationCoroutine = StartCoroutine(CheckAnimationState(0));
                             dirtTarget.GetDug();
                         }
@@ -309,12 +298,10 @@ public class PlayerManager : MonoBehaviour
                         }
                     }
                 }
-                //wearables0.gameObject.SetActive(true);
             }
             else{
                 animator.SetBool("shoveling1", false);
                 animator.SetBool("icebreak", false);
-                //wearables0.gameObject.SetActive(false);
 
             }
         }
@@ -326,6 +313,7 @@ public class PlayerManager : MonoBehaviour
             redVignette.SetActive(false);
 
         }
+#endregion
     }
 
     void FixedUpdate()
@@ -340,20 +328,12 @@ public class PlayerManager : MonoBehaviour
         curSpeed = speed * (1-isSlowDown);
         animator.SetFloat("walkSpeed", 1-isSlowDown);
 
-        //nowPlatform = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
-
-        //if(canMove){
         if (wInput != 0)
         {
             if(!animator.GetBool("down")){
 
                 rb.velocity = new Vector2(curSpeed * wInput, rb.velocity.y);
             }
-            // else if(isForcedRun){
-            //     if(animator.GetBool("down")){
-            //         rb.velocity = new Vector2(curSpeed * -1 * 0.5f, rb.velocity.y);
-            //     }
-            // }
 
         }
         else if (wSet != 0)
@@ -367,16 +347,13 @@ public class PlayerManager : MonoBehaviour
         {
             if (!jumpDelay && !onLadder)
             {
-                //jumpDelay = true;
-        //Debug.Log("jumpDelay : " + jumpDelay);
                 Jump();
-        //jumpDelay = true;
             }
 
         }
 
         if(getLadder){
-            if(hInput!=0){
+            if(hInput<0 || (hInput>0&&!isGrounded)){
                 onLadder = true;
                 jumpDelay = false;
                 
@@ -391,20 +368,14 @@ public class PlayerManager : MonoBehaviour
             if(jumpInput && wInput!=0 && canJumpFromLadder){
                 onLadder = false;
                 
-                //if(!jumpDelay){
                     if(getLadderDelayCoroutine!=null) StopCoroutine(getLadderDelayCoroutine);
                     getLadderDelayCoroutine = StartCoroutine(GetLadderDelay());
-                    //jumpDelay = true;
-        Debug.Log("jumpDelay : " + jumpDelay);
                     Jump();
-                //}
             }
             else{   
                 isJumping = false;
                 rb.gravityScale = 0f;
                 rb.velocity = new Vector2(0, (curSpeed*0.7f) * hInput  );
-                // animator.gameObject.SetActive(false);
-                // animator_back.gameObject.SetActive(true);
                 ToggleBodyMode(0);
             }
 
@@ -416,12 +387,16 @@ public class PlayerManager : MonoBehaviour
                 animator_back.speed = 0;
             }
 
+            if(isGrounded&&wInput!=0&&hInput==0){
+                onLadder = false;
+                rb.gravityScale = gravityScale;
+                ToggleBodyMode(1);
+            }
+
         }
         else{
             rb.gravityScale = gravityScale;
             ToggleBodyMode(1);
-            //animator.gameObject.SetActive(true);
-            //animator_back.gameObject.SetActive(false);
         }
 
 //[미니게임 2] - 강제 달리기 모션 + 포복 시 뒤로 이동
@@ -449,6 +424,7 @@ public class PlayerManager : MonoBehaviour
     }
     void ToggleBodyMode(int modeNum){
         //tempColor.a = 0;
+        bodyMode = modeNum;
         if(modeNum == 0 ){
             for(int i=0; i<spriteRenderers.Length;i++){
                 spriteRenderers[i].color = hideColor;
@@ -793,6 +769,7 @@ public class PlayerManager : MonoBehaviour
                 break;
             }
             sr_helmet.sprite = null;
+            sr_back_helmet.sprite = null;
             
         }
         for(int i=0;i<equipmentSprites.Length;i++){

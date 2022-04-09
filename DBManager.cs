@@ -12,11 +12,12 @@ public class DBManager : MonoBehaviour
     public uint buildNum;
     public string buildDate;
     public string language;
+    [Header("[Game]")]
     
     [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public float maxDirtAmount;
     public float dirtAmountPaneltyPerSeconds;
-    [Header("[Dialogue]─────────")]
+    [Header("[Dialogue]")]
     public float waitTime_dialogueInterval;
     public float waitTime_dialogueTypingInterval;
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
@@ -77,26 +78,40 @@ public class DBManager : MonoBehaviour
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList = new List<int>();
 
-        public Data DeepCopy(){
-            Data newCopy = new Data();
-            newCopy.playerX = this.playerX;
-            newCopy.playerY = this.playerY;
-            newCopy.curMapNum = this.curMapNum;
-            newCopy.curPlayDate = this.curPlayDate;
-            newCopy.curPlayTime = this.curPlayTime;
-            newCopy.curPlayCount = this.curPlayCount;
-            newCopy.curDirtAmount = this.curDirtAmount;
-            newCopy.curHoneyAmount = this.curHoneyAmount;
-            newCopy.curEquipmentsID = this.curEquipmentsID;
-            newCopy.itemList = this.itemList;
-            newCopy.trigOverList = this.trigOverList;
-            return newCopy;
-        }
+
+        //public Vector2 screenSize;
+
+        // public Data DeepCopy(){
+        //     Data newCopy = new Data();
+        //     newCopy.playerX = this.playerX;
+        //     newCopy.playerY = this.playerY;
+        //     newCopy.curMapNum = this.curMapNum;
+        //     newCopy.curPlayDate = this.curPlayDate;
+        //     newCopy.curPlayTime = this.curPlayTime;
+        //     newCopy.curPlayCount = this.curPlayCount;
+        //     newCopy.curDirtAmount = this.curDirtAmount;
+        //     newCopy.curHoneyAmount = this.curHoneyAmount;
+        //     newCopy.curEquipmentsID = this.curEquipmentsID;
+        //     newCopy.itemList = this.itemList;
+        //     newCopy.trigOverList = this.trigOverList;
+        //     return newCopy;
+        // }
     }
     
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
     public class LocalData{
         public List<int> endingCollectionOverList = new List<int>();
+
+        
+        [Header("Options")]
+        public float bgmVolume;
+        public float sfxVolume;
+        public bool onTalkingSound;
+        public int languageValue;
+        public bool isWindowedMode;
+        public int resolutionValue;
+        public int frameRateValue;
+        
     }
     public void SaveDefaultData(){
 
@@ -218,6 +233,8 @@ public class DBManager : MonoBehaviour
             if(file != null && file.Length >0){
                 localData =(LocalData)bf.Deserialize(file);
             }
+
+            //language = localData.language;
             
             file.Close();
         }
@@ -354,6 +371,17 @@ public class DBManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+
+
+        Application.targetFrameRate = 60;
+        QualitySettings.vSyncCount = 0;
+
+
+
+
+
+
         SaveDefaultData();
         CallLocalDataLoad();
 
@@ -364,7 +392,7 @@ public class DBManager : MonoBehaviour
         //ApplyStoryInfo();
         //CallLocalDataLoad();
     }
-    public void ApplyNewLanguage(){
+    public void ApplyNewLanguage(bool resetUI){
 
         ApplyItemInfo();
         ApplyCollectionInfo();
@@ -373,13 +401,20 @@ public class DBManager : MonoBehaviour
         //ApplyStoryInfo();
         //ApplySysMsgText();
 
-        if(InventoryManager.instance != null) InventoryManager.instance.ResetInventory();
-        if(MenuManager.instance != null){
-            MenuManager.instance.ResetCardOrder();
-            MenuManager.instance.menuPanel.SetActive(false);
-            MenuManager.instance.settingPanel.SetActive(false);
-            MenuManager.instance.menuPanel.SetActive(true);
-            MenuManager.instance.settingPanel.SetActive(true);
+
+        if(resetUI){
+            if(InventoryManager.instance != null) InventoryManager.instance.ResetInventory();
+
+            if(MenuManager.instance != null){
+                MenuManager.instance.ResetCardOrder();
+                if(MenuManager.instance.menuPanel.activeSelf){
+
+                    MenuManager.instance.menuPanel.SetActive(false);
+                    MenuManager.instance.menuPanel.SetActive(true);
+                }
+                MenuManager.instance.settingPanel.SetActive(false);
+                MenuManager.instance.settingPanel.SetActive(true);
+            }
         }
     }
 
@@ -388,7 +423,7 @@ public class DBManager : MonoBehaviour
     }
     void Update(){
         //System.DateTime dateTime = System.DateTime.Now;
-        curData.curPlayDate = DateTime.Now.ToString("yyyy-MM-dd hh:mm");
+        curData.curPlayDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
     }
 
     void FixedUpdate(){
@@ -427,16 +462,25 @@ public class DBManager : MonoBehaviour
         var a = CSVReader.instance.data_collection;
         cache_EndingCollectionDataList.Clear();
 
-        for(int i=0; i<a.Count; i++){
+        for(int x=0; x<a.Count; x++){
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
-            cache_EndingCollectionDataList.Add(new EndingCollection(
-                int.Parse(a[i]["ID"].ToString())
-                ,a[i]["name_"+language].ToString()
-                ,int.Parse(a[i]["resourceID"].ToString())
-                //byte.Parse(a[i]["type"].ToString()),
-                //int.Parse(a[i]["resourceID"].ToString()),
-                //bool.Parse(a[i]["isStack"].ToString())
-            ));
+
+            for(int i=0; i<a.Count; i++){
+                if(int.Parse(a[i]["sortOrder"].ToString())==x){
+
+                    cache_EndingCollectionDataList.Add(new EndingCollection(
+                        int.Parse(a[i]["ID"].ToString())
+                        ,a[i]["name_"+language].ToString()
+                        ,int.Parse(a[i]["resourceID"].ToString())
+                        //byte.Parse(a[i]["type"].ToString()),
+                        //int.Parse(a[i]["resourceID"].ToString()),
+                        //bool.Parse(a[i]["isStack"].ToString())
+                    ));
+
+                    break;
+                }
+
+            }
         }
     }
 

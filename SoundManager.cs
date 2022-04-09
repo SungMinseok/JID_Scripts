@@ -176,7 +176,7 @@ public class SoundManager : MonoBehaviour
                 bgmPlayer.clip = null;
                 bgmPlayer.Stop();
             }
-            while(bgmPlayer.volume < 1){
+            while(bgmPlayer.volume < MenuManager.instance.slider_bgm.value){
                 bgmPlayer.volume += 0.05f;
                 yield return wait10ms;
             }
@@ -212,15 +212,21 @@ public class SoundManager : MonoBehaviour
     // }
 
     #region 옵션에서 볼륨조절
-    public void SetVolumeSFX()
+    public void SetVolumeSFX(float value)
     {
-        sfxPlayer.volume = MenuManager.instance.slider_sound.value;
+        DBManager.instance.localData.sfxVolume = value;
+        sfxPlayer.volume = value;
     }
 
-    public void SetVolumeBGM()
+    public void SetVolumeBGM(float value)
     {
-        bgmPlayer.volume = MenuManager.instance.slider_bgm.value;
+        DBManager.instance.localData.bgmVolume = value;
+        bgmPlayer.volume = value;
     }
+    // public void SetVolumeBGM(float value)
+    // {
+    //     bgmPlayer.volume = value;
+    // }
     #endregion
 
 }

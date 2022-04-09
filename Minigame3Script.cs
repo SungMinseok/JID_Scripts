@@ -49,6 +49,12 @@ public class Minigame3Script : MonoBehaviour
     void ResetGameSettings(){
         ResetValves();
 
+        //notePage.SetActive(false);
+
+        openedCapsule.SetActive(false);
+        closedCapsule.SetActive(true);
+
+        checkedMushroom = false;
     }
     public void ResetValves(){
         curValveOrder = "";
@@ -104,6 +110,7 @@ public class Minigame3Script : MonoBehaviour
         for(int i=0;i<madePotions.Length;i++){
             madePotions[i].SetActive(false);
         }
+        failedBottle.SetActive(false);
 
         
         switch(curValveOrder){
@@ -164,6 +171,7 @@ public class Minigame3Script : MonoBehaviour
     }
     private void OnEnable() {
         PlayerManager.instance.LockPlayer();
+       // ResetValves();
         ResetGameSettings();
 
         openedCapsule.SetActive(false);
@@ -180,7 +188,6 @@ public class Minigame3Script : MonoBehaviour
     void OnDisable(){
         //SceneController.instance.SetConfiner(DBManager.instance.curData.curMapNum);
         //SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
-        
         PlayerManager.instance.UnlockPlayer();
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();

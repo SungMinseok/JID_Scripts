@@ -50,7 +50,7 @@ public class SelectManager : MonoBehaviour
         curSelectedNum = 0;
     }
 
-    public void SetSelect(Select select, string[] argument){
+    public void SetSelect(Select select, string[] arguments){
 
         //PlayerManager.instance.LockPlayer();
 
@@ -60,10 +60,10 @@ public class SelectManager : MonoBehaviour
             UIManager.instance.ui_select_grid.GetChild(i).gameObject.SetActive(true);
             int temp = int.Parse(select.answers[i]);
 
-            if(argument != null){
+            if(arguments != null){
 
                 UIManager.instance.ui_select_grid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text //= CSVReader.instance.GetIndexToString(temp,"select");//select.answers[i];
-                = string.Format(CSVReader.instance.GetIndexToString(temp,"select"), argument[i]);
+                = string.Format(CSVReader.instance.GetIndexToString(temp,"select"), arguments[i]);
             }
             else{
                 

@@ -90,6 +90,10 @@ public class MinigameManager : MonoBehaviour
     }
     public void StartMinigame(int gameNum){
 
+        PlayerManager.instance.isPlayingMinigame = true;
+        // if(nowMinigameNum == 2){
+        //     PlayerManager.instance.canMove = false;
+        // }
 
         Debug.Log(gameNum + "번 미니게임 시작");
 
@@ -106,9 +110,8 @@ public class MinigameManager : MonoBehaviour
         yield return wait1000ms;
         var nowMinigame = minigameScriptTransforms[gameNum];
 
-        if(gameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
+        if(gameNum < minigameParent.childCount){// && !PlayerManager.instance.isPlayingMinigame){
             
-            PlayerManager.instance.isPlayingMinigame = true;
             if(nowMinigameNum == 4){
                 PlayerManager.instance.canMove = false;
             }

@@ -62,6 +62,7 @@ public class Location : MonoBehaviour
     public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     public bool notZoom; //카메라 줌 X
+    public bool holdPlayer; //True 시, 트리거 종료 후 이동 제한 해제 X
     [Header("Patrol_NPC")]
     public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
@@ -680,6 +681,7 @@ public class LocationEditor : Editor
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
             selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
             selected.notZoom = EditorGUILayout.ToggleLeft("카메라 줌 사용 안함", selected.notZoom);
+            selected.holdPlayer = EditorGUILayout.ToggleLeft("종료 후 이동불가", selected.holdPlayer);
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지 있으면 해제)", selected.preserveTrigger);
 

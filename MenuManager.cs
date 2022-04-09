@@ -25,6 +25,8 @@ public class MenuManager : MonoBehaviour
     public GameObject popUpPanel1;
     public TextMeshProUGUI[] popUpText1; //main, sub, ok, cancel
     public bool popUpOkayCheck;
+    public GameObject popUpOnWork;
+    public bool waitPopUpClosed;
     [Header("UI_Save&Load")]
     public GameObject savePanel;
     public GameObject loadPanel;
@@ -39,6 +41,12 @@ public class MenuManager : MonoBehaviour
     public Transform setting_languagePage;
     public Slider slider_sound;
     public Slider slider_bgm;
+    public GameObject toggleBtnOff_talkSound;
+    public GameObject toggleBtnOn_talkSound;
+    public GameObject checkedBtn_fullScreen;
+    public GameObject checkedBtn_window;
+    public TMP_Dropdown dropdown_resolution;
+    public TMP_Dropdown dropdown_frameRate;
     [System.Serializable]
     public class SaveLoadSlot{
         public TextMeshProUGUI saveNameText;
@@ -66,17 +74,17 @@ public class MenuManager : MonoBehaviour
     void Awake(){
         instance = this;
     }    
-    void Update(){
-            if(Input.GetButtonUp("Cancel") && PlayerManager.instance.canMove){
-                menuPanel.SetActive(!menuPanel.activeSelf);
-            }
+    // void Update(){
+    //     if(menuPanel.activeSelf){
 
-            //Debug.Log(curPopUpType);
-    }
+    //     }
+
+    // }
     void Start(){
 
 #region Reset Collection
-        totalPage = DBManager.instance.endingCollectionSprites.Length;
+        //totalPage = DBManager.instance.endingCollectionSprites.Length;
+        totalPage = DBManager.instance.cache_EndingCollectionDataList.Count;
         ResetCardOrder();
 
         collectionScrollArrows[0].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollRightBtn());
@@ -121,8 +129,29 @@ public class MenuManager : MonoBehaviour
         ResetLoadSlots();
 #endregion
 #region Settings
-        slider_bgm.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeBGM();});
-        slider_sound.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeSFX();});
+        slider_bgm.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeBGM(MenuManager.instance.slider_bgm.value);});
+        slider_sound.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeSFX(MenuManager.instance.slider_sound.value);});
+        dropdown_resolution.onValueChanged.AddListener(delegate{SetResolutionByValue(dropdown_resolution.value);});
+        dropdown_frameRate.onValueChanged.AddListener(delegate{SetFrameRateByValue(dropdown_frameRate.value);});
+
+        for(int i=0;i<setting_languagePage.childCount;i++){
+            int temp = i;
+            setting_languagePage.GetChild(i).GetComponent<Button>().onClick.AddListener(()=>ChangeLanguage(temp));
+
+        }
+
+
+        SoundManager.instance.SetVolumeBGM(DBManager.instance.localData.bgmVolume);
+        slider_bgm.value = DBManager.instance.localData.bgmVolume;
+        SoundManager.instance.SetVolumeSFX(DBManager.instance.localData.sfxVolume);
+        slider_sound.value = DBManager.instance.localData.sfxVolume;
+        ToggleTalkSound(DBManager.instance.localData.onTalkingSound);
+
+        ChangeLanguage(DBManager.instance.localData.languageValue, resetUI : false);
+
+        SetWindowedMode(DBManager.instance.localData.isWindowedMode);
+        dropdown_resolution.value = DBManager.instance.localData.resolutionValue;
+        dropdown_frameRate.value = DBManager.instance.localData.frameRateValue;
 #endregion
     
     }
@@ -137,10 +166,7 @@ public class MenuManager : MonoBehaviour
 
 
     // void Update(){
-    //     if(animator.GetCurrentAnimatorStateInfo(0).IsName("Base Layer.Collection_Scroll_Right") && animator.GetCurrentAnimatorStateInfo(0).normalizedTime>=1f){
-    //         RearrangeCardOrder();
-    //         Debug.Log("33");
-    //     }
+
     // }
 #region Collection
     public void CollectionScrollRightBtn(){
@@ -182,24 +208,26 @@ public class MenuManager : MonoBehaviour
 //        Debug.Log(tempCardNum[0]+","+tempCardNum[1]+","+tempCardNum[2]+","+tempCardNum[3]+","+tempCardNum[4]);
     }
     public void RearrangeCards(){
+
+        if(DBManager.instance == null) return;
+
+        DBManager theDB = DBManager.instance;
+
         for(int i=0;i<5;i++){
 
-            if(DBManager.instance.CheckEndingCollectionOver(tempCardNum[i])){
-                collectionCardImages[i].sprite = DBManager.instance.endingCollectionSprites[tempCardNum[i]];//collectionCardSprites[tempCardNum[i]];
-                //collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[i].name;
+            if(theDB.CheckEndingCollectionOver(theDB.cache_EndingCollectionDataList[tempCardNum[i]].ID)){
+                //collectionCardImages[i].sprite = DBManager.instance.endingCollectionSprites[tempCardNum[i]];
+                collectionCardImages[i].sprite = theDB.cache_EndingCollectionDataList[tempCardNum[i]].sprite;
             }
             else{
 
                 collectionCardImages[i].sprite = collectionNullImage;//collectionCardSprites[tempCardNum[i]];
                 //collectionNameText.text = "???";
             }
-
-
-
         }
 
     
-        if(DBManager.instance.CheckEndingCollectionOver(tempCardNum[2])){
+        if(DBManager.instance.CheckEndingCollectionOver(theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID)){
             collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
             collectionSubText0.text = "획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
         }
@@ -385,8 +413,12 @@ public class MenuManager : MonoBehaviour
         popUpOkayCheck = false;
 
     }
+    public void ClosePopUp(){
+        waitPopUpClosed = false;
+    }
     public void Save(int curSaveNum){
         DBManager.instance.CallSave(curSaveNum);
+        LoadManager.instance.lastLoadFileNum = curSaveNum;
         saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");
         saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
     }
@@ -439,7 +471,7 @@ public class MenuManager : MonoBehaviour
     }
 #endregion
 
-#region Settings
+#region Settings / Options
     public void OpenSettingPage(int pageNum){
         foreach(GameObject page in settingPages){
             page.SetActive(false);
@@ -452,26 +484,120 @@ public class MenuManager : MonoBehaviour
         settingMenuBtns[pageNum].interactable = false;
     }
 
-    public void ChangeLanguage(int languageNum){
+    public void ChangeLanguage(int languageNum , bool resetUI = true){
         for(int i=0;i<setting_languagePage.childCount;i++){
             setting_languagePage.GetChild(i).GetComponent<Button>().interactable = true;
         }
+//        Debug.Log(languageNum);
 
         setting_languagePage.GetChild(languageNum).GetComponent<Button>().interactable = false;
-
+        string lang = "";
         switch(languageNum){
             case 0 :    
-                DBManager.instance.language = "kr";
+                lang = "kr";
                 break;
             case 1 :    
-                DBManager.instance.language = "en";
+                lang = "en";
                 break;
             case 2 :    
-                DBManager.instance.language = "jp";
+                lang = "jp";
                 break;
         }
-        DBManager.instance.ApplyNewLanguage();
+        DBManager.instance.language = lang;
+        DBManager.instance.localData.languageValue = languageNum;
+
+        DBManager.instance.ApplyNewLanguage(resetUI);
+    }
+
+    public void ToggleTalkSound(bool active){
+        //false : off, 1 : on
+        //if(active){
+            //Debug.Log(gameObject.name);
+            toggleBtnOff_talkSound.SetActive(!active);
+            toggleBtnOn_talkSound.SetActive(active);
+            DBManager.instance.localData.onTalkingSound  = active;
+
+        // }
+        // else{
+        //     toggleBtnOff_talkSound.SetActive(true);
+        //     toggleBtnOn_talkSound.SetActive(false);
+        //     DBManager.instance.curData.onTalkingSound = true;
+        // }
+    }
+    public void SetWindowedMode(bool active){
+        checkedBtn_fullScreen.SetActive(!active);
+        checkedBtn_window.SetActive(active);
+        DBManager.instance.localData.isWindowedMode  = active;
+        SetResolutionByValue(DBManager.instance.localData.resolutionValue);
+        //SetResolutionBySavedValue();
+    }
+
+    public void SetResolutionByValue(int value){
+
+        DBManager.instance.localData.resolutionValue = value;
+
+        int width=0, height=0;
+        switch(value){
+            case 0 :
+                width = 1920;
+                height = 1080;
+                break;
+            case 1 :
+                width = 1680;
+                height = 1050;
+                break;
+        }
+        SetResolution(width, height);
+
+        // DBManager.instance.localData.screenWidth = width;
+        // DBManager.instance.localData.screenHeight = height;
+        // SetResolutionBySavedValue();
+    }
+    // public void SetResolutionBySavedValue(){
+    //     Screen.SetResolution(DBManager.instance.localData.screenWidth,DBManager.instance.localData.screenHeight,!DBManager.instance.localData.isWindowedMode);
+    // }
+    void SetResolution(int width, int height){
+        Screen.SetResolution(width,height,!DBManager.instance.localData.isWindowedMode);
+    }
+    
+    public void SetFrameRateByValue(int value){
+        DBManager.instance.localData.frameRateValue = value;
+
+        switch(value){
+            case 0 :
+                SetFrameRate(144);
+                break;
+            case 1 :
+                SetFrameRate(60);
+                break;
+            case 2 :
+                SetFrameRate(30);
+                break;
+        }
+        
+    }
+    // public void SetFrameRateBySavedValue(){
+    //     //Debug.Log(DBManager.instance.localData.frameRate);
+    //     SetFrameRateByValue(DBManager.instance.localData.frameRateValue);
+    //     //Application.targetFrameRate = DBManager.instance.localData.frameRate;
+    //     //QualitySettings.vSyncCount = 0;
+    // }
+
+    void SetFrameRate(int frameRate){
+        Application.targetFrameRate = frameRate;
+        QualitySettings.vSyncCount = 0;
     }
 
 #endregion
+
+    public void ToggleMenuPanel(bool active){
+        MenuManager.instance.menuPanel.SetActive(active);
+        if(active){
+            PlayerManager.instance.LockPlayer();
+        }
+        else{
+            PlayerManager.instance.UnlockPlayer();
+
+        }
+    }
 }

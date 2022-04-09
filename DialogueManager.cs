@@ -47,14 +47,10 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    // public void SetFullDialogue(Dialogue[] dialogues,bool stopCheck = false)
-    // {
-    //     StartCoroutine(DialogueCoroutine0(dialogues,stopCheck));
-    // }
-    public void SetDialogue(Dialogue dialogue)
+    public void SetDialogue(Dialogue dialogue, string argument = null)
     {
         PlayerManager.instance.isTalking = true;
-        StartCoroutine(DialogueCoroutine1(dialogue));
+        StartCoroutine(DialogueCoroutine(dialogue, argument));
     }    
 
     //글자 한번에 나오기.
@@ -63,39 +59,15 @@ public class DialogueManager : MonoBehaviour
         //PlayerManager.instance.isTalking = true;
         StartCoroutine(DialogueCoroutine_NPC(dialogue));
     }
-    // public void SetRandomDialogue_NPC(string dialogueText,Transform talker,float duration, int interval){
-        
-    //     //talker.GetComponent<NPCScript>().randomDialogueCrt = StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-    //     StartCoroutine(SetRandomDialogueCoroutine(dialogueText,talker,duration,interval));
-    // }
-    // public void StopRandomDialogue_NPC(Coroutine coroutine){
-    //     if(coroutine !=null) StopCoroutine(coroutine);
-    // }
-
-    // IEnumerator DialogueCoroutine0(Dialogue[] dialogues,bool stopCheck)
-    // {
-    //     //Debug.Log("A");
-    //     PlayerManager.instance.canMove = false;
-    //     for(int i=0;i<dialogues.Length;i++){
-            
-    //         StartCoroutine(DialogueCoroutine1(dialogues[i]));
-    //         yield return new WaitUntil(()=>!dialogueFlag);
-
-    //     }
-
-    //     PlayerManager.instance.isTalking = false;
-    //     PlayerManager.instance.canMove = true;
-    // }
 
     //스킵 가능한 메시지 출력
-    IEnumerator DialogueCoroutine1(Dialogue dialogue, bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
+    IEnumerator DialogueCoroutine(Dialogue dialogue, string argument = null ,bool oneTime = false, float typingSpeed =0.05f, float typingInterval= 1.5f)
     {
-        //curWaitSkipCoroutine = StartCoroutine(WaitSkipCoroutine());
-        //Debug.Log("B");
         PlayerManager.instance.isTalking = true;
         dialogueFlag= true;
         if(dialogue.talker==null) dialogue.talker = PlayerManager.instance.transform;
 
+        //독백
         if(dialogue.isMonologue){
             dialogue.talker.GetChild(0).GetChild(0).GetComponent<Image>().sprite = playerMonologueTalkCanvas;
         }
@@ -106,8 +78,6 @@ public class DialogueManager : MonoBehaviour
             
         dialogue.talker.GetChild(0).GetChild(0).gameObject.SetActive(true);
 
-        //var npcScript = dialogue.talker.TryGetComponent<NPCScript>(out npcScript);
-        //NPCScript tempNpcScript;
         if(dialogue.talker.TryGetComponent<NPCScript>(out NPCScript tempNpcScript)){
             tempNpcScript.isTalkingWithPlayer = true;
         }
@@ -116,18 +86,12 @@ public class DialogueManager : MonoBehaviour
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
 
-            // if(dialogues_T!=null){
-            //     for(int i=0; i<dialogues_T.Length;i++){
-            //         for(int j=0; j<dialogues_T[i].sentences.Length;j++){
-            //             int temp = int.Parse(dialogues_T[i].sentences[j]);
-            //             //dialogues_T[i].sentences[j] = TextLoader.instance.ApplyText(temp);
-            //             dialogues_T[i].sentences[j] = CSVReader.instance.GetIndexToString(temp,"dialogue");
-            //         }
-            //     }
-            // }
-
-            //curSentence = dialogue.sentences[i];
             curSentence = CSVReader.instance.GetIndexToString(int.Parse(dialogue.sentences[i]),"dialogue");
+
+            if(argument != null){
+                curSentence = string.Format(curSentence, argument);
+            }
+
             if(!oneTime) nowDialogueCoroutine = StartCoroutine(RevealText(dialogue, tmp, DBManager.instance.waitTime_dialogueTypingInterval, DBManager.instance.waitTime_dialogueInterval));
              
             yield return new WaitUntil(()=>!revealTextFlag);
@@ -142,8 +106,6 @@ public class DialogueManager : MonoBehaviour
         
         dialogueFlag= false;
         
-        //StopCoroutine(curWaitSkipCoroutine);
-
         PlayerManager.instance.isTalking = false;
         
     }
@@ -215,26 +177,30 @@ public class DialogueManager : MonoBehaviour
             }
             tmp.maxVisibleCharacters = i;
             //print(i);
-            if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0){
 
-                if(dialogue.talker == PlayerManager.instance.transform){
-                    if(!dialogue.isMonologue)
-                        SoundManager.instance.PlaySound("lucky_talk_"+Random.Range(1,11));
+            if(DBManager.instance.localData.onTalkingSound){
+
+                if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0){
+
+                    if(dialogue.talker == PlayerManager.instance.transform){
+                        if(!dialogue.isMonologue)
+                            SoundManager.instance.PlaySound("lucky_talk_"+Random.Range(1,11));
+
+                    }
+                    else if(dialogue.talker.GetComponent<NPCScript>().isMerchant){
+                        SoundManager.instance.PlaySound("merchant_0"+Random.Range(1,8));
+
+                    }
+                    else if(dialogue.talker.GetComponent<NPCScript>().isKid){
+                        SoundManager.instance.PlaySound("little_ant_talking_"+Random.Range(1,7));
+
+                    }
+                    else{
+                        SoundManager.instance.PlaySound("ant_talking_"+Random.Range(1,10));
+
+                    }
 
                 }
-                else if(dialogue.talker.GetComponent<NPCScript>().isMerchant){
-                    SoundManager.instance.PlaySound("merchant_0"+Random.Range(1,8));
-
-                }
-                else if(dialogue.talker.GetComponent<NPCScript>().isKid){
-                    SoundManager.instance.PlaySound("little_ant_talking_0"+Random.Range(1,7));
-
-                }
-                else{
-                    SoundManager.instance.PlaySound("ant_talking_"+Random.Range(1,11));
-
-                }
-
             }
             
             yield return _typingSpeed;
@@ -329,14 +295,5 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    // public class DialogueData{
-    //     public int index { get; set; }
-    //     public string sentences { get; set; }
-    // }
-
-    // public void SetDialogueData(){
-    //     TextAsset dialogueData= Resources.Load<TextAsset>("Dialogue");
-    //     string content = dialogueData.text;
-    // }
 }
 

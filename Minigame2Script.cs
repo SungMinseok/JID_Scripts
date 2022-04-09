@@ -60,6 +60,7 @@ public class Minigame2Script : MonoBehaviour
         flyingBottlePos = flyingBottle.localPosition;
         //StartSliderMoving();
         UIManager.instance.SetHUD(false);
+        PlayerManager.instance.UnlockPlayer();
     }
     void OnDisable(){
         UIManager.instance.SetHUD(true);

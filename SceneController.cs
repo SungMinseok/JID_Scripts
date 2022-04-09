@@ -23,6 +23,10 @@ public class SceneController : MonoBehaviour
     public Collider2D temp;
     public TranslateText[] translateTexts;
     public GameObject[] textObjs;
+
+    
+    [Header("Set Demo")]
+    public Location[] locations;
     void Awake()
     {
         instance = this;
@@ -33,6 +37,12 @@ public class SceneController : MonoBehaviour
         }
         else if(SceneManager.GetActiveScene().name == "Level"){
             SoundManager.instance.ChangeBgm("juicy drug");
+
+            
+#if isDemo
+        locations[0].isLocked = true;
+#endif
+
         }
 
         // Debug.Log("11");     
@@ -163,11 +173,4 @@ public class SceneController : MonoBehaviour
     }
 
 
-
-    #region Main Control
-    public void PushStartBtn(){
-        LoadManager.instance.StartBtn();
-    }
-
-    #endregion
 }

@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 using UB.Simple2dWeatherEffects.Standard;
 using TMPro;
 
+#region 앱 실행/종료 관련  처리
+#endregion
 public class LoadManager : MonoBehaviour
 {
     public static LoadManager instance;
@@ -33,7 +35,7 @@ public class LoadManager : MonoBehaviour
     public bool isLoadingInGame;
     [Tooltip("인게임에서 게임 오버 후 마지막 저장 파일 로드")]
     public bool isLoadingInGameToLastPoint;
-    public int lastLoadFileNum;
+    public int lastLoadFileNum; // 최초 시작 : -1, 그 외 : 0 ~
 
     WaitForSeconds wait1s = new WaitForSeconds(1);
     void Awake(){
@@ -50,23 +52,21 @@ public class LoadManager : MonoBehaviour
     }
     void Start()
     {
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
         
         //ddol = DDOLScript.instance.gameObject;
     }
 
-    public void StartBtn()
+    public void MainToGame()
     {
         StartCoroutine(MainToGameCoroutine());
 //        Debug.Log("33");
     }
     IEnumerator MainToGameCoroutine(){
-        //SceneController.instance.objects[0].GetComponent<Animator>().SetTrigger("go");
-        //yield return new WaitForSeconds(1f);
         lastLoadFileNum = -1;
-        //loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
         FadeOut();
         yield return wait1s;
+        VideoManager.instance.StopVideo();
         StartCoroutine(LoadNextScene("Level"));
     }
     public void LoadGame(){
@@ -343,4 +343,7 @@ public class LoadManager : MonoBehaviour
     }
 #endregion
 
+    void OnApplicationQuit(){
+        DBManager.instance.CallLocalDataSave();
+    }
 }

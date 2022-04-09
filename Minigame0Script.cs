@@ -100,7 +100,7 @@ public class Minigame0Script : MonoBehaviour
                 curTimer -= Time.fixedDeltaTime;
             }
             else{
-                MinigameManager.instance.FailMinigame(2);
+                MinigameManager.instance.FailMinigame(3);
                 //UIManager.instance.SetGameOverUI(2);
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
@@ -159,7 +159,11 @@ public class Minigame0Script : MonoBehaviour
         }
         else{
 
-                    SoundManager.instance.PlaySound("cutting_wrongkey");
+            SoundManager.instance.PlaySound("cutting_wrongkey");
+            curLevelAnswer.Clear();
+            SetRandomKeyArray();
+            SetStageSprite(curLevel);
+            curStage = 0;
             AddTimer(-timerPanelty);
         }
     }
@@ -181,7 +185,8 @@ public class Minigame0Script : MonoBehaviour
 
             yield return new WaitUntil(()=>!curLevelFlag);
             //curLevelFlag = false;
-            yield return new WaitForSeconds(1f);
+
+            if(i<4) yield return new WaitForSeconds(1f);
 
         }
 

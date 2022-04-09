@@ -67,14 +67,20 @@ public class InventoryManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        for(int i=1;i<11;i++){
-            if(Input.GetKeyDown((KeyCode)(48+i))){
-                PushItemBtn(i-1);
-            }
-        }
-    }
+    // void Update()
+    // {
+    //     for(int i=1;i<12;i++){
+    //         if(Input.GetKeyDown((KeyCode)(48+i))){
+    //             PushItemBtn(i-1);
+    //         }
+    //     }
+    //     if(Input.GetKeyDown(KeyCode.Minus)){
+    //         PushItemBtn(10);
+    //     }
+    //     else if(Input.GetKeyDown(KeyCode.Alpha0)){
+    //         PushItemBtn(9);
+    //     }
+    // }
     public void ResetInventory(){
 
         curPage = 0;
@@ -138,7 +144,7 @@ public class InventoryManager : MonoBehaviour
     }
     public bool CheckHaveItem(int ID, int amount = 1){
 
-        if(DBManager.instance.curData.itemList.Exists(x => x.itemID == ID)){
+        if(DBManager.instance.curData.itemList.Exists(x => x.itemID == ID) && DBManager.instance.curData.itemList.Exists(x => x.itemAmount == amount)){
             return true;
         }
         else{

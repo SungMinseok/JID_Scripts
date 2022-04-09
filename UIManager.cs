@@ -150,21 +150,21 @@ public class UIManager : MonoBehaviour
         ui_fader.SetTrigger("fadeIn");
     }
 #region GameOver
-    public void SetGameOverUI(int num){
+    public void SetGameOverUI(int collectionID){
         //PlayerManager.instance.LockPlayer();
         PlayerManager.instance.isGameOver = true;
         SoundManager.instance.BgmOff();
-        StartCoroutine(SetGameOverUICoroutine(num));
+        StartCoroutine(SetGameOverUICoroutine(collectionID));
     }
     public void ResetGameOverUI(){
         gameOverBtns.SetActive(false);
         gameOverNewImage.gameObject.SetActive(false);
     }
-    IEnumerator SetGameOverUICoroutine(int num){
+    IEnumerator SetGameOverUICoroutine(int collectionID){
         bool endingAlreadyOver;
         
-        if(!DBManager.instance.CheckEndingCollectionOver(num)){
-            DBManager.instance.EndingCollectionOver(num);
+        if(!DBManager.instance.CheckEndingCollectionOver(collectionID)){
+            DBManager.instance.EndingCollectionOver(collectionID);
             endingAlreadyOver = false;
         }
         else{
@@ -178,7 +178,7 @@ public class UIManager : MonoBehaviour
         yield return wait1000ms;
         yield return wait500ms;
 
-        switch(num){
+        switch(collectionID){
             case 1 :
                 SoundManager.instance.PlaySound("spear_death");
                 yield return wait3000ms;
@@ -191,7 +191,7 @@ public class UIManager : MonoBehaviour
 
 
         if(MinigameManager.instance.nowMinigameNum!=-1) MinigameManager.instance.minigameScriptTransforms[MinigameManager.instance.nowMinigameNum].gameObject.SetActive(false);
-        ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[num];
+        ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[collectionID];
         //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();

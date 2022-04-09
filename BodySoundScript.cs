@@ -49,7 +49,8 @@ public class BodySoundScript : MonoBehaviour
     public void PlayWalkSound(){
         switch(bodyType){
             case BodyType.lucky : 
-                SoundManager.instance.PlaySound("lucky_walk_0"+Random.Range(1,3),0.3f);
+                if(PlayerManager.instance.bodyMode == 1)
+                    SoundManager.instance.PlaySound("lucky_walk_0"+Random.Range(1,3),0.3f);
                 break;
             case BodyType.lucky_back : 
                 SoundManager.instance.PlaySound("ladder_0"+Random.Range(1,3));
