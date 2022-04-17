@@ -31,11 +31,15 @@ public class LoadManager : MonoBehaviour
     }
 
     [Header("───────Debug───────")]
+    [Tooltip("앱 최초 실행 시 체크")]
+    public bool checkFirstRun;
     [Tooltip("인게임에서 로드 시 (맵설정/플레이어위치설정)")]
     public bool isLoadingInGame;
     [Tooltip("인게임에서 게임 오버 후 마지막 저장 파일 로드")]
     public bool isLoadingInGameToLastPoint;
     public int lastLoadFileNum; // 최초 시작 : -1, 그 외 : 0 ~
+
+    public string mainSceneName;
 
     WaitForSeconds wait1s = new WaitForSeconds(1);
     void Awake(){
@@ -55,6 +59,8 @@ public class LoadManager : MonoBehaviour
         //Application.targetFrameRate = 60;
         
         //ddol = DDOLScript.instance.gameObject;
+
+        mainSceneName = "Level_" + DBManager.instance.buildVersion;
     }
 
     public void MainToGame()
@@ -67,7 +73,7 @@ public class LoadManager : MonoBehaviour
         FadeOut();
         yield return wait1s;
         VideoManager.instance.StopVideo();
-        StartCoroutine(LoadNextScene("Level"));
+        StartCoroutine(LoadNextScene(mainSceneName));
     }
     public void LoadGame(){
         if(PlayerManager.instance!=null){
@@ -83,7 +89,7 @@ public class LoadManager : MonoBehaviour
 
         }
 
-        StartCoroutine(LoadCoroutine("Level"));
+        StartCoroutine(LoadCoroutine(mainSceneName));
     }
     public void LoadMain(){
         
@@ -99,6 +105,9 @@ public class LoadManager : MonoBehaviour
         FadeOut();
         yield return wait1s;
         StartCoroutine(LoadNextScene(sceneName));
+        if(VideoManager.instance.isPlayingVideo){
+            VideoManager.instance.StopVideo();
+        }
     }
     
     IEnumerator LoadNextScene(string nextScene)
@@ -295,7 +304,7 @@ public class LoadManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
         yield return new WaitForSeconds(1f);
-        StartCoroutine(LoadNextScene("Level"));
+        StartCoroutine(LoadNextScene(mainSceneName));
     }
 
     

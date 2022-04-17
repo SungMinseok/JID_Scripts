@@ -14,9 +14,8 @@ public class LocationRader : MonoBehaviour
             && DBManager.instance.CheckHaveItems(curLocation.trigNum,curLocation.haveItemNums,false)
             ){
 
-//                Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
-                //curLocation.targetMark.gameObject.SetActive(true);
-                curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");
+                //curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");
+                curLocation.targetMark.GetComponent<Animator>().SetBool("activate",true);
             }
         }
         else if(other.CompareTag("NPC")) {
@@ -35,6 +34,26 @@ public class LocationRader : MonoBehaviour
             }
         }
     }
+    void OnTriggerStay2D(Collider2D other){
+        if(other.CompareTag("Location") ){
+            var curLocation = other.GetComponent<Location>();
+            if(curLocation.activateTargetMark 
+            && !PlayerManager.instance.canMove
+            ){
+
+//                Debug.Log(curLocation.trigNum + "번 트리거 느낌표 활성화");
+                //curLocation.targetMark.gameObject.SetActive(true);
+                //curLocation.targetMark.GetComponent<Animator>().SetTrigger("off");
+                curLocation.targetMark.GetComponent<Animator>().SetBool("activate",false);
+            }
+        }
+        else if(other.CompareTag("NPC")) {
+            if(PlayerManager.instance.equipments_id[0]==-1 && !PlayerManager.instance.isCaught && other.GetComponent<NPCScript>().isGuard){
+                PlayerManager.instance.isCaught = true;
+                other.GetComponent<NPCScript>().CatchPlayerAsGuard();
+            }
+        }
+    }
     void OnTriggerExit2D(Collider2D other) {
         if(other.CompareTag("Location")){
             var curLocation = other.GetComponent<Location>();
@@ -42,7 +61,7 @@ public class LocationRader : MonoBehaviour
 
                 //Debug.Log(curLocation.trigNum + "번 트리거 느낌표 비활성화");
                 //curLocation.targetMark.gameObject.SetActive(false);
-                curLocation.targetMark.GetComponent<Animator>().SetTrigger("off");
+                curLocation.targetMark.GetComponent<Animator>().SetBool("activate",false);
             }
         }
         else if(other.CompareTag("NPC")) {

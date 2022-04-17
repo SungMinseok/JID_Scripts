@@ -9,6 +9,7 @@ public class LockedButtonScript : MonoBehaviour
     void OnEnable()
     {
         transform.parent.GetComponent<Button>().enabled = false;
+        transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPopUpPanel_onWork());
         // rect = GetComponent<RectTransform>();
         // rect.sizeDelta = transform.parent.GetComponent<RectTransform>().sizeDelta;//new Vector2(transform.parent.GetComponent<RectTransform>().sizeDelta.x,transform.parent.GetComponent<RectTransform>().sizeDelta.y);
         // //transform.GetComponentInParent<Button>().interactable = false;

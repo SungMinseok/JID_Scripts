@@ -35,11 +35,11 @@ public class SceneController : MonoBehaviour
         if(SceneManager.GetActiveScene().name == "Main"){
             SoundManager.instance.PlayBGM("jelly in the dark");
         }
-        else if(SceneManager.GetActiveScene().name == "Level"){
+        else if(SceneManager.GetActiveScene().name.Substring(0,5) == "Level"){
             SoundManager.instance.ChangeBgm("juicy drug");
 
             
-#if isDemo
+#if demo
         locations[0].isLocked = true;
 #endif
 
@@ -164,6 +164,7 @@ public class SceneController : MonoBehaviour
         SetLensOrthoSize(defaultZoomOutSize,0.1f);
     }
     public void SetCameraNoised(float intensity, float duration){
+        SoundManager.instance.PlaySound("shock_effect_"+Random.Range(0,2));
         StartCoroutine(SetCameraNoisedCoroutine(intensity, duration));
     }
     IEnumerator SetCameraNoisedCoroutine(float intensity, float duration){

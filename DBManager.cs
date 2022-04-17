@@ -11,6 +11,7 @@ public class DBManager : MonoBehaviour
     [Header("[Game Info]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public uint buildNum;
     public string buildDate;
+    public string buildVersion;
     public string language;
     [Header("[Game]")]
     
@@ -76,7 +77,8 @@ public class DBManager : MonoBehaviour
 
         [Space]
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
-        public List<int> trigOverList = new List<int>();
+        public List<int> trigOverList;
+        public List<int> getItemOverList;
 
 
         //public Vector2 screenSize;
@@ -100,7 +102,7 @@ public class DBManager : MonoBehaviour
     
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
     public class LocalData{
-        public List<int> endingCollectionOverList = new List<int>();
+        public List<ClearedEndingCollection> endingCollectionOverList = new List<ClearedEndingCollection>();
 
         
         [Header("Options")]
@@ -162,9 +164,18 @@ public class DBManager : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
         
             if(file != null && file.Length >0){
+
                 curData =(Data)bf.Deserialize(file);
 
                 curData.curPlayCount ++;
+
+                if(curData.getItemOverList == null){
+                    //Debug.Log("1111");
+                    curData.getItemOverList = new List<int>();
+                    //Debug.Log("2222");
+
+                }
+                //curData.honeyOverList.Add(-1);
             }
             
             file.Close();
@@ -223,6 +234,8 @@ public class DBManager : MonoBehaviour
         file.Close();
     }
     public void CallLocalDataLoad(){
+
+        localData.endingCollectionOverList.Clear();
 
         BinaryFormatter bf = new BinaryFormatter();
         FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/LocalDataFile.dat");
@@ -341,19 +354,25 @@ public class DBManager : MonoBehaviour
 
     //엔딩 컬렉션 달성 등록
     public void EndingCollectionOver(int collectionNum){
-        if(!CheckEndingCollectionOver(collectionNum)){
-            localData.endingCollectionOverList.Add(collectionNum);
+        if(GetClearedEndingCollectionID(collectionNum) == -1){
+            localData.endingCollectionOverList.Add(new ClearedEndingCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
             CallLocalDataSave();
         }
     }
     //엔딩 컬렉션 달성되었는지 확인
-    public bool CheckEndingCollectionOver(int collectionNum){
-        if(localData.endingCollectionOverList.Contains(collectionNum)){
-            return true;
+    public int GetClearedEndingCollectionID(int collectionNum){
+        if(localData.endingCollectionOverList.Count == 0){
+            return -1;
         }
-        else{
-            return false;
-        }
+        //Debug.Log(localData.endingCollectionOverList.Count);
+        // if(localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum) != -1){
+        //     return true;
+        // }
+        // else{
+        //     return false;
+        // }
+        //ebug.Log(localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum));
+        return localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum);
     }
     public void ResetEndingCollection(){
         localData.endingCollectionOverList.Clear();
@@ -374,13 +393,16 @@ public class DBManager : MonoBehaviour
 
 
 
-        Application.targetFrameRate = 60;
-        QualitySettings.vSyncCount = 0;
+        //Application.targetFrameRate = 60;
+        //QualitySettings.vSyncCount = 0;
 
-
-
-
-
+#if demo
+        buildVersion = "demo";
+#elif alpha
+        buildVersion = "alpha";
+#else
+        buildVersion = "";
+#endif
 
         SaveDefaultData();
         CallLocalDataLoad();
@@ -579,10 +601,6 @@ public class EndingCollection{
     public int resourceID;
     public Sprite sprite;
 
-    [Space]
-    
-    public string clearedDate;
-    public string clearedCount;
 
     public EndingCollection(int a, string b, int c){
         ID = a;
@@ -593,6 +611,26 @@ public class EndingCollection{
         resourceID = c;
         if(DBManager.instance.endingCollectionSprites.Length > resourceID)
         sprite = DBManager.instance.endingCollectionSprites[resourceID];
+    }
+}
+
+[System.Serializable]
+public class ClearedEndingCollection{
+    public int ID;
+    
+    public string clearedDate;
+    public int clearedPlayCount;
+
+    public ClearedEndingCollection(int _ID, string _clearedDate, int _clearedPlayCount){
+        ID = _ID;
+        clearedDate = _clearedDate;
+        clearedPlayCount = _clearedPlayCount;
+        //description = c;
+        //date = d;
+        //count = e;
+        // resourceID = c;
+        // if(DBManager.instance.endingCollectionSprites.Length > resourceID)
+        // sprite = DBManager.instance.endingCollectionSprites[resourceID];
     }
 }
 

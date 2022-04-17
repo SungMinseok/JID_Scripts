@@ -8,7 +8,9 @@ public enum DoodadsType{
     SlowDown,
     Bullet,
     Mushroom,
-    Water
+    Water,
+    Bullet1, //나는 개미가 아래로 던짐
+    Bullet2 //하늘에서 떨어짐
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -19,7 +21,7 @@ public class DoodadsScript : MonoBehaviour
     Color color;
     WaitForSeconds waitTime = new WaitForSeconds(0.01f);
     //PlayerManager thePlayer;
-    
+    public Vector2 curPos;
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
     
     [Header("이속 감소")]
@@ -33,6 +35,15 @@ public class DoodadsScript : MonoBehaviour
         //thePlayer = PlayerManager.instance;
 
         
+    }
+    void OnEnable(){
+        if(type == DoodadsType.Bullet2)
+            transform.localPosition = curPos;
+            
+        else if(type == DoodadsType.Bullet){
+            
+            Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.endCol, true);
+        }
     }
 
     void Cloak(float _speed = 0.03f){
@@ -88,11 +99,30 @@ public class DoodadsScript : MonoBehaviour
                         // MinigameManager.instance.FailMinigame(4);
                     }
                 }
-                else if(other.gameObject.CompareTag("MainGround") || other.gameObject.CompareTag("Collider_Player")){
+                else if(/*other.gameObject.CompareTag("MainGround") || */other.gameObject.CompareTag("Collider_Player")){
                     gameObject.SetActive(false);
                 }
                 break;
 
+            case DoodadsType.Bullet1 :
+            case DoodadsType.Bullet2 :
+                if(other.gameObject.CompareTag("Player")){
+                    
+                    if(!PlayerManager.instance.isGameOver){
+                        SoundManager.instance.PlaySound("minigame_bottlecrash");
+                        PlayerManager.instance.KillPlayer(4, "dead0");
+
+                        // PlayerManager.instance.isGameOver = true;
+                        // PlayerManager.instance.canMove = false;
+                        // PlayerManager.instance.animator.SetBool("dead0",true);
+                        // MinigameManager.instance.FailMinigame(4);
+                    }
+                }
+                else if(other.gameObject.CompareTag("MainGround") || other.gameObject.CompareTag("Collider_Player")){
+                        SoundManager.instance.PlaySound("minigame_bottlecrash");
+                    gameObject.SetActive(false);
+                }
+                break;
             
         }
     }
@@ -280,6 +310,9 @@ public class DoodadsScript : MonoBehaviour
                 }
 //                Debug.Log("B");
             }
+
+
+
         }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);

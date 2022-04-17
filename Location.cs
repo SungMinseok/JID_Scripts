@@ -141,7 +141,13 @@ public class Location : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         if(type != LocationType.Comment){
             if(other.CompareTag("Player")){
-                if(!waitKey && !locFlag&&!PlayerManager.instance.isActing){
+                if(!waitKey && !locFlag&&!PlayerManager.instance.isActing ){
+
+                    if(PlayerManager.instance.ladderDelay && PlayerManager.instance.jumpDelay){
+                        return;
+                    }
+
+
                     locFlag = true;
                     if(type == LocationType.Trigger)
                         Debug.Log(string.Format("TrigNum.{0} - [{1}] 실행 시도",trigNum,trigComment));
@@ -158,6 +164,17 @@ public class Location : MonoBehaviour
                 }
 
             }
+        }
+
+    }
+    //키 안입력해도 발동
+    void OnTriggerExit2D(Collider2D other) {
+        if(type != LocationType.Comment){
+            if(other.CompareTag("Player")){
+                if(!waitKey && locFlag){
+                    locFlag = false;
+                }
+            }       
         }
 
     }
@@ -288,7 +305,7 @@ public class Location : MonoBehaviour
                                     {
                                         PlayerManager.instance.Look(direction);
                                     }
-                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetTrigger("off");
+                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetBool("activate",false);
                                     Debug.Log(trigNum +"번 트리거 실행 성공");
                                     //SetTalk();
                                     triggerScript.Action(this);
@@ -353,7 +370,7 @@ public class Location : MonoBehaviour
                                 if(!PlayerManager.instance.isActing){
                                     PlayerManager.instance.isActing = true;
                                     //triggerScript.Action(this);
-                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetTrigger("off");
+                                    if(activateTargetMark) targetMark.GetComponent<Animator>().SetBool("activate",false);
                                     Debug.Log(trigNum +"번 트리거 실행 성공");
 
                                     triggerScript.Action(this);

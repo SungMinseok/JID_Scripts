@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 //[RequireComponent (typeof (Rigidbody2D))]
 [RequireComponent (typeof (CircleCollider2D))]
-public class NPCScript : MonoBehaviour
+public class NPCScript : CharacterScript
 {
     //public bool isNearPlayer;//플레이어 근처에서 발걸음 소리 on/off용
     public bool isMerchant;//대사 소리 분리용
@@ -76,6 +76,9 @@ public class NPCScript : MonoBehaviour
     public bool jumpDelay;
     public Transform onTriggerCol;
     public bool isTalkingWithPlayer;//플레이어와 대화 시 true
+    public bool isGuard;//개미탈 미착용시 발각
+    public int guardDialogueIndex;
+    public Dialogue guardDialogue;
     Vector2 defaultScale;
 
     Rigidbody2D rb;
@@ -162,6 +165,13 @@ public class NPCScript : MonoBehaviour
         //기본 애니메이션 상태 설정(bool)
         if(defaultAnimatorBoolVal!=""){
             animator.SetBool(defaultAnimatorBoolVal,true);
+        }
+
+        //isGuard 모드
+        if(isGuard){
+            guardDialogue.talker = this.transform;
+            guardDialogue.sentences = new string[1];
+            guardDialogue.sentences[0] = guardDialogueIndex.ToString();
         }
     }
     void OnDisable(){
@@ -415,7 +425,7 @@ public class NPCScript : MonoBehaviour
             if(other.CompareTag("Player")){
                 if(!PlayerManager.instance.isCaught){
 
-                    if(PlayerManager.instance.isHiding){
+                    if(PlayerManager.instance.isHiding || PlayerManager.instance.equipments_id[0] != -1){
                         //DM(gameObject.name+"의 레이더 내부 진입했지만 발각되지 않음");
                     }
                     else{
@@ -447,6 +457,7 @@ public class NPCScript : MonoBehaviour
                 isTalkingWithPlayer = true;
                 //StopCoroutine(randomDialogueCrt);
                 //DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
+                NpcLookObject(PlayerManager.instance.transform);
                 
                 if(randomDialogueCrt !=null){
                     StopCoroutine(randomDialogueCrt);
@@ -521,7 +532,7 @@ public class NPCScript : MonoBehaviour
             // else{
             //     var v = 1;
             // }
-
+            Debug.Log(defaultTalkCanvasHolderPosX);
 
             var tempRect = talkCanvas.GetComponent<RectTransform>();
             tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
@@ -531,5 +542,38 @@ public class NPCScript : MonoBehaviour
             tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
         }
     }
+    
+    public void StopMove(){
+
+        isPaused = true;
+        patrolInput = 0;
+    }
+
+    public void SetNpcAnimatorBool(string animName, bool animBool){
+        animator.SetBool(animName, animBool);
+    }
+    public void NpcLookObject(Transform target){
+
+        if(this.transform.position.x > target.position.x){
+            Look("left");
+        }
+        else{
+            Look("right");
+        }
+        //SetTalkCanvasDirection();
+    }
+    public void CatchPlayerAsGuard(){
+        //if(PlayerManager.instance.equipments_id[0] == -1){
+
+            //NpcLookObject(PlayerManager.instance.transform);
+
+            SceneController.instance.virtualCamera.Follow = this.transform;
+            DialogueManager.instance.SetDialogue(guardDialogue);
+            
+            UIManager.instance.SetGameOverUI(21);
+        //}
+
+    }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+
 }

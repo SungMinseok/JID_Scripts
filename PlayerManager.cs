@@ -7,7 +7,7 @@ public class EquipmentSprite{
     public Sprite sprite;
     public Sprite sprite_back;
 }
-public class PlayerManager : MonoBehaviour
+public class PlayerManager : CharacterScript
 {
 
     public static PlayerManager instance;
@@ -199,7 +199,13 @@ public class PlayerManager : MonoBehaviour
             rb.AddForce(Vector2.zero);
             
             //움직이는 중 체크
-            isMoving = rb.velocity != Vector2.zero ? true : false;
+            if(rb.velocity.x > 0.1f ||rb.velocity.x < -0.1f ||rb.velocity.y > 0.1f ||rb.velocity.y< -0.1f ){
+                isMoving = true;
+            }
+            else{
+                isMoving = false;
+            }
+            //isMoving = rb.velocity != Vector2.zero ? true : false;
         }
         else{
 
@@ -306,12 +312,13 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        if(DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount <= 0.1f){
+        if(DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount <= 0.1f
+        ||(isGameOver&&!UIManager.instance.ui_gameOver.activeSelf)
+        ){
             redVignette.SetActive(true);
         }
         else{
             redVignette.SetActive(false);
-
         }
 #endregion
     }
@@ -855,4 +862,19 @@ public class PlayerManager : MonoBehaviour
         rb.AddForce(Vector2.zero);
     }
 
+    public void PlayerLookObject(Transform target){
+        if(target == null){
+            Debug.LogWarning("No target");
+            return;
+        }
+
+        if(this.transform.position.x > target.position.x){
+            Look("left");
+        }
+        else{
+            Look("right");
+        }
+        
+        PlayerManager.instance.SetTalkCanvasDirection();
+    }
 }

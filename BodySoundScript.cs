@@ -13,6 +13,7 @@ public class BodySoundScript : MonoBehaviour
     }
     public BodyType bodyType;
     public bool isNearPlayer;
+    public bool alwaysOnPlay;
     [Header("pushable━━━━━━━━━━━━━━━━━━━━")]
     //public bool isPushed;
     public MovingSound[] movingSounds;
@@ -57,7 +58,14 @@ public class BodySoundScript : MonoBehaviour
                 break;
             case BodyType.ant : 
                 //if(GetComponentInParent<NPCScript>().isNearPlayer){
-                if(isNearPlayer && !PlayerManager.instance.isPlayingMinigame){
+                if(!alwaysOnPlay){
+
+                    if(isNearPlayer && (!PlayerManager.instance.isPlayingMinigame && !PlayerManager.instance.isGameOver)){
+                        SoundManager.instance.PlaySound("AntWalk"+Random.Range(0,4));
+
+                    }
+                }
+                else{
                     SoundManager.instance.PlaySound("AntWalk"+Random.Range(0,4));
 
                 }

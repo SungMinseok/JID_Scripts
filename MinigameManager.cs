@@ -71,6 +71,9 @@ public class MinigameManager : MonoBehaviour
         PlayerManager.instance.isPlayingMinigame = false;
         success = true;
         Debug.Log(nowMinigameNum + "번 미니게임 강제 성공 (테스트)");
+        if(nowMinigameNum == 2){
+            Minigame2Script.instance.Success();
+        }
     }
     public void FailMinigameTest(){
         for(int i=0;i<instance.transform.childCount;i++){
@@ -126,6 +129,7 @@ public class MinigameManager : MonoBehaviour
     IEnumerator FinishMinigameCoroutine(){
 
         LoadManager.instance.FadeOut();
+        yield return wait1000ms;
         yield return wait1000ms;
         var nowMinigame = minigameScriptTransforms[nowMinigameNum];
         nowMinigame.gameObject.SetActive(false);

@@ -48,16 +48,19 @@ public class Minigame0Script : MonoBehaviour
 
 #if UNITY_EDITOR || alpha
         MinigameManager.instance.successBtn.SetActive(true);
+        MinigameManager.instance.failBtn.SetActive(true);
 #endif
     }
     void OnDisable(){
-        PlayerManager.instance.UnlockPlayer();
+        if(!PlayerManager.instance.isActing)
+            PlayerManager.instance.UnlockPlayer();
 
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();
 
 #if UNITY_EDITOR || alpha
         MinigameManager.instance.successBtn.SetActive(false);
+        MinigameManager.instance.failBtn.SetActive(false);
 #endif
     }
     // Start is called before the first frame update
@@ -100,7 +103,8 @@ public class Minigame0Script : MonoBehaviour
                 curTimer -= Time.fixedDeltaTime;
             }
             else{
-                MinigameManager.instance.FailMinigame(3);
+                //MinigameManager.instance.FailMinigame(3);
+                MinigameManager.instance.FailMinigame(-1);
                 //UIManager.instance.SetGameOverUI(2);
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
@@ -112,6 +116,7 @@ public class Minigame0Script : MonoBehaviour
         curLevel = 0;
         curStage = 0;
         curTimer = maxTimerSet;
+        isPaused = false;
     }
 
     void SetRandomKeyArray(){
@@ -122,6 +127,7 @@ public class Minigame0Script : MonoBehaviour
 
             keyArray.GetChild(i).GetComponent<Image>().sprite = keySprites[randomNum];
             curLevelAnswer.Add(randomNum);
+            //Debug.Log(i);
         }
     }
     void SetStageSprite(int levelNum){
@@ -176,6 +182,7 @@ public class Minigame0Script : MonoBehaviour
     IEnumerator MinigameCoroutine(){
         
         for(int i=0;i<5;i++){
+            //Debug.Log("111");
             curLevelFlag = true;
 
             curLevelAnswer.Clear();

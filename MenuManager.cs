@@ -57,12 +57,19 @@ public class MenuManager : MonoBehaviour
     }
     [Header("UI_Collection_Ending")]
     public Animator animator;
-    public TextMeshProUGUI collectionSubText0;
-    public TextMeshProUGUI collectionNameText;
+    public GameObject collectionEndingNumberVessel;
+    public Text collectionEndingNumberText;
+    public Text collectionNameText;
+    public Text collectionPlayCountText;
+    public Text collectionRateText;
+    public Text collectionTimeText;
     public Sprite collectionNullImage;
     public Image[] collectionCardImages;
     public Sprite[] collectionCardSprites;
     public Button[] collectionScrollArrows;
+    
+    [Header("UI_ETC")]
+    public Font[] fonts ;
     [Header("Debug────────────────────")]
     public string curPopUpType;
     public int curSaveNum;
@@ -82,10 +89,13 @@ public class MenuManager : MonoBehaviour
     // }
     void Start(){
 
+        fonts = new Font[2];
+        fonts[0] = Resources.Load<Font>("Cafe24Ssurround");
+        fonts[1] = Resources.Load<Font>("uzura");
+
 #region Reset Collection
         //totalPage = DBManager.instance.endingCollectionSprites.Length;
         totalPage = DBManager.instance.cache_EndingCollectionDataList.Count;
-        ResetCardOrder();
 
         collectionScrollArrows[0].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollRightBtn());
         collectionScrollArrows[1].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollLeftBtn());
@@ -94,10 +104,10 @@ public class MenuManager : MonoBehaviour
 
 #region Reset Save&Load
         
-        for(int i=0;i<3;i++){
-            int temp = i;
-            btns[temp].GetComponent<Button>().onClick.AddListener(()=>OpenPanel(temp));
-        }
+        // for(int i=0;i<3;i++){
+        //     int temp = i;
+        //     btns[temp].GetComponent<Button>().onClick.AddListener(()=>OpenPanel(temp));
+        // }
 
         for(int i=0;i<saveSlotGrid.childCount;i++){
             int temp = i;
@@ -215,7 +225,9 @@ public class MenuManager : MonoBehaviour
 
         for(int i=0;i<5;i++){
 
-            if(theDB.CheckEndingCollectionOver(theDB.cache_EndingCollectionDataList[tempCardNum[i]].ID)){
+            int tempCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[tempCardNum[i]].ID);
+
+            if(tempCollectionID != -1){
                 //collectionCardImages[i].sprite = DBManager.instance.endingCollectionSprites[tempCardNum[i]];
                 collectionCardImages[i].sprite = theDB.cache_EndingCollectionDataList[tempCardNum[i]].sprite;
             }
@@ -226,14 +238,39 @@ public class MenuManager : MonoBehaviour
             }
         }
 
+        collectionRateText.text = string.Format("{0:N0}%",100*theDB.localData.endingCollectionOverList.Count/theDB.cache_EndingCollectionDataList.Count);
+
+        int tempCenterCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID);
     
-        if(DBManager.instance.CheckEndingCollectionOver(theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID)){
+        if(tempCenterCollectionID!=-1){
             collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
-            collectionSubText0.text = "획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
+
+            int tempTrueEndingNum = 0;  //트루엔딩 번호
+            //Debug.Log(tempCardNum[2]);
+
+            if(theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCenterCollectionID)!=-1){
+                collectionEndingNumberVessel.SetActive(true);
+                tempTrueEndingNum = theDB.cache_GameEndDataList[theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCenterCollectionID)].endingNum;
+            //Debug.Log(theDB.cache_GameEndDataList[theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCardNum[2])].comment);
+            }
+            else{
+                
+                collectionEndingNumberVessel.SetActive(false);
+                tempTrueEndingNum = 0;
+            }
+
+            collectionEndingNumberText.text = string.Format("Ending no.{0}",tempTrueEndingNum);//[tempCardNum[2]].endingNum);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
+            collectionPlayCountText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempCenterCollectionID].clearedPlayCount);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
+            //collectionRateText.text = string.Format("{0}%");//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
+            collectionTimeText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempCenterCollectionID].clearedDate);//.Substring(0,10);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
         }
         else{                
-            collectionSubText0.text = "미획득";
+            
             collectionNameText.text = "???";
+            collectionEndingNumberVessel.SetActive(false);
+            //collectionEndingNumberText.text = string.Format("Ending no.{0}",DBManager.instance.cache_GameEndDataList[tempCardNum[2]].endingNum);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
+            collectionPlayCountText.text = "-";
+            collectionTimeText.text = "-";
 
         }
         ActivateBtns(collectionScrollArrows);
@@ -262,7 +299,7 @@ public class MenuManager : MonoBehaviour
                 saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
             }
             else{
-                saveSlots[i].saveNameText.text = "빈 슬롯";
+                saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
                 saveSlots[i].saveDateText.text = "-";
                 saveSlots[i].itemInfoText0.text ="-";
                 saveSlots[i].itemInfoText1.text = "-";
@@ -279,7 +316,7 @@ public class MenuManager : MonoBehaviour
                 //loadSlots[i].itemInfoText1.text = DBManager.instance.GetData(i).curDirtAmount.ToString();
             }
             else{
-                loadSlots[i].saveNameText.text = "빈 슬롯";
+                loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
                 loadSlots[i].saveDateText.text = "-";
                 loadSlots[i].itemInfoText0.text ="-";
                 loadSlots[i].itemInfoText1.text = "-";
@@ -421,6 +458,9 @@ public class MenuManager : MonoBehaviour
         LoadManager.instance.lastLoadFileNum = curSaveNum;
         saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");
         saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+        saveSlots[curSaveNum].itemInfoText0.text = DBManager.instance.curData.curHoneyAmount.ToString();
+        saveSlots[curSaveNum].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.curData.curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+        
     }
     public void Load(int curLoadNum){
         CloseAllPanels();
@@ -445,19 +485,28 @@ public class MenuManager : MonoBehaviour
         CloseAllPanels();
         panels[panelNum].SetActive(true);
     }
-    public void OpenPanel(int panelNum){
+    public void OpenPanel(string panelName){
         CloseAllPanels();
 
-        switch(panelNum){
-            case 0 :
+        switch(panelName){
+            case "save" :
                 ResetSaveSlots();
+                savePanel.SetActive(true);
                 break;
-            case 1 :
+            case "load" :
                 ResetLoadSlots();
+                loadPanel.SetActive(true);
+                break;
+            case "collection" :
+                ResetCardOrder();
+                collectionPanel.SetActive(true);
+                break;
+            case "setting" :
+                settingPanel.SetActive(true);
                 break;
         }
 
-        panels[panelNum].SetActive(true);
+        //panels[panelNum].SetActive(true);
         
     }
     public void LoadLast(){
@@ -599,5 +648,8 @@ public class MenuManager : MonoBehaviour
             PlayerManager.instance.UnlockPlayer();
 
         }
+    }
+    public void OpenPopUpPanel_onWork(){
+        popUpOnWork.SetActive(true);
     }
 }

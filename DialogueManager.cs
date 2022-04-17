@@ -259,6 +259,27 @@ public class DialogueManager : MonoBehaviour
 
             tmp.maxVisibleCharacters = i;
             
+            if(DBManager.instance.localData.onTalkingSound){
+
+                if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0){
+
+                    if(dialogue.talker.GetComponent<NPCScript>().isMerchant){
+                        SoundManager.instance.PlaySound("merchant_0"+Random.Range(1,8));
+
+                    }
+                    else if(dialogue.talker.GetComponent<NPCScript>().isKid){
+                        SoundManager.instance.PlaySound("little_ant_talking_"+Random.Range(1,7));
+
+                    }
+                    else{
+                        SoundManager.instance.PlaySound("ant_talking_"+Random.Range(1,10));
+
+                    }
+
+                }
+            }
+
+
             yield return _typingSpeed;
 
         }

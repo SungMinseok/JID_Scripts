@@ -11,6 +11,7 @@ public class ItemScript : MonoBehaviour
 {
     public ItemType type;
     //[Header("Honey")]
+    public int objectID;
     [Header("Honey ────────────────────")]
     public int amount_honey;
     [Header("Dirt ────────────────────")]
@@ -119,6 +120,9 @@ public class ItemScript : MonoBehaviour
             StartCoroutine(GetItemAndRemoveCoroutine());
             //DM("꿀 충전 : "+amount_honey);
             DBManager.instance.curData.curHoneyAmount+=amount_honey;
+            if(!DBManager.instance.curData.getItemOverList.Contains(objectID)){
+                DBManager.instance.curData.getItemOverList.Add(objectID);
+            }
             SoundManager.instance.PlaySound("get_honeydrop");
         }
         else if(type == ItemType.Dirt){

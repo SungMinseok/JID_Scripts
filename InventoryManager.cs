@@ -129,23 +129,61 @@ public class InventoryManager : MonoBehaviour
         }
         RefreshInventory(curPage);
     }
-    public void RemoveItem(int ID){
+    public void RemoveItem(int ID, int amount = 1){
         //DBManager.instance.curData.itemList.Remove(ID);
-        var curItemList = DBManager.instance.curData.itemList;
+        var myItemList = DBManager.instance.curData.itemList;
+        int curItemIndex = myItemList.FindIndex(x => x.itemID == ID);
 
-        for (var i = curItemList.Count - 1; i >= 0; i--) { // reverse iteration
-            if (curItemList[i].itemID == ID) {
-                curItemList.RemoveAt(i);
-                break;
-            }
+        if(curItemIndex == -1){
+            Debug.Log(string.Format("{0}번 아이템 없음",ID));
+            return;
         }
+
+        //Debug.Log(curItemIndex);
+
+        // for (var i = curItemList.Count - 1; i >= 0; i--) { // reverse iteration
+        //     if (curItemList[i].itemID == ID) {
+        //         curItemList.RemoveAt(i);
+        //         break;
+        //     }
+        // }
+
+        //if(DBManager.instance.cache_ItemDataList[ID].isStack){
+        if(myItemList[curItemIndex].itemAmount - amount > 0){
+            myItemList[curItemIndex].itemAmount -= amount;
+        }
+        else{
+            myItemList.RemoveAt(curItemIndex);
+
+        }
+        //}
+        //else{
+        //    myItemList.RemoveAt(curItemIndex);
+        //}
+
+
+
         RefreshInventory(curPage);
 
     }
     public bool CheckHaveItem(int ID, int amount = 1){
+        List<ItemList> myItemList = DBManager.instance.curData.itemList;
 
-        if(DBManager.instance.curData.itemList.Exists(x => x.itemID == ID) && DBManager.instance.curData.itemList.Exists(x => x.itemAmount == amount)){
-            return true;
+        //if(DBManager.instance.curData.itemList.Exists(x => x.itemID == ID && DBManager.instance.curData.itemList[x].itemAmount >= amount) && DBManager.instance.curData.itemList[ID].itemAmount >= amount){//&& DBManager.instance.curData.itemList.Exists(x => x.itemAmount >= amount)){
+        if(myItemList.Exists(x => x.itemID == ID)){// && myItemList[myItemList.FindIndex(y => y.)].itemAmount >= amount){
+            if(amount>1){
+                if(myItemList[myItemList.FindIndex(y => y.itemID == ID)].itemAmount >= amount){
+                    return true;
+                }
+                else{
+                    return false;
+
+                }
+            }
+            else{
+
+                return true;
+            }
         }
         else{
             return false;

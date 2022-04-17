@@ -34,8 +34,10 @@ public class HotkeyManager : MonoBehaviour
 
 
         if(Input.GetButtonUp("Cancel") && !PlayerManager.instance.isActing){
-
-            if(theMenu.savePanel.activeSelf){
+            if(theMenu.popUpOnWork.activeSelf){
+                theMenu.popUpOnWork.SetActive(false);
+            }
+            else if(theMenu.savePanel.activeSelf){
                 theMenu.savePanel.SetActive(false);
             }
             else if(theMenu.loadPanel.activeSelf){

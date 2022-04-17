@@ -59,6 +59,8 @@ public class UIManager : MonoBehaviour
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait2000ms = new WaitForSeconds(2);
     WaitForSeconds wait3000ms = new WaitForSeconds(3);
+
+    int calculatedHoney;
     void Awake()
     {
         instance = this;
@@ -66,6 +68,8 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         thePlayer = PlayerManager.instance;
+        calculatedHoney = 0;
+        honeyText.text = "0";
 
         ResetGameOverUI();
         //playerOriginPos = thePlayer.transform.position;
@@ -77,10 +81,23 @@ public class UIManager : MonoBehaviour
             dirtGauge.fillAmount = DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount;
         }
 
-        if(honeyText.text != DBManager.instance.curData.curHoneyAmount.ToString()){
+        // if(honeyText.text != DBManager.instance.curData.curHoneyAmount.ToString()){
             
-            
-            honeyText.text = DBManager.instance.curData.curHoneyAmount.ToString();
+        //     int temp = DBManager.instance.curData.curHoneyAmount - int.Parse(honeyText.text);
+        //     //honeyText.text = DBManager.instance.curData.curHoneyAmount.ToString();
+        //     honeyText.text = temp > 0 ?  += 1;
+        // }
+
+        if(calculatedHoney != DBManager.instance.curData.curHoneyAmount){
+            int temp = DBManager.instance.curData.curHoneyAmount-calculatedHoney;
+            if(temp>=10 || temp <=-10){
+                calculatedHoney= calculatedHoney + temp/10;
+            }
+            else{
+                calculatedHoney= temp>0 ? calculatedHoney + 1 : calculatedHoney - 1;
+
+            }
+            honeyText.text = string.Format("{0:#,###0}", calculatedHoney);
         }
 
         
@@ -163,12 +180,19 @@ public class UIManager : MonoBehaviour
     IEnumerator SetGameOverUICoroutine(int collectionID){
         bool endingAlreadyOver;
         
-        if(!DBManager.instance.CheckEndingCollectionOver(collectionID)){
+        if(DBManager.instance.GetClearedEndingCollectionID(collectionID)==-1){
             DBManager.instance.EndingCollectionOver(collectionID);
             endingAlreadyOver = false;
         }
         else{
             endingAlreadyOver = true;
+        }
+
+        if(collectionID == 21){
+            yield return wait2000ms;
+        }
+        else if(collectionID == 1){
+            yield return wait500ms;
         }
 
         yield return wait1000ms;
@@ -196,7 +220,7 @@ public class UIManager : MonoBehaviour
         ui_gameOver.SetActive(true);
         LoadManager.instance.FadeIn();
 
-        SoundManager.instance.PlaySound("gameover2");//+Random.Range(0,3));
+        SoundManager.instance.PlaySound("gameover"+Random.Range(0,3));
         yield return new WaitForSeconds(2f);
         gameOverBtns.gameObject.SetActive(true);
 

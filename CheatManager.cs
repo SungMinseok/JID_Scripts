@@ -88,7 +88,7 @@ public class CheatManager : MonoBehaviour
 
                     }
                     break;
-                case "minigame":
+                case "g":
                     if(temp[1]!=null && temp[1]!="2"){
                         int minigameNum = int.Parse(temp[1]);
                         if(minigameNum < minigameParent.childCount && !PlayerManager.instance.isPlayingMinigame){
@@ -114,7 +114,7 @@ public class CheatManager : MonoBehaviour
                     else if(temp[1]=="2"){
                         PlayerManager.instance.MovePlayer(checkPoint_Special.GetChild(0).transform);
                         SceneController.instance.SetSomeConfiner(minigameParent.GetChild(2).GetComponent<Minigame2Script>().mapCollider);
-
+                        MinigameManager.instance.nowMinigameNum = 2;
                         
                             PlayerManager.instance.isPlayingMinigame = true;
                             var tempGame = minigameParent.GetChild(2).gameObject;
@@ -122,9 +122,8 @@ public class CheatManager : MonoBehaviour
 
                     }
                     break;
-                case "completeendingcollection":
+                case "ec":
                     if(temp[1]!=null){
-
                         if(temp[1]=="all"){
                             for(int i=0;i<DBManager.instance.cache_EndingCollectionDataList.Count;i++){
                                 DBManager.instance.EndingCollectionOver(i);
@@ -132,8 +131,10 @@ public class CheatManager : MonoBehaviour
                         }
                         else{
                             int collectionID = int.Parse(temp[1]);
-                            if(collectionID <DBManager.instance.cache_EndingCollectionDataList.Count)
+                            if(collectionID <DBManager.instance.cache_EndingCollectionDataList.Count){
+                                Debug.Log("{0}번 컬렉션 획득");
                                 DBManager.instance.EndingCollectionOver(int.Parse(temp[1]));
+                            }
                             else{
                                 Debug.Log("해당 컬렉션 없음");
                             }
@@ -277,6 +278,51 @@ public class CheatManager : MonoBehaviour
                     InventoryManager.instance.AddItem(5, 100);
                     InputCheat("additems 2 21 26 18 24 25");
                     break;
+                case "removeitem":
+
+                    if(temp[1]!=""){
+
+                        // if(temp[1]=="all"){
+                        //     //for(int i=0;i<TextLoader.instance.dictionaryItemText.Count;i++){
+                        //     for(int i=0;i<CSVReader.instance.itemAmount;i++){
+                        //         InventoryManager.instance.AddItem(i,1);
+                        //     }
+                        //     break;
+                        // }
+                        int itemID = int.Parse(temp[1]);
+
+                        if(temp[2]!=""){
+
+                            int itemAmount = int.Parse(temp[2]);
+                            if(itemID <CSVReader.instance.itemAmount)
+                                InventoryManager.instance.RemoveItem(itemID,itemAmount);
+                                //InventoryManager.instance.AddItem(int.Parse(temp[1]), int.Parse(temp[2]));
+                        }
+                        else{
+
+                            //int itemID = int.Parse(temp[1]);
+                            //if(itemID <CSVReader.instance.itemAmount)
+                            //    InventoryManager.instance.AddItem(int.Parse(temp[1]));
+                        }
+
+                    }
+                    break;
+                case "load":
+
+                    if(temp[1]!=""){
+                        int loadDataNum = int.Parse(temp[1]);
+                        MenuManager.instance.Load(loadDataNum);
+                    }
+                    break;
+                case "save":
+
+                    if(temp[1]!=""){
+                        int saveDataNum = int.Parse(temp[1]);
+                        MenuManager.instance.Save(saveDataNum);
+                    }
+                    break;
+
+                
             }
 //EndingCollectionOver
 //DeleteSaveFile
@@ -313,5 +359,23 @@ public class CheatManager : MonoBehaviour
     //             break;
     //     }
     // }
+    
+    void Update(){
+        if(isDebugMode){
+            if(Input.GetKeyDown(KeyCode.Return)){
+                cheatPanel.SetActive(!cheatPanel.activeSelf);
+                //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
+                CheatManager.instance.cheat.Select();
+                CheatManager.instance.cheat.ActivateInputField();
+                
+            }
+            if(Input.GetKeyDown(KeyCode.F10)){
+                //SceneManager.LoadScene("warehouse");
+                PlayerManager.instance.RevivePlayer();
+                CheatManager.instance.InputCheat("t 0");
+                //ResetPlayerPos();
+            }
+        }
+    }
 }
 #endif
