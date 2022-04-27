@@ -17,7 +17,7 @@ public class LoadManager : MonoBehaviour
     public D2FogsNoiseTexPE fogsNoiseTexPE;
     public GameObject[] mainBtns;
     public bool loadFlag;
-    public bool reloadScene;  //NPC 코루틴 종료용
+    public bool reloadScene;  //로드 페이드 아웃 직후 ~ 로드 페이드 인 직전 (NPC 코루틴 종료용)
     //public GameObject ddol;
     [Header("UI_Save&Load")]
     public Transform saveSlotGrid;
@@ -60,7 +60,7 @@ public class LoadManager : MonoBehaviour
         
         //ddol = DDOLScript.instance.gameObject;
 
-        mainSceneName = "Level_" + DBManager.instance.buildVersion;
+        mainSceneName = "Level" + DBManager.instance.buildVersion;
     }
 
     public void MainToGame()
@@ -116,7 +116,8 @@ public class LoadManager : MonoBehaviour
         SceneManager.LoadScene("Loading");
         yield return null;
 
-        //인게임 로드 시 데이터 불러오기
+#region [ 인게임 > 파일 선택해서 불러오기 ]
+
         if(isLoadingInGame){
             DBManager.instance.CallLoad(lastLoadFileNum);
 
@@ -125,7 +126,10 @@ public class LoadManager : MonoBehaviour
             
             Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
         }
-        //인게임 로드 시 데이터 불러오기(마지막 저장지점)
+
+#endregion
+
+#region [ 인게임 > 마지막 저장지점 불러오기 ]
         else if(isLoadingInGameToLastPoint){
             if(lastLoadFileNum == -1){
                 //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
@@ -141,7 +145,10 @@ public class LoadManager : MonoBehaviour
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
         }
-        //인게임 > 메인화면 복귀
+        
+#endregion
+
+#region [ 인게임 > 메인씬 ]
         else if(nextScene == "Main"){
                 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
@@ -151,6 +158,10 @@ public class LoadManager : MonoBehaviour
             DBManager.instance.LoadDefaultData();
             //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
         }
+
+#endregion
+
+#region [ 데이터 로드 완료 후 ]
 
         AsyncOperation asyncScene = SceneManager.LoadSceneAsync(nextScene);
         asyncScene.allowSceneActivation = false;
@@ -166,6 +177,7 @@ public class LoadManager : MonoBehaviour
                 } 
             }
         }
+#endregion
     }
     IEnumerator LoadSceneFadeIn(string nextScene){
         yield return null;
@@ -260,7 +272,10 @@ public class LoadManager : MonoBehaviour
         reloadScene = false;
         
         yield return wait1s;
+        // yield return wait1s;
+        // yield return wait1s;
         if(PlayerManager.instance!=null){
+            Debug.Log("33344");
             PlayerManager.instance.canMove = true;
         }
         //loadFader.GetComponent<Animator>().SetTrigger("fadeIn");

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,21 +89,42 @@ public class CSVReader : MonoBehaviour
                     string resultString = result.ToString();
                                 
                     if(!resultString.Contains("</color>")){
+                        //한 줄 최소 텍스트 갯수(공백 포함)
+                        int dialogueMaxCountPerRow = 18;
 
-//                        Debug.Log(result);
+                        switch(DBManager.instance.language){
+                            case "kr" : 
+                            case "jp" : 
+                                dialogueMaxCountPerRow = 18;
+                                break;
+                            case "en" : 
+                                dialogueMaxCountPerRow = 25;
+                                break;
+                            default :
+                                break;
+                        }
 
-                        if(resultString.Length>20){
-                            resultString = resultString.Insert(20,"\n");
-                            //totalVisibleCharacters++;
+                        var quotient = resultString.Length / dialogueMaxCountPerRow ;
+
+                        if(quotient == 0){
+                            break;
                         }
-                        if(resultString.Length>40){
-                            resultString = resultString.Insert(40,"\n");
-                            //totalVisibleCharacters++;
+
+                        int add = 0;
+
+                        for(int i=1;i<=quotient;i++){
+                            int startIndex = dialogueMaxCountPerRow * i + add;
+                            add = 0;
+                            //단어가 중간에 안잘리도록 함.
+                            while( startIndex + add < resultString.Length && resultString[startIndex + add]!=' '){
+                                add++;
+                            }
+                            if(startIndex + add >= resultString.Length) break;
+                            resultString = resultString.Insert(startIndex + add + 1,"\n");
+
                         }
-                        if(resultString.Length>60){
-                            resultString = resultString.Insert(60,"\n");
-                            //totalVisibleCharacters++;
-                        }
+
+
                     }
 
 

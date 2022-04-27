@@ -124,7 +124,8 @@ public class Location : MonoBehaviour
 //                    Debug.Log(locFlag);
                 if(waitKey&&!locFlag&&!PlayerManager.instance.isWaitingInteract&&!PlayerManager.instance.isActing){
                     //Debug.Log("AAA");
-                    if(Input.GetButton("Interact_OnlyKey")){
+                    //if(Input.GetButton("Interact_OnlyKey")){
+                    if(PlayerManager.instance.interactInput){
                         locFlag = true;
                         if(type == LocationType.Trigger)
                             //Debug.Log(trigNum +"번 트리거 (" + trigComment + ") 실행 시도");

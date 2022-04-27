@@ -54,7 +54,14 @@ public class BodySoundScript : MonoBehaviour
                     SoundManager.instance.PlaySound("lucky_walk_0"+Random.Range(1,3),0.3f);
                 break;
             case BodyType.lucky_back : 
+                if(PlayerManager.instance.onRope){
+
+                SoundManager.instance.PlaySound("rope_"+Random.Range(1,6));
+                }
+                else{
                 SoundManager.instance.PlaySound("ladder_0"+Random.Range(1,3));
+
+                }
                 break;
             case BodyType.ant : 
                 //if(GetComponentInParent<NPCScript>().isNearPlayer){

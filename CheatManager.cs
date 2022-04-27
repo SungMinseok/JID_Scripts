@@ -1,6 +1,5 @@
 ﻿
 
-#if alpha
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +12,8 @@ public class CheatManager : MonoBehaviour
     public Transform checkPoint;
     public Transform checkPoint_Special;
     public Transform minigameParent;
+    
+#if alpha
     void Awake(){
         instance = this;
     }
@@ -361,9 +362,9 @@ public class CheatManager : MonoBehaviour
     // }
     
     void Update(){
-        if(isDebugMode){
+        if(DebugManager.instance.isDebugMode){
             if(Input.GetKeyDown(KeyCode.Return)){
-                cheatPanel.SetActive(!cheatPanel.activeSelf);
+                DebugManager.instance.cheatPanel.SetActive(!DebugManager.instance.cheatPanel.activeSelf);
                 //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
                 CheatManager.instance.cheat.Select();
                 CheatManager.instance.cheat.ActivateInputField();
@@ -373,9 +374,10 @@ public class CheatManager : MonoBehaviour
                 //SceneManager.LoadScene("warehouse");
                 PlayerManager.instance.RevivePlayer();
                 CheatManager.instance.InputCheat("t 0");
+                CheatManager.instance.InputCheat("completetrigger 1");
                 //ResetPlayerPos();
             }
         }
     }
-}
 #endif
+}

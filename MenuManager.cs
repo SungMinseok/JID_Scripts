@@ -47,6 +47,11 @@ public class MenuManager : MonoBehaviour
     public GameObject checkedBtn_window;
     public TMP_Dropdown dropdown_resolution;
     public TMP_Dropdown dropdown_frameRate;
+    public bool waitKeyChange;
+    public string curChangingKeyName;
+    public Text keyText_jump;
+    public Text keyText_interact;
+
     [System.Serializable]
     public class SaveLoadSlot{
         public TextMeshProUGUI saveNameText;
@@ -81,12 +86,37 @@ public class MenuManager : MonoBehaviour
     void Awake(){
         instance = this;
     }    
-    // void Update(){
-    //     if(menuPanel.activeSelf){
+    void Update(){
+        if(Input.GetButtonUp("Cancel")){
+            if(PlayerManager.instance == null){
+                Debug.Log("3333");
+                if(popUpOnWork.activeSelf){
+                    popUpOnWork.SetActive(false);
+                }
+                else if(popUpPanel.activeSelf){
+                    popUpPanel.SetActive(false);
+                }
+                else if(popUpPanel1.activeSelf){
+                    popUpPanel1.SetActive(false);
+                }
+                else if(loadPanel.activeSelf){
+                    loadPanel.SetActive(false);
+                }
+                else if(collectionPanel.activeSelf){
+                    collectionPanel.SetActive(false);
+                }
+                else if(settingPanel.activeSelf){
+                    settingPanel.SetActive(false);
+                }
+                // else{
+                //     //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);
+                //     MenuManager.instance.ToggleMenuPanel(!MenuManager.instance.menuPanel.activeSelf);
+                // }
 
-    //     }
+            }
+        }
 
-    // }
+    }
     void Start(){
 
         fonts = new Font[2];
@@ -138,6 +168,7 @@ public class MenuManager : MonoBehaviour
         ResetSaveSlots();
         ResetLoadSlots();
 #endregion
+
 #region Settings
         slider_bgm.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeBGM(MenuManager.instance.slider_bgm.value);});
         slider_sound.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeSFX(MenuManager.instance.slider_sound.value);});
@@ -162,8 +193,13 @@ public class MenuManager : MonoBehaviour
         SetWindowedMode(DBManager.instance.localData.isWindowedMode);
         dropdown_resolution.value = DBManager.instance.localData.resolutionValue;
         dropdown_frameRate.value = DBManager.instance.localData.frameRateValue;
+
+        
+        keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
+        keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
 #endregion
     
+
     }
 
     public void OpenLoadPanel(){
@@ -416,8 +452,8 @@ public class MenuManager : MonoBehaviour
         switch(curPopUpType){
             case "save_overwrite" :
                 Save(curSaveNum);
-        ResetSaveSlots();
-        ResetLoadSlots();
+                ResetSaveSlots();
+                ResetLoadSlots();
                 //Debug.Log(curSaveNum + "번 저장 시도");
                 break;
 
@@ -436,6 +472,10 @@ public class MenuManager : MonoBehaviour
                 Application.Quit();
                 //LoadManager.instance.LoadMain();
                 break;
+            // case "changeKey" :
+            //     waitKeyChange = false;
+            //     //LoadManager.instance.LoadMain();
+            //     break;
 
             default:
 //                Debug.Log(curPopUpType);
@@ -636,7 +676,56 @@ public class MenuManager : MonoBehaviour
         Application.targetFrameRate = frameRate;
         QualitySettings.vSyncCount = 0;
     }
+    
+    void OnGUI()
+    {
+        if(waitKeyChange){
 
+            Event e = Event.current;
+            if (e.isKey && e.keyCode != KeyCode.Escape)
+            {
+                waitKeyChange = false;
+                Debug.Log("설정완료" + e.keyCode.ToString());
+                GameInputManager.SetKeyMap(curChangingKeyName,e.keyCode);
+
+                switch (curChangingKeyName)
+                {
+                    case "Jump" :  
+                        DBManager.instance.localData.jumpKey = e.keyCode;
+                        break;
+                    case "Interact" :  
+                        DBManager.instance.localData.interactKey = e.keyCode;
+                        break;
+                    default:
+                        break;
+                }
+
+                keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
+                keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
+
+                popUpPanel.SetActive(false);
+                popUpPanel1.SetActive(false);
+                //ClosePopUp();
+
+            }
+        }
+    }
+    public void ChangeKey(string keyName){
+        curPopUpType = "changeKey";
+        waitKeyChange = true;
+        curChangingKeyName = keyName;
+        switch (keyName)
+        {
+            case "Jump" :  
+                OpenPopUpPanel_SetStringByIndex("70","1");
+                break;
+            case "Interact" :  
+                OpenPopUpPanel_SetStringByIndex("71","1");
+                break;
+            default:
+                break;
+        }
+    }
 #endregion
 
     public void ToggleMenuPanel(bool active){

@@ -23,6 +23,8 @@ public class SceneController : MonoBehaviour
     public Collider2D temp;
     public TranslateText[] translateTexts;
     public GameObject[] textObjs;
+    public Transform centerViewPoint;
+    public Transform tempObj;
 
     
     [Header("Set Demo")]
@@ -30,6 +32,8 @@ public class SceneController : MonoBehaviour
     void Awake()
     {
         instance = this;
+
+
     }
     void Start(){   
         if(SceneManager.GetActiveScene().name == "Main"){
@@ -37,6 +41,7 @@ public class SceneController : MonoBehaviour
         }
         else if(SceneManager.GetActiveScene().name.Substring(0,5) == "Level"){
             SoundManager.instance.ChangeBgm("juicy drug");
+            SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
 
             
 #if demo

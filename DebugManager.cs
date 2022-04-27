@@ -62,23 +62,7 @@ public class DebugManager : MonoBehaviour
 
     
 #if UNITY_EDITOR || alpha
-    // void Update(){
-    //     if(isDebugMode){
-    //         if(Input.GetKeyDown(KeyCode.Return)){
-    //             cheatPanel.SetActive(!cheatPanel.activeSelf);
-    //             //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
-    //             CheatManager.instance.cheat.Select();
-    //             CheatManager.instance.cheat.ActivateInputField();
-                
-    //         }
-    //         if(Input.GetKeyDown(KeyCode.F10)){
-    //             //SceneManager.LoadScene("warehouse");
-    //             PlayerManager.instance.RevivePlayer();
-    //             CheatManager.instance.InputCheat("t 0");
-    //             //ResetPlayerPos();
-    //         }
-    //     }
-    // }
+
 
 #endif
 

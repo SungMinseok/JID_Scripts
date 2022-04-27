@@ -22,7 +22,9 @@ public class DoodadsScript : MonoBehaviour
     WaitForSeconds waitTime = new WaitForSeconds(0.01f);
     //PlayerManager thePlayer;
     public Vector2 curPos;
+    public BoxCollider2D boxCol0;
     [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
+    public bool isRope;
     
     [Header("이속 감소")]
     public float slowDownValue;
@@ -34,11 +36,19 @@ public class DoodadsScript : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         //thePlayer = PlayerManager.instance;
 
-        
+        if(type == DoodadsType.Trap){
+            
+            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, boxCol0, true);
+            Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, boxCol0, true);
+           //Physics2D.IgnoreCollision(boxCol0, PlayerManager.instance.bodyCollider2D, true);
+        }
     }
     void OnEnable(){
-        if(type == DoodadsType.Bullet2)
+        if(type == DoodadsType.Bullet2){
             transform.localPosition = curPos;
+            Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.endCol, true);
+
+        }
             
         else if(type == DoodadsType.Bullet){
             
@@ -105,7 +115,6 @@ public class DoodadsScript : MonoBehaviour
                 break;
 
             case DoodadsType.Bullet1 :
-            case DoodadsType.Bullet2 :
                 if(other.gameObject.CompareTag("Player")){
                     
                     if(!PlayerManager.instance.isGameOver){
@@ -124,6 +133,24 @@ public class DoodadsScript : MonoBehaviour
                 }
                 break;
             
+            case DoodadsType.Bullet2 :
+                if(other.gameObject.CompareTag("Player")){
+                    
+                    if(!PlayerManager.instance.isGameOver){
+                        SoundManager.instance.PlaySound("minigame_bottlecrash");
+                        PlayerManager.instance.KillPlayer(4, "dead0");
+
+                        // PlayerManager.instance.isGameOver = true;
+                        // PlayerManager.instance.canMove = false;
+                        // PlayerManager.instance.animator.SetBool("dead0",true);
+                        // MinigameManager.instance.FailMinigame(4);
+                    }
+                }                
+                else if(other.gameObject.CompareTag("MainGround")){
+                        SoundManager.instance.PlaySound("minigame_bottlecrash");
+                    gameObject.SetActive(false);
+                }
+                break;
         }
     }
     void OnCollisionStay2D(Collision2D other){
@@ -185,6 +212,17 @@ public class DoodadsScript : MonoBehaviour
                     //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
                     //if(PlayerManager.instance.isFalling){
                     PlayerManager.instance.KillPlayer(0, "drowning");
+                    //}
+                }
+                break;
+            case DoodadsType.Ladder :
+                if(other.CompareTag("Player")){
+                    //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+                    //if(PlayerManager.instance.isFalling){
+                    if(isRope)
+                        PlayerManager.instance.onRope = true;
+                    else
+                        PlayerManager.instance.onRope = false;
                     //}
                 }
                 break;
@@ -283,36 +321,35 @@ public class DoodadsScript : MonoBehaviour
     }
     void OnTriggerExit2D(Collider2D other) {
         
-        if(type == DoodadsType.Ladder){
-            if(other.CompareTag("Player")){
-                for(int i=0;i<platformCollider.Length;i++){
-                        
-                        Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], false);
-                        Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
+        switch(type){
+            case DoodadsType.Ladder :
+                if(other.CompareTag("Player")){
+                    for(int i=0;i<platformCollider.Length;i++){
+                            
+                            Physics2D.IgnoreCollision(PlayerManager.instance.bodyCollider2D, platformCollider[i], false);
+                            Physics2D.IgnoreCollision(PlayerManager.instance.circleCollider2D, platformCollider[i], false);
+                    }
+
+                    PlayerManager.instance.onRope = false;
+                } 
+                break;
+            case DoodadsType.Cover :
+                if(other.CompareTag("Player")){
+
+                    PlayerManager.instance.isHiding = false;
+                    Decloak();
+
                 }
-
-            }
-        }        
-        else if(type == DoodadsType.Cover){
-            
-            if(other.CompareTag("Player")){
-
-                PlayerManager.instance.isHiding = false;
-                Decloak();
-
-            }
-        }
-        else if(type == DoodadsType.SlowDown){
-            if(other.CompareTag("Player")){
-                if(onHit){
-                    onHit = false;
-                PlayerManager.instance.isSlowDown -= slowDownValue;
+                break;
+            case DoodadsType.SlowDown :
+                if(other.CompareTag("Player")){
+                    if(onHit){
+                        onHit = false;
+                    PlayerManager.instance.isSlowDown -= slowDownValue;
+                    }
+    //                Debug.Log("B");
                 }
-//                Debug.Log("B");
-            }
-
-
-
+                break;
         }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);

@@ -152,7 +152,7 @@ public class NPCSkillScript : MonoBehaviour
             randomNum = 4;
         }
 
-        for(int i=1;i<12;i++){
+        for(int i=1;i<bullets.Length;i++){
             bullets[i].GetComponent<DoodadsScript>().curPos = new Vector2(randomNum + (i-1)*3.5f, 15);
             //bullets[i].SetActive(true);
         }
@@ -177,9 +177,9 @@ public class NPCSkillScript : MonoBehaviour
             
             //yield return wait500ms;
         yield return wait1000ms;
-            bullets[0].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
+        bullets[0].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
 
-        for(int i=1;i<12;i++){
+        for(int i=1;i<bullets.Length;i++){
             bullets[i].transform.localPosition = bullets[i].GetComponent<DoodadsScript>().curPos;
             bullets[i].SetActive(true);
         }

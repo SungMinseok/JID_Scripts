@@ -76,13 +76,20 @@ public class MinigameManager : MonoBehaviour
         }
     }
     public void FailMinigameTest(){
-        for(int i=0;i<instance.transform.childCount;i++){
-            instance.transform.GetChild(i).gameObject.SetActive(false);
+        if(nowMinigameNum == 0){
+            Minigame0Script.instance.ActivateGameOver();
         }
-        //success = true;
-        PlayerManager.instance.isPlayingMinigame = false;
-        fail = true;
-        Debug.Log(nowMinigameNum + "번 미니게임 강제 실패 (테스트)");
+        else{
+
+            for(int i=0;i<instance.transform.childCount;i++){
+                instance.transform.GetChild(i).gameObject.SetActive(false);
+            }
+            //success = true;
+            PlayerManager.instance.isPlayingMinigame = false;
+            fail = true;
+        }
+
+            Debug.Log(nowMinigameNum + "번 미니게임 강제 실패 (테스트)");
     }
     public void GiveReward(int gameNum){
         switch(gameNum){

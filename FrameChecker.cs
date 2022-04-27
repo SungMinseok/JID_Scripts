@@ -49,6 +49,17 @@ public class FrameChecker : MonoBehaviour
   void Update()
   {
     deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
+        //if(isDebugMode){
+    if(Input.GetKeyDown(KeyCode.F11)){    
+      //GUI.Label(rect0, text0, GUIStyle.none);
+      var curAlphaState = style0.normal.textColor.a ;
+      var setAlphaState = curAlphaState == 0 ? 1 : 0;
+      style1.normal.textColor = new Color(0,1,1,setAlphaState);
+      style0.normal.textColor = new Color(0,1,1,setAlphaState);
+
+        
+    }
+        //}
   }
  
   void OnGUI()//소스로 GUI 표시.

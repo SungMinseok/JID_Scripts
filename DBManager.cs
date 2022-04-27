@@ -113,6 +113,8 @@ public class DBManager : MonoBehaviour
         public bool isWindowedMode;
         public int resolutionValue;
         public int frameRateValue;
+        public KeyCode jumpKey;
+        public KeyCode interactKey;
         
     }
     public void SaveDefaultData(){
@@ -247,6 +249,12 @@ public class DBManager : MonoBehaviour
                 localData =(LocalData)bf.Deserialize(file);
             }
 
+            if(localData.jumpKey==KeyCode.None){
+                localData.jumpKey = KeyCode.Space;
+            }
+            if(localData.interactKey==KeyCode.None){
+                localData.interactKey = KeyCode.E;
+            }
             //language = localData.language;
             
             file.Close();
@@ -397,9 +405,9 @@ public class DBManager : MonoBehaviour
         //QualitySettings.vSyncCount = 0;
 
 #if demo
-        buildVersion = "demo";
+        buildVersion = "_demo";
 #elif alpha
-        buildVersion = "alpha";
+        buildVersion = "";
 #else
         buildVersion = "";
 #endif
@@ -454,7 +462,7 @@ public class DBManager : MonoBehaviour
 
         if(PlayerManager.instance != null){
 
-            if(PlayerManager.instance.isMoving && !PlayerManager.instance.isInvincible){
+            if(PlayerManager.instance.isMoving && !PlayerManager.instance.isActing && !PlayerManager.instance.isInvincible && !PlayerManager.instance.isPlayingMinigame){
                 if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
             }
         }

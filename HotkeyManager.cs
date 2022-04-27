@@ -7,11 +7,13 @@ public class HotkeyManager : MonoBehaviour
     InventoryManager theInven;
     SoundManager theSound;
     MenuManager theMenu;
+    UIManager theUI;
 
     void Start(){
         theInven = InventoryManager.instance;
         theSound = SoundManager.instance;
         theMenu = MenuManager.instance;
+        theUI = UIManager.instance;
     }
     void Update()
     {
@@ -33,27 +35,44 @@ public class HotkeyManager : MonoBehaviour
         }
 
 
-        if(Input.GetButtonUp("Cancel") && !PlayerManager.instance.isActing){
-            if(theMenu.popUpOnWork.activeSelf){
-                theMenu.popUpOnWork.SetActive(false);
-            }
-            else if(theMenu.savePanel.activeSelf){
-                theMenu.savePanel.SetActive(false);
-            }
-            else if(theMenu.loadPanel.activeSelf){
-                theMenu.loadPanel.SetActive(false);
-            }
-            else if(theMenu.collectionPanel.activeSelf){
-                theMenu.collectionPanel.SetActive(false);
-            }
-            else if(theMenu.settingPanel.activeSelf){
-                theMenu.settingPanel.SetActive(false);
+        if(Input.GetButtonUp("Cancel")){
+            if(!PlayerManager.instance.isActing && !UIManager.instance.waitTutorial){
+
+                if(theMenu.popUpOnWork.activeSelf){
+                    theMenu.popUpOnWork.SetActive(false);
+                }
+                // else if(theMenu.savePanel.activeSelf){
+                //     theMenu.savePanel.SetActive(false);
+                // }
+                else if(theMenu.popUpPanel.activeSelf){
+                    theMenu.popUpPanel.SetActive(false);
+                }
+                else if(theMenu.popUpPanel1.activeSelf){
+                    theMenu.popUpPanel1.SetActive(false);
+                }
+                else if(theMenu.loadPanel.activeSelf){
+                    theMenu.loadPanel.SetActive(false);
+                }
+                else if(theMenu.collectionPanel.activeSelf){
+                    theMenu.collectionPanel.SetActive(false);
+                }
+                else if(theMenu.settingPanel.activeSelf){
+                    theMenu.settingPanel.SetActive(false);
+                }
+                else{
+                    //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);
+                    MenuManager.instance.ToggleMenuPanel(!MenuManager.instance.menuPanel.activeSelf);
+                }
+
             }
             else{
-                //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);
-                MenuManager.instance.ToggleMenuPanel(!MenuManager.instance.menuPanel.activeSelf);
+                if(theMenu.savePanel.activeSelf){
+                    theMenu.savePanel.SetActive(false);
+                }
+                else if(theUI.ui_book.activeSelf){
+                    theUI.ui_book.SetActive(false);
+                }
             }
-
         }
         
         if(Input.GetKey(KeyCode.LeftAlt)&&Input.GetKeyDown(KeyCode.Return)){

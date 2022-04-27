@@ -23,6 +23,7 @@ public class Minigame2Script : MonoBehaviour
     [Range(8f, 15f)] public float throwingBottleSpeed = 10f;
     [Space]
     [Header("[Game Objects]─────────────────")]
+    public GameObject madAnt;
     public NPCScript runningMadAnt;
     public NPCScript flyingMadAnt;
     public Transform defaultPos0;
@@ -109,7 +110,7 @@ public class Minigame2Script : MonoBehaviour
         isActive = true;
 
         PlayerManager.instance.isForcedRun = true;
-
+        madAnt.SetActive(false);
 
         while(curMapScrollSpeed < mapScrollSpeed){
             curMapScrollSpeed += 0.005f;

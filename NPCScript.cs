@@ -458,6 +458,7 @@ public class NPCScript : CharacterScript
                 //StopCoroutine(randomDialogueCrt);
                 //DialogueManager.instance.StopRandomDialogue_NPC(randomDialogueCrt);
                 NpcLookObject(PlayerManager.instance.transform);
+                UIManager.instance.SetHUD(false);
                 
                 if(randomDialogueCrt !=null){
                     StopCoroutine(randomDialogueCrt);

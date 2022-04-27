@@ -5,6 +5,7 @@ using UnityEngine.UI;
 //Level, Stage  : Level이 상위 개념
 public class Minigame0Script : MonoBehaviour
 {
+    public static Minigame0Script instance;
     [Header("게임 최대 시간")]
     [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━")]
     public float maxTimerSet;
@@ -24,6 +25,7 @@ public class Minigame0Script : MonoBehaviour
     public Transform keyArray;
 
     public Animator handAnimator;
+    public GameObject gameOverImage;
     [Space]
 
     [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
@@ -52,10 +54,11 @@ public class Minigame0Script : MonoBehaviour
 #endif
     }
     void OnDisable(){
-        if(!PlayerManager.instance.isActing)
+        if(!PlayerManager.instance.isActing){
             PlayerManager.instance.UnlockPlayer();
+            UIManager.instance.SetHUD(true);
+        }
 
-        UIManager.instance.SetHUD(true);
         StopAllCoroutines();
 
 #if UNITY_EDITOR || alpha
@@ -64,9 +67,9 @@ public class Minigame0Script : MonoBehaviour
 #endif
     }
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        instance =this;
     }
 
     // Update is called once per frame
@@ -104,7 +107,8 @@ public class Minigame0Script : MonoBehaviour
             }
             else{
                 //MinigameManager.instance.FailMinigame(3);
-                MinigameManager.instance.FailMinigame(-1);
+                PlayerManager.instance.isGameOver = true;
+                ActivateGameOver();
                 //UIManager.instance.SetGameOverUI(2);
             }
             timerGauge.fillAmount = curTimer / maxTimerSet;
@@ -202,12 +206,18 @@ public class Minigame0Script : MonoBehaviour
         isPaused = true;
         MinigameManager.instance.SuccessMinigame();
         
+    }
+    public void ActivateGameOver(){
 
-
-
-
-
-
+        StartCoroutine(ActivateGameOverCoroutine());
     }
 
+    IEnumerator ActivateGameOverCoroutine(){
+        SoundManager.instance.BgmOff();
+        yield return new WaitForSeconds(0.5f);
+        gameOverImage.gameObject.SetActive(true);
+        SoundManager.instance.PlaySound("ending_minigamefail");
+        yield return new WaitForSeconds(1f);
+        MinigameManager.instance.FailMinigame(3);
+    }
 }

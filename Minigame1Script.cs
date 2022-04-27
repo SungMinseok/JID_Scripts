@@ -83,9 +83,11 @@ public class Minigame1Script : MonoBehaviour
 #endif
     }
     void OnDisable(){
-        PlayerManager.instance.UnlockPlayer();
+        if(!PlayerManager.instance.isActing){
+            PlayerManager.instance.UnlockPlayer();
 
-        UIManager.instance.SetHUD(true);
+            UIManager.instance.SetHUD(true);
+        }
         StopAllCoroutines();
 
 #if UNITY_EDITOR || alpha

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
 public enum ItemType{
@@ -26,6 +27,8 @@ public class ItemScript : MonoBehaviour
     public bool isDefaultDialogue = true;
     public Dialogue getItemDialogue;
     
+    [Header("Tutorial ────────────────────")]
+    public int[] tutorialIds;
     [Header("Setting ────────────────────")]
     public bool isAvailable = true;
     public bool disableAnimation;
@@ -40,6 +43,11 @@ public class ItemScript : MonoBehaviour
     //Vector2 itemVector;
     WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
     bool getFlag;
+    
+    WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
+    WaitForSeconds wait1000ms = new WaitForSeconds(1);
+    WaitForSeconds wait2000ms = new WaitForSeconds(2);
     [Space]
     public Transform itemObject;
     void Start(){
@@ -109,20 +117,12 @@ public class ItemScript : MonoBehaviour
     }
     IEnumerator GetItemCoroutine(){
 //아이템 습득 시 대화
-        if(useDialogue){
-            PlayerManager.instance.LockPlayer();
-            DialogueManager.instance.SetDialogue(getItemDialogue);
-            yield return waitTalking;
-            PlayerManager.instance.UnlockPlayer();
-        }
+
 
         if(type == ItemType.Honey){
             StartCoroutine(GetItemAndRemoveCoroutine());
             //DM("꿀 충전 : "+amount_honey);
             DBManager.instance.curData.curHoneyAmount+=amount_honey;
-            if(!DBManager.instance.curData.getItemOverList.Contains(objectID)){
-                DBManager.instance.curData.getItemOverList.Add(objectID);
-            }
             SoundManager.instance.PlaySound("get_honeydrop");
         }
         else if(type == ItemType.Dirt){
@@ -131,12 +131,6 @@ public class ItemScript : MonoBehaviour
             InventoryManager.instance.AddItem(5,3);
             SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
 
-            //DM("흙 충전 : "+amount_dirt);
-            
-            // DBManager.instance.curData.curDirtAmount+=amount_dirt;
-            // if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
-            //     DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
-            // }
         }
         else if(type == ItemType.Item){
             StartCoroutine(GetItemAndRemoveCoroutine());
@@ -147,21 +141,70 @@ public class ItemScript : MonoBehaviour
             
         }
 
+        if(!DBManager.instance.curData.getItemOverList.Contains(objectID)){
+            DBManager.instance.curData.getItemOverList.Add(objectID);
+        }
 
-        // if(useDialogue){
-        //     //WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
-        // }
+        if(useDialogue){
+            
+            PlayerManager.instance.isActing =true;  
+            
+            PlayerManager.instance.LockPlayer();
+            PlayerManager.instance.SetTalkCanvasDirection();
+            if(GameManager.instance.mode_zoomWhenInteract){
 
+                SceneController.instance.SetCameraDefaultZoomIn();
+                SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
+            }
+            UIManager.instance.SetHUD(false);
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
+            //트리거 시작시 배경음 감소
+            SoundManager.instance.bgmPlayer.volume = SoundManager.instance.bgmPlayer.volume * 0.3f;
+
+            DialogueManager.instance.SetDialogue(getItemDialogue);
+            yield return waitTalking;
+
+            UIManager.instance.SetHUD(true);
+
+            if(GameManager.instance.mode_zoomWhenInteract){
+                SceneController.instance.SetCameraDefaultZoomOut();
+                SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[DBManager.instance.curData.curMapNum]);
+            }
+
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
+            //트리거 완료 혹은 재시작 가능 시 느낌표 재출력을 위해 로케이션 레이더 재활성화
+            PlayerManager.instance.locationRader.ResetLocationRader();
+
+
+            PlayerManager.instance.isActing =false;  
+            PlayerManager.instance.UnlockPlayer();
+            
+        }
+
+        if(tutorialIds.Length != 0){
+            yield return wait100ms;
+            yield return wait100ms;
+            yield return wait100ms;
+            for(int i=0;i<tutorialIds.Length;i++){
+                UIManager.instance.OpenTutorialUI(tutorialIds[i]);
+                yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+                //yield return wait100ms;
+                //yield return wait100ms;
+            }
+        }
+        
+        
+        itemObject.gameObject.SetActive(false);
     }
 
     IEnumerator GetItemAndRemoveCoroutine(){
         yield return null;
-        // animator.SetTrigger("got");
-        // while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.8)
-        // {
-        //     yield return null;
-        // }
-        itemObject.gameObject.SetActive(false);
+        itemObject.GetComponent<SpriteRenderer>().color= new Color(1,1,1,0);
+        if(itemObject.TryGetComponent<PolygonCollider2D>(out PolygonCollider2D col)){
+            col.enabled = false;
+        }
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 }

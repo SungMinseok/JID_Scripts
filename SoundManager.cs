@@ -90,7 +90,7 @@ public class SoundManager : MonoBehaviour
             return;
         }
         sfxPlayer.PlayOneShot(audioClipsDic[soundFileName], a_volume * sfxPlayer.volume);
-        
+        //Debug.Log(soundFileName);
     }
     
     public void PlayLoopSound(string soundFileName)
@@ -124,6 +124,7 @@ public class SoundManager : MonoBehaviour
     public void SetBgmByMapNum(int mapNum){
         string soundFileName = "";
         switch(mapNum){
+            case 6:
             case 11:
             case 13:
             case 14:
