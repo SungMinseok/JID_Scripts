@@ -10,11 +10,15 @@ public class MainControlScript : MonoBehaviour
     //public RenderTexture texture;
     public GameObject mainBtns;
     public GameObject demoImage;
+    public bool canSkip;
+    public string titleVideoName;
     WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
 
     void Start(){
         StartCoroutine(IntroCoroutine());
+
+        titleVideoName = videoClips[0].ToString();
     }
 
     IEnumerator IntroCoroutine(){
@@ -53,5 +57,12 @@ public class MainControlScript : MonoBehaviour
     public void PushGameExitBtn(){
         Application.Quit();
     }
+    void Update(){
+        //if(VideoManager.instance.GetPlayingVideoName()==titleVideoName){
 
+            if(Input.anyKeyDown && VideoManager.instance != null && VideoManager.instance.GetPlayingVideoName()==titleVideoName){
+                VideoManager.instance.SkipPlayingVideo();
+            }
+        //}
+    }
 }

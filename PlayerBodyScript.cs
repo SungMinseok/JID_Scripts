@@ -69,6 +69,7 @@ public class PlayerBodyScript : MonoBehaviour
             thePlayer.getDirt = false;
             thePlayer.animator.SetBool("shoveling1", false);
             thePlayer.dirtTarget = null;
+            thePlayer.weapons[0].gameObject.SetActive(false);
             //UIManager.instance.clearPanel.SetActive(true);
         }
         else if (other.CompareTag("Icicle"))
@@ -106,15 +107,16 @@ public class PlayerBodyScript : MonoBehaviour
         else if (other.CompareTag("Dirt"))
         {
             var tempGetObject = other.GetComponent<DirtScript>();
-            if(tempGetObject.curHp>0) thePlayer.getDirt = true;
+            if(tempGetObject.dirtBundleInfo.curHp>0) thePlayer.getDirt = true;
             thePlayer.dirtTarget = tempGetObject;
+            if(InventoryManager.instance.CheckHaveItem(21)) thePlayer.weapons[0].gameObject.SetActive(true);
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
         else if (other.CompareTag("Icicle"))
         {
             var tempGetObject = other.GetComponent<DirtScript>();
-            if(tempGetObject.curHp>0) thePlayer.getIcicle = true;
+            if(tempGetObject.dirtBundleInfo.curHp>0) thePlayer.getIcicle = true;
             thePlayer.dirtTarget = tempGetObject;
             //UIManager.instance.clearPanel.SetActive(true);
         }

@@ -96,6 +96,7 @@ public class PlayerManager : CharacterScript
     public bool isShopping;
     public bool onRope; // 밧줄 소리용
     public int bodyMode;    //0 : 후면, 1 : 정면
+    public bool onKeyTutorial;
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -104,6 +105,8 @@ public class PlayerManager : CharacterScript
     [Header("────────────────────────────")]
     public Transform talkCanvas;
     public LocationRader locationRader;
+    public Transform tutorialBox;
+    public Transform tutorialBox_Right;
     float defaultTalkCanvasHolderPosX;
     [Header("────────────────────────────")]
     public DirtScript dirtTarget;
@@ -193,6 +196,8 @@ public class PlayerManager : CharacterScript
 
     void Update()
     {
+            interactInput = GameInputManager.GetKeyDown("Interact") ? true : false;
+
         if(isGameOver){
             canMove = false;
         }
@@ -206,7 +211,7 @@ public class PlayerManager : CharacterScript
             hInput = Input.GetAxisRaw("Vertical");
             //jumpInput = Input.GetButton("Jump") ? true : false;
             jumpInput = GameInputManager.GetKey("Jump") ? true : false;
-            interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
+            //interactInput = Input.GetButton("Interact_OnlyKey") ? true : false;
 
             if(DBManager.instance.curData.curDirtAmount<=0 && canMove){
                 canMove = false;
@@ -300,9 +305,10 @@ public class PlayerManager : CharacterScript
             
             animator.SetBool("run", false);
             
-            if(interactInput){
+            if(interactInput && !isActing){
                 if(getDirt){
-                    if(equipments_id[2]==21){
+                    //if(equipments_id[2]==21){
+                    if(InventoryManager.instance.CheckHaveItem(21)){
 
                         animator.SetBool("shoveling1", true);
                         if(!digFlag){
@@ -314,7 +320,8 @@ public class PlayerManager : CharacterScript
                     }
                 }
                 else if(getIcicle){
-                    if(equipments_id[2]==26){
+                    //if(equipments_id[2]==26){
+                    if(InventoryManager.instance.CheckHaveItem(26)){
                         animator.SetBool("icebreak", true);
                         if(!digFlag){
                             digFlag = true;
@@ -628,20 +635,20 @@ public class PlayerManager : CharacterScript
         }
     }
     IEnumerator CheckAnimationState(int animNum){
-        SpriteRenderer _spriteRenderer ;
+        //SpriteRenderer _spriteRenderer ;
 
-        switch(animNum){
-            case 0 : 
-                _spriteRenderer = weapons[0];
-                break;
-            case 1 : 
-                _spriteRenderer = weapons[1];
-                break;
-            default :
-                _spriteRenderer = null;
-                break;
-        }
-        if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
+        // switch(animNum){
+        //     case 0 : 
+        //         _spriteRenderer = weapons[0];
+        //         break;
+        //     case 1 : 
+        //         _spriteRenderer = weapons[1];
+        //         break;
+        //     default :
+        //         _spriteRenderer = null;
+        //         break;
+        // }
+        // if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
 
         switch(animNum){
             case 0 : 
@@ -655,7 +662,7 @@ public class PlayerManager : CharacterScript
                 break;
         }
         
-        if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
+        //if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
 
         switch(animNum){
             case 0 : 

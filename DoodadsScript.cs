@@ -45,7 +45,7 @@ public class DoodadsScript : MonoBehaviour
     }
     void OnEnable(){
         if(type == DoodadsType.Bullet2){
-            transform.localPosition = curPos;
+            //transform.localPosition = curPos;
             Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.endCol, true);
 
         }
@@ -157,8 +157,10 @@ public class DoodadsScript : MonoBehaviour
 
         switch(type){
             case DoodadsType.Bullet :
+            case DoodadsType.Bullet2 :
                 if(other.gameObject.CompareTag("Collider_Player")){
                     Physics2D.IgnoreCollision(GetComponent<Collider2D>(), other.transform.GetComponent<Collider2D>(), true);
+                    Debug.Log("3413414");
                 }
                 break;
         }

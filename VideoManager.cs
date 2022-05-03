@@ -83,7 +83,14 @@ public class VideoManager : MonoBehaviour
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = rt;
     }
-
+    public string GetPlayingVideoName(){
+        Debug.Log(videoPlayer.clip.ToString());
+        return videoPlayer.clip.ToString();
+    }
+    public void SkipPlayingVideo(){
+        Debug.Log("skip");
+        VideoManager.instance.isPlayingVideo = false;
+    }
     // IEnumerator IntroCoroutine(){
 
     // }

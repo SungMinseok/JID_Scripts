@@ -33,10 +33,25 @@ public static class GameInputManager
     private static void InitializeDictionary()
     {
         keyMapping = new Dictionary<string, KeyCode>();
-        for(int i=0;i<keyMaps.Length;++i)
-        {
-            keyMapping.Add(keyMaps[i], defaults[i]);
+
+        var localData = DBManager.instance.localData;
+        // for(int i=0;i<keyMaps.Length;++i)
+        // {
+        //     keyMapping.Add(keyMaps[i], defaults[i]);
+        // }
+        if(localData.jumpKey==KeyCode.None){
+            localData.jumpKey = KeyCode.Space;
         }
+        if(localData.interactKey==KeyCode.None){
+            localData.interactKey = KeyCode.E;
+        }
+
+        SetKeyMap("Jump",localData.jumpKey);
+        SetKeyMap("Interact",localData.interactKey);
+        
+        
+        MenuManager.instance.keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
+        MenuManager.instance.keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
     }
  
     public static void SetKeyMap(string keyMap,KeyCode key)
@@ -44,6 +59,10 @@ public static class GameInputManager
         //if (!keyMapping.ContainsKey(keyMap))
         //    throw new ArgumentException("Invalid KeyMap in SetKeyMap: " + keyMap);
         keyMapping[keyMap] = key;
+    }
+    public static string ReadKey(string keyMap){
+        if (!keyMapping.ContainsKey(keyMap)) return "";
+        else return keyMapping[keyMap].ToString();
     }
  
     public static bool GetKeyDown(string keyMap)

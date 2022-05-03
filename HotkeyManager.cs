@@ -17,16 +17,19 @@ public class HotkeyManager : MonoBehaviour
     }
     void Update()
     {
-        for(int i=1;i<12;i++){
-            if(Input.GetKeyDown((KeyCode)(48+i))){
-                theInven.PushItemBtn(i-1);
+        if(!PlayerManager.instance.isActing){
+
+            for(int i=1;i<12;i++){
+                if(Input.GetKeyDown((KeyCode)(48+i))){
+                    theInven.PushItemBtn(i-1);
+                }
             }
-        }
-        if(Input.GetKeyDown(KeyCode.Minus)){
-            theInven.PushItemBtn(10);
-        }
-        else if(Input.GetKeyDown(KeyCode.Alpha0)){
-            theInven.PushItemBtn(9);
+            if(Input.GetKeyDown(KeyCode.Minus)){
+                theInven.PushItemBtn(10);
+            }
+            else if(Input.GetKeyDown(KeyCode.Alpha0)){
+                theInven.PushItemBtn(9);
+            }
         }
 
         if(Input.GetKey(KeyCode.LeftControl)&&Input.GetKeyDown(KeyCode.M)){
@@ -36,7 +39,7 @@ public class HotkeyManager : MonoBehaviour
 
 
         if(Input.GetButtonUp("Cancel")){
-            if(!PlayerManager.instance.isActing && !UIManager.instance.waitTutorial){
+            if(!PlayerManager.instance.isActing && !UIManager.instance.waitTutorial && !PlayerManager.instance.isPlayingMinigame){
 
                 if(theMenu.popUpOnWork.activeSelf){
                     theMenu.popUpOnWork.SetActive(false);

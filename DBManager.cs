@@ -41,7 +41,7 @@ public class DBManager : MonoBehaviour
     
     [Header("[Sprites Files]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public Sprite[] endingCollectionSprites;
-    public Sprite[] itemSprites;
+    //public Sprite[] itemSprites;
     public Sprite honeySprite;
 
     //public List<Item> cache_ItemDataList;
@@ -79,6 +79,7 @@ public class DBManager : MonoBehaviour
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList;
         public List<int> getItemOverList;
+        public List<DirtBundleInfo> getDirtBundleOverList;
 
 
         //public Vector2 screenSize;
@@ -171,12 +172,9 @@ public class DBManager : MonoBehaviour
 
                 curData.curPlayCount ++;
 
-                if(curData.getItemOverList == null){
-                    //Debug.Log("1111");
-                    curData.getItemOverList = new List<int>();
-                    //Debug.Log("2222");
-
-                }
+                if(curData.getItemOverList == null) curData.getItemOverList = new List<int>();
+                if(curData.getDirtBundleOverList == null) curData.getDirtBundleOverList = new List<DirtBundleInfo>();
+                
                 //curData.honeyOverList.Add(-1);
             }
             
@@ -249,12 +247,12 @@ public class DBManager : MonoBehaviour
                 localData =(LocalData)bf.Deserialize(file);
             }
 
-            if(localData.jumpKey==KeyCode.None){
-                localData.jumpKey = KeyCode.Space;
-            }
-            if(localData.interactKey==KeyCode.None){
-                localData.interactKey = KeyCode.E;
-            }
+            // if(localData.jumpKey==KeyCode.None){
+            //     localData.jumpKey = KeyCode.Space;
+            // }
+            // if(localData.interactKey==KeyCode.None){
+            //     localData.interactKey = KeyCode.E;
+            // }
             //language = localData.language;
             
             file.Close();
@@ -416,7 +414,6 @@ public class DBManager : MonoBehaviour
         CallLocalDataLoad();
 
         //ApplyNewLanguage();
-        
         ApplyItemInfo();
         ApplyCollectionInfo();
         //ApplyStoryInfo();
@@ -479,10 +476,10 @@ public class DBManager : MonoBehaviour
                 ,a[i]["name_"+language].ToString()
                 ,a[i]["desc_"+language].ToString()
                 ,byte.Parse(a[i]["type"].ToString())
-                ,int.Parse(a[i]["resourceID"].ToString())
+                ,a[i]["resourceID"].ToString()
                 ,bool.Parse(a[i]["isStack"].ToString())
                 ,int.Parse(a[i]["price"].ToString())
-                ,int.Parse(a[i]["goldResourceID"].ToString())
+                ,a[i]["goldResourceID"].ToString()
             ));
         }
     }
@@ -572,28 +569,28 @@ public class Item{
     public string name;
     public string description;
     public byte type;
-    public int resourceID;
+    public string resourceID;
     public bool isStack;
     public Sprite icon;
     public int price;    
-    public int goldResourceID;
+    public string goldResourceID;
     public Sprite goldIcon;
     //public bool isStack;
 
     public enum ItemType{
         equip,
     }
-    public Item(int a, string b, string c, byte d, int e, bool f, int g, int h){
+    public Item(int a, string b, string c, byte d, string _resourceID, bool f, int g, string _goldResourceID){
         ID = a;
         name = b;
         description = c;
         type = d;
-        resourceID = e;
-        icon = DBManager.instance.itemSprites[resourceID];
+        resourceID = _resourceID;
+        icon = ResourceManager.instance.GetItemSprite(resourceID);//DBManager.instance.itemSprites[resourceID];
         isStack = f;
         price = g;
-        goldResourceID = h;
-        goldIcon = DBManager.instance.itemSprites[goldResourceID];
+        goldResourceID = _goldResourceID;
+        goldIcon = ResourceManager.instance.GetItemSprite(resourceID);//DBManager.instance.itemSprites[goldResourceID];
     }
 }
 

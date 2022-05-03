@@ -216,34 +216,34 @@ public class ShopManager : MonoBehaviour
         ui_shop.SetActive(false);
     }
     public void BuyItem(int slotNum){
-        int curHoneyAmount = DBManager.instance.curData.curHoneyAmount;
+        // int curHoneyAmount = DBManager.instance.curData.curHoneyAmount;
 
-        curItemPrice = int.Parse(shopSlots[slotNum].itemPriceText.text);
+        // curItemPrice = int.Parse(shopSlots[slotNum].itemPriceText.text);
 
-        //골드로 구매가능한 아이템
-        if(DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID == 7){
-            if(curHoneyAmount >= curItemPrice){
-                DBManager.instance.curData.curHoneyAmount -= curItemPrice;
-                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
-                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
-            }   
-            else{
-                DM("구매 실패 : 골드 부족");
-            }
-        }
-        //골드 제외 아이템으로 구매가능한 아이템
-        else{
-            var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID;
+        // //골드로 구매가능한 아이템
+        // if(DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID == 7){
+        //     if(curHoneyAmount >= curItemPrice){
+        //         DBManager.instance.curData.curHoneyAmount -= curItemPrice;
+        //         InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
+        //         lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+        //     }   
+        //     else{
+        //         DM("구매 실패 : 골드 부족");
+        //     }
+        // }
+        // //골드 제외 아이템으로 구매가능한 아이템
+        // else{
+        //     var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID;
 
-            if(InventoryManager.instance.CheckHaveItem(goldTypeIndex)){
-                InventoryManager.instance.RemoveItem(goldTypeIndex);
-                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
-                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
-            }
-            else{
-                DM("구매 실패 : "+goldTypeIndex+"번 아이템 부족");
-            }
-        }
+        //     if(InventoryManager.instance.CheckHaveItem(goldTypeIndex)){
+        //         InventoryManager.instance.RemoveItem(goldTypeIndex);
+        //         InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
+        //         lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+        //     }
+        //     else{
+        //         DM("구매 실패 : "+goldTypeIndex+"번 아이템 부족");
+        //     }
+        // }
 
 
 

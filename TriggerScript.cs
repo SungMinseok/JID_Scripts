@@ -39,6 +39,9 @@ public class TriggerScript : MonoBehaviour
 //트리거 이미 완료됐을 때,
         if(DBManager.instance.CheckTrigOver(location.trigNum)){
             switch(location.trigNum){
+                case 4 :
+                    objects[0].gameObject.SetActive(false);
+                    break;
                 case 12 :
                     if(DBManager.instance.CheckTrigOver(41)){
                         objects[0].gameObject.SetActive(false);
@@ -122,6 +125,17 @@ public class TriggerScript : MonoBehaviour
                 case 50 :
                     objects[0].gameObject.SetActive(false);
                     break;
+                case 53 :
+                    objects[0].gameObject.SetActive(false);
+                    break;
+                case 54 :
+                    objects[0].gameObject.SetActive(true);
+                    objects[1].gameObject.SetActive(false);
+                    break;
+                case 55 :
+                case 56 :
+                    objects[0].gameObject.SetActive(false);
+                    break;
                 default :
                     break;
             }
@@ -156,7 +170,7 @@ public class TriggerScript : MonoBehaviour
         // else{
         //     Debug.Log("선택지 없음");
         // }
-        Debug.Log(location.trigNum + " aa");
+//        Debug.Log(location.trigNum + " aa");
         if(waitInTrigger){
 
         }
@@ -452,7 +466,11 @@ public class TriggerScript : MonoBehaviour
 #region t1 여긴 어디?
             case 1 :
                 SetDialogue(dialogues[0]);
+                yield return wait500ms;
+                UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey("Interact"),backStringIndex:"82",boxType:1);
                 yield return waitTalking;
+                UIManager.instance.HideKeyTutorial();
+
                 PlayerManager.instance.Look("right");
                 SetDialogue(dialogues[1]);
                 yield return waitTalking;
@@ -496,7 +514,7 @@ public class TriggerScript : MonoBehaviour
                 ////CameraView(nerd_ant.transform);
                 ShakeCamera(2,3);
                 yield return new WaitForSeconds(1.2f);
-                nerd_ant.wSet = -1;
+                nerd_ant.wSet = 1;
                 yield return waitTalking;
                 yield return wait2000ms;
                 FadeOut();
@@ -519,6 +537,8 @@ public class TriggerScript : MonoBehaviour
 
 #region t4 수배지 확인
             case 4 :
+            
+                objects[0].gameObject.SetActive(false);
                 ActivateEffect(1,3);
                 SoundManager.instance.PlaySound("wanted_paper");
                 ShakeCamera();
@@ -567,6 +587,8 @@ public class TriggerScript : MonoBehaviour
                 objects[3].GetComponent<NPCScript>().onPatrol = true;
                 objects[3].GetComponent<NPCScript>().onRandomDialogue = true;
 
+                objects[4].gameObject.SetActive(true);
+                objects[5].gameObject.SetActive(true);
                 ForceToPatrol(objects[0].GetComponent<NPCScript>());
                 ForceToPatrol(objects[3].GetComponent<NPCScript>());
 
@@ -684,6 +706,7 @@ public class TriggerScript : MonoBehaviour
 #region t8 [미니게임0 - 종이 오리기] 유치원 센세에게 말을 건다.
             case 8 :
             
+                AutoSave();
                 //CameraView(objects[0]);
                 
                 for(int k=0;k<10;k++){
@@ -839,6 +862,8 @@ public class TriggerScript : MonoBehaviour
 
 #region t15 [미니게임2 - 미친 수개미 피하기] 빛나는 양동이를 클릭한다.
             case 15 :   
+                AutoSave();
+
                 objects[2].gameObject.SetActive(false);
                 objects[3].gameObject.SetActive(true);
                 
@@ -1965,6 +1990,9 @@ public class TriggerScript : MonoBehaviour
 
 #region t49 [미니게임0 - 종이 오리기] 재시작
             case 49 :
+
+                AutoSave();
+
                 int curSelectNumber;
 
                 if(!InventoryManager.instance.CheckHaveItem(6)){
@@ -2233,6 +2261,43 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+#region t53 풀사다리 습득
+            case 53 :
+
+                objects[0].gameObject.SetActive(false);
+                objects[1].gameObject.SetActive(true);
+                InventoryManager.instance.AddItem(36);
+
+
+                break;
+#endregion
+
+#region t54 풀사다리 습득
+            case 54 :
+                
+                objects[0].gameObject.SetActive(true);
+                objects[1].gameObject.SetActive(false);
+                InventoryManager.instance.RemoveItem(36);
+                PlaySound("rope1s");
+                yield return wait1000ms;
+
+
+                break;
+#endregion
+
+#region t55 흙파기
+            case 55 :
+                if(InventoryManager.instance.CheckHaveItem(21)){
+                    objects[0].gameObject.SetActive(false);
+                    location.preserveTrigger = false;
+                }
+                break;
+#endregion
+#region t56 세갈래길 자동저장
+            case 56 :
+                AutoSave();
+                break;
+#endregion
 
 #region 201st [엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
             case 201 :
@@ -2848,4 +2913,9 @@ public class TriggerScript : MonoBehaviour
     public void PlayerLookObject(Transform target) => PlayerManager.instance.PlayerLookObject(target);
 
     public void PlaySound(string soundFileName, float volume = 1f) => SoundManager.instance.PlaySound(soundFileName);
+
+    public void AutoSave(){
+        DBManager.instance.CallSave(99);
+        LoadManager.instance.lastLoadFileNum = 99;
+    }
 }

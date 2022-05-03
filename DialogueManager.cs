@@ -302,13 +302,15 @@ public class DialogueManager : MonoBehaviour
 
     void Update(){
         if(canSkip){
-            if(Input.GetButtonDown("Interact")){
+            //if(Input.GetButtonDown("Interact")){
+            if(PlayerManager.instance.interactInput){
                 goSkip = true;
             }
         }
         else if(canSkip2){
             
-            if(Input.GetButtonDown("Interact")){
+            //if(Input.GetButtonDown("Interact")){
+            if(PlayerManager.instance.interactInput){
                 revealTextFlag = false;
                 StopCoroutine(nowDialogueCoroutine);
             }

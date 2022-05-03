@@ -57,6 +57,8 @@ public class UIManager : MonoBehaviour
     public bool waitTutorial;
     public int curTutorialID;
     // [Header("UI_Fog")]
+    //[Header("ETC")]
+    //public Sprite nullSprite;
     // public Canvas ui_fog_canvas;
     // public Transform ui_fog;
     // Vector3 offset = Vector3.zero;
@@ -123,11 +125,13 @@ public class UIManager : MonoBehaviour
 
         if (waitTutorial)
         {
-            if (Input.GetButtonDown("Interact_OnlyKey"))
+            //if (Input.GetButtonDown("Interact_OnlyKey"))
+            if ( PlayerManager.instance.interactInput )
             {
                 CloseTutorial();
             }
         }
+
     }
 
     public void ActivateEffect(int num, float timer, bool bgOn = true)
@@ -500,6 +504,43 @@ public class UIManager : MonoBehaviour
     public void ChangeSprite(Sprite sprite)
     {
 
+    }
+
+    
+    public void ShowKeyTutorial(string keyString,string frontStringIndex ="", string backStringIndex = "", int boxType = 0){
+        //Debug.Log("show");
+        PlayerManager.instance.onKeyTutorial = true;
+        var tutorialBox = PlayerManager.instance.tutorialBox;
+
+        if(boxType==1){
+            tutorialBox = PlayerManager.instance.tutorialBox_Right;
+        }
+        else{
+            tutorialBox.GetChild(0).gameObject.SetActive(true);
+        }
+        CSVReader csv = CSVReader.instance;
+        //tutorialBox.GetChild(0).gameObject.SetActive(true);
+
+        string frontString = "", backString = "";
+        if(frontStringIndex!="") frontString = csv.GetIndexToString(int.Parse(frontStringIndex),"sysmsg");
+        if(backStringIndex!="") backString = csv.GetIndexToString(int.Parse(backStringIndex),"sysmsg");
+
+
+        tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = 
+        frontString + keyString + backString ;
+        tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",true);
+        
+    }
+    
+    public void HideKeyTutorial(){
+        PlayerManager.instance.onKeyTutorial = false;
+        //Debug.Log("hide");
+        var tutorialBox = PlayerManager.instance.tutorialBox;
+        tutorialBox.GetChild(0).gameObject.SetActive(false);
+        tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",false);
+        var tutorialBox_Right = PlayerManager.instance.tutorialBox_Right;
+        //tutorialBox.GetChild(0).gameObject.SetActive(false);
+        tutorialBox_Right.GetChild(1).GetComponent<Animator>().SetBool("activate",false);
     }
 //     public void ChangeKey(){
 //         foreach(KeyCode kcode in Enum.GetValues(typeof(KeyCode)))

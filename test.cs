@@ -6,11 +6,14 @@ using System;
 //Level, Stage  : Level이 상위 개념
 //Level : 총 3레벨
 //Stage : 레벨 당 3스테이지
-public class test : MonoBehaviour
+public static class test// : MonoBehaviour
 {
-    void OnTriggerEnter2D(Collider2D other) {
-        if(other.CompareTag("Aphid")){
-        Debug.Log("AAAA");
-        }
+    static test(){
+        Debug.Log("333333");
     }
+    // void OnTriggerEnter2D(Collider2D other) {
+    //     if(other.CompareTag("Aphid")){
+    //     Debug.Log("AAAA");
+    //     }
+    // }
 }

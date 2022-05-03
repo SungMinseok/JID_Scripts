@@ -35,7 +35,7 @@ public class NPCSkillScript : MonoBehaviour
 
             bullets[i].SetActive(true);
             bullets[i].GetComponent<Rigidbody2D>().velocity = Vector3.zero;
-                yield return waitForFixedUpdate;
+            yield return waitForFixedUpdate;
             bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2((i-2)*2,0) * (Minigame2Script.instance.flyingBottleSpeed), ForceMode2D.Impulse);
             SoundManager.instance.PlaySound("minigame_bottle_throw");
         }
@@ -59,7 +59,7 @@ public class NPCSkillScript : MonoBehaviour
             bullets[i].SetActive(true);
                 yield return waitForFixedUpdate;
             bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2((i+0.2f)* (Minigame2Script.instance.flyingBottleSpeed) / 1.5f,0) , ForceMode2D.Impulse);
-            Debug.Log(new Vector2((i+0.2f),0) * (Minigame2Script.instance.flyingBottleSpeed) / 1.5f);
+//            Debug.Log(new Vector2((i+0.2f),0) * (Minigame2Script.instance.flyingBottleSpeed) / 1.5f);
                 yield return waitForFixedUpdate;
             bullets[i+1].SetActive(true);
             bullets[i+1].GetComponent<Rigidbody2D>().AddForce(new Vector2((i+0.2f)*-1f,0) * (Minigame2Script.instance.flyingBottleSpeed) / 1.5f, ForceMode2D.Impulse);

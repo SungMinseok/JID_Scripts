@@ -53,9 +53,11 @@ public class SoundManager : MonoBehaviour
         //SetBgmByMapNum(0);
 
     }
+    public Sprite[] itemSprites;
     void LoadResources(){
         audioClips = Resources.LoadAll<AudioClip>("Sounds");
         //bgmClips = Resources.LoadAll<AudioClip>("BGM");
+        itemSprites = Resources.LoadAll<Sprite>("Sprites/Items");
     }
     void PutSoundsToDictionary(){
 
@@ -216,13 +218,13 @@ public class SoundManager : MonoBehaviour
     public void SetVolumeSFX(float value)
     {
         DBManager.instance.localData.sfxVolume = value;
-        sfxPlayer.volume = value;
+        sfxPlayer.volume = value * 0.5f;
     }
 
     public void SetVolumeBGM(float value)
     {
         DBManager.instance.localData.bgmVolume = value;
-        bgmPlayer.volume = value;
+        bgmPlayer.volume = value * 0.5f;
     }
     // public void SetVolumeBGM(float value)
     // {

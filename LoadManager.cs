@@ -31,7 +31,9 @@ public class LoadManager : MonoBehaviour
     }
 
     [Header("───────Debug───────")]
-    [Tooltip("앱 최초 실행 시 체크")]
+    //[Tooltip("자동저장 체크용 (True : 마지막 저장지점 불러오기 시 자동저장 파일 불러옴. // false : lastLoadFileNum 파일 불러옴")]
+    //public bool isAutoSaved;
+    [Tooltip("앱 최초 실행 시 체크 (타이틀 영상 풀 재생 여부 확인용)")]
     public bool checkFirstRun;
     [Tooltip("인게임에서 로드 시 (맵설정/플레이어위치설정)")]
     public bool isLoadingInGame;
@@ -116,10 +118,17 @@ public class LoadManager : MonoBehaviour
         SceneManager.LoadScene("Loading");
         yield return null;
 
-#region [ 인게임 > 파일 선택해서 불러오기 ]
+#region [ 인게임 > 파일 선택해서 불러오기, 처 ]
 
         if(isLoadingInGame){
-            DBManager.instance.CallLoad(lastLoadFileNum);
+            if(lastLoadFileNum == -1){
+                DBManager.instance.LoadDefaultData();
+                Debug.Log("기본 데이터 불러오기 성공");
+            }
+            else{
+                DBManager.instance.CallLoad(lastLoadFileNum);
+
+            }
 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);

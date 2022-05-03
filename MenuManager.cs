@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using System;
 
 public class MenuManager : MonoBehaviour
 {
@@ -52,14 +53,14 @@ public class MenuManager : MonoBehaviour
     public Text keyText_jump;
     public Text keyText_interact;
 
-    [System.Serializable]
-    public class SaveLoadSlot{
-        public TextMeshProUGUI saveNameText;
-        public TextMeshProUGUI saveDateText;
-        public TextMeshProUGUI slotNumText;
-        public TextMeshProUGUI itemInfoText0;
-        public TextMeshProUGUI itemInfoText1;
-    }
+    // [System.Serializable]
+    // public class SaveLoadSlot{
+    //     public TextMeshProUGUI saveNameText;
+    //     public TextMeshProUGUI saveDateText;
+    //     public TextMeshProUGUI slotNumText;
+    //     public TextMeshProUGUI itemInfoText0;
+    //     public TextMeshProUGUI itemInfoText1;
+    // }
     [Header("UI_Collection_Ending")]
     public Animator animator;
     public GameObject collectionEndingNumberVessel;
@@ -74,6 +75,7 @@ public class MenuManager : MonoBehaviour
     public Button[] collectionScrollArrows;
     
     [Header("UI_ETC")]
+    public Sprite nullSprite;
     public Font[] fonts ;
     [Header("Debug────────────────────")]
     public string curPopUpType;
@@ -148,22 +150,22 @@ public class MenuManager : MonoBehaviour
             loadSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>TryLoad(temp));
         }
 
-        for(int i=0;i<saveSlotGrid.childCount;i++){
-            saveSlots[i].saveNameText = saveSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
-            saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
-            saveSlots[i].slotNumText = saveSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
-            saveSlots[i].slotNumText.text = (i+1).ToString();
-            saveSlots[i].itemInfoText0 = saveSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
-            saveSlots[i].itemInfoText1 = saveSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
-        }
-        for(int i=0;i<loadSlotGrid.childCount;i++){
-            loadSlots[i].saveNameText = loadSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
-            loadSlots[i].saveDateText = loadSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
-            loadSlots[i].slotNumText = loadSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
-            loadSlots[i].slotNumText.text = (i+1).ToString();
-            loadSlots[i].itemInfoText0 = loadSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
-            loadSlots[i].itemInfoText1 = loadSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
-        }
+        // for(int i=0;i<saveSlotGrid.childCount;i++){
+        //     saveSlots[i].saveNameText = saveSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
+        //     saveSlots[i].saveDateText = saveSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+        //     saveSlots[i].slotNumText = saveSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
+        //     saveSlots[i].slotNumText.text = (i+1).ToString();
+        //     saveSlots[i].itemInfoText0 = saveSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+        //     saveSlots[i].itemInfoText1 = saveSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
+        // }
+        // for(int i=0;i<loadSlotGrid.childCount;i++){
+        //     loadSlots[i].saveNameText = loadSlotGrid.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>();
+        //     loadSlots[i].saveDateText = loadSlotGrid.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
+        //     loadSlots[i].slotNumText = loadSlotGrid.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>();
+        //     loadSlots[i].slotNumText.text = (i+1).ToString();
+        //     loadSlots[i].itemInfoText0 = loadSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+        //     loadSlots[i].itemInfoText1 = loadSlotGrid.GetChild(i).GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>();
+        // }
 
         ResetSaveSlots();
         ResetLoadSlots();
@@ -195,8 +197,6 @@ public class MenuManager : MonoBehaviour
         dropdown_frameRate.value = DBManager.instance.localData.frameRateValue;
 
         
-        keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
-        keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
 #endregion
     
 
@@ -326,39 +326,109 @@ public class MenuManager : MonoBehaviour
     
     
 #region Save&Load 
+    public Transform saveSlotMother;
+
     public void ResetSaveSlots(){
-        for(int i=0; i<saveSlotGrid.childCount; i++){
+        for(int i=0; i<saveSlotMother.childCount; i++){
+
+            var curSlot = saveSlotMother.GetChild(i).GetComponent<SaveLoadSlot>();
+
             if(DBManager.instance.CheckSaveFile(i)){
-                saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
-                saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
-                saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
-                saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+
+                var getData = DBManager.instance.GetData(i);
+
+                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
+                curSlot.saveDateText.text = getData.curPlayDate;
+                curSlot.itemInfoText0.text = getData.curHoneyAmount.ToString();
+                curSlot.itemInfoText1.text = string.Format("{0:N2}%", 100*getData.curDirtAmount/DBManager.instance.maxDirtAmount);
             }
             else{
-                saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-                saveSlots[i].saveDateText.text = "-";
-                saveSlots[i].itemInfoText0.text ="-";
-                saveSlots[i].itemInfoText1.text = "-";
+                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
+                curSlot.saveDateText.text = "-";
+                curSlot.itemInfoText0.text ="-";
+                curSlot.itemInfoText1.text = "-";
             }
         }
     }
+    public Transform loadSlotMother;
+
     public void ResetLoadSlots(){
-        for(int i=0; i<loadSlotGrid.childCount; i++){
+        for(int i=0; i<loadSlotMother.childCount; i++){
+
+            var curSlot = loadSlotMother.GetChild(i).GetComponent<SaveLoadSlot>();
+
             if(DBManager.instance.CheckSaveFile(i)){
-                loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
-                loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
-                loadSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
-                loadSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
-                //loadSlots[i].itemInfoText1.text = DBManager.instance.GetData(i).curDirtAmount.ToString();
+
+                var getData = DBManager.instance.GetData(i);
+                var getItemList = getData.itemList;
+
+                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
+                curSlot.playTimeText.text = ConvertSeconds2TimeString(getData.curPlayTime);
+                curSlot.saveDateText.text = getData.curPlayDate;
+                curSlot.itemInfoText0.text = string.Format("{0:#,###0}", getData.curHoneyAmount);//getData.curHoneyAmount.ToString();
+                curSlot.itemInfoText1.text = string.Format("{0:N0}%", 100*getData.curDirtAmount/DBManager.instance.maxDirtAmount);
+                
+                for(int j=0;j<getItemList.Count;j++){
+                    if(j==10) break;
+                    var curItem = getItemList[j];
+                    var curItemInfo = DBManager.instance.cache_ItemDataList.Find(x => x.ID == curItem.itemID);
+
+                    curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = curItemInfo.icon;
+
+                    if(curItemInfo.isStack){
+                        curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = curItem.itemAmount.ToString();
+                    }
+                }
             }
             else{
-                loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-                loadSlots[i].saveDateText.text = "-";
-                loadSlots[i].itemInfoText0.text ="-";
-                loadSlots[i].itemInfoText1.text = "-";
+                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
+                curSlot.playTimeText.text = "-";
+                curSlot.saveDateText.text = "-";
+                curSlot.itemInfoText0.text ="-";
+                curSlot.itemInfoText1.text = "-";
+                
+                for(int j=0;j<10;j++){
+                    if(MenuManager.instance != null)
+                        curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = MenuManager.instance.nullSprite;
+                    curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = string.Empty;
+                }
             }
         }
     }
+    //220502_Unused public void ResetSaveSlots(){
+    //     for(int i=0; i<saveSlotGrid.childCount; i++){
+    //         if(DBManager.instance.CheckSaveFile(i)){
+    //             saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
+    //             saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+    //             saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
+    //             saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+    //         }
+    //         else{
+    //             saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
+    //             saveSlots[i].saveDateText.text = "-";
+    //             saveSlots[i].itemInfoText0.text ="-";
+    //             saveSlots[i].itemInfoText1.text = "-";
+    //         }
+    //     }
+    // }
+    
+    // public void ResetLoadSlots(){
+    //     for(int i=0; i<loadSlotGrid.childCount; i++){
+    //         if(DBManager.instance.CheckSaveFile(i)){
+    //             loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
+    //             loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
+    //             loadSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
+    //             loadSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+    //             //loadSlots[i].itemInfoText1.text = DBManager.instance.GetData(i).curDirtAmount.ToString();
+    //         }
+    //         else{
+    //             loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
+    //             loadSlots[i].saveDateText.text = "-";
+    //             loadSlots[i].itemInfoText0.text ="-";
+    //             loadSlots[i].itemInfoText1.text = "-";
+    //         }
+    //     }
+    // }
     //저장 슬롯 터치 시
     public void TrySave(int num){
         curSaveNum = num;
@@ -390,6 +460,10 @@ public class MenuManager : MonoBehaviour
 
         OpenPopUpPanel("goMain");
     }
+    public void TryRestartGame(){
+        OpenPopUpPanel("restart");
+
+    }
     public void TryQuitGame(){
 
         OpenPopUpPanel("quitGame");
@@ -416,6 +490,10 @@ public class MenuManager : MonoBehaviour
             case "goMain" :
                 popUpText[0].text = "6";
                 popUpText[1].text = "";
+                break;
+            case "restart" :
+                popUpText[0].text = "11";
+                popUpText[1].text = "3";
                 break;
             case "quitGame" :
                 popUpText[0].text = "2";
@@ -459,6 +537,10 @@ public class MenuManager : MonoBehaviour
 
             case "load" :
                 Load(curLoadNum);
+                //Debug.Log(curSaveNum + "번 로드 시도");
+                break;
+            case "restart" :
+                Load(-1);
                 //Debug.Log(curSaveNum + "번 로드 시도");
                 break;
 
@@ -740,5 +822,14 @@ public class MenuManager : MonoBehaviour
     }
     public void OpenPopUpPanel_onWork(){
         popUpOnWork.SetActive(true);
+    }
+    public string ConvertSeconds2TimeString(float getSec){
+        TimeSpan t = TimeSpan.FromSeconds( getSec );
+
+        return 
+        string.Format("{0:D2}:{1:D2}:{2:D2}",
+                            t.Hours,
+                            t.Minutes,
+                            t.Seconds);
     }
 }

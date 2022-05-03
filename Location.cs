@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +15,7 @@ public enum LocationType{
     Patrol_NPC,
     Comment,
     PlaySound,
+    KeyTutorial
 }
 public enum TargetType{
     Player,
@@ -63,6 +64,7 @@ public class Location : MonoBehaviour
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     public bool notZoom; //카메라 줌 X
     public bool holdPlayer; //True 시, 트리거 종료 후 이동 제한 해제 X
+    public bool showKeyTutorial;
     [Header("Patrol_NPC")]
     public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
@@ -76,6 +78,11 @@ public class Location : MonoBehaviour
     public int soundRandomCount;
     public float soundDelay;
 
+    [Header("KeyTutorial")]
+    public string keyMap;
+    public string tutorialFrontStringIndex;
+    public string tutorialBackStringIndex;
+    //public bool tutorialOver;
     [HideInInspector] public bool locFlag;
     TriggerScript triggerScript;
     void Start(){
@@ -125,14 +132,27 @@ public class Location : MonoBehaviour
                 if(waitKey&&!locFlag&&!PlayerManager.instance.isWaitingInteract&&!PlayerManager.instance.isActing){
                     //Debug.Log("AAA");
                     //if(Input.GetButton("Interact_OnlyKey")){
+
+                    if(showKeyTutorial && !PlayerManager.instance.onKeyTutorial && !DBManager.instance.CheckTrigOver(trigNum)){
+                        UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialFrontStringIndex, tutorialBackStringIndex);
+                    }
+
                     if(PlayerManager.instance.interactInput){
                         locFlag = true;
                         if(type == LocationType.Trigger)
                             //Debug.Log(trigNum +"번 트리거 (" + trigComment + ") 실행 시도");
                             Debug.Log(string.Format("TrigNum.{0} - [{1}] 실행 시도",trigNum,trigComment));
                         //PlayerManager.instance.ActivateWaitInteract(1);
+
+                            
+                        if(showKeyTutorial){
+                            UIManager.instance.HideKeyTutorial();
+                        }
                         LocationScript(other);
+
                     }
+
+
                 }
             }
         }
@@ -144,7 +164,7 @@ public class Location : MonoBehaviour
             if(other.CompareTag("Player")){
                 if(!waitKey && !locFlag&&!PlayerManager.instance.isActing ){
 
-                    if(PlayerManager.instance.ladderDelay && PlayerManager.instance.jumpDelay){
+                    if(PlayerManager.instance.ladderDelay && PlayerManager.instance.jumpDelay ){
                         return;
                     }
 
@@ -175,9 +195,16 @@ public class Location : MonoBehaviour
                 if(!waitKey && locFlag){
                     locFlag = false;
                 }
+
+                if(type == LocationType.KeyTutorial || showKeyTutorial){
+                    UIManager.instance.HideKeyTutorial();
+                    // var tutorialBox = PlayerManager.instance.tutorialBox;
+                    // tutorialBox.GetChild(0).gameObject.SetActive(false);
+                    // tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",false);
+                }
             }       
         }
-
+ 
     }
     public void LocationScript(Collider2D other){
         
@@ -422,6 +449,14 @@ public class Location : MonoBehaviour
                         SoundManager.instance.PlaySound(soundFileName + Random.Range(0,soundRandomCount));
                     }
                     break;
+                case LocationType.KeyTutorial :
+                    UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialFrontStringIndex, tutorialBackStringIndex);
+                    // var tutorialBox = PlayerManager.instance.tutorialBox;
+                    // tutorialBox.GetChild(0).gameObject.SetActive(true);
+                    // tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = 
+                    // tutorialFrontStringIndex + GameInputManager.ReadKey(keyMap) + tutorialBackStringIndex;
+                    // tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",true);
+                    break;
                 default :
                     DebugManager.instance.PrintDebug("로케이션 오류");
                     break;
@@ -430,6 +465,7 @@ public class Location : MonoBehaviour
         }
         
     }
+
 
     // public void SetTalk(){
     //     DialogueManager.instance.SetFullDialogue(dialogues_T);
@@ -594,6 +630,19 @@ public class Location : MonoBehaviour
                 namePos.y += 0.7f;
                 Handles.Label(namePos, commentStr.ToString(),style);
                 break;
+            case LocationType.KeyTutorial :
+                Gizmos.color = Color.white;   
+                //Gizmos.DrawWireCube(transform.position, transform.localScale);
+
+                //GUIStyle style = new GUIStyle();
+                style.fontSize = 20;
+                style.fontStyle = FontStyle.Bold;
+                style.normal.textColor = Color.white;
+                namePos = transform.position;
+                namePos.x -= 0.5f;
+                namePos.y += 0.7f;
+                Handles.Label(namePos, keyMap.ToString(),style);
+                break;
     //Handles.Label(transform.position, "Text");
  
         }
@@ -700,6 +749,11 @@ public class LocationEditor : Editor
             selected.activateTargetMark = EditorGUILayout.ToggleLeft("느낌표 표시", selected.activateTargetMark);
             selected.notZoom = EditorGUILayout.ToggleLeft("카메라 줌 사용 안함", selected.notZoom);
             selected.holdPlayer = EditorGUILayout.ToggleLeft("종료 후 이동불가", selected.holdPlayer);
+            selected.showKeyTutorial = EditorGUILayout.ToggleLeft("키 튜토리얼 표시", selected.showKeyTutorial);            
+            selected.keyMap =  EditorGUILayout.TextField("키맵",selected.keyMap);
+            selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
+            selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
+
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지 있으면 해제)", selected.preserveTrigger);
 
@@ -721,6 +775,12 @@ public class LocationEditor : Editor
             selected.soundRandomCount = EditorGUILayout.IntField("사운드 랜덤 개수", selected.soundRandomCount);
             selected.soundDelay = EditorGUILayout.FloatField("사운드 딜레이", selected.soundDelay);
             selected.waitKey = EditorGUILayout.ToggleLeft("상호작용 시 발동", selected.waitKey);
+        }
+        else if (selected.type == LocationType.KeyTutorial)
+        {
+            selected.keyMap =  EditorGUILayout.TextField("키맵",selected.keyMap);
+            selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
+            selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
         }
         //EditorGUILayout.EndHorizontal();
 

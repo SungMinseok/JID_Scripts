@@ -50,7 +50,7 @@ public class BodySoundScript : MonoBehaviour
     public void PlayWalkSound(){
         switch(bodyType){
             case BodyType.lucky : 
-                if(PlayerManager.instance.bodyMode == 1)
+                if(PlayerManager.instance.bodyMode == 1 && PlayerManager.instance.isGrounded)
                     SoundManager.instance.PlaySound("lucky_walk_0"+Random.Range(1,3),0.3f);
                 break;
             case BodyType.lucky_back : 
