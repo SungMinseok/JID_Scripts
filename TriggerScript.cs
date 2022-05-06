@@ -133,7 +133,7 @@ public class TriggerScript : MonoBehaviour
                     objects[1].gameObject.SetActive(false);
                     break;
                 case 55 :
-                case 56 :
+                //case 56 :
                     objects[0].gameObject.SetActive(false);
                     break;
                 default :
@@ -515,6 +515,7 @@ public class TriggerScript : MonoBehaviour
                 ShakeCamera(2,3);
                 yield return new WaitForSeconds(1.2f);
                 nerd_ant.wSet = 1;
+                nerd_ant.spriteRenderer.flipX = true;
                 yield return waitTalking;
                 yield return wait2000ms;
                 FadeOut();
@@ -2293,8 +2294,15 @@ public class TriggerScript : MonoBehaviour
                 }
                 break;
 #endregion
+
 #region t56 세갈래길 자동저장
             case 56 :
+                AutoSave();
+                break;
+#endregion
+
+#region t57 경비개미방 입장직전 자동저장
+            case 57 :
                 AutoSave();
                 break;
 #endregion

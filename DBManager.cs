@@ -13,6 +13,7 @@ public class DBManager : MonoBehaviour
     public string buildDate;
     public string buildVersion;
     public string language;
+    public string dataDirectory;
     [Header("[Game]")]
     
     [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
@@ -121,7 +122,7 @@ public class DBManager : MonoBehaviour
     public void SaveDefaultData(){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/SaveFileDefault.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+        FileStream file = File.Create(Application.persistentDataPath + dataDirectory +"/SaveFileDefault.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
 
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, emptyData);
@@ -130,10 +131,10 @@ public class DBManager : MonoBehaviour
     public void LoadDefaultData(){
         
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFileDefault.dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFileDefault.dat");
 
         if(fileCheck.Exists){
-            FileStream file = File.Open(Application.persistentDataPath + "/SaveFileDefault.dat", FileMode.Open);
+            FileStream file = File.Open(Application.persistentDataPath + dataDirectory +"/SaveFileDefault.dat", FileMode.Open);
         
             if(file != null && file.Length >0){
                 curData =(Data)bf.Deserialize(file);
@@ -147,7 +148,7 @@ public class DBManager : MonoBehaviour
     public void CallSave(int fileNum){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+        FileStream file = File.Create(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
         
         //curData.
         curData.playerX = PlayerManager.instance.transform.position.x;
@@ -161,10 +162,10 @@ public class DBManager : MonoBehaviour
     public void CallLoad(int fileNum){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
 
         if(fileCheck.Exists){
-            FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
+            FileStream file = File.Open(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
         
             if(file != null && file.Length >0){
 
@@ -183,7 +184,7 @@ public class DBManager : MonoBehaviour
 
     }
     public bool CheckSaveFile(int fileNum){
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
 
         if(fileCheck.Exists){
             //FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
@@ -197,7 +198,7 @@ public class DBManager : MonoBehaviour
     public Data GetData(int fileNum){
         BinaryFormatter bf = new BinaryFormatter();
 
-        FileStream file = File.Open(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
+        FileStream file = File.Open(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat", FileMode.Open);
 
         var data = (Data)bf.Deserialize(file);
 
@@ -208,13 +209,13 @@ public class DBManager : MonoBehaviour
     public void DeleteSaveFile(int fileNum){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
 
         if(fileCheck.Exists){
-            File.Delete(Application.persistentDataPath + "/SaveFile" + fileNum.ToString() +".dat");
+            File.Delete(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
 
             Debug.Log(fileNum + "번 파일 제거 성공");
-            MenuManager.instance.ResetLoadSlots();
+            //MenuManager.instance.ResetLoadSlots();
 
             //file.Close();
         }
@@ -226,7 +227,7 @@ public class DBManager : MonoBehaviour
     public void CallLocalDataSave(){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/LocalDataFile.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
+        FileStream file = File.Create(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
         
 
         //Debug.Log(Application.persistentDataPath);
@@ -238,10 +239,10 @@ public class DBManager : MonoBehaviour
         localData.endingCollectionOverList.Clear();
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/LocalDataFile.dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
 
         if(fileCheck.Exists){
-            FileStream file = File.Open(Application.persistentDataPath + "/LocalDataFile.dat", FileMode.Open);
+            FileStream file = File.Open(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat", FileMode.Open);
         
             if(file != null && file.Length >0){
                 localData =(LocalData)bf.Deserialize(file);
@@ -262,10 +263,10 @@ public class DBManager : MonoBehaviour
     public void ResetLocalData(){
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + "/LocalDataFile.dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
 
         if(fileCheck.Exists){
-            File.Delete(Application.persistentDataPath + "/LocalDataFile.dat");
+            File.Delete(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
             localData.endingCollectionOverList.Clear();
             Debug.Log("로컬 파일 초기화 성공");
             //MenuManager.instance.ResetLoadSlots();
@@ -403,12 +404,22 @@ public class DBManager : MonoBehaviour
         //QualitySettings.vSyncCount = 0;
 
 #if demo
-        buildVersion = "_demo";
+        buildVersion = "demo";
+        dataDirectory = "/" + buildVersion + "_" + buildNum;
 #elif alpha
-        buildVersion = "";
+        buildVersion = "alpha";
+        dataDirectory = "/" + buildVersion + "_" + buildNum;
+        //dataDirectory = "";
 #else
         buildVersion = "";
 #endif
+
+
+        if (!Directory.Exists(Application.persistentDataPath + dataDirectory))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + dataDirectory);
+        }
+
 
         SaveDefaultData();
         CallLocalDataLoad();

@@ -62,7 +62,15 @@ public class LoadManager : MonoBehaviour
         
         //ddol = DDOLScript.instance.gameObject;
 
-        mainSceneName = "Level" + DBManager.instance.buildVersion;
+        mainSceneName = 
+        "Level"
+        + "_"
+        + DBManager.instance.buildVersion
+        + "_"
+        + DBManager.instance.buildNum
+        + "_" 
+        + DBManager.instance.buildDate
+        ;
     }
 
     public void MainToGame()
@@ -127,13 +135,13 @@ public class LoadManager : MonoBehaviour
             }
             else{
                 DBManager.instance.CallLoad(lastLoadFileNum);
+                Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
 
             }
 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
             if(PlayerManager.instance!=null) Destroy(PlayerManager.instance.gameObject);
             
-            Debug.Log(lastLoadFileNum + "번 파일 데이터 불러오기 성공");
         }
 
 #endregion

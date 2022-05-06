@@ -88,7 +88,7 @@ public class VideoManager : MonoBehaviour
         return videoPlayer.clip.ToString();
     }
     public void SkipPlayingVideo(){
-        Debug.Log("skip");
+        //Debug.Log("skip");
         VideoManager.instance.isPlayingVideo = false;
     }
     // IEnumerator IntroCoroutine(){

@@ -16,7 +16,8 @@ public class SaveLoadSlot : MonoBehaviour{
     void Start(){
         slotNumText.text = (transform.GetSiblingIndex()+1).ToString();
         Debug.Log(DBManager.instance);
-        deleteFileBtn.onClick.AddListener(()=>DBManager.instance.DeleteSaveFile(transform.GetSiblingIndex()));
+        //deleteFileBtn.onClick.AddListener(()=>DBManager.instance.DeleteSaveFile(transform.GetSiblingIndex()));
+        deleteFileBtn.onClick.AddListener(()=>MenuManager.instance.TryDeleteSaveFile(transform.GetSiblingIndex()));
         //deleteFileBtn.onClick.AddListener(delegate{DBManager.instance.DeleteSaveFile(1);});
 
     }

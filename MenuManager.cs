@@ -32,9 +32,9 @@ public class MenuManager : MonoBehaviour
     public GameObject savePanel;
     public GameObject loadPanel;
     public Transform saveSlotGrid;
-    public SaveLoadSlot[] saveSlots;
+    //public SaveLoadSlot[] saveSlots;
     public Transform loadSlotGrid;
-    public SaveLoadSlot[] loadSlots;
+    //public SaveLoadSlot[] loadSlots;
     [Header("UI_Settings")]
     public GameObject settingPanel;
     public GameObject[] settingPages;
@@ -327,108 +327,91 @@ public class MenuManager : MonoBehaviour
     
 #region Save&Load 
     public Transform saveSlotMother;
-
     public void ResetSaveSlots(){
         for(int i=0; i<saveSlotMother.childCount; i++){
-
-            var curSlot = saveSlotMother.GetChild(i).GetComponent<SaveLoadSlot>();
-
-            if(DBManager.instance.CheckSaveFile(i)){
-
-                var getData = DBManager.instance.GetData(i);
-
-                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
-                curSlot.saveDateText.text = getData.curPlayDate;
-                curSlot.itemInfoText0.text = getData.curHoneyAmount.ToString();
-                curSlot.itemInfoText1.text = string.Format("{0:N2}%", 100*getData.curDirtAmount/DBManager.instance.maxDirtAmount);
-            }
-            else{
-                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-                curSlot.saveDateText.text = "-";
-                curSlot.itemInfoText0.text ="-";
-                curSlot.itemInfoText1.text = "-";
-            }
+            ResetSaveSlot(i);
         }
+    }
+
+    public void ResetSaveSlot(int slotNum){
+
+
+        var curSlot = saveSlotMother.GetChild(slotNum).GetComponent<SaveLoadSlot>();
+
+        ResetSlot(slotNum, curSlot);
+        
     }
     public Transform loadSlotMother;
 
     public void ResetLoadSlots(){
         for(int i=0; i<loadSlotMother.childCount; i++){
+            ResetLoadSlot(i);
+        }
+    }
+    public void ResetLoadSlot(int slotNum){
+        var curSlot = loadSlotMother.GetChild(slotNum).GetComponent<SaveLoadSlot>();
+        
+        ResetSlot(slotNum, curSlot);
+    }
+    public void ResetSlot(int slotNum, SaveLoadSlot curSlot){
+        
+        if(DBManager.instance.CheckSaveFile(slotNum)){
 
-            var curSlot = loadSlotMother.GetChild(i).GetComponent<SaveLoadSlot>();
+            var getData = DBManager.instance.GetData(slotNum);
+            var getItemList = getData.itemList;
 
-            if(DBManager.instance.CheckSaveFile(i)){
+            curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
+            curSlot.playTimeText.text = ConvertSeconds2TimeString(getData.curPlayTime);
+            curSlot.saveDateText.text = getData.curPlayDate;
+            curSlot.itemInfoText0.text = string.Format("{0:#,###0}", getData.curHoneyAmount);//getData.curHoneyAmount.ToString();
+            curSlot.itemInfoText1.text = string.Format("{0:N0}%", 100*getData.curDirtAmount/DBManager.instance.maxDirtAmount);
+            
+            for(int j=0;j<getItemList.Count;j++){
+                if(j==10) break;
+                var curItem = getItemList[j];
 
-                var getData = DBManager.instance.GetData(i);
-                var getItemList = getData.itemList;
-
-                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
-                curSlot.playTimeText.text = ConvertSeconds2TimeString(getData.curPlayTime);
-                curSlot.saveDateText.text = getData.curPlayDate;
-                curSlot.itemInfoText0.text = string.Format("{0:#,###0}", getData.curHoneyAmount);//getData.curHoneyAmount.ToString();
-                curSlot.itemInfoText1.text = string.Format("{0:N0}%", 100*getData.curDirtAmount/DBManager.instance.maxDirtAmount);
-                
-                for(int j=0;j<getItemList.Count;j++){
-                    if(j==10) break;
-                    var curItem = getItemList[j];
-                    var curItemInfo = DBManager.instance.cache_ItemDataList.Find(x => x.ID == curItem.itemID);
-
-                    curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = curItemInfo.icon;
-
-                    if(curItemInfo.isStack){
-                        curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = curItem.itemAmount.ToString();
-                    }
+                Item curItemInfo = null;
+                //if(DBManager.instance.cache_ItemDataList.Count != 0)
+                try {
+                    curItemInfo = DBManager.instance.cache_ItemDataList.Find(x => x.ID == curItem.itemID);
                 }
-            }
-            else{
-                curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-                curSlot.playTimeText.text = "-";
-                curSlot.saveDateText.text = "-";
-                curSlot.itemInfoText0.text ="-";
-                curSlot.itemInfoText1.text = "-";
-                
-                for(int j=0;j<10;j++){
-                    if(MenuManager.instance != null)
-                        curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = MenuManager.instance.nullSprite;
+                catch (NullReferenceException){
+                    Debug.Log(slotNum + "번 슬롯 아이템 리스트 불러오기 오류");
+                    return;
+                }
+
+                curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = curItemInfo.icon;
+
+                if(curItemInfo.isStack){
+                    curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = curItem.itemAmount.ToString();
+                }
+                else{
+                    
                     curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = string.Empty;
                 }
             }
+            
+            for(int j=getItemList.Count;j<10;j++){
+                curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = nullSprite;
+                curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = string.Empty;
+                
+            }
+            
+        }
+        else{
+            curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
+            curSlot.playTimeText.text = "-";
+            curSlot.saveDateText.text = "-";
+            curSlot.itemInfoText0.text ="-";
+            curSlot.itemInfoText1.text = "-";
+            
+            for(int j=0;j<10;j++){
+                if(MenuManager.instance != null)
+                    curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemImage.sprite = MenuManager.instance.nullSprite;
+                curSlot.itemSlotGrid.GetChild(j).GetComponent<ItemSlot2>().itemAmountText.text = string.Empty;
+            }
         }
     }
-    //220502_Unused public void ResetSaveSlots(){
-    //     for(int i=0; i<saveSlotGrid.childCount; i++){
-    //         if(DBManager.instance.CheckSaveFile(i)){
-    //             saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
-    //             saveSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
-    //             saveSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
-    //             saveSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
-    //         }
-    //         else{
-    //             saveSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-    //             saveSlots[i].saveDateText.text = "-";
-    //             saveSlots[i].itemInfoText0.text ="-";
-    //             saveSlots[i].itemInfoText1.text = "-";
-    //         }
-    //     }
-    // }
-    
-    // public void ResetLoadSlots(){
-    //     for(int i=0; i<loadSlotGrid.childCount; i++){
-    //         if(DBManager.instance.CheckSaveFile(i)){
-    //             loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.GetData(i).curMapNum,"map");
-    //             loadSlots[i].saveDateText.text = DBManager.instance.GetData(i).curPlayDate;
-    //             loadSlots[i].itemInfoText0.text = DBManager.instance.GetData(i).curHoneyAmount.ToString();
-    //             loadSlots[i].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.GetData(i).curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
-    //             //loadSlots[i].itemInfoText1.text = DBManager.instance.GetData(i).curDirtAmount.ToString();
-    //         }
-    //         else{
-    //             loadSlots[i].saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
-    //             loadSlots[i].saveDateText.text = "-";
-    //             loadSlots[i].itemInfoText0.text ="-";
-    //             loadSlots[i].itemInfoText1.text = "-";
-    //         }
-    //     }
-    // }
     //저장 슬롯 터치 시
     public void TrySave(int num){
         curSaveNum = num;
@@ -468,6 +451,17 @@ public class MenuManager : MonoBehaviour
 
         OpenPopUpPanel("quitGame");
     }
+        
+    public void TryDeleteSaveFile(int saveFileNum){
+        curSaveNum = saveFileNum;
+        
+        if(DBManager.instance.CheckSaveFile(saveFileNum)){
+            OpenPopUpPanel("deleteSaveFile");
+        }
+        else{
+            Debug.Log("No Save File : "+saveFileNum);
+        }
+    }
     public void OpenPopUpPanel(string type){
         curPopUpType = type;
         //확인
@@ -497,6 +491,10 @@ public class MenuManager : MonoBehaviour
                 break;
             case "quitGame" :
                 popUpText[0].text = "2";
+                popUpText[1].text = "";
+                break;
+            case "deleteSaveFile" :
+                popUpText[0].text = "12";
                 popUpText[1].text = "";
                 break;
             default :
@@ -559,6 +557,11 @@ public class MenuManager : MonoBehaviour
             //     //LoadManager.instance.LoadMain();
             //     break;
 
+            case "deleteSaveFile" :
+                DBManager.instance.DeleteSaveFile(curSaveNum);
+                ResetSaveSlot(curSaveNum);
+                ResetLoadSlot(curSaveNum);
+                break;
             default:
 //                Debug.Log(curPopUpType);
                 popUpOkayCheck = true;
@@ -578,10 +581,12 @@ public class MenuManager : MonoBehaviour
     public void Save(int curSaveNum){
         DBManager.instance.CallSave(curSaveNum);
         LoadManager.instance.lastLoadFileNum = curSaveNum;
-        saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");
-        saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
-        saveSlots[curSaveNum].itemInfoText0.text = DBManager.instance.curData.curHoneyAmount.ToString();
-        saveSlots[curSaveNum].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.curData.curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
+
+        ResetSaveSlot(curSaveNum);
+        // saveSlots[curSaveNum].saveNameText.text = CSVReader.instance.GetIndexToString(DBManager.instance.curData.curMapNum,"map");
+        // saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
+        // saveSlots[curSaveNum].itemInfoText0.text = DBManager.instance.curData.curHoneyAmount.ToString();
+        // saveSlots[curSaveNum].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.curData.curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
         
     }
     public void Load(int curLoadNum){

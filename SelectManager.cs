@@ -140,7 +140,7 @@ public class SelectManager : MonoBehaviour
             }
 
 
-            if(Input.GetButtonDown("Interact_OnlyKey") && !PlayerManager.instance.isWaitingInteract){
+            if(PlayerManager.instance.interactInput && !PlayerManager.instance.isWaitingInteract){
                 ExitSelect();
             }
 
