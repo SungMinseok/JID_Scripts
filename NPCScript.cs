@@ -49,12 +49,8 @@ public class NPCScript : CharacterScript
     [Header("플레이어와 충돌 무시")]
     public bool noCollision = true;
     [Header("랜덤 대화 설정")]
-    //아무때나 랜덤 대화 활성화
-    //public bool alwaysRandomDialogue;
     public bool onRandomDialogue;//자동 대사 사용 시 true
-    //플레이어 근처에서만 랜덤 대화 활성화
-    //public bool onlyNearPlayerRandomDialogue;
-    //public bool activateRandomDialogue;
+    public bool changeTalkCanvasDirection;
     public bool randomDialogueFlag;
     public float dialogueDuration;
     public float dialogueInterval;
@@ -378,6 +374,9 @@ public class NPCScript : CharacterScript
         else{
             yield return waitTime1;
         }
+
+        if(changeTalkCanvasDirection)
+            SetTalkCanvasDirection();
 
         //DialogueManager.instance.SetRandomDialogue_NPC(dialogues[0].sentences[Random.Range(0,dialogues[0].sentences.Length)],this.transform,dialogueDuration,dialogueInterval);
         int tempSentenceNum = Random.Range(0,dialogues[0].sentences.Length);

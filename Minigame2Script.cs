@@ -21,6 +21,7 @@ public class Minigame2Script : MonoBehaviour
     public Transform flyingBottle;
     [Range(1f, 4f)] public float flyingBottleSpeed = 2f;
     [Range(8f, 15f)] public float throwingBottleSpeed = 10f;
+    public int maxLife;
     [Space]
     [Header("[Game Objects]─────────────────")]
     public GameObject madAnt;

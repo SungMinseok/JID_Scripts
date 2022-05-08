@@ -10,16 +10,16 @@ public class MenuManager : MonoBehaviour
 {
     public static MenuManager instance;
     [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
-    public GameObject btnGridObject;
+    //public GameObject btnGridObject;
     public GameObject[] panels;
-    public GameObject[] btns;
+    //public GameObject[] btns;
     [Header("UI_Menu_Main")]
     public GameObject menuPanel;
-    public Color defaultBtnColor;
-    public Color activatedBtnColor;
+    //public Color defaultBtnColor;
+    //public Color activatedBtnColor;
     public GameObject collectionPanel;
-    public GameObject antCollectionPanel;
-    public GameObject endingCollectionPanel;
+    //public GameObject antCollectionPanel;
+    //public GameObject endingCollectionPanel;
     [Header("UI_PopUp")]
     public GameObject popUpPanel;
     public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
@@ -497,6 +497,11 @@ public class MenuManager : MonoBehaviour
                 popUpText[0].text = "12";
                 popUpText[1].text = "";
                 break;
+            case "resetData" :
+                popUpText[0].text = "13";
+                popUpText[1].text = "14";
+                break;
+
             default :
                 break;
         }
@@ -561,6 +566,12 @@ public class MenuManager : MonoBehaviour
                 DBManager.instance.DeleteSaveFile(curSaveNum);
                 ResetSaveSlot(curSaveNum);
                 ResetLoadSlot(curSaveNum);
+                break;
+
+            case "resetData" :
+                
+                DBManager.instance.ResetAllData();
+                LoadManager.instance.LoadMain();
                 break;
             default:
 //                Debug.Log(curPopUpType);
@@ -813,6 +824,11 @@ public class MenuManager : MonoBehaviour
                 break;
         }
     }
+    
+    public void TryResetData(){
+        
+        OpenPopUpPanel("resetData");
+    }
 #endregion
 
     public void ToggleMenuPanel(bool active){
@@ -837,4 +853,5 @@ public class MenuManager : MonoBehaviour
                             t.Minutes,
                             t.Seconds);
     }
+
 }

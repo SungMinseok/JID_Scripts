@@ -223,6 +223,14 @@ public class DBManager : MonoBehaviour
             Debug.Log(fileNum + "번 파일 제거 불가 : 파일 없음");
         }
     }
+    public void ResetAllData(){
+        for(int i=0;i<20;i++){
+            DeleteSaveFile(i);
+        }
+
+        ResetLocalData();
+        
+    }
 #region LocalData
     public void CallLocalDataSave(){
 

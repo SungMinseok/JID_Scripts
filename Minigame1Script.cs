@@ -106,6 +106,9 @@ public class Minigame1Script : MonoBehaviour
         // SetErrorArea(0);
     }
     void ResetGameSettings(){
+        curStage = 0;
+        curLevel = 0;
+
         canSelect = false;
         errorArea.gameObject.SetActive(false);
         sliderPointer.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
@@ -161,7 +164,8 @@ public class Minigame1Script : MonoBehaviour
     void Update()
     {
         if(canSelect){
-            if(Input.GetButtonDown("Interact_OnlyKey")){
+            //if(Input.GetButtonDown("Interact_OnlyKey")){
+            if(PlayerManager.instance.interactInput){
                 canSelect = false;
                 StartCoroutine(CheckPointerPostion());
             }

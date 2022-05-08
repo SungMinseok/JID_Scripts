@@ -12,6 +12,7 @@ public class MainControlScript : MonoBehaviour
     //public RenderTexture texture;
     public GameObject mainBtns;
     public GameObject demoImage;
+    public bool splashFlag;
     public bool canSkip;
     public string titleVideoName;
     public string splashVideoName;
@@ -47,22 +48,40 @@ public class MainControlScript : MonoBehaviour
 
         if(!LoadManager.instance.checkFirstRun){
             LoadManager.instance.checkFirstRun = true;
+            splashFlag = true;
+        //LoadManager.instance.loadFader.gameObject.SetActive(true);
+            StartCoroutine(SplashCoroutine());
+            yield return new WaitUntil(()=>!splashFlag);
+            //LoadManager.instance.ResetFader(0f);
 
             // VideoManager.instance.PlayVideo(splashClip, volume : 0.5f);
             // yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
+SoundManager.instance.PlayBGM("jelly in the dark");
 
             VideoManager.instance.PlayVideo(videoClips[0], volume : 0.5f);
             yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
         }
 
-
+SoundManager.instance.ChangeBgm("jelly in the dark");
         mainBtns.SetActive(true);
         //collectionBtn.SetActive(true);
 
         VideoManager.instance.PlayVideo(videoClips[1], true, needClear: false);
 
     }
+    IEnumerator SplashCoroutine(){
+        LoadManager.instance.ResetFader(1f);
+        LoadManager.instance.loadFader.gameObject.SetActive(true);
+        LoadManager.instance.FadeIn();
+        VideoManager.instance.PlayVideo(splashClip, volume : 0.5f);
+        yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
+        LoadManager.instance.FadeOut();
+        yield return new WaitForSeconds(0.9f);
+        VideoManager.instance.ClearOutRenderTexture();
+        LoadManager.instance.loadFader.gameObject.SetActive(false);
+        splashFlag = false;
 
+    }
 
     public void PushStartBtn(){
         LoadManager.instance.MainToGame();
@@ -75,7 +94,7 @@ public class MainControlScript : MonoBehaviour
 
             if(Input.anyKeyDown && VideoManager.instance != null 
             && (VideoManager.instance.GetPlayingVideoName()==titleVideoName
-            || VideoManager.instance.GetPlayingVideoName()==splashVideoName)
+            /* || VideoManager.instance.GetPlayingVideoName()==splashVideoName */)
             ){
                 VideoManager.instance.SkipPlayingVideo();
             }

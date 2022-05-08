@@ -31,7 +31,7 @@ public class VideoManager : MonoBehaviour
         //Debug.Log("1");
         isPlayingVideo = true;
         if(needClear)
-            ClearOutRenderTexture(texture);
+            ClearOutRenderTexture();
         StartCoroutine(PlayVideoCoroutine(curVideo, isLooping,delayTime,volume));
 
     }
@@ -63,6 +63,7 @@ public class VideoManager : MonoBehaviour
         }
         videoPlayer.Play();
         videoRenderer.gameObject.SetActive(true);
+        //LoadManager.instance.loadFader.gameObject.SetActive(false);
 
 //        Debug.Log("B");
         while(videoPlayer.isPlaying){
@@ -76,10 +77,10 @@ public class VideoManager : MonoBehaviour
     }
 
 
-    public void ClearOutRenderTexture(RenderTexture renderTexture)
+    public void ClearOutRenderTexture()
     {
         RenderTexture rt = RenderTexture.active;
-        RenderTexture.active = renderTexture;
+        RenderTexture.active = texture;
         GL.Clear(true, true, Color.clear);
         RenderTexture.active = rt;
     }

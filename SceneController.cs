@@ -36,10 +36,10 @@ public class SceneController : MonoBehaviour
 
     }
     void Start(){   
-        if(SceneManager.GetActiveScene().name == "Main"){
+        /* if(SceneManager.GetActiveScene().name == "Main"){
             SoundManager.instance.PlayBGM("jelly in the dark");
         }
-        else if(SceneManager.GetActiveScene().name.Substring(0,5) == "Level"){
+        else  */if(SceneManager.GetActiveScene().name.Substring(0,5) == "Level"){
             SoundManager.instance.ChangeBgm("juicy drug");
             SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
 

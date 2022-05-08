@@ -103,8 +103,8 @@ public class LoadManager : MonoBehaviour
     }
     public void LoadMain(){
         
-        TriggerScript.instance.StopAllCoroutines();
-        PlayerManager.instance.StopAllCoroutines();
+        if(TriggerScript.instance!=null) TriggerScript.instance.StopAllCoroutines();
+        if(PlayerManager.instance!=null) PlayerManager.instance.StopAllCoroutines();
         SoundManager.instance.SoundOff();
 
         StartCoroutine(LoadCoroutine("Main"));
@@ -307,9 +307,10 @@ public class LoadManager : MonoBehaviour
         var defaultColor = loadFader.color;
         loadFader.color = new Color(defaultColor.r,defaultColor.g,defaultColor.b,value);
     }
-
+//화면 검게하기
     public void FadeOut(){
         loadFader.gameObject.SetActive(true);
+        //ResetFader(0f);
         loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
 
         // while (fogsNoiseTexPE.Density <= 4)
@@ -319,7 +320,8 @@ public class LoadManager : MonoBehaviour
         // }
     }
     public void FadeIn(){
-        //Debug.Log("fadeIn");
+        Debug.Log("fadeIn");
+        //loadFader.gameObject.SetActive(true);
         loadFader.GetComponent<Animator>().SetTrigger("fadeIn");
 
         // while (fogsNoiseTexPE.Density >= 0)

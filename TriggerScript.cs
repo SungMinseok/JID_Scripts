@@ -817,6 +817,7 @@ public class TriggerScript : MonoBehaviour
                 MinigameManager.instance.StartMinigame(1);
                 yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
 
+                yield return wait2000ms;
                 if(MinigameManager.instance.success){
                     yield return wait2000ms;
                     objects[0].gameObject.SetActive(false);
@@ -1675,6 +1676,7 @@ public class TriggerScript : MonoBehaviour
                     MinigameManager.instance.StartMinigame(1);
                     yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
 
+                    yield return wait2000ms;
                     if(MinigameManager.instance.success){
 
                     yield return wait2000ms;
@@ -1817,51 +1819,54 @@ public class TriggerScript : MonoBehaviour
                     }
                 }
 
-                //재료 부족해
-                if(!metrialCheck){
-                    SetDialogue(dialogues[2]);
-                    yield return waitTalking;
-                }
-                //얼음덩어리/장전된 권총/장전된 소총을 만들까?
-                else{
-                    SetDialogue(dialogues[3], DBManager.instance.cache_ItemDataList[resultItemID].name.ToString());
-                    yield return waitTalking;
+                if(GetSelect()!=3){
 
-                    SetSelect(selects[1]);
-                    yield return waitSelecting;
-
-                    //만들자
-                    if(GetSelect()==0){
-
-                        
-                        FadeOut();
-                        yield return wait1000ms;
-                        SoundManager.instance.PlaySound("makingsound");
-                        yield return wait5000ms;
-                        FadeIn();
-
-                        SetDialogue(dialogues[4]);
-                        yield return waitTalking;
-
-                        objects[0].gameObject.SetActive(false);//완성본 비활성화
-                        objects[1].gameObject.SetActive(true);//부서진거 활성화
-                        SoundManager.instance.PlaySound("table_broken");
-
-
-                        SetDialogue(dialogues[5]);
-                        yield return waitTalking;
-
-                        InventoryManager.instance.RemoveItem(materialItemID0, materialItemAmount);
-                        InventoryManager.instance.RemoveItem(materialItemID1, materialItemAmount);
-                        InventoryManager.instance.AddItem(resultItemID);
-                        location.selectPhase = -1;
-                    }
-                    //다음에 만들자
-                    else if(GetSelect()==1){
-                        SetDialogue(dialogues[6]);
+                    //재료 부족해
+                    if(!metrialCheck){
+                        SetDialogue(dialogues[2]);
                         yield return waitTalking;
                     }
+                    //얼음덩어리/장전된 권총/장전된 소총을 만들까?
+                    else{
+                        SetDialogue(dialogues[3], DBManager.instance.cache_ItemDataList[resultItemID].name.ToString());
+                        yield return waitTalking;
 
+                        SetSelect(selects[1]);
+                        yield return waitSelecting;
+
+                        //만들자
+                        if(GetSelect()==0){
+
+                            
+                            FadeOut();
+                            yield return wait1000ms;
+                            SoundManager.instance.PlaySound("makingsound");
+                            yield return wait5000ms;
+                            FadeIn();
+
+                            SetDialogue(dialogues[4]);
+                            yield return waitTalking;
+
+                            objects[0].gameObject.SetActive(false);//완성본 비활성화
+                            objects[1].gameObject.SetActive(true);//부서진거 활성화
+                            SoundManager.instance.PlaySound("table_broken");
+
+
+                            SetDialogue(dialogues[5]);
+                            yield return waitTalking;
+
+                            InventoryManager.instance.RemoveItem(materialItemID0, materialItemAmount);
+                            InventoryManager.instance.RemoveItem(materialItemID1, materialItemAmount);
+                            InventoryManager.instance.AddItem(resultItemID);
+                            location.selectPhase = -1;
+                        }
+                        //다음에 만들자
+                        else if(GetSelect()==1){
+                            SetDialogue(dialogues[6]);
+                            yield return waitTalking;
+                        }
+
+                    }
                 }
                 break;
 #endregion 
