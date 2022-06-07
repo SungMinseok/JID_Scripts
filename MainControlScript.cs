@@ -26,8 +26,9 @@ public class MainControlScript : MonoBehaviour
         splashVideoName = splashClip.ToString();
 
         mainBtns.transform.GetChild(0).GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("load"));
-        mainBtns.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("setting"));
-        mainBtns.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
+        mainBtns.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
+        mainBtns.transform.GetChild(0).GetChild(3).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("setting"));
+        //mainBtns.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
         
     }
 
@@ -68,6 +69,7 @@ SoundManager.instance.ChangeBgm("jelly in the dark");
 
         VideoManager.instance.PlayVideo(videoClips[1], true, needClear: false);
 
+        VideoManager.instance.isPlayingVideo = true;
     }
     IEnumerator SplashCoroutine(){
         LoadManager.instance.ResetFader(1f);

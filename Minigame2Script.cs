@@ -22,6 +22,7 @@ public class Minigame2Script : MonoBehaviour
     [Range(1f, 4f)] public float flyingBottleSpeed = 2f;
     [Range(8f, 15f)] public float throwingBottleSpeed = 10f;
     public int maxLife;
+    public int curLife;
     [Space]
     [Header("[Game Objects]─────────────────")]
     public GameObject madAnt;
@@ -31,6 +32,7 @@ public class Minigame2Script : MonoBehaviour
     public Transform createPos0;
     public Transform defaultPos1;
     public Transform createPos1;
+    public BoxCollider2D startCol;
     public BoxCollider2D endCol;
     public Transform endPos;
 
@@ -39,6 +41,7 @@ public class Minigame2Script : MonoBehaviour
     public Transform[] spriteSets;
     public Transform startPoint;
     public PolygonCollider2D mapCollider;
+    public Transform lifeObjectGrid;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -52,7 +55,7 @@ public class Minigame2Script : MonoBehaviour
     WaitForSeconds wait2s = new WaitForSeconds(2f);
     WaitForSeconds wait3s = new WaitForSeconds(3f);
     Vector3 flyingBottlePos;
-    
+    public bool damageDelay;
     void Awake(){
         instance = this;
     }
@@ -74,12 +77,19 @@ public class Minigame2Script : MonoBehaviour
         MinigameManager.instance.successBtn.SetActive(true);
         //MinigameManager.instance.failBtn.SetActive(true);
 #endif
+        curLife = maxLife;
+        for(int i=0;i<lifeObjectGrid.childCount;i++){
+            lifeObjectGrid.GetChild(i).gameObject.SetActive(false);
+        }
         
+        for(int i=0;i<curLife;i++){
+            lifeObjectGrid.GetChild(i).gameObject.SetActive(true);
+        }
     }
     void OnDisable(){
+        StopAllCoroutines();
         UIManager.instance.SetHUD(true);
         isActive = false;
-        StopAllCoroutines();
 #if UNITY_EDITOR || alpha
         MinigameManager.instance.successBtn.SetActive(false);
         //MinigameManager.instance.failBtn.SetActive(false);
@@ -222,5 +232,26 @@ public class Minigame2Script : MonoBehaviour
         PlayerManager.instance.MoveTo(endPos);
         PlayerManager.instance.canMove = true;
         endCol.gameObject.SetActive(false);
+    }
+
+    public void GetDamage(){
+        if(!damageDelay){
+            SoundManager.instance.PlaySound("minigame_bottlecrash");
+            damageDelay = true;
+            if(curLife > 0){
+                lifeObjectGrid.GetChild(curLife-1).gameObject.SetActive(false);
+                //StartCoroutine(MinigameCoroutine());
+                Debug.Log("hit");
+                curLife --;
+            }
+            else{
+                //MinigameManager.instance.FailMinigame(4);
+                PlayerManager.instance.KillPlayer(4, "dead0");
+            }
+            Invoke("ResetDamageDelay",1f);
+        }
+    }
+    public void ResetDamageDelay(){
+        damageDelay = false;
     }
 }

@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
     [Header("UI_States")]
     public Image dirtGauge;
     public TextMeshProUGUI honeyText;
+    public Transform iceGaugeMother;
+    public float iceGaugeCoolTime = 20f;
     [Header("UI_Select")]
     public GameObject ui_select;
     public Transform ui_select_grid;
@@ -73,6 +75,9 @@ public class UIManager : MonoBehaviour
     WaitForSeconds wait3000ms = new WaitForSeconds(3);
 
     int calculatedHoney;
+    [Header("Debug")]
+    public bool iceGaugeFlag;
+    Coroutine gameEndCoroutine;
     void Awake()
     {
         instance = this;
@@ -218,6 +223,7 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator SetGameOverUICoroutine(int collectionID)
     {
+        Debug.Log("4141414");
         bool endingAlreadyOver;
 
         if (DBManager.instance.GetClearedEndingCollectionID(collectionID) == -1)
@@ -259,21 +265,24 @@ public class UIManager : MonoBehaviour
         }
 
 
-        if (MinigameManager.instance.nowMinigameNum != -1) MinigameManager.instance.minigameScriptTransforms[MinigameManager.instance.nowMinigameNum].gameObject.SetActive(false);
-        ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[collectionID];
-        //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
-        ui_gameOver.SetActive(true);
-        LoadManager.instance.FadeIn();
-
-        SoundManager.instance.PlaySound("gameover" + Random.Range(0, 3));
-        yield return new WaitForSeconds(2f);
-        gameOverBtns.gameObject.SetActive(true);
-
 
         if (!endingAlreadyOver)
         {
 
+            if (MinigameManager.instance.nowMinigameNum != -1) MinigameManager.instance.minigameScriptTransforms[MinigameManager.instance.nowMinigameNum].gameObject.SetActive(false);
+            ui_gameOver_image.sprite = DBManager.instance.endingCollectionSprites[collectionID];
+            //ui_gameOver_image.sprite = gameOverSprites[num]; DBManager.instance.endingCollectionSprites[tempCardNum[i]]
+            ui_gameOver.SetActive(true);
+            LoadManager.instance.FadeIn();
+
+            SoundManager.instance.PlaySound("gameover" + Random.Range(0, 3));
+            yield return new WaitForSeconds(2f);
+            gameOverBtns.gameObject.SetActive(true);
+
             UIManager.instance.gameOverNewImage.gameObject.SetActive(true);
+        }
+        else{
+            MenuManager.instance.LoadLast();
         }
     }
     #endregion
@@ -281,16 +290,25 @@ public class UIManager : MonoBehaviour
     #region GameEnd
     public void SetGameEndUI(int num)
     {
-        PlayerManager.instance.isGameOver = true;
-        for (int i = 0; i < DBManager.instance.cache_GameEndDataList.Count; i++)
-        {
-            if (DBManager.instance.cache_GameEndDataList[i].endingNum == num)
+        PlayerManager.instance.LockPlayer();
+
+        var index = DBManager.instance.cache_GameEndDataList.FindIndex(x=> x.endingNum == num);
+
+        //PlayerManager.instance.isGameOver = true;
+        //for (int i = 0; i < DBManager.instance.cache_GameEndDataList.Count; i++)
+        //{
+            //if (DBManager.instance.cache_GameEndDataList[i].endingNum == num)
+            if(index != -1)
             {
-                Debug.Log(i + "번 엔딩 코루틴 시작");
-                StartCoroutine(SetGameEndUICoroutine(i));
+                Debug.Log(num + "번 엔딩 시작");
+                gameEndCoroutine = StartCoroutine(SetGameEndUICoroutine(index));
                 return;
             }
-        }
+            else{
+                Debug.Log(num + "번 엔딩 없음");
+
+            }
+        //}
 
     }
     IEnumerator SetGameEndUICoroutine(int num)
@@ -315,6 +333,11 @@ public class UIManager : MonoBehaviour
         LoadManager.instance.FadeIn();
 
 
+        if (!string.IsNullOrEmpty(curGameEndList.preSoundFileName))
+        {
+            SoundManager.instance.PlaySound(curGameEndList.preSoundFileName);
+            yield return new WaitForSeconds(SoundManager.instance.GetSoundLength(curGameEndList.preSoundFileName));
+        }
         //for(int i=0;i<curGameEndList.storySprites.Length;i++){
 
         gameEndImage.sprite = curGameEndList.stories[0].sprite;
@@ -327,16 +350,21 @@ public class UIManager : MonoBehaviour
         }
 
         yield return wait500ms;
-        //}
+        
+        //삽화 진행
 
         for (int i = 0; i < curGameEndList.stories.Length; i++)
         {
 
-            if (curGameEndList.stories[i].sprite != null && i != 0)
+            if (curGameEndList.stories[i].sprite != null/*  && i != 0 */)
             {
                 gameEndImage.sprite = curGameEndList.stories[i].sprite;
             }
 
+            if (!string.IsNullOrEmpty(curGameEndList.stories[i].soundFileName))
+            {
+                SoundManager.instance.PlaySound(curGameEndList.stories[i].soundFileName);
+            }
             //gameEndText0.text = curGameEndList.stories[i].descriptions;
             gameEndText0.text = reader1[int.Parse(curGameEndList.stories[i].descriptions)]["text_" + language].ToString();//curGameEndList.stories[i].descriptions;
 
@@ -363,6 +391,15 @@ public class UIManager : MonoBehaviour
             yield return wait10ms;
         }
 
+        
+        if (!string.IsNullOrEmpty(curGameEndList.postSoundFileName))
+        {
+            SoundManager.instance.PlaySound(curGameEndList.postSoundFileName);
+            yield return new WaitForSeconds(SoundManager.instance.GetSoundLength(curGameEndList.postSoundFileName));
+        }
+
+        //삽화 노출 종료 후 엔딩 번호 & 제목 노출
+
         yield return wait500ms;
 
         gameEndText1_0.text = "ending no." + curGameEndList.endingNum;
@@ -386,8 +423,12 @@ public class UIManager : MonoBehaviour
     }
     public void PushNextBtn()
     {
-
         gameEndCanSkip = false;
+    }
+    public void PushSkipBtn(){
+        StopCoroutine(gameEndCoroutine);
+        
+        LoadManager.instance.LoadMain();
     }
     #endregion
 
@@ -487,8 +528,23 @@ public class UIManager : MonoBehaviour
 
     public void SetHUD(bool active)
     {
-        hud_state.SetActive(active);
-        hud_inventory.SetActive(active);
+        //hud_state.SetActive(active);
+        
+        if(active){
+            hud_state.GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else{
+            hud_state.GetComponent<CanvasGroup>().alpha = 0;
+
+        }
+        //hud_inventory.SetActive(active);
+        if(active){
+            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else{
+            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 0;
+
+        }
 
         if (!active)
         {
@@ -541,6 +597,22 @@ public class UIManager : MonoBehaviour
         var tutorialBox_Right = PlayerManager.instance.tutorialBox_Right;
         //tutorialBox.GetChild(0).gameObject.SetActive(false);
         tutorialBox_Right.GetChild(1).GetComponent<Animator>().SetBool("activate",false);
+    }
+    public IEnumerator FillIceGaugeCoroutine(){
+        ResetIceGauge();
+        for(int i=0;i<iceGaugeMother.childCount;i++){
+            iceGaugeMother.GetChild(i).gameObject.SetActive(true);
+            if(i!=4) yield return new WaitForSeconds(iceGaugeCoolTime);
+        }
+        PlayerManager.instance.KillPlayer(6,"shake");
+        
+        //SetGameOverUI(6);
+    }
+    public void ResetIceGauge(){
+
+        for(int i=0;i<iceGaugeMother.childCount;i++){
+            iceGaugeMother.GetChild(i).gameObject.SetActive(false);
+        }
     }
 //     public void ChangeKey(){
 //         foreach(KeyCode kcode in Enum.GetValues(typeof(KeyCode)))

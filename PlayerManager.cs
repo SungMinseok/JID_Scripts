@@ -63,7 +63,7 @@ public class PlayerManager : CharacterScript
     [Header("Input Check")]
     public float wInput;
     public float hInput;
-    public bool jumpInput, downInput, interactInput;
+    public bool jumpInput, downInput, interactInput, interactKeepInput;
     [Space]
     public float wSet;
     [Header("States────────────────────")]
@@ -197,6 +197,7 @@ public class PlayerManager : CharacterScript
     void Update()
     {
             interactInput = GameInputManager.GetKeyDown("Interact") ? true : false;
+            interactKeepInput = GameInputManager.GetKey("Interact") ? true : false;
 
         if(isGameOver){
             canMove = false;
@@ -305,7 +306,7 @@ public class PlayerManager : CharacterScript
             
             animator.SetBool("run", false);
             
-            if(interactInput && !isActing){
+            if(interactKeepInput && !isActing){
                 if(getDirt){
                     //if(equipments_id[2]==21){
                     if(InventoryManager.instance.CheckHaveItem(21)){

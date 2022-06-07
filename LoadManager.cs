@@ -112,8 +112,11 @@ public class LoadManager : MonoBehaviour
 
     }
     IEnumerator LoadCoroutine(string sceneName){
-        FadeOut();
-        yield return wait1s;
+        
+        if(loadFader.color.a != 1){
+            FadeOut();
+            yield return wait1s;
+        }
         StartCoroutine(LoadNextScene(sceneName));
         if(VideoManager.instance.isPlayingVideo){
             VideoManager.instance.StopVideo();
@@ -245,6 +248,7 @@ public class LoadManager : MonoBehaviour
                 SceneController.instance.CameraView(PlayerManager.instance.transform);
                 SceneController.instance.SetPlayerPosition();
                 SceneController.instance.SetPlayerEquipments();
+                yield return new WaitUntil(()=>InventoryManager.instance);
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
             SoundManager.instance.SoundOff();
@@ -309,7 +313,12 @@ public class LoadManager : MonoBehaviour
     }
 //화면 검게하기
     public void FadeOut(){
+        if(loadFader.color.a == 1){
+            return;
+        }
+
         loadFader.gameObject.SetActive(true);
+        Debug.Log("fadeOut");
         //ResetFader(0f);
         loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
 
@@ -321,6 +330,7 @@ public class LoadManager : MonoBehaviour
     }
     public void FadeIn(){
         Debug.Log("fadeIn");
+        //ResetFader(1);
         //loadFader.gameObject.SetActive(true);
         loadFader.GetComponent<Animator>().SetTrigger("fadeIn");
 

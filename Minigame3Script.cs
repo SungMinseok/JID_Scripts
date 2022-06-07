@@ -27,7 +27,7 @@ public class Minigame3Script : MonoBehaviour
     public GameObject openedCapsule;
     public GameObject closedCapsule;
     public Animator madeEffect;
-    
+    public Location trigLocation;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -124,6 +124,8 @@ public class Minigame3Script : MonoBehaviour
                 InventoryManager.instance.AddItem(32);
                 break;
         }
+
+        trigLocation.selectPhase = 1;
     }
     public void OpenNote(){
         notePage.SetActive(true);

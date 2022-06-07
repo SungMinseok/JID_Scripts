@@ -90,12 +90,12 @@ public class DirtScript : MonoBehaviour
             }
             else if(dirtBundleInfo.curHp/maxHp<0.334f && remainPieceCount==2){
                 //if(phaseOn) dirtPhases[1].SetActive(false);
-                //CreatePiece(1);
+                if(bundleType==BundleType.Icicle) CreatePiece(1);
 
             }
             else if(dirtBundleInfo.curHp/maxHp<0.667f && remainPieceCount==3){
                 //if(phaseOn) dirtPhases[2].SetActive(false);
-                //CreatePiece(2);
+                if(bundleType==BundleType.Icicle) CreatePiece(2);
             }
 
             if(phaseOn){

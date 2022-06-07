@@ -77,6 +77,7 @@ public class PlayerBodyScript : MonoBehaviour
             thePlayer.getIcicle = false;
             thePlayer.animator.SetBool("icebreak", false);
             thePlayer.dirtTarget = null;
+            thePlayer.weapons[1].gameObject.SetActive(false);
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
@@ -118,6 +119,7 @@ public class PlayerBodyScript : MonoBehaviour
             var tempGetObject = other.GetComponent<DirtScript>();
             if(tempGetObject.dirtBundleInfo.curHp>0) thePlayer.getIcicle = true;
             thePlayer.dirtTarget = tempGetObject;
+            if(InventoryManager.instance.CheckHaveItem(26)) thePlayer.weapons[1].gameObject.SetActive(true);
             //UIManager.instance.clearPanel.SetActive(true);
         }
         else if (other.CompareTag("Cover"))

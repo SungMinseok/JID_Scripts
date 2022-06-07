@@ -46,12 +46,14 @@ public class DoodadsScript : MonoBehaviour
     void OnEnable(){
         if(type == DoodadsType.Bullet2){
             //transform.localPosition = curPos;
+            Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.startCol, true);
             Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.endCol, true);
 
         }
             
         else if(type == DoodadsType.Bullet){
             
+            Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.startCol, true);
             Physics2D.IgnoreCollision(this.GetComponent<BoxCollider2D>(), Minigame2Script.instance.endCol, true);
         }
     }
@@ -99,33 +101,34 @@ public class DoodadsScript : MonoBehaviour
             case DoodadsType.Bullet :
                 if(other.gameObject.CompareTag("Player")){
                     
-                    if(!PlayerManager.instance.isGameOver){
-                        SoundManager.instance.PlaySound("minigame_bottlecrash");
-                        PlayerManager.instance.KillPlayer(4, "dead0");
-
-                        // PlayerManager.instance.isGameOver = true;
-                        // PlayerManager.instance.canMove = false;
-                        // PlayerManager.instance.animator.SetBool("dead0",true);
-                        // MinigameManager.instance.FailMinigame(4);
+                    if(Minigame2Script.instance!=null){
+                        Minigame2Script.instance.GetDamage();
+                        
                     }
+
+                    // if(!PlayerManager.instance.isGameOver){
+                    //     SoundManager.instance.PlaySound("minigame_bottlecrash");
+                    //     PlayerManager.instance.KillPlayer(4, "dead0");
+
+                    // }
                 }
-                else if(/*other.gameObject.CompareTag("MainGround") || */other.gameObject.CompareTag("Collider_Player")){
-                    gameObject.SetActive(false);
-                }
+                // else if(/*other.gameObject.CompareTag("MainGround") || */other.gameObject.CompareTag("Collider_Player")){
+                //     gameObject.SetActive(false);
+                // }
                 break;
 
             case DoodadsType.Bullet1 :
                 if(other.gameObject.CompareTag("Player")){
                     
-                    if(!PlayerManager.instance.isGameOver){
-                        SoundManager.instance.PlaySound("minigame_bottlecrash");
-                        PlayerManager.instance.KillPlayer(4, "dead0");
-
-                        // PlayerManager.instance.isGameOver = true;
-                        // PlayerManager.instance.canMove = false;
-                        // PlayerManager.instance.animator.SetBool("dead0",true);
-                        // MinigameManager.instance.FailMinigame(4);
+                    if(Minigame2Script.instance!=null){
+                        Minigame2Script.instance.GetDamage();
+                        
                     }
+                    // if(!PlayerManager.instance.isGameOver){
+                    //     SoundManager.instance.PlaySound("minigame_bottlecrash");
+                    //     PlayerManager.instance.KillPlayer(4, "dead0");
+
+                    // }
                 }
                 else if(other.gameObject.CompareTag("MainGround") || other.gameObject.CompareTag("Collider_Player")){
                         SoundManager.instance.PlaySound("minigame_bottlecrash");
@@ -136,15 +139,15 @@ public class DoodadsScript : MonoBehaviour
             case DoodadsType.Bullet2 :
                 if(other.gameObject.CompareTag("Player")){
                     
-                    if(!PlayerManager.instance.isGameOver){
-                        SoundManager.instance.PlaySound("minigame_bottlecrash");
-                        PlayerManager.instance.KillPlayer(4, "dead0");
-
-                        // PlayerManager.instance.isGameOver = true;
-                        // PlayerManager.instance.canMove = false;
-                        // PlayerManager.instance.animator.SetBool("dead0",true);
-                        // MinigameManager.instance.FailMinigame(4);
+                    if(Minigame2Script.instance!=null){
+                        Minigame2Script.instance.GetDamage();
+                        
                     }
+                    // if(!PlayerManager.instance.isGameOver){
+                    //     SoundManager.instance.PlaySound("minigame_bottlecrash");
+                    //     PlayerManager.instance.KillPlayer(4, "dead0");
+
+                    // }
                 }                
                 else if(other.gameObject.CompareTag("MainGround")){
                         SoundManager.instance.PlaySound("minigame_bottlecrash");
@@ -179,7 +182,7 @@ public class DoodadsScript : MonoBehaviour
             case DoodadsType.Trap :
                 if(other.CompareTag("Player")){
                     //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
-                    if(PlayerManager.instance.isFalling){
+                    if(PlayerManager.instance.isFalling && !PlayerManager.instance.isGameOver){
 
                         PlayerManager.instance.KillPlayer(0, "dead0");
                     }

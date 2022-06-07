@@ -19,7 +19,7 @@ public class LocationRader : MonoBehaviour
             }
         }
         else if(other.CompareTag("NPC")) {
-            if(other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+            if(other.GetComponent<NPCScript>().mainBody != null && other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
                 bodySoundScript.isNearPlayer = true;
             }
         }
@@ -65,7 +65,9 @@ public class LocationRader : MonoBehaviour
             }
         }
         else if(other.CompareTag("NPC")) {
-            if(other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
+                //Debug.Log(other.name);
+
+            if(other.GetComponent<NPCScript>().mainBody != null && other.GetComponent<NPCScript>().mainBody.TryGetComponent<BodySoundScript>(out BodySoundScript bodySoundScript)){
                 bodySoundScript.isNearPlayer = false;
             }
         }

@@ -167,6 +167,7 @@ public class NPCScript : CharacterScript
         if(isGuard){
             guardDialogue.talker = this.transform;
             guardDialogue.sentences = new string[1];
+            if(guardDialogueIndex == 0){guardDialogueIndex = 18;}
             guardDialogue.sentences[0] = guardDialogueIndex.ToString();
         }
     }

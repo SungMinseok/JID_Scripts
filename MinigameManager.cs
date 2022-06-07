@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MinigameManager : MonoBehaviour
 {   
@@ -13,6 +14,12 @@ public class MinigameManager : MonoBehaviour
     //public bool minigameFlag;
     
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
+    [Space]
+    [Header("[Game Objects]─────────────────")]
+    public GameObject minigameGuidePopUp;
+    public Text guideMainText;
+    public Text guideSubText;
+    public bool waitGuidePass;
 
     public bool success, fail;
 
@@ -148,5 +155,15 @@ public class MinigameManager : MonoBehaviour
     public void ResetMinigameResult(){
         success = false;
         fail = false;
+    }
+    public void OpenGuide(int mainSysMsgIndex, int subSysMsgIndex){
+        guideMainText.text = CSVReader.instance.GetIndexToString(mainSysMsgIndex,"sysmsg");
+        guideSubText.text = CSVReader.instance.GetIndexToString(subSysMsgIndex,"sysmsg");
+        minigameGuidePopUp.SetActive(true);
+        waitGuidePass = true;
+    }
+    public void PassGuide(){
+        minigameGuidePopUp.SetActive(false);
+        waitGuidePass = false;
     }
 }

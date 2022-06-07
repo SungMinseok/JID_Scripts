@@ -17,6 +17,7 @@ public class TriggerScript : MonoBehaviour
     WaitUntil waitSelecting = new WaitUntil(()=>!PlayerManager.instance.isSelecting);
     WaitUntil waitShopping = new WaitUntil(()=>!PlayerManager.instance.isShopping);
     WaitUntil waitMoving = new WaitUntil(()=>PlayerManager.instance.canMove);
+    Coroutine iceGaugeCoroutine;
     
     void Awake()
     {
@@ -60,6 +61,18 @@ public class TriggerScript : MonoBehaviour
                     objects[3].gameObject.SetActive(true);
                     objects[2].gameObject.SetActive(false);
                     break;
+                case 18 :
+                    objects[2].gameObject.SetActive(false);
+                    
+                    if(DBManager.instance.CheckTrigOver(62)){
+                        objects[3].gameObject.SetActive(false);
+                    }
+                    else{
+                        objects[3].gameObject.SetActive(true);
+                    }
+                    break;
+
+                    
                 case 22 :
                     //location.poses[10].gameObject.SetActive(false);
                         for(int i=0;i<14;i++){
@@ -73,6 +86,9 @@ public class TriggerScript : MonoBehaviour
                     for(int i=8;i<17;i++){
                         objects[i].gameObject.SetActive(false);
                     }
+                    objects[19].gameObject.SetActive(false);
+                    objects[20].gameObject.SetActive(false);
+
                     break;     
                 case 27 :
                     //objects[1].gameObject.SetActive(false);
@@ -135,6 +151,9 @@ public class TriggerScript : MonoBehaviour
                 case 55 :
                 //case 56 :
                     objects[0].gameObject.SetActive(false);
+                    break;
+                case 62 :
+                    objects[0].GetComponent<Location>().isLocked = false;
                     break;
                 default :
                     break;
@@ -396,7 +415,12 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
 
-                ShopManager.instance.OpenShopUI(0,"땃쥐 상점",new int[]{23,20});
+                if(!DBManager.instance.CheckTrigOver(40)){
+                    ShopManager.instance.OpenShopUI(0,"땃쥐 상점",new int[]{23,20});//23빨대, 20비밀쪽지
+                }
+                else{
+                    ShopManager.instance.OpenShopUI(0,"땃쥐 상점",new int[]{20});//20비밀쪽지
+                }
                 yield return waitShopping;
 
 
@@ -915,27 +939,44 @@ public class TriggerScript : MonoBehaviour
                 yield return waitTalking;
                 SetDialogue(dialogues[1]);
                 yield return waitTalking;
-                SetDialogue(dialogues[2]);
-                yield return waitTalking;
                 //UIManager.instance.SetFadeOut();
                 LoadManager.instance.FadeOut();
                 yield return wait1000ms;
 
 
 
-#if demo
+//#if demo
 
                 PlayerManager.instance.transform.position = objects[1].position;
                 SceneController.instance.SetConfiner(4);
-#else
+                PlayerManager.instance.Look("left");
+                PlayerManager.instance.SetTalkCanvasDirection("right");
+                objects[4].gameObject.SetActive(true);
+// #else
 
-                PlayerManager.instance.transform.position = objects[0].position;
-                SceneController.instance.SetConfiner(8);
-#endif
+//                 PlayerManager.instance.transform.position = objects[0].position;
+//                 SceneController.instance.SetConfiner(8);
+// #endif
                 //UIManager.instance.SetFadeIn();
                 LoadManager.instance.FadeIn();
+        
                 
+                for(int i=2;i<10;i++){
+
+                    SetDialogue(dialogues[i]);
+                    yield return waitTalking;
+                }
                 
+                InventoryManager.instance.AddItem(12);
+                
+                SetDialogue(dialogues[10]);
+                yield return waitTalking;
+
+                
+                FadeOut();
+                yield return wait1000ms;
+                objects[4].gameObject.SetActive(false);
+                FadeIn();
                 break;
 #endregion
 
@@ -951,6 +992,9 @@ public class TriggerScript : MonoBehaviour
                 LoadManager.instance.FadeOut();
                 yield return wait1000ms;
 
+                objects[2].gameObject.SetActive(false);
+                objects[3].gameObject.SetActive(true);
+
 #if demo
 
                 PlayerManager.instance.transform.position = objects[1].position;
@@ -964,6 +1008,7 @@ public class TriggerScript : MonoBehaviour
                 
                 LoadManager.instance.FadeIn();
                 
+                InventoryManager.instance.AddItem(12);
                 
                 break;
                 
@@ -1060,7 +1105,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
            
-#region 23th 진딧물농장 미니게임4
+#region t23 진딧물농장 미니게임4
             case 23 :
 
                 FadeOut();
@@ -1072,6 +1117,8 @@ public class TriggerScript : MonoBehaviour
                 PlayerManager.instance.transform.position = objects[5].position;
                 yield return wait100ms;
 
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
+            SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
                 //CameraView(objects[0]);
                 yield return wait500ms;
                 FadeIn();
@@ -1089,13 +1136,11 @@ public class TriggerScript : MonoBehaviour
                 SetSelect(selects[0]);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(GetSelect()==2){
-                }
-                else if(GetSelect()==1){
-                    
+                    break;
                 }
                 location.selectPhase = -1;
 
-                yield return wait500ms;
+                //yield return wait500ms;
 
                 SceneController.instance.SetCameraDefaultZoomOut();
 
@@ -1104,10 +1149,6 @@ public class TriggerScript : MonoBehaviour
                 yield return new WaitUntil(()=>MinigameManager.instance.success || MinigameManager.instance.fail);
 
                 yield return wait1000ms;
-                PlayerManager.instance.vignette.SetActive(true);
-                for(int i=8;i<17;i++){
-                    objects[i].gameObject.SetActive(false);
-                }
 
                 objects[17].GetComponent<Location>().isLocked = false;
                     PlayerManager.instance.transform.position = objects[6].position;
@@ -1115,6 +1156,10 @@ public class TriggerScript : MonoBehaviour
                 //게임 성공 시
                 if(MinigameManager.instance.success){
 
+                    PlayerManager.instance.vignette.SetActive(true);
+                    for(int i=8;i<17;i++){
+                        objects[i].gameObject.SetActive(false);
+                    }
                     yield return wait1000ms;
                     objects[7].gameObject.SetActive(true);
                     SceneController.instance.SetCameraDefaultZoomIn();
@@ -1149,13 +1194,16 @@ public class TriggerScript : MonoBehaviour
 
 
                 }
+                else{
+
+                }
 
                 //FadeIn();
                 break;
 #endregion
             
 //알번데기방 - 꼰대개미와 대화
-#region 24
+#region t24
             case 24 :
 
                 //CameraView(dialogues[0].talker);
@@ -1198,6 +1246,8 @@ public class TriggerScript : MonoBehaviour
                 
                 location.selectPhase = -1;
 
+                InventoryManager.instance.AddItem(37);
+
                 break;
 #endregion
             
@@ -1212,6 +1262,9 @@ public class TriggerScript : MonoBehaviour
                     yield return waitTalking;
                 }
                 else{
+                    
+                    InventoryManager.instance.RemoveItem(37);
+
                     SetDialogue(dialogues[1]);
                     yield return waitTalking;
 
@@ -1243,7 +1296,10 @@ public class TriggerScript : MonoBehaviour
 #region 26
             case 26 :
                 if(PlayerManager.instance.equipments_id[1] == -1){
-                        UIManager.instance.SetGameOverUI(4);
+
+                    SetDialogue(dialogues[17]);
+                    yield return waitTalking;
+                    UIManager.instance.SetGameOverUI(4);
 
                 }
                 else{
@@ -1565,8 +1621,17 @@ public class TriggerScript : MonoBehaviour
 //물약제조 ( 미니게임 3 )
 #region t32 물약제조 ( 미니게임 3 )
             case 32 :
-                MinigameManager.instance.minigameScriptTransforms[3].gameObject.SetActive(true);
-                yield return waitMoving;
+                if(location.selectPhase ==0 ){
+
+                    MinigameManager.instance.minigameScriptTransforms[3].gameObject.SetActive(true);
+                    yield return waitMoving;
+                }
+                else{
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                    location.preserveTrigger = false;
+                }
+
                 
                 break;
 #endregion 
@@ -1653,7 +1718,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion 
 //연못앞
-#region 39
+#region t39
             case 39 :
                 objects[0].GetComponent<BoxCollider2D>().enabled = true;
                 objects[1].GetComponent<Location>().isLocked = true;
@@ -2048,6 +2113,10 @@ public class TriggerScript : MonoBehaviour
                     InventoryManager.instance.RemoveItem(6);
                     SetDialogue(dialogues[4]);
                     yield return waitTalking;
+                    SetDialogue(dialogues[5]);
+                    yield return waitTalking;
+                    SetDialogue(dialogues[6]);
+                    yield return waitTalking;
 
 #if !demo
                     objects[1].gameObject.SetActive(true);
@@ -2312,7 +2381,79 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region 201st [엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
+#region t58,t59 진딧물게임 패배 후
+            case 58 :
+            case 59 :
+                if(location.selectPhase==0){
+                    location.selectPhase = 1;
+
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+                else{
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                }
+                break;
+#endregion
+
+#region t61 버섯농장앞 표지판
+            case 61 :
+        
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+                break;
+#endregion
+
+#region t62 버섯농장앞 수레개미
+            case 62 :
+            
+                for(int i=0;i<dialogues.Length;i++){
+                    PlayerLookObject(dialogues[i].talker);
+                    SetDialogue(dialogues[i]);
+                    yield return waitTalking;
+                }
+
+                FadeOut();
+                yield return wait2000ms;
+                objects[1].gameObject.SetActive(false);
+                FadeIn();
+
+
+
+                objects[0].GetComponent<Location>().isLocked = false;
+                break;
+#endregion
+
+#region t69 냉동굴 게이지 ON
+            case 69 :
+            
+                if(!UIManager.instance.iceGaugeFlag){
+                    UIManager.instance.iceGaugeFlag = true;
+                    iceGaugeCoroutine = StartCoroutine(UIManager.instance.FillIceGaugeCoroutine());
+                }
+                break;
+#endregion
+
+#region t70 냉동굴 게이지 OFF
+            case 70 :
+            
+                if(iceGaugeCoroutine!=null && UIManager.instance.iceGaugeFlag){
+                    UIManager.instance.iceGaugeFlag = false;
+                    StopCoroutine(iceGaugeCoroutine);
+                    UIManager.instance.ResetIceGauge();
+                }
+                break;
+#endregion
+
+#region t899 자동저장
+            case 899 :
+                AutoSave();
+                break;
+#endregion
+
+#region t201 [엔딩1 : 여왕의 방 - 전설의 젤리(젤할라)]
             case 201 :
                 FadeOut();
                 yield return wait2000ms;
@@ -2390,7 +2531,7 @@ public class TriggerScript : MonoBehaviour
                 SetDialogue(dialogues[11]);
                 yield return waitTalking;
 
-                for(int k=12;k<dialogues.Length;k++){
+                for(int k=12;k<18;k++){
                     //CameraView(dialogues[k].talker);
                     SetDialogue(dialogues[k]);
                     yield return waitTalking;

@@ -21,10 +21,6 @@ public class ItemSlot{
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager instance;
-    [Header("Debug───────────────")]
-    public int curPage;
-    public int slotCountPerPage;
-    public bool isHide;
     //public UIManager theUI;
     
     [Header("UI_Inventory───────────────")]
@@ -37,6 +33,11 @@ public class InventoryManager : MonoBehaviour
     public Sprite nullSprite;
     public Animator inventoryAnimator;
     public Button toggleBtn;
+    [Header("Debug───────────────")]
+    public int curPage;
+    public int slotCountPerPage;
+    public bool isHide;
+    public bool selectFlag;
     void Awake(){
         instance = this;
 
@@ -242,6 +243,7 @@ public class InventoryManager : MonoBehaviour
             //아이템 없을 경우
             else{
                 //itemSlotGrid.GetChild(i%slotCountPerPage).GetComponent<Image>().sprite = nullSprite;
+                //Debug.Log(itemSlot[i%slotCountPerPage].itemImage.sprite);
                 itemSlot[i%slotCountPerPage].itemImage.sprite = nullSprite;
                 itemSlot[i%slotCountPerPage].equippedMark.gameObject.SetActive(false);
                 
@@ -320,7 +322,7 @@ public class InventoryManager : MonoBehaviour
 
         var theDB = DBManager.instance;
         
-        switch(curItem.type){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
+        switch(curItem.type){   // 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품, 5:특수(사용)
             case 1 : 
             case 2 : 
             case 3 : 
@@ -372,6 +374,16 @@ public class InventoryManager : MonoBehaviour
                     }
                 }
                 break;
+            case 5:
+                // switch(curItem.ID){
+                //     case 34:
+                        if(!selectFlag){
+                            selectFlag = true;
+                            StartCoroutine(SetSelectByUsingItem(curItem.ID));
+                        }
+                        // break;
+                // }
+                break;
             default :
                 break;
         }
@@ -404,5 +416,53 @@ public class InventoryManager : MonoBehaviour
     }
     public void AddHoney(int honeyAmount){
         DBManager.instance.curData.curHoneyAmount += honeyAmount;
+    }
+    IEnumerator SetSelectByUsingItem(int itemID){
+
+        PlayerManager.instance.LockPlayer();
+
+        Select tempSelect = new Select();
+        Dialogue tempDialogue = new Dialogue();
+
+        switch(itemID){
+            case 33 ://권총
+                tempSelect.answers = new string[2]{"161","162"};
+                SelectManager.instance.SetSelect(tempSelect,null);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(SelectManager.instance.GetSelect()==0){
+                    if(DBManager.instance.curData.curMapNum==16){
+                        UIManager.instance.SetGameEndUI(11);
+                    }
+                    else if(DBManager.instance.curData.curMapNum==23){
+                        UIManager.instance.SetGameEndUI(12);
+                    }
+                    else{
+                        tempDialogue.sentences = new string[1]{"863"};
+                        tempDialogue.isMonologue = true;
+                        DialogueManager.instance.SetDialogue(tempDialogue);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    }
+                }
+                break;
+            case 34 ://소총(기관총)
+                tempSelect.answers = new string[2]{"161","162"};
+                SelectManager.instance.SetSelect(tempSelect,null);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(SelectManager.instance.GetSelect()==0){
+                    if(DBManager.instance.curData.curMapNum==8){
+                        UIManager.instance.SetGameEndUI(10);
+                    }
+                    else{
+                        tempDialogue.sentences = new string[1]{"863"};
+                        tempDialogue.isMonologue = true;
+                        DialogueManager.instance.SetDialogue(tempDialogue);
+                        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    }
+                }
+                break;
+        }
+
+        selectFlag = false;
+        PlayerManager.instance.UnlockPlayer();
     }
 }

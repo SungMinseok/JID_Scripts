@@ -416,8 +416,8 @@ public class DBManager : MonoBehaviour
         dataDirectory = "/" + buildVersion + "_" + buildNum;
 #elif alpha
         buildVersion = "alpha";
-        dataDirectory = "/" + buildVersion + "_" + buildNum;
-        //dataDirectory = "";
+        //dataDirectory = "/" + buildVersion + "_" + buildNum;
+        dataDirectory = "";
 #else
         buildVersion = "";
 #endif
@@ -609,7 +609,7 @@ public class Item{
         isStack = f;
         price = g;
         goldResourceID = _goldResourceID;
-        goldIcon = ResourceManager.instance.GetItemSprite(resourceID);//DBManager.instance.itemSprites[goldResourceID];
+        goldIcon = ResourceManager.instance.GetItemSprite(goldResourceID);//DBManager.instance.itemSprites[goldResourceID];
     }
 }
 
@@ -671,9 +671,11 @@ public class ItemList{
 [System.Serializable]
 public class GameEndList{
     public string comment;
-    public int endingCollectionNum; //컬렉션 내 엔딩 넘버(data_collection.csv) 컬렉션 UI 내 순서
+    public int endingCollectionNum; //data_collection.csv의 ID
     public int endingNum; //찐엔딩 넘버(임의의 값)
     public string name;
+    public string preSoundFileName;
+    public string postSoundFileName;
     public Story[] stories;
     //public Sprite[] storySprites;
     //public string[] storyDescriptions;
@@ -687,5 +689,6 @@ public class Story{
     public Sprite sprite;
     //[TextArea(2,4)]
     public string soundFileName;
+    public int soundOrder;
     public string descriptions;
 }

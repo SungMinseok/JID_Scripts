@@ -19,9 +19,11 @@ public class MushroomScript : MonoBehaviour
                 //Debug.Log("1");
     }
     void Update(){
-        if(DBManager.instance.curData.curMapNum == 14 && !actFlag && !PlayerManager.instance.isGameOver){
-            actFlag = true;
-            StartCoroutine(ActCoroutine());
+        if(DBManager.instance.curData.curMapNum == 14){
+            if(!actFlag && !PlayerManager.instance.isGameOver && !DBManager.instance.CheckTrigOver(60)){
+                actFlag = true;
+                StartCoroutine(ActCoroutine());
+            }
         }
     }
     IEnumerator ActCoroutine(){

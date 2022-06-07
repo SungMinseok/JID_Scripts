@@ -15,6 +15,15 @@ public class MushroomGameScript : MonoBehaviour
     }
     void Start(){
         ResetPiano();
+
+        if(DBManager.instance.CheckTrigOver(60)){
+            
+            animator_main.SetBool("down",true);
+            
+            for(int i=0; i<4;i++){
+                animators_piano[i].SetBool("down",true);
+            }
+        }
     }
     public void PushPiano(int num){
         if(!animators_piano[num].GetBool("down")){
@@ -29,8 +38,11 @@ public class MushroomGameScript : MonoBehaviour
             animator_main.SetBool("down",true);
 
             if(curOrder == correctOrder){
+                
                 SoundManager.instance.PlaySound("mushroom_success2");
                 InventoryManager.instance.AddItem(13);
+                DBManager.instance.TrigOver(60);
+                return;//성공 시 리셋되지 않음.
             }
             
             StartCoroutine(PushMainCoroutine());

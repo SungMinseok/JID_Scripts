@@ -37,6 +37,10 @@ public class Minigame4Script : MonoBehaviour
     public Image timerGauge;
     public GameObject[] leftRedDots;
     public GameObject[] rightRedDots;
+    public GameObject resultBoard;
+    public Text resultBoardLeftScoreText;
+    public Text resultBoardRightScoreText;
+    public Text resultBoardNextAlertText;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -54,6 +58,7 @@ public class Minigame4Script : MonoBehaviour
     WaitForSeconds waitAphidLifeTime;
     WaitForSeconds waitAphidCreationCycle;
     WaitUntil popUpOkayCheck = new WaitUntil(()=>MenuManager.instance.popUpOkayCheck);
+    WaitUntil waitInteract = new WaitUntil(()=>PlayerManager.instance.interactInput);
     WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     WaitForSeconds wait1s = new WaitForSeconds(1f);
@@ -158,8 +163,10 @@ public class Minigame4Script : MonoBehaviour
     }
     IEnumerator MinigameCoroutine(){
         
-        MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
-        yield return popUpOkayCheck;
+        // MenuManager.instance.OpenPopUpPanel_SetStringByIndex("30","9");
+        // yield return popUpOkayCheck;
+        MinigameManager.instance.OpenGuide(159,160);
+        yield return new WaitUntil(()=>!MinigameManager.instance.waitGuidePass);
 
         while(setScore_ant < goalScoreToWin && setScore_lucky < goalScoreToWin){
             
@@ -195,34 +202,39 @@ public class Minigame4Script : MonoBehaviour
             if(score_ant>score_lucky){
                 rightRedDots[setScore_ant].SetActive(true);
                 setScore_ant ++;
-                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
-                yield return popUpOkayCheck;
+                // MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
+                // yield return popUpOkayCheck;
             }
             else if(score_ant<score_lucky){
                 leftRedDots[setScore_lucky].SetActive(true);
                 setScore_lucky ++;
-                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
-                yield return popUpOkayCheck;
+                // MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
+                // yield return popUpOkayCheck;
             }
-            else{
-                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("35","9");
-                yield return popUpOkayCheck;
-            }
-            
-            //결과 팝업
-            // if(setScore_lucky != goalScoreToWin && setScore_ant != goalScoreToWin){
-
+            // else{
+            //     MenuManager.instance.OpenPopUpPanel_SetStringByIndex("35","9");
+            //     yield return popUpOkayCheck;
             // }
+            
+
+            resultBoardLeftScoreText.text = setScore_ant.ToString();
+            resultBoardRightScoreText.text = setScore_lucky.ToString();
+            resultBoardNextAlertText.text = GameInputManager.ReadKey("Interact") + CSVReader.instance.GetIndexToString(84,"sysmsg");
+            resultBoard.SetActive(true);
+            yield return waitInteract;
+            resultBoard.SetActive(false);
+
+            
         }
         yield return wait100ms;
 
         if(setScore_lucky == goalScoreToWin){
-            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","9");
+            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","0");
             yield return popUpOkayCheck;
             MinigameManager.instance.SuccessMinigame();
         }
         else{
-            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","9");
+            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","0");
             yield return popUpOkayCheck;
             MinigameManager.instance.FailMinigame();
         }

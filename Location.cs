@@ -121,6 +121,10 @@ public class Location : MonoBehaviour
         if(type!=LocationType.Trigger && type!=LocationType.Teleport && type!=LocationType.Dialogue && type!=LocationType.PlaySound){
             waitKey = false;
         }
+
+        if(showKeyTutorial && string.IsNullOrEmpty(keyMap)){
+            keyMap = "Interact";
+        }
     }
 
     //키 입력시 발동
@@ -133,7 +137,13 @@ public class Location : MonoBehaviour
                     //Debug.Log("AAA");
                     //if(Input.GetButton("Interact_OnlyKey")){
 
-                    if(showKeyTutorial && !PlayerManager.instance.onKeyTutorial && !DBManager.instance.CheckTrigOver(trigNum)){
+                    if(showKeyTutorial 
+                    && !PlayerManager.instance.onKeyTutorial 
+                    && !DBManager.instance.CheckTrigOver(trigNum)
+                    && DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums,printDebug:false)
+                    && DBManager.instance.CheckIncompletedTrigs(trigNum,incompletedTriggerNums,false)
+                    && DBManager.instance.CheckHaveItems(trigNum,haveItemNums,false)
+                    ){
                         UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialFrontStringIndex, tutorialBackStringIndex);
                     }
 
