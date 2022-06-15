@@ -276,17 +276,21 @@ public class MenuManager : MonoBehaviour
 
         collectionRateText.text = string.Format("{0:N0}%",100*theDB.localData.endingCollectionOverList.Count/theDB.cache_EndingCollectionDataList.Count);
 
-        int tempCenterCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID);
+        //int tempCenterCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID);
+        int tempCenterCollectionID = theDB.cache_EndingCollectionDataList[tempCardNum[2]].ID;
+        int tempEndedIndex = theDB.localData.endingCollectionOverList.FindIndex(x=>x.ID==tempCenterCollectionID);
     
-        if(tempCenterCollectionID!=-1){
+        if(tempEndedIndex!=-1){
             collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
 
             int tempTrueEndingNum = 0;  //트루엔딩 번호
-            //Debug.Log(tempCardNum[2]);
+            Debug.Log(tempCardNum[2]);
 
             if(theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCenterCollectionID)!=-1){
                 collectionEndingNumberVessel.SetActive(true);
                 tempTrueEndingNum = theDB.cache_GameEndDataList[theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCenterCollectionID)].endingNum;
+                
+                Debug.Log(tempCenterCollectionID);
             //Debug.Log(theDB.cache_GameEndDataList[theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCardNum[2])].comment);
             }
             else{
@@ -295,10 +299,12 @@ public class MenuManager : MonoBehaviour
                 tempTrueEndingNum = 0;
             }
 
+            Debug.Log(tempEndedIndex);
+
             collectionEndingNumberText.text = string.Format("Ending no.{0}",tempTrueEndingNum);//[tempCardNum[2]].endingNum);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
-            collectionPlayCountText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempCenterCollectionID].clearedPlayCount);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
+            collectionPlayCountText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempEndedIndex].clearedPlayCount);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
             //collectionRateText.text = string.Format("{0}%");//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
-            collectionTimeText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempCenterCollectionID].clearedDate);//.Substring(0,10);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
+            collectionTimeText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempEndedIndex].clearedDate);//.Substring(0,10);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
         }
         else{                
             

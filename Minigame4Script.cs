@@ -200,13 +200,13 @@ public class Minigame4Script : MonoBehaviour
 
 //결과
             if(score_ant>score_lucky){
-                rightRedDots[setScore_ant].SetActive(true);
+                leftRedDots[setScore_ant].SetActive(true);
                 setScore_ant ++;
                 // MenuManager.instance.OpenPopUpPanel_SetStringByIndex("32","9");
                 // yield return popUpOkayCheck;
             }
             else if(score_ant<score_lucky){
-                leftRedDots[setScore_lucky].SetActive(true);
+                rightRedDots[setScore_lucky].SetActive(true);
                 setScore_lucky ++;
                 // MenuManager.instance.OpenPopUpPanel_SetStringByIndex("31","9");
                 // yield return popUpOkayCheck;

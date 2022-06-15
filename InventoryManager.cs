@@ -232,6 +232,11 @@ public class InventoryManager : MonoBehaviour
                         itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
                     }
                 }
+                //삽, 곡괭이 자동 장착 ON
+                else if(theDB.cache_ItemDataList[itemID].type == 6){
+
+                    itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);
+                }
                 else{
                     itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
 

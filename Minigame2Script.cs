@@ -105,6 +105,8 @@ public class Minigame2Script : MonoBehaviour
                 }
             }
 
+        UIManager.instance.SetHUD(false);
+        
             
             // flyingBottle.localPosition = new Vector3(flyingBottle.localPosition.x + flyingBottleSpeed,0,0);
             // if(flyingBottle.localPosition.x >= flyingBottlePos.x){
@@ -114,10 +116,13 @@ public class Minigame2Script : MonoBehaviour
     }    
     IEnumerator MinigameCoroutine(){
 
+
         PlayerManager.instance.transform.position = startPoint.position;
         SceneController.instance.SetSomeConfiner(mapCollider);
         SceneController.instance.virtualCamera.Follow = null;
 
+        MinigameManager.instance.OpenGuide(157,158);
+        yield return new WaitUntil(()=>!MinigameManager.instance.waitGuidePass);
         isActive = true;
 
         PlayerManager.instance.isForcedRun = true;

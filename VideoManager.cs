@@ -29,11 +29,11 @@ public class VideoManager : MonoBehaviour
 
     public void PlayVideo(VideoClip curVideo, bool isLooping = false, float delayTime = 0f, bool needClear = true, float volume = 1f){
         //Debug.Log("1");
-        isPlayingVideo = true;
         if(needClear)
             ClearOutRenderTexture();
         StartCoroutine(PlayVideoCoroutine(curVideo, isLooping,delayTime,volume));
 
+        isPlayingVideo = true;
     }
 
     IEnumerator PlayVideoCoroutine(VideoClip curVideo, bool isLooping, float delayTime, float volume){
@@ -89,7 +89,7 @@ public class VideoManager : MonoBehaviour
         return videoPlayer.clip.ToString();
     }
     public void SkipPlayingVideo(){
-        //Debug.Log("skip");
+        Debug.Log("skip");
         VideoManager.instance.isPlayingVideo = false;
     }
     // IEnumerator IntroCoroutine(){

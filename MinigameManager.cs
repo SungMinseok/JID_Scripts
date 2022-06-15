@@ -34,17 +34,17 @@ public class MinigameManager : MonoBehaviour
         // }
     }
     
-#if UNITY_EDITOR || alpha
+//#if UNITY_EDITOR || alpha
     void Update(){
-        // if(PlayerManager.instance.isPlayingMinigame){
-        //     successBtn.SetActive(true);
-        // }
-        // else{
-        //     successBtn.SetActive(false);
-
-        // }
+        if(waitGuidePass){
+            
+            if ( PlayerManager.instance.interactInput )
+            {
+                CloseGuide();
+            }
+        }
     }
-#endif
+//#endif
     public void SuccessMinigame(){
         success = true;
         //PlayerManager.instance.isPlayingMinigame = false;
@@ -162,7 +162,7 @@ public class MinigameManager : MonoBehaviour
         minigameGuidePopUp.SetActive(true);
         waitGuidePass = true;
     }
-    public void PassGuide(){
+    public void CloseGuide(){
         minigameGuidePopUp.SetActive(false);
         waitGuidePass = false;
     }

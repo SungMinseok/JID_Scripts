@@ -74,6 +74,7 @@ public class Minigame1Script : MonoBehaviour
         //canSelect = true;
         ResetGameSettings();
         //StartCoroutine(Wait());
+        
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
         //StartSliderMoving();
         UIManager.instance.SetHUD(false);
@@ -95,7 +96,17 @@ public class Minigame1Script : MonoBehaviour
         MinigameManager.instance.failBtn.SetActive(false);
 #endif
     }
+    
     IEnumerator MinigameCoroutine(){
+
+        MinigameManager.instance.OpenGuide(155,156);
+        yield return new WaitUntil(()=>!MinigameManager.instance.waitGuidePass);
+
+
+
+        StartCoroutine(Cycle());
+    }
+    IEnumerator Cycle(){
         //bubbleObjects.GetChild(0).gameObject.SetActive(true);
         SetLevel();
         yield return wait1000ms;
@@ -233,7 +244,7 @@ public class Minigame1Script : MonoBehaviour
                 yield return wait1000ms;
                 bubbleObjects.GetChild(curStage+1).GetComponent<Animator>().SetTrigger("reset");
                 if(++curLevel <= 2){
-                    StartCoroutine(MinigameCoroutine());
+                    StartCoroutine(Cycle());
                 }
                 else{
                     //게임성공
@@ -265,7 +276,7 @@ public class Minigame1Script : MonoBehaviour
 
             if(curLife > 0){
                 lifeObjectGrid.GetChild(curLife-1).gameObject.SetActive(false);
-                StartCoroutine(MinigameCoroutine());
+                StartCoroutine(Cycle());
             }
             else{
                 MinigameManager.instance.FailMinigame(-1);

@@ -173,6 +173,10 @@ public class Minigame3Script : MonoBehaviour
     }
     private void OnEnable() {
         PlayerManager.instance.LockPlayer();
+
+        
+        MinigameManager.instance.OpenGuide(161,162);
+        //yield return new WaitUntil(()=>!MinigameManager.instance.waitGuidePass);
        // ResetValves();
         ResetGameSettings();
 

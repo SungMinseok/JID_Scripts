@@ -184,7 +184,10 @@ public class Minigame0Script : MonoBehaviour
         } 
     }
     IEnumerator MinigameCoroutine(){
-        
+        isPaused = true;
+        MinigameManager.instance.OpenGuide(153,154);
+        yield return new WaitUntil(()=>!MinigameManager.instance.waitGuidePass);
+        isPaused = false;
         for(int i=0;i<5;i++){
             //Debug.Log("111");
             curLevelFlag = true;

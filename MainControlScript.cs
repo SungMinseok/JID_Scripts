@@ -68,8 +68,9 @@ SoundManager.instance.ChangeBgm("jelly in the dark");
         //collectionBtn.SetActive(true);
 
         VideoManager.instance.PlayVideo(videoClips[1], true, needClear: false);
-
+        yield return new WaitForSeconds(0.1f);
         VideoManager.instance.isPlayingVideo = true;
+        //Debug.Log(VideoManager.instance.isPlayingVideo);
     }
     IEnumerator SplashCoroutine(){
         LoadManager.instance.ResetFader(1f);
@@ -97,8 +98,10 @@ SoundManager.instance.ChangeBgm("jelly in the dark");
             if(Input.anyKeyDown && VideoManager.instance != null 
             && (VideoManager.instance.GetPlayingVideoName()==titleVideoName
             /* || VideoManager.instance.GetPlayingVideoName()==splashVideoName */)
+            && VideoManager.instance.isPlayingVideo
             ){
-                VideoManager.instance.SkipPlayingVideo();
+                VideoManager.instance.isPlayingVideo = false;
+                //VideoManager.instance.SkipPlayingVideo();
             }
         //}
     }

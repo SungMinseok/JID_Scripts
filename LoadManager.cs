@@ -68,8 +68,8 @@ public class LoadManager : MonoBehaviour
         + DBManager.instance.buildVersion
         + "_"
         + DBManager.instance.buildNum
-        + "_" 
-        + DBManager.instance.buildDate
+        // + "_" 
+        // + DBManager.instance.buildDate
         ;
     }
 

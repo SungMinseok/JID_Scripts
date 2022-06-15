@@ -28,6 +28,7 @@ public class DirtScript : MonoBehaviour
     public int innerHoneyAmount = 0;
     public int maxHp = 6;
     public int remainPieceCount;
+    public GameObject keyTutorial;
     WaitForSeconds wait180ms = new WaitForSeconds(0.18f);
     [Space]
     [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
@@ -75,6 +76,7 @@ public class DirtScript : MonoBehaviour
             }
 
             if(dirtBundleInfo.curHp==0){
+                if(keyTutorial!=null) keyTutorial.SetActive(false);
                 dirtPhases[0].SetActive(false);
                 CreatePiece(0);
 

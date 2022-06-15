@@ -58,6 +58,11 @@ public class UIManager : MonoBehaviour
     public Transform tutorialSet;
     public bool waitTutorial;
     public int curTutorialID;
+    
+    [Header("UI_Screen")]
+    public GameObject ui_screen;
+    public Transform screenMother;
+    public bool screenOn;
     // [Header("UI_Fog")]
     //[Header("ETC")]
     //public Sprite nullSprite;
@@ -215,6 +220,7 @@ public class UIManager : MonoBehaviour
         PlayerManager.instance.isGameOver = true;
         SoundManager.instance.BgmOff();
         StartCoroutine(SetGameOverUICoroutine(collectionID));
+        Debug.Log("setgameoverID : "+collectionID);
     }
     public void ResetGameOverUI()
     {
@@ -613,6 +619,19 @@ public class UIManager : MonoBehaviour
         for(int i=0;i<iceGaugeMother.childCount;i++){
             iceGaugeMother.GetChild(i).gameObject.SetActive(false);
         }
+    }
+    public void OpenScreen(int screenNum){
+        screenOn = true;
+        for(int i=0;i<screenMother.childCount;i++){
+            screenMother.GetChild(i).gameObject.SetActive(false);
+        }
+        screenMother.GetChild(screenNum).gameObject.SetActive(true);
+        ui_screen.SetActive(true);
+    }
+    public void CloseScreen(){
+        screenOn = false;
+        ui_screen.SetActive(false);
+
     }
 //     public void ChangeKey(){
 //         foreach(KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
