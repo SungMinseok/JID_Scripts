@@ -46,6 +46,7 @@ public class PasswordBoxScript : MonoBehaviour
         string temp = string.Join("", curPassword);
         Debug.Log(temp);
         if(temp.Equals(answer)){
+            isPlaying = false;
             Debug.Log("Pass");
             InventoryManager.instance.AddItem(32);
             StartCoroutine(SuccessCoroutine());
@@ -53,11 +54,12 @@ public class PasswordBoxScript : MonoBehaviour
     }
     IEnumerator SuccessCoroutine(){
         SoundManager.instance.PlaySound("minigame_complete");
-        yield return new WaitForSeconds(1f);
-        LoadManager.instance.FadeOut();
+        // yield return new WaitForSeconds(1f);
+        // LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(2f);
-        LoadManager.instance.FadeIn();
-        InventoryManager.instance.AddItem(32);
+        //LoadManager.instance.FadeIn();
+        //InventoryManager.instance.AddItem(32);
+        UIManager.instance.CloseScreen();
     }
 }
 #endregion

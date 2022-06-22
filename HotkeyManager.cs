@@ -62,18 +62,25 @@ public class HotkeyManager : MonoBehaviour
                 else if(theMenu.settingPanel.activeSelf){
                     theMenu.settingPanel.SetActive(false);
                 }
+                else if(theUI.ui_endingGuide.activeSelf){
+                    theUI.ui_endingGuide.SetActive(false);
+                }
                 else{
                     //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);
                     MenuManager.instance.ToggleMenuPanel(!MenuManager.instance.menuPanel.activeSelf);
                 }
 
             }
+            //트리거 중 뜨는 UI
             else{
                 if(theMenu.savePanel.activeSelf){
                     theMenu.savePanel.SetActive(false);
                 }
                 else if(theUI.ui_book.activeSelf){
                     theUI.ui_book.SetActive(false);
+                }
+                else if(theUI.screenOn){
+                    theUI.CloseScreen();
                 }
             }
         }
@@ -82,5 +89,13 @@ public class HotkeyManager : MonoBehaviour
             MenuManager.instance.SetWindowedMode(!DBManager.instance.localData.isWindowedMode);
             //Debug.Log("#3434");
         }
+
+#if UNITY_EDITOR || alpha
+        if(Input.GetKeyDown(KeyCode.F12)){
+            PlayerManager.instance.petHolder.SetActive(!PlayerManager.instance.petHolder.activeSelf);
+        }
+#endif
+
+
     }
 }

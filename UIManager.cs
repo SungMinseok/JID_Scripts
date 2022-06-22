@@ -58,11 +58,14 @@ public class UIManager : MonoBehaviour
     public Transform tutorialSet;
     public bool waitTutorial;
     public int curTutorialID;
+    public bool canSkipTutorial;//스킵용 딜레이
     
     [Header("UI_Screen")]
     public GameObject ui_screen;
     public Transform screenMother;
     public bool screenOn;
+    [Header("UI_EndingGuide")]
+    public GameObject ui_endingGuide;
     // [Header("UI_Fog")]
     //[Header("ETC")]
     //public Sprite nullSprite;
@@ -133,7 +136,7 @@ public class UIManager : MonoBehaviour
             honeyText.text = string.Format("{0:#,###0}", calculatedHoney);
         }
 
-        if (waitTutorial)
+        if (waitTutorial && canSkipTutorial)
         {
             //if (Input.GetButtonDown("Interact_OnlyKey"))
             if ( PlayerManager.instance.interactInput )
@@ -141,6 +144,13 @@ public class UIManager : MonoBehaviour
                 CloseTutorial();
             }
         }
+
+
+        // if(Input.GetKeyDown(KeyCode.Escape)){
+        //     // if(screenOn){
+        //     //     CloseScreen();
+        //     // }
+        // }
 
     }
 
@@ -451,9 +461,14 @@ public class UIManager : MonoBehaviour
     #endregion
 
     #region Tutorial
+    public void WaitSkipTutorial(){
+        canSkipTutorial = true;
+
+    }
     public void OpenTutorialUI(int tutorialNum)
     {
         waitTutorial = true;
+        Invoke("WaitSkipTutorial",0.5f);
         curTutorialID = tutorialNum;
         PlayerManager.instance.LockPlayer();
         SoundManager.instance.PlaySound("item_get");
@@ -518,6 +533,7 @@ public class UIManager : MonoBehaviour
     public void CloseTutorial()
     {
         waitTutorial = false;
+        canSkipTutorial = false;
         ui_tutorial.gameObject.SetActive(false);
         for (int i = 0; i < tutorialSet.childCount; i++)
         {
@@ -632,6 +648,23 @@ public class UIManager : MonoBehaviour
         screenOn = false;
         ui_screen.SetActive(false);
 
+    }
+    public void OpenEndingGuide(){
+        
+    }
+    public void CloseEndingGuide(){
+        
+    }
+    
+    public void ToggleEndingGuide(bool active){
+        ui_endingGuide.SetActive(active);
+        if(active){
+            PlayerManager.instance.LockPlayer();
+        }
+        else{
+            PlayerManager.instance.UnlockPlayer();
+
+        }
     }
 //     public void ChangeKey(){
 //         foreach(KeyCode kcode in Enum.GetValues(typeof(KeyCode)))

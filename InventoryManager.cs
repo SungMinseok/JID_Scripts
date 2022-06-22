@@ -470,4 +470,8 @@ public class InventoryManager : MonoBehaviour
         selectFlag = false;
         PlayerManager.instance.UnlockPlayer();
     }
+    public void CleanUpInventory(){
+        DBManager.instance.curData.itemList.Clear();
+        RefreshInventory(0);
+    }
 }

@@ -149,6 +149,9 @@ public class PlayerManager : CharacterScript
     WaitForSeconds wait125ms = new WaitForSeconds(0.125f);
     Coroutine jumpDelayCoroutine;
     Coroutine getLadderDelayCoroutine;
+    
+    [Header("────────────────────────────")]
+    public GameObject petHolder;
     void Awake()
     {
         //Application.targetFrameRate = 120;
@@ -196,10 +199,13 @@ public class PlayerManager : CharacterScript
 
     void Update()
     {
+        if(!UIManager.instance.ui_endingGuide.activeSelf && MenuManager.instance != null && !MenuManager.instance.menuPanel.activeSelf){
+
             interactInput = GameInputManager.GetKeyDown("Interact") ? true : false;
             interactKeepInput = GameInputManager.GetKey("Interact") ? true : false;
+        }
 
-        if(isGameOver){
+        if(isGameOver || UIManager.instance.ui_gameEnd.activeSelf){
             canMove = false;
         }
         // if(MenuManager.instance != null){
@@ -715,6 +721,15 @@ public class PlayerManager : CharacterScript
     public void UnlockPlayer(){
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.isActing = false;
+    }
+    public void ToggleInteract(bool active){//false : 트리거 상호작용 잠그기
+        if(active){
+            PlayerManager.instance.isActing = false;
+        }
+        else{
+            PlayerManager.instance.isActing = true;
+            
+        }
     }
     public void MovePlayer(Transform destination){
         PlayerManager.instance.transform.position = destination.position;

@@ -118,7 +118,7 @@ public class Minigame3Script : MonoBehaviour
                 InventoryManager.instance.AddItem(4);
                 break;
             case var value when value == recipes[1]:
-                InventoryManager.instance.AddItem(2);
+                InventoryManager.instance.AddItem(8);
                 break;
             default :
                 InventoryManager.instance.AddItem(32);

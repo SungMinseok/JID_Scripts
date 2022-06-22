@@ -149,8 +149,8 @@ public class TriggerScript : MonoBehaviour
                     objects[1].gameObject.SetActive(false);
                     break;
                 case 55 :
-                //case 56 :
                     objects[0].gameObject.SetActive(false);
+                    objects[1].gameObject.SetActive(true);
                     break;
                 case 62 :
                     objects[0].GetComponent<Location>().isLocked = false;
@@ -2388,6 +2388,17 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.OpenScreen(0);
                 yield return new WaitUntil(()=>!UIManager.instance.screenOn);
                 
+                if(InventoryManager.instance.CheckHaveItem(32)){
+                    location.preserveTrigger= false;
+
+                    objects[0].gameObject.SetActive(false);
+                    objects[1].gameObject.SetActive(true);
+                    
+                }
+                else{
+
+                }
+                
                 break;
 #endregion
 
@@ -2495,13 +2506,12 @@ public class TriggerScript : MonoBehaviour
 
 #region t72 흙파기(키헬퍼ON)
             case 72 :
-                //if(InventoryManager.instance.CheckHaveItem(21)){
-                //if(objects[1].GetComponent<DirtScript>().dirtBundleInfo.curHp == 1){
-                    objects[0].gameObject.SetActive(true);
-                //    location.preserveTrigger = false;
-                //}
+               
+                UIManager.instance.OpenScreen(1);
+                yield return new WaitUntil(()=>!UIManager.instance.screenOn);
                 break;
 #endregion
+
 #region t899 자동저장
             case 899 :
                 AutoSave();
@@ -2809,11 +2819,13 @@ public class TriggerScript : MonoBehaviour
                         FadeIn();
                         //오른쪽으로 이동
                         SceneController.instance.SetConfiner(16);
-                        PlayerManager.instance.speed *= 0.6f;
+                        PlayerManager.instance.speed *= 0.7f;
                         PlayerManager.instance.wSet = 1;
                         objects[1].gameObject.SetActive(false);
                         //objects[1].GetComponent<Location>().isLocked = false;
                         yield return wait3000ms;
+                        yield return wait1000ms;
+                        objects[2].gameObject.SetActive(true);
                         PlayerManager.instance.wSet = 0;
 
                         UIManager.instance.SetGameEndUI(8);

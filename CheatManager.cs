@@ -264,7 +264,7 @@ public class CheatManager : MonoBehaviour
                     }
 
                     break;
-                case "completetriggers":
+                case "cts":
                     for(int i=1;i<temp.Length;i++){
                             
                         DBManager.instance.TrigOver(int.Parse(temp[i]));
@@ -323,6 +323,12 @@ public class CheatManager : MonoBehaviour
                     }
                     break;
 
+                case "cleanupinventory":
+                    InventoryManager.instance.CleanUpInventory();
+                    break;
+                case "cleanuptrigger":
+                    DBManager.instance.curData.trigOverList.Clear();
+                    break;
                 
             }
 //EndingCollectionOver
