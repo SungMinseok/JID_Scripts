@@ -15,11 +15,14 @@ public class TranslateText : MonoBehaviour
     [Header("키 튜토리얼 번역")]
     public bool isKeyTutorial;
     public string keyMap;
+    [Header("default")]
+    public bool unused;
+
     // Start is called before the first frame update
     void Awake(){
         //TryGetComponent<TextMeshProUGUI>(out curText);
         //curText = GetComponent<TextMeshProUGUI>();
-
+        if(unused) return;
 
         Text curText = GetComponent<Text>();
 
@@ -35,6 +38,10 @@ public class TranslateText : MonoBehaviour
 
     }
     void OnEnable(){
+        if(key==-1){
+            Debug.LogError("텍스트 키 설정값 없음" + DebugManager.GetGameObjectPath(this.gameObject));
+        }
+
         Text curText = GetComponent<Text>();
         ApplyTranslation(curText);
         ApplyFont(curText);

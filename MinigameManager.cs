@@ -47,21 +47,14 @@ public class MinigameManager : MonoBehaviour
 //#endif
     public void SuccessMinigame(){
         success = true;
-        //PlayerManager.instance.isPlayingMinigame = false;
-        //minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
-                SoundManager.instance.PlaySound("minigame_complete");
+        SoundManager.instance.PlaySound("minigame_complete");
         StartCoroutine(FinishMinigameCoroutine());
     }
     //-1이면 setgameoverui 실행 x
     public void FailMinigame(int gameOverSpriteNum = -1){
         fail = true;
-        //PlayerManager.instance.isPlayingMinigame = false;
-        //minigameScriptTransforms[nowMinigameNum].gameObject.SetActive(false);
         Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
-
-        //FailMinigame(gameOverSpriteNum);
-
         if(gameOverSpriteNum != -1){
             UIManager.instance.SetGameOverUI(gameOverSpriteNum);
         }
@@ -145,6 +138,10 @@ public class MinigameManager : MonoBehaviour
         LoadManager.instance.FadeOut();
         yield return wait1000ms;
         yield return wait1000ms;
+        if(nowMinigameNum == 4){
+            yield return wait1000ms;
+
+        }
         var nowMinigame = minigameScriptTransforms[nowMinigameNum];
         nowMinigame.gameObject.SetActive(false);
         LoadManager.instance.FadeIn();

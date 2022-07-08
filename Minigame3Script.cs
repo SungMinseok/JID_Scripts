@@ -28,6 +28,7 @@ public class Minigame3Script : MonoBehaviour
     public GameObject closedCapsule;
     public Animator madeEffect;
     public Location trigLocation;
+    public GameObject makingBtnGlow;
     [Space]
 
     [Header("[Debug]─────────────────")]
@@ -83,6 +84,9 @@ public class Minigame3Script : MonoBehaviour
             SoundManager.instance.PlaySound("waterdrop");
             InventoryManager.instance.RemoveItem(13);
 
+            mushroom.SetActive(false);
+            makingBtnGlow.SetActive(false);
+
             emptyBottle.SetActive(false);
             switch(curValveOrder){
                 case var value when value == recipes[0]:
@@ -130,15 +134,18 @@ public class Minigame3Script : MonoBehaviour
     public void OpenNote(){
         notePage.SetActive(true);
 
-        if(InventoryManager.instance.CheckHaveItem(13)){
-            mushroom.SetActive(true);
-        }
-        else{
-            mushroom.SetActive(false);
-        }
+        // if(InventoryManager.instance.CheckHaveItem(13)){
+        //     mushroom.SetActive(true);
+        // }
+        // else{
+        //     mushroom.SetActive(false);
+        // }
     }
     public void PutMushroom(){
-        notePage.SetActive(false);
+        //notePage.SetActive(false);
+        if(!InventoryManager.instance.CheckHaveItem(13)){
+            return;
+        }
 
         openedCapsule.SetActive(true);
         closedCapsule.SetActive(false);

@@ -70,6 +70,7 @@ public class DialogueManager : MonoBehaviour
         //독백
         if(dialogue.isMonologue){
             dialogue.talker.GetChild(0).GetChild(0).GetComponent<Image>().sprite = playerMonologueTalkCanvas;
+            PlayerManager.instance.onMonologue = true;
         }
         else{
             if(dialogue.talker == PlayerManager.instance.transform)
@@ -83,6 +84,10 @@ public class DialogueManager : MonoBehaviour
         }
 
         for(int i=0; i<dialogue.sentences.Length;i++){
+            // Debug.Log(i + dialogue.sentences[i]);
+            // for(int x=0; x<dialogue.sentences.Length;x++){
+            //     Debug.Log(dialogue.sentences[x]);
+            // }
             
             var tmp = dialogue.talker.GetChild(0).GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
 
@@ -107,6 +112,7 @@ public class DialogueManager : MonoBehaviour
         dialogueFlag= false;
         
         PlayerManager.instance.isTalking = false;
+        PlayerManager.instance.onMonologue = false;
         
     }
     

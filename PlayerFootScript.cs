@@ -70,7 +70,10 @@ public class PlayerFootScript : MonoBehaviour
             if (!thePlayer.ladderDelay) thePlayer.getLadder = true;
             if(!canJumpFromLadderFlag && !thePlayer.canJumpFromLadder){
                 canJumpFromLadderFlag = true;
-                Invoke("SetCanJumpFromLadder",0.3f);
+
+                //점프 불가인 사다리일 경우, 점프 불가(ex. 맵 이동+내려가는 사다리)
+                if(!other.GetComponent<DoodadsScript>().isUnableToJump)
+                    Invoke("SetCanJumpFromLadder",0.3f);
             }
         }
         else if (other.CompareTag("OrderDestination"))

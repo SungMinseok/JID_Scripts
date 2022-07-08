@@ -97,6 +97,9 @@ public class PlayerManager : CharacterScript
     public bool onRope; // 밧줄 소리용
     public int bodyMode;    //0 : 후면, 1 : 정면
     public bool onKeyTutorial;
+    public bool onMonologue;//독백중 애니메이션 X
+    public byte flagID;//특수 설정을 위한 플래그값(권총 엔딩 등)
+    public bool watchingGameEnding;//트루 엔딩 UI 발동 시 트루, 트리거 발동 제한
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -199,13 +202,13 @@ public class PlayerManager : CharacterScript
 
     void Update()
     {
-        if(!UIManager.instance.ui_endingGuide.activeSelf && MenuManager.instance != null && !MenuManager.instance.menuPanel.activeSelf){
+        //if(!UIManager.instance.ui_endingGuide.activeSelf){// && MenuManager.instance != null && !MenuManager.instance.menuPanel.activeSelf){
 
             interactInput = GameInputManager.GetKeyDown("Interact") ? true : false;
             interactKeepInput = GameInputManager.GetKey("Interact") ? true : false;
-        }
+        //}
 
-        if(isGameOver || UIManager.instance.ui_gameEnd.activeSelf){
+        if(isGameOver /* || UIManager.instance.ui_gameEnd.activeSelf */){
             canMove = false;
         }
         // if(MenuManager.instance != null){
@@ -355,6 +358,18 @@ public class PlayerManager : CharacterScript
             redVignette.SetActive(false);
         }
 #endregion
+
+
+        if(talkCanvas.gameObject.activeSelf && !DialogueManager.instance.canSkip2){
+            if(!onMonologue){
+                animator.SetBool("talk", true);
+
+            }
+        }
+        else{
+            animator.SetBool("talk", false);
+
+        }
     }
 
     void FixedUpdate()
@@ -409,9 +424,9 @@ public class PlayerManager : CharacterScript
             if(jumpInput && wInput!=0 && canJumpFromLadder){
                 onLadder = false;
                 
-                    if(getLadderDelayCoroutine!=null) StopCoroutine(getLadderDelayCoroutine);
-                    getLadderDelayCoroutine = StartCoroutine(GetLadderDelay());
-                    Jump();
+                if(getLadderDelayCoroutine!=null) StopCoroutine(getLadderDelayCoroutine);
+                getLadderDelayCoroutine = StartCoroutine(GetLadderDelay());
+                Jump();
             }
             else{   
                 isJumping = false;
@@ -487,6 +502,7 @@ public class PlayerManager : CharacterScript
     }
     void Jump(float multiple = 1)
     {
+        Debug.Log("Jump");
         //if(jumpDelay) return;
         //isJumping = true;
         //Debug.Log("jumpDelay : " + jumpDelay);
@@ -961,4 +977,19 @@ public class PlayerManager : CharacterScript
         PlayerManager.instance.SetTalkCanvasDirection();
     }
     
+    public void SetMainBodySize(float scale, float speed = 0.01f){
+        circleCollider2D.transform.SetParent(playerBody.transform);
+        bodyCollider2D.transform.SetParent(playerBody.transform);
+
+        StartCoroutine(SetMainBodySizeCoroutine(scale,speed));
+    }
+    IEnumerator SetMainBodySizeCoroutine(float scale, float speed){
+        //Debug.Log(speed);
+        WaitForSeconds waitSpeed = new WaitForSeconds(speed);
+        while(playerBody.localScale.x < scale){
+            playerBody.localScale += new Vector3(0.1f,0.1f)  ;//new Vector2(playerBody.localScale + 0.1f)
+            yield return waitSpeed;
+
+        }
+    }
 }

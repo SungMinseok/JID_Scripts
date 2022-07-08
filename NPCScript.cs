@@ -22,6 +22,7 @@ public class NPCScript : CharacterScript
     [Header("Sub things")]
     public Transform talkCanvas;
     public Transform interactiveMark;
+    [Header("mainbody 연결 시, 애니메이터 적용(talk)")]
     public Transform mainBody;
     
     [Header("Status")]
@@ -273,10 +274,10 @@ public class NPCScript : CharacterScript
             }
         }
 #endregion
-        if(haveTalk && talkCanvas.gameObject.activeSelf){
+        if(haveTalk && talkCanvas.gameObject.activeSelf && !DialogueManager.instance.canSkip2){
             // isPaused = true;
             // patrolInput = 0;
-            if(haveTalk&&animator!=null) animator.SetBool("talk", true);
+            if(haveTalk&&animator) animator.SetBool("talk", true);
             if(interactiveMark!=null) interactiveMark.gameObject.SetActive(false);
         }
         else{

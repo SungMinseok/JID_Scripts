@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using System.Linq;
 
 
 
@@ -38,6 +40,8 @@ public class InventoryManager : MonoBehaviour
     public int slotCountPerPage;
     public bool isHide;
     public bool selectFlag;
+    public bool waitGetItemDialogue;//트루 시, 트리거 종료 후에도 이동 불가
+    Dialogue tempDialogue;
     void Awake(){
         instance = this;
 
@@ -88,8 +92,13 @@ public class InventoryManager : MonoBehaviour
         RefreshInventory(0);
     }
     
-    public void AddItem(int ID, int amount = 1){
+    public void AddItem(int ID, int amount = 1, bool activateDialogue = false, float delayTime = 0, int tutorialID = -1){
         if(amount<1) return;
+
+        if(activateDialogue){
+            waitGetItemDialogue = true;
+            StartCoroutine(GetItemDialogue(ID, delayTime:delayTime, tutorialID:tutorialID));
+        }
 
         switch(ID){
             case 15 : 
@@ -419,12 +428,20 @@ public class InventoryManager : MonoBehaviour
             DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
         }
     }
-    public void AddHoney(int honeyAmount){
+    public void AddHoney(int honeyAmount, bool activateDialogue = false, float delayTime = 0){
         DBManager.instance.curData.curHoneyAmount += honeyAmount;
+        
+        if(activateDialogue){
+            waitGetItemDialogue = true;
+            StartCoroutine(GetItemDialogue(999, honeyAmount:honeyAmount ,delayTime:delayTime));
+        }
     }
     IEnumerator SetSelectByUsingItem(int itemID){
 
         PlayerManager.instance.LockPlayer();
+        PlayerManager.instance.isActing = true;
+            //PlayerManager.instance.rb.AddForce(Vector2.zero);
+
 
         Select tempSelect = new Select();
         Dialogue tempDialogue = new Dialogue();
@@ -433,9 +450,10 @@ public class InventoryManager : MonoBehaviour
             case 33 ://권총
                 tempSelect.answers = new string[2]{"161","162"};
                 SelectManager.instance.SetSelect(tempSelect,null);
+                Array.Clear(tempSelect.answers,0,tempSelect.answers.Length);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(SelectManager.instance.GetSelect()==0){
-                    if(DBManager.instance.curData.curMapNum==16){
+                    if(PlayerManager.instance.flagID == 1){
                         UIManager.instance.SetGameEndUI(11);
                     }
                     else if(DBManager.instance.curData.curMapNum==23){
@@ -445,6 +463,7 @@ public class InventoryManager : MonoBehaviour
                         tempDialogue.sentences = new string[1]{"863"};
                         tempDialogue.isMonologue = true;
                         DialogueManager.instance.SetDialogue(tempDialogue);
+                        Array.Clear(tempDialogue.sentences,0,tempDialogue.sentences.Length);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
                 }
@@ -452,6 +471,7 @@ public class InventoryManager : MonoBehaviour
             case 34 ://소총(기관총)
                 tempSelect.answers = new string[2]{"161","162"};
                 SelectManager.instance.SetSelect(tempSelect,null);
+                Array.Clear(tempSelect.answers,0,tempSelect.answers.Length);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(SelectManager.instance.GetSelect()==0){
                     if(DBManager.instance.curData.curMapNum==8){
@@ -461,8 +481,44 @@ public class InventoryManager : MonoBehaviour
                         tempDialogue.sentences = new string[1]{"863"};
                         tempDialogue.isMonologue = true;
                         DialogueManager.instance.SetDialogue(tempDialogue);
+                        Array.Clear(tempDialogue.sentences,0,tempDialogue.sentences.Length);
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
+                }
+                break;
+            case 39 ://거대물약
+                tempSelect.answers = new string[2]{"163","164"};
+                SelectManager.instance.SetSelect(tempSelect,null);
+                Array.Clear(tempSelect.answers,0,tempSelect.answers.Length);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if(SelectManager.instance.GetSelect()==0){
+                    SoundManager.instance.PlaySound("drinking_sth");
+                    yield return new WaitForSeconds(2f);
+
+                    // tempDialogue.sentences = new string[3];
+                    // tempDialogue.sentences[0] = "1062";
+                    // tempDialogue.sentences[1] = "1063";
+                    // tempDialogue.sentences[2] = "1064";
+                    tempDialogue.sentences = new string[3]{"1062","1063","1064"};
+                    tempDialogue.isMonologue = true;
+                    DialogueManager.instance.SetDialogue(tempDialogue,null);
+                    yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    Array.Clear(tempDialogue.sentences,0,tempDialogue.sentences.Length);
+
+                    PlayerManager.instance.SetMainBodySize(1.25f,0.01f);
+                    SceneController.instance.SetCameraNoised(5,5);
+                    SoundManager.instance.PlaySound("changing_body_drug");
+                    PlayerManager.instance.animator.SetBool("shake", true);
+                    yield return new WaitForSeconds(3f);
+                    UIManager.instance.SetGameEndUI(9);
+                    // if(DBManager.instance.curData.curMapNum==8){
+                    // }
+                    // else{
+                    //     tempDialogue.sentences = new string[1]{"863"};
+                    //     tempDialogue.isMonologue = true;
+                    //     DialogueManager.instance.SetDialogue(tempDialogue);
+                    //     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+                    // }
                 }
                 break;
         }
@@ -474,4 +530,68 @@ public class InventoryManager : MonoBehaviour
         DBManager.instance.curData.itemList.Clear();
         RefreshInventory(0);
     }
+
+//itemID = 999 : 꿀
+    IEnumerator GetItemDialogue(int itemID, int honeyAmount = 0, float delayTime = 0f, int tutorialID = -1){
+        
+        UIManager.instance.hud_block.SetActive(true);
+        if(delayTime != 0){
+            yield return new WaitForSeconds(delayTime);
+
+        }
+
+        PlayerManager.instance.LockPlayer();
+        PlayerManager.instance.isActing = true;
+
+        string curItemName = "";
+        string sentenceID = "123";
+
+        if(itemID != 999){
+            curItemName = DBManager.instance.cache_ItemDataList[itemID].name;
+        }
+        else{
+            //꿀
+            curItemName = honeyAmount.ToString();//CSVReader.instance.GetIndexToString(15,"sysmsg");
+            sentenceID = "124";
+        }
+
+        if(DBManager.instance.language == "kr") curItemName = GetCompleteWorld(curItemName);
+
+        Debug.Log(curItemName);
+        tempDialogue = new Dialogue();
+        tempDialogue.sentences = new string[1]{sentenceID};
+        tempDialogue.isMonologue = true;
+
+        DialogueManager.instance.SetDialogue(tempDialogue,curItemName);
+        Array.Clear(tempDialogue.sentences,0,tempDialogue.sentences.Length);
+        yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
+
+        if(tutorialID != -1){
+            UIManager.instance.OpenTutorialUI(tutorialID);
+            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+        }
+        PlayerManager.instance.UnlockPlayer();
+        PlayerManager.instance.isActing = false;
+        waitGetItemDialogue = false;
+
+        //상호작용 키 연타로 인한 트리거 즉시 재시작 방지
+        PlayerManager.instance.ActivateWaitInteract(PlayerManager.instance.delayTime_WaitingInteract);
+        UIManager.instance.hud_block.SetActive(false);
+
+    }
+
+    public string GetCompleteWorld(string name) {
+        char lastName = name.ElementAt(name.Length - 1);
+        int index = (lastName - 0xAC00) % 28;
+        Console.WriteLine(index);
+        //한글의 제일 처음과 끝의 범위 밖일경우 에러 
+        if (lastName < 0xAC00 || lastName > 0xD7A3) {
+            return name;
+        }
+
+        string selectVal = (lastName - 0xAC00) % 28 > 0 ? "을" : "를";
+
+        return name + selectVal;
+    }
+             
 }

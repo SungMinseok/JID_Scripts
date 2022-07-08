@@ -29,6 +29,7 @@ public class Minigame4Script : MonoBehaviour
     [Header("[Game Objects]─────────────────")]
     public GameObject[] aphids;
     public Sprite[] numberSprites;
+    public Sprite[] aphidSprites;
     public Transform miniLucky, miniAnt;
     public Vector2 miniAntDestination;
     public PolygonCollider2D mapCollider;
@@ -119,6 +120,12 @@ public class Minigame4Script : MonoBehaviour
         PlayerManager.instance.LockPlayer();
         ResetGameSettings();
 
+        
+#if UNITY_EDITOR || alpha
+        MinigameManager.instance.successBtn.SetActive(true);
+        MinigameManager.instance.failBtn.SetActive(true);
+#endif
+
         minigameCoroutine = StartCoroutine(MinigameCoroutine());
 
         SceneController.instance.SetSomeConfiner(mapCollider,true);
@@ -192,7 +199,9 @@ public class Minigame4Script : MonoBehaviour
                     continue;
                 }
 
-                aphids[Random.Range(0,aphids.Length)].SetActive(true);
+                //aphids[Random.Range(0,aphids.Length)].SetActive(true);
+                curAphid.GetComponent<SpriteRenderer>().sprite = aphidSprites[Random.Range(0,aphidSprites.Length)];
+                curAphid.SetActive(true);
                 SoundManager.instance.PlaySound("generating_aphid_0"+Random.Range(1,4));
                 CalculateDistance();
                 yield return waitAphidCreationCycle;
@@ -229,13 +238,15 @@ public class Minigame4Script : MonoBehaviour
         yield return wait100ms;
 
         if(setScore_lucky == goalScoreToWin){
-            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","0");
-            yield return popUpOkayCheck;
+            //MenuManager.instance.OpenPopUpPanel_SetStringByIndex("33","0");
+            //yield return popUpOkayCheck;
             MinigameManager.instance.SuccessMinigame();
         }
         else{
-            MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","0");
-            yield return popUpOkayCheck;
+            //MenuManager.instance.OpenPopUpPanel_SetStringByIndex("34","0");
+            //yield return popUpOkayCheck;
+            //MinigameManager.instance.SuccessMinigame();
+
             MinigameManager.instance.FailMinigame();
         }
 

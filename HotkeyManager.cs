@@ -19,6 +19,14 @@ public class HotkeyManager : MonoBehaviour
     {
         if(!PlayerManager.instance.isActing){
 
+     
+#if UNITY_EDITOR || alpha
+            if(CheatManager.instance.cheat.gameObject.activeSelf){
+                return;
+            }
+#endif
+       
+
             for(int i=1;i<12;i++){
                 if(Input.GetKeyDown((KeyCode)(48+i))){
                     theInven.PushItemBtn(i-1);
@@ -63,7 +71,8 @@ public class HotkeyManager : MonoBehaviour
                     theMenu.settingPanel.SetActive(false);
                 }
                 else if(theUI.ui_endingGuide.activeSelf){
-                    theUI.ui_endingGuide.SetActive(false);
+                    //theUI.ui_endingGuide.SetActive(false);
+                    theUI.ToggleEndingGuide(false);
                 }
                 else{
                     //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);

@@ -24,6 +24,7 @@ public class ShopManager : MonoBehaviour
     public TextMeshProUGUI shopNameText;
     public Transform shopSlotGrid;
     public ShopSlot[] shopSlots;
+    public Sprite[] shopIconSprites;
 
 
 
@@ -184,8 +185,8 @@ public class ShopManager : MonoBehaviour
 
         curShopSalesItemIndexes = shopSalesItemIndexes;
 
-        curShopIconIndex = shopIconIndex;
-        shopIconImage.sprite = theDB.cache_ItemDataList[curShopIconIndex].icon;
+        //curShopIconIndex = shopIconIndex;
+        shopIconImage.sprite = shopIconSprites[shopIconIndex];
 
         curShopName = shopName;
         shopNameText.text = curShopName;

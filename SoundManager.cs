@@ -12,6 +12,7 @@ public class SoundManager : MonoBehaviour
     public string defaultBtnSoundName;
     public string defaultGetItemSoundName = "item_get";
     public string defaultDoorSoundName = "opendoor";
+    public float changeBgmDelta = 0.005f;
 
     //public float masterVolumeSFX = 1f;
     public float masterVolumeBGM = 1f;
@@ -42,6 +43,7 @@ public class SoundManager : MonoBehaviour
         PutSoundsToDictionary();
     }
     void OnDisable(){
+        Debug.Log("bgmVolume : "+bgmPlayer.volume);
         StopAllCoroutines();
     }
     void Start()
@@ -51,6 +53,8 @@ public class SoundManager : MonoBehaviour
 
         //PlayBGM("ant mill");
         //SetBgmByMapNum(0);
+
+        Debug.Log("bgmVolume : "+bgmPlayer.volume);
 
     }
     public Sprite[] itemSprites;
@@ -147,6 +151,11 @@ public class SoundManager : MonoBehaviour
         ChangeBgm(soundFileName);
     }
     public void ChangeBgm(string soundFileName){
+        if(!audioClipsDic.ContainsKey(soundFileName)){
+            Debug.Log("bgm 파일 없음 : "+soundFileName);
+            return;
+        }
+
         if(bgmPlayer.clip != audioClipsDic[soundFileName]){
             //Debug.Log("브금변경");
             if(curChangeBgmCoroutine!=null) StopCoroutine(curChangeBgmCoroutine);
@@ -163,11 +172,14 @@ public class SoundManager : MonoBehaviour
         curChangeBgmCoroutine = StartCoroutine(ChangeBgmCoroutine("off"));
     }
     IEnumerator ChangeBgmCoroutine(string soundFileName){
+
+        float curBgmVolume = DBManager.instance.localData.bgmVolume;
+        float tempDelta = changeBgmDelta / curBgmVolume;
         
         if(bgmPlayer.clip != null){
 
             while(bgmPlayer.volume > 0){
-                bgmPlayer.volume -= 0.05f;
+                bgmPlayer.volume -= tempDelta;
                 yield return wait10ms;
             }
             if(soundFileName != "off"){
@@ -179,8 +191,8 @@ public class SoundManager : MonoBehaviour
                 bgmPlayer.clip = null;
                 bgmPlayer.Stop();
             }
-            while(bgmPlayer.volume < MenuManager.instance.slider_bgm.value){
-                bgmPlayer.volume += 0.05f;
+            while(bgmPlayer.volume < curBgmVolume){
+                bgmPlayer.volume += tempDelta;
                 yield return wait10ms;
             }
         }

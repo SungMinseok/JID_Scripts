@@ -42,6 +42,14 @@ public class CSVReader : MonoBehaviour
         itemAmount = data_item.Count;
         //print(data_dialogue[0]["text_kr"]);
     }
+    // void Start(){
+    //     for(int i=0;i<200;i++){
+    //         if(data_story[i]["kr"].ToString()==string.Empty){
+    //             continue;
+    //         }
+    //         Debug.Log(data_story[i]["kr"]);
+    //     }
+    // }
     public static List<Dictionary<string, object>> Read(string file)
     {
         var list = new List<Dictionary<string, object>>();

@@ -60,11 +60,13 @@ public class Location : MonoBehaviour
     public int[] completedTriggerNums;
     public int[] incompletedTriggerNums;
     public int[] haveItemNums;
+    public int[] notHaveItemNums;
     public bool keepGo; //선행 트리거 실행된 것 확인되면 진행
     public int selectPhase; //선택지 갯수 만큼 단계 설정 , 선택지 통과 시 해당 선택지 체크 포인트 설정용 . (2개 선택지 있을 경우, 선택지 정답 시 +1, 오답 후 다시 대화 시, 해당 phase 부터시작)
     public bool notZoom; //카메라 줌 X
     public bool holdPlayer; //True 시, 트리거 종료 후 이동 제한 해제 X
     public bool showKeyTutorial;
+    public bool notLook; //중앙 보지 않기
     [Header("Patrol_NPC")]
     public Transform desLoc_Patrol_NPC;
     public bool patrolFlag;
@@ -80,6 +82,7 @@ public class Location : MonoBehaviour
 
     [Header("KeyTutorial")]
     public string keyMap;
+    public string tutorialArgumentIndex;
     public string tutorialFrontStringIndex;
     public string tutorialBackStringIndex;
     //public bool tutorialOver;
@@ -133,7 +136,11 @@ public class Location : MonoBehaviour
 
             if(other.CompareTag("Player")){
 //                    Debug.Log(locFlag);
-                if(waitKey&&!locFlag&&!PlayerManager.instance.isWaitingInteract&&!PlayerManager.instance.isActing){
+                if(waitKey&&!locFlag
+                &&!PlayerManager.instance.isWaitingInteract
+                &&!PlayerManager.instance.isActing
+                &&!PlayerManager.instance.watchingGameEnding
+                ){
                     //Debug.Log("AAA");
                     //if(Input.GetButton("Interact_OnlyKey")){
 
@@ -143,8 +150,9 @@ public class Location : MonoBehaviour
                     && DBManager.instance.CheckCompletedTrigs(trigNum,completedTriggerNums,printDebug:false)
                     && DBManager.instance.CheckIncompletedTrigs(trigNum,incompletedTriggerNums,false)
                     && DBManager.instance.CheckHaveItems(trigNum,haveItemNums,false)
+                    && DBManager.instance.CheckNotHaveItems(trigNum,notHaveItemNums,true)
                     ){
-                        UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialFrontStringIndex, tutorialBackStringIndex);
+                        UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialArgumentIndex);
                     }
 
                     if(PlayerManager.instance.interactInput){
@@ -164,6 +172,12 @@ public class Location : MonoBehaviour
 
 
                 }
+                else{
+                    
+                        if(showKeyTutorial){
+                            UIManager.instance.HideKeyTutorial();
+                        }
+                }
             }
         }
 
@@ -172,7 +186,7 @@ public class Location : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         if(type != LocationType.Comment){
             if(other.CompareTag("Player")){
-                if(!waitKey && !locFlag&&!PlayerManager.instance.isActing ){
+                if(!waitKey && !locFlag&&!PlayerManager.instance.isActing&&!PlayerManager.instance.isTalking ){
 
                     if(PlayerManager.instance.ladderDelay && PlayerManager.instance.jumpDelay ){
                         return;
@@ -394,13 +408,13 @@ public class Location : MonoBehaviour
                                 StartCoroutine(ResetFlagDelayCoroutine());
                                 return;
                             }
-                            // for(int i=0;i<haveItemNums.Length;i++){
-                            //     if(!InventoryManager.instance.CheckHaveItem(haveItemNums[i])){
-                            //         DM(trigNum +"번 트리거 실행 실패 : " + haveItemNums[i] + "번 아이템 미보유.");
-                            //         StartCoroutine(ResetFlagDelayCoroutine());
-                            //         return;
-                            //     }
-                            // }
+                        }
+                        //아이템 미보유 여부 확인
+                        if(notHaveItemNums.Length>0){
+                            if(DBManager.instance.CheckHaveItems(trigNum,notHaveItemNums)){
+                                StartCoroutine(ResetFlagDelayCoroutine());
+                                return;
+                            }
                         }
 
                         if(other.CompareTag("Player")){
@@ -460,7 +474,7 @@ public class Location : MonoBehaviour
                     }
                     break;
                 case LocationType.KeyTutorial :
-                    UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialFrontStringIndex, tutorialBackStringIndex);
+                    UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialArgumentIndex);
                     // var tutorialBox = PlayerManager.instance.tutorialBox;
                     // tutorialBox.GetChild(0).gameObject.SetActive(true);
                     // tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = 
@@ -746,7 +760,9 @@ public class LocationEditor : Editor
             EditorGUILayout.LabelField("미선행 트리거 번호");
             EditorGUILayout.PropertyField(serializedObject.FindProperty("incompletedTriggerNums"),GUIContent.none, true);
             EditorGUILayout.LabelField("필요 아이템 번호");
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("haveItemNums"),GUIContent.none, true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("haveItemNums"),GUIContent.none, true);            
+            EditorGUILayout.LabelField("미보유 아이템 번호");
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("notHaveItemNums"),GUIContent.none, true);
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("[Actions]",EditorStyles.boldLabel);
             EditorGUILayout.LabelField("오브젝트");
@@ -761,8 +777,9 @@ public class LocationEditor : Editor
             selected.holdPlayer = EditorGUILayout.ToggleLeft("종료 후 이동불가", selected.holdPlayer);
             selected.showKeyTutorial = EditorGUILayout.ToggleLeft("키 튜토리얼 표시", selected.showKeyTutorial);            
             selected.keyMap =  EditorGUILayout.TextField("키맵",selected.keyMap);
-            selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
-            selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
+            //selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
+            //selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
+            selected.notLook = EditorGUILayout.ToggleLeft("중앙 안 쳐다보기", selected.notLook);         
 
             EditorGUILayout.Space();
             selected.preserveTrigger = EditorGUILayout.ToggleLeft("반복 사용(선택지 있으면 해제)", selected.preserveTrigger);
@@ -789,8 +806,8 @@ public class LocationEditor : Editor
         else if (selected.type == LocationType.KeyTutorial)
         {
             selected.keyMap =  EditorGUILayout.TextField("키맵",selected.keyMap);
-            selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
-            selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
+            //selected.tutorialFrontStringIndex =  EditorGUILayout.TextField("별도 스트링(앞)",selected.tutorialFrontStringIndex);
+            //selected.tutorialBackStringIndex =  EditorGUILayout.TextField("별도 스트링(뒤)",selected.tutorialBackStringIndex);
         }
         //EditorGUILayout.EndHorizontal();
 

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +9,8 @@ public class MushroomGameScript : MonoBehaviour
     public Animator[] animators_piano;
     public Animator animator_main;
     public string curOrder;
+    public Rigidbody2D mushroomItem;
+    public ParticleSystem mushroomSpore; 
 
     void Awake(){
         instance = this;
@@ -39,9 +41,16 @@ public class MushroomGameScript : MonoBehaviour
 
             if(curOrder == correctOrder){
                 
+
+                StartCoroutine(CanGetMushroom());
+                //Invoke("CanGetMushroom",1f);
+                
+
                 SoundManager.instance.PlaySound("mushroom_success2");
-                InventoryManager.instance.AddItem(13);
+                //InventoryManager.instance.AddItem(13);
                 DBManager.instance.TrigOver(60);
+
+                
                 return;//성공 시 리셋되지 않음.
             }
             
@@ -52,7 +61,6 @@ public class MushroomGameScript : MonoBehaviour
         yield return new WaitForSeconds(1f);
         ResetPiano();
 
-        
         animator_main.SetBool("down",false);
     }
     void ResetPiano(){
@@ -64,5 +72,27 @@ public class MushroomGameScript : MonoBehaviour
                 SoundManager.instance.PlaySound("mushroom_popup_0"+Random.Range(1,6));
 
         }
+    }
+    IEnumerator CanGetMushroom(){
+        PlayerManager.instance.LockPlayer();
+        UIManager.instance.SetHUD(false);
+
+        mushroomSpore.gameObject.SetActive(true);
+        yield return new WaitForSeconds(1f);
+                SoundManager.instance.PlaySound("mushroom_popup_0"+Random.Range(1,6));
+        
+        mushroomItem.gameObject.SetActive(true);
+        mushroomItem.AddForce(new Vector2(0,1) * (7), ForceMode2D.Impulse);
+        mushroomItem.GetComponent<ItemScript>().isAvailable = true;
+        mushroomItem.GetComponent<BoxCollider2D>().enabled = true;
+        yield return new WaitForSeconds(3f);
+        mushroomSpore.Stop();
+
+        PlayerManager.instance.UnlockPlayer();
+        UIManager.instance.SetHUD(true);
+
+        //yield return new WaitUntil(()=>InventoryManager.instance.CheckHaveItem(13));
+        //mushroomSpore.Stop();
+        
     }
 }

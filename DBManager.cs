@@ -106,6 +106,7 @@ public class DBManager : MonoBehaviour
     public class LocalData{
         public List<ClearedEndingCollection> endingCollectionOverList = new List<ClearedEndingCollection>();
 
+        public List<ClearedAntCollection> antCollectionOverList = new List<ClearedAntCollection>();
         
         [Header("Options")]
         public float bgmVolume;
@@ -245,6 +246,7 @@ public class DBManager : MonoBehaviour
     public void CallLocalDataLoad(){
 
         localData.endingCollectionOverList.Clear();
+        localData.antCollectionOverList.Clear();
 
         BinaryFormatter bf = new BinaryFormatter();
         FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
@@ -255,6 +257,9 @@ public class DBManager : MonoBehaviour
             if(file != null && file.Length >0){
                 localData =(LocalData)bf.Deserialize(file);
             }
+
+            if(localData.antCollectionOverList==null)
+                localData.antCollectionOverList = new List<ClearedAntCollection>();
 
             // if(localData.jumpKey==KeyCode.None){
             //     localData.jumpKey = KeyCode.Space;
@@ -276,6 +281,7 @@ public class DBManager : MonoBehaviour
         if(fileCheck.Exists){
             File.Delete(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
             localData.endingCollectionOverList.Clear();
+            localData.antCollectionOverList.Clear();
             Debug.Log("로컬 파일 초기화 성공");
             //MenuManager.instance.ResetLoadSlots();
 
@@ -363,6 +369,27 @@ public class DBManager : MonoBehaviour
         }
         
     }
+    public bool CheckNotHaveItems(int trigNum, int[] haveItemNums, bool printDebug = true){
+        List<int> tempList = new List<int>();
+
+        for(int i=0;i<haveItemNums.Length;i++){
+            if(InventoryManager.instance.CheckHaveItem(haveItemNums[i])){
+                if(printDebug) Debug.Log(string.Format("TrigNum.{0} 실행 실패 : itemID.{1}({2}) 보유",trigNum, haveItemNums[i], DBManager.instance.cache_ItemDataList[haveItemNums[i]].name));
+
+                tempList.Add(haveItemNums[i]);
+            }
+        }
+
+        if(tempList.Count != 0){
+            tempList.Clear();
+            return false;
+        }
+        else{
+            tempList.Clear();
+            return true;
+        }
+        
+    }
 #endregion
 
 #region EndingCollection
@@ -379,18 +406,31 @@ public class DBManager : MonoBehaviour
         if(localData.endingCollectionOverList.Count == 0){
             return -1;
         }
-        //Debug.Log(localData.endingCollectionOverList.Count);
-        // if(localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum) != -1){
-        //     return true;
-        // }
-        // else{
-        //     return false;
-        // }
-        //ebug.Log(localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum));
         return localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum);
     }
     public void ResetEndingCollection(){
         localData.endingCollectionOverList.Clear();
+        CallLocalDataSave();
+    }
+#endregion
+#region AntCollection
+
+    //엔딩 컬렉션 달성 등록
+    public void AntCollectionOver(int collectionNum){
+        if(GetClearedAntCollectionIndex(collectionNum) == -1){
+            localData.antCollectionOverList.Add(new ClearedAntCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
+            CallLocalDataSave();
+        }
+    }
+    //엔딩 컬렉션 달성되었는지 확인
+    public int GetClearedAntCollectionIndex(int collectionNum){
+        if(localData.antCollectionOverList.Count == 0){
+            return -1;
+        }
+        return localData.antCollectionOverList.FindIndex(x => x.ID == collectionNum);
+    }
+    public void ResetAntCollection(){
+        localData.antCollectionOverList.Clear();
         CallLocalDataSave();
     }
 #endregion
@@ -649,12 +689,18 @@ public class ClearedEndingCollection{
         ID = _ID;
         clearedDate = _clearedDate;
         clearedPlayCount = _clearedPlayCount;
-        //description = c;
-        //date = d;
-        //count = e;
-        // resourceID = c;
-        // if(DBManager.instance.endingCollectionSprites.Length > resourceID)
-        // sprite = DBManager.instance.endingCollectionSprites[resourceID];
+    }
+}
+[System.Serializable]
+public class ClearedAntCollection{
+    public int ID;
+    public string clearedDate;
+    public int clearedPlayCount;
+
+    public ClearedAntCollection(int _ID, string _clearedDate, int _clearedPlayCount){
+        ID = _ID;
+        clearedDate = _clearedDate;
+        clearedPlayCount = _clearedPlayCount;
     }
 }
 
@@ -676,6 +722,7 @@ public class GameEndList{
     public string name;
     public string preSoundFileName;
     public string postSoundFileName;
+    public string bgm;
     public Story[] stories;
     //public Sprite[] storySprites;
     //public string[] storyDescriptions;

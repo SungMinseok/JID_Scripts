@@ -12,6 +12,7 @@ public class LocationRader : MonoBehaviour
             && DBManager.instance.CheckCompletedTrigs(curLocation.trigNum,curLocation.completedTriggerNums,printDebug:false)
             && DBManager.instance.CheckIncompletedTrigs(curLocation.trigNum,curLocation.incompletedTriggerNums,false)
             && DBManager.instance.CheckHaveItems(curLocation.trigNum,curLocation.haveItemNums,false)
+            && DBManager.instance.CheckNotHaveItems(curLocation.trigNum,curLocation.notHaveItemNums,false)
             ){
 
                 //curLocation.targetMark.GetComponent<Animator>().SetTrigger("on");

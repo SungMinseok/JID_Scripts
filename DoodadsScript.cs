@@ -10,7 +10,8 @@ public enum DoodadsType{
     Mushroom,
     Water,
     Bullet1, //나는 개미가 아래로 던짐
-    Bullet2 //하늘에서 떨어짐
+    Bullet2, //하늘에서 떨어짐,
+    SetFlag,
 }
 public class DoodadsScript : MonoBehaviour
 {
@@ -23,8 +24,10 @@ public class DoodadsScript : MonoBehaviour
     //PlayerManager thePlayer;
     public Vector2 curPos;
     public BoxCollider2D boxCol0;
-    [Header("사다리로 올라가는 플랫폼들")]public Collider2D[] platformCollider;
+    [Header("Ladder")]
+    public Collider2D[] platformCollider;
     public bool isRope;
+    public bool isUnableToJump;
     
     [Header("이속 감소")]
     public float slowDownValue;
@@ -32,6 +35,8 @@ public class DoodadsScript : MonoBehaviour
 
     [Header("머시룸")]
     public int mushroomNum;
+    [Header("Set Flag")]
+    public byte flagID;//1:권총엔딩
     void Start(){
         spriteRenderer = GetComponent<SpriteRenderer>();
         //thePlayer = PlayerManager.instance;
@@ -214,10 +219,10 @@ public class DoodadsScript : MonoBehaviour
 
             case DoodadsType.Water :
                 if(other.CompareTag("Player")){
-                    //if(!PlayerManager.instance.isGrounded && !PlayerManager.instance.isGameOver){
+                    if(!PlayerManager.instance.isGameOver){
                     //if(PlayerManager.instance.isFalling){
                     PlayerManager.instance.KillPlayer(0, "drowning");
-                    //}
+                    }
                 }
                 break;
             case DoodadsType.Ladder :
@@ -232,6 +237,11 @@ public class DoodadsScript : MonoBehaviour
                 }
                 break;
 
+            case DoodadsType.SetFlag :
+                if(other.CompareTag("Player")){
+                    PlayerManager.instance.flagID = flagID;
+                }
+                break;
             default : 
                 break;
 
@@ -353,6 +363,12 @@ public class DoodadsScript : MonoBehaviour
                     PlayerManager.instance.isSlowDown -= slowDownValue;
                     }
     //                Debug.Log("B");
+                }
+                break;
+                
+            case DoodadsType.SetFlag :
+                if(other.CompareTag("Player")){
+                    PlayerManager.instance.flagID = 0;
                 }
                 break;
         }

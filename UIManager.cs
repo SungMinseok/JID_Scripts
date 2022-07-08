@@ -47,6 +47,10 @@ public class UIManager : MonoBehaviour
     [Header("UI_HUD")]
     public GameObject hud_state;
     public GameObject hud_inventory;
+    public GameObject hud_sub_collection;
+    public GameObject hud_sub_endingGuide;
+    public GameObject hud_sub_map;
+    public GameObject hud_block;
     [Header("UI_Book")]
     public GameObject ui_book;
     public Image bookMainImage;
@@ -145,7 +149,14 @@ public class UIManager : MonoBehaviour
             }
         }
 
-
+        if ( gameEndCanSkip ){
+            
+            if ( PlayerManager.instance.interactInput )
+            {
+                //gameEndCanSkip = false;
+                PushNextBtn();
+            }
+        }
         // if(Input.GetKeyDown(KeyCode.Escape)){
         //     // if(screenOn){
         //     //     CloseScreen();
@@ -306,6 +317,7 @@ public class UIManager : MonoBehaviour
     #region GameEnd
     public void SetGameEndUI(int num)
     {
+        PlayerManager.instance.watchingGameEnding = true;
         PlayerManager.instance.LockPlayer();
 
         var index = DBManager.instance.cache_GameEndDataList.FindIndex(x=> x.endingNum == num);
@@ -336,7 +348,7 @@ public class UIManager : MonoBehaviour
         string language = DBManager.instance.language;
 
         LoadManager.instance.FadeOut();
-        yield return wait2000ms;
+        yield return wait3000ms;
 
 
         gameEndImageCanvas.alpha = 0;
@@ -348,11 +360,19 @@ public class UIManager : MonoBehaviour
         ui_gameEnd.SetActive(true);
         LoadManager.instance.FadeIn();
 
+            
 
         if (!string.IsNullOrEmpty(curGameEndList.preSoundFileName))
         {
+            SoundManager.instance.BgmOff();
             SoundManager.instance.PlaySound(curGameEndList.preSoundFileName);
             yield return new WaitForSeconds(SoundManager.instance.GetSoundLength(curGameEndList.preSoundFileName));
+        }
+        
+        if (!string.IsNullOrEmpty(curGameEndList.bgm))
+        {
+            SoundManager.instance.ChangeBgm(curGameEndList.bgm);
+            //yield return new WaitForSeconds(SoundManager.instance.GetSoundLength(curGameEndList.preSoundFileName));
         }
         //for(int i=0;i<curGameEndList.storySprites.Length;i++){
 
@@ -361,7 +381,7 @@ public class UIManager : MonoBehaviour
         gameEndImageCanvas.alpha = 0;
         while (gameEndImageCanvas.alpha < 1)
         {
-            gameEndImageCanvas.alpha += 0.01f;
+            gameEndImageCanvas.alpha += 0.02f;
             yield return wait10ms;
         }
 
@@ -382,16 +402,17 @@ public class UIManager : MonoBehaviour
                 SoundManager.instance.PlaySound(curGameEndList.stories[i].soundFileName);
             }
             //gameEndText0.text = curGameEndList.stories[i].descriptions;
+            Debug.Log("index : " + curGameEndList.stories[i].descriptions);
             gameEndText0.text = reader1[int.Parse(curGameEndList.stories[i].descriptions)]["text_" + language].ToString();//curGameEndList.stories[i].descriptions;
 
             gameEndTextCanvas0.alpha = 0;
             while (gameEndTextCanvas0.alpha < 1)
             {
-                gameEndTextCanvas0.alpha += 0.01f;
+                gameEndTextCanvas0.alpha += 0.03f;
                 yield return wait10ms;
             }
 
-            yield return wait1000ms;
+            yield return wait500ms;
             gameEndCanSkip = true;
             gameEndNextBtn.SetActive(true);
             yield return new WaitUntil(() => !gameEndCanSkip);
@@ -402,8 +423,8 @@ public class UIManager : MonoBehaviour
 
         while (gameEndTextCanvas0.alpha > 0)
         {
-            gameEndImageCanvas.alpha -= 0.01f;
-            gameEndTextCanvas0.alpha -= 0.01f;
+            gameEndImageCanvas.alpha -= 0.03f;
+            gameEndTextCanvas0.alpha -= 0.03f;
             yield return wait10ms;
         }
 
@@ -418,19 +439,19 @@ public class UIManager : MonoBehaviour
 
         yield return wait500ms;
 
-        gameEndText1_0.text = "ending no." + curGameEndList.endingNum;
+        gameEndText1_0.text = "<color=yellow>ending no." + curGameEndList.endingNum + "</color>";
         //gameEndText1_1.text = curGameEndList.name;
         gameEndText1_1.text = reader0[curGameEndList.endingCollectionNum]["name_" + language].ToString();
 
         while (gameEndTextCanvas1.alpha < 1)
         {
-            gameEndTextCanvas1.alpha += 0.01f;
+            gameEndTextCanvas1.alpha += 0.02f;
             yield return wait10ms;
         }
         yield return wait2000ms;
         while (gameEndTextCanvas1.alpha > 0)
         {
-            gameEndTextCanvas1.alpha -= 0.01f;
+            gameEndTextCanvas1.alpha -= 0.02f;
             yield return wait10ms;
         }
         yield return wait500ms;
@@ -439,6 +460,7 @@ public class UIManager : MonoBehaviour
     }
     public void PushNextBtn()
     {
+        Debug.Log("44");
         gameEndCanSkip = false;
     }
     public void PushSkipBtn(){
@@ -584,8 +606,8 @@ public class UIManager : MonoBehaviour
 
     }
 
-    
-    public void ShowKeyTutorial(string keyString,string frontStringIndex ="", string backStringIndex = "", int boxType = 0){
+    //0 : 중앙 분홍 박스 내 노출, 1 : 아래 노출
+    public void ShowKeyTutorial(string keyString,string argumentIndex ="", int boxType = 0){
         //Debug.Log("show");
         PlayerManager.instance.onKeyTutorial = true;
         var tutorialBox = PlayerManager.instance.tutorialBox;
@@ -599,13 +621,23 @@ public class UIManager : MonoBehaviour
         CSVReader csv = CSVReader.instance;
         //tutorialBox.GetChild(0).gameObject.SetActive(true);
 
-        string frontString = "", backString = "";
-        if(frontStringIndex!="") frontString = csv.GetIndexToString(int.Parse(frontStringIndex),"sysmsg");
-        if(backStringIndex!="") backString = csv.GetIndexToString(int.Parse(backStringIndex),"sysmsg");
+        //string frontString = "", backString = "";
+        //if(frontStringIndex!="") frontString = csv.GetIndexToString(int.Parse(frontStringIndex),"sysmsg");
+        //if(backStringIndex!="") backString = csv.GetIndexToString(int.Parse(backStringIndex),"sysmsg");
+        string argumentString = "";
+        if(argumentIndex!=""){
+            argumentString = csv.GetIndexToString(int.Parse(argumentIndex),"sysmsg");
+            argumentString = string.Format(argumentString,keyString);
+
+        }
+        else{
+            argumentString = keyString;
+
+        }
 
 
-        tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = 
-        frontString + keyString + backString ;
+        tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = argumentString;
+        //frontString + keyString + backString ;
         tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",true);
         
     }

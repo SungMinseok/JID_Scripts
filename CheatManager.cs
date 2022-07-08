@@ -13,7 +13,7 @@ public class CheatManager : MonoBehaviour
     public Transform checkPoint_Special;
     public Transform minigameParent;
     
-#if alpha
+#if UNITY_EDITOR || alpha
     void Awake(){
         instance = this;
     }
@@ -234,6 +234,7 @@ public class CheatManager : MonoBehaviour
 
                     break;
                 case "gameend" :
+                case "ge" :
 
                     if(temp[1]=="") return;
 
@@ -330,6 +331,22 @@ public class CheatManager : MonoBehaviour
                     DBManager.instance.curData.trigOverList.Clear();
                     break;
                 
+                case "resetantcollection":
+                    DBManager.instance.ResetAntCollection();
+                    MenuManager.instance.ResetAntCollectionUI();
+                    DM("resetantcollection");
+
+                    break;
+                case "ac":
+                    //DBManager.instance.ResetAntCollection();
+                    for(int i=0;i<MenuManager.instance.antStickersMother.childCount;i++){
+                        DBManager.instance.AntCollectionOver(i+1);
+                    }
+                    MenuManager.instance.RefreshAntCollectionUI();
+                    DM("complete all ant collection");
+
+                    break;
+                    
             }
 //EndingCollectionOver
 //DeleteSaveFile

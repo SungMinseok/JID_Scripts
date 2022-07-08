@@ -65,8 +65,8 @@ public class LoadManager : MonoBehaviour
         mainSceneName = 
         "Level"
         + "_"
-        + DBManager.instance.buildVersion
-        + "_"
+        //+ DBManager.instance.buildVersion
+        //+ "_"
         + DBManager.instance.buildNum
         // + "_" 
         // + DBManager.instance.buildDate
@@ -297,6 +297,7 @@ public class LoadManager : MonoBehaviour
         // yield return wait1s;
         if(PlayerManager.instance!=null){
             Debug.Log("33344");
+            yield return wait1s;
             PlayerManager.instance.canMove = true;
         }
         //loadFader.GetComponent<Animator>().SetTrigger("fadeIn");

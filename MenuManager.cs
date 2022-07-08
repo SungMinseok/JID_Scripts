@@ -61,7 +61,11 @@ public class MenuManager : MonoBehaviour
     //     public TextMeshProUGUI itemInfoText0;
     //     public TextMeshProUGUI itemInfoText1;
     // }
+    [Header("UI_Collection")]
+    public Button[] collectionTabBtns;
+    public GameObject[] collectionPages;
     [Header("UI_Collection_Ending")]
+    public GameObject endingCollectionPanel;
     public Animator animator;
     public GameObject collectionEndingNumberVessel;
     public Text collectionEndingNumberText;
@@ -73,7 +77,14 @@ public class MenuManager : MonoBehaviour
     public Image[] collectionCardImages;
     public Sprite[] collectionCardSprites;
     public Button[] collectionScrollArrows;
-    
+    [Header("UI_Collection_Ant")]
+    public GameObject antCollectionPanel;
+    public Text antMainNameText;
+    public Image antMainImage;
+    public GameObject antMainNameTextHolderObj;
+    public Transform antStickersMother;
+    StickerScript[] antStickers;
+    public Sprite[] antSprites;
     [Header("UI_ETC")]
     public Sprite nullSprite;
     public Font[] fonts ;
@@ -199,22 +210,27 @@ public class MenuManager : MonoBehaviour
         
 #endregion
     
+#region Set Ant Collection Object
+        antStickers = new StickerScript[antStickersMother.childCount];
 
+        for(int i=0;i<antStickersMother.childCount;i++){
+            antStickers[i] = antStickersMother.GetChild(i).GetComponent<StickerScript>();
+        }
+
+        ResetAntCollectionUI();
+#endregion
     }
 
     public void OpenLoadPanel(){
     
     }
     
-    public void OpenCollectionPanel(){
-
-    }
 
 
     // void Update(){
 
     // }
-#region Collection
+#region Collection_Ending
     public void CollectionScrollRightBtn(){
         DeactivateBtns(collectionScrollArrows);
         if(curPage+1 == totalPage){
@@ -860,4 +876,65 @@ public class MenuManager : MonoBehaviour
                             t.Seconds);
     }
 
+#region Collection_Ant
+    public void OpenCollectionPage(int pageNum){
+        
+        foreach(GameObject page in collectionPages){
+            page.SetActive(false);
+        }
+        foreach(Button btn in collectionTabBtns){
+            btn.interactable = true;
+        }
+
+        if(pageNum==0){
+            ResetAntCollectionUI();
+            RefreshAntCollectionUI();
+        }
+        else{
+        }
+
+
+        collectionPages[pageNum].SetActive(true);
+        collectionTabBtns[pageNum].interactable = false;
+    }
+
+    public void ResetAntCollectionUI(){
+        antMainImage.sprite = nullSprite;
+        antMainNameTextHolderObj.SetActive(false);
+
+        // for(int i=0;i<antStickersMother.childCount;i++){
+        //     if(DBManager.instance.localData.antCollectionOverList.Exists(x=>x.ID == i+301)){
+        //         antStickers[i].ActivateSticker();
+        //     }
+        //     else{
+        //         antStickers[i].DeactivateSticker();
+        //     }
+        // }
+    }
+    public void RefreshAntCollectionUI(){
+        //antMainImage.sprite = nullSprite;
+
+        for(int i=0;i<antStickersMother.childCount;i++){
+            if(DBManager.instance.GetClearedAntCollectionIndex(i+1)!=-1){
+                antStickers[i].ActivateSticker();
+            }
+            else{
+                antStickers[i].DeactivateSticker();
+            }
+        }
+        // foreach(StickerScript a in antStickersMother.GetComponentsInChildren<StickerScript>()){
+        //     if(DBManager.instance.)
+        // }
+    }
+
+
+
+
+
+
+
+
+
+
+#endregion
 }

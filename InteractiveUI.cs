@@ -28,7 +28,9 @@ public class InteractiveUI : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other){
         
             if(other.CompareTag("Player")){
-                if(!isHided){
+                if(!isHided
+                &&!PlayerManager.instance.isPlayingMinigame
+                ){
                     Cloak();
                 }
             }
@@ -36,7 +38,9 @@ public class InteractiveUI : MonoBehaviour
     void OnTriggerExit2D(Collider2D other){
         
             if(other.CompareTag("Player")){
-                if(isHided){
+                if(isHided
+                &&!PlayerManager.instance.isPlayingMinigame
+                ){
                     Decloak();
                 }
             }
