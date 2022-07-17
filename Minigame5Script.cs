@@ -83,7 +83,7 @@ public class Minigame5Script : MonoBehaviour
                 StartCoroutine(RouletteCoroutine());
             }
             else{
-                MenuManager.instance.OpenPopUpPanel_SetStringByIndex("10");
+                MenuManager.instance.OpenPopUpPanel_OneAnswer("10");
             }
  
         }

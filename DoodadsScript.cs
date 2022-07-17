@@ -221,7 +221,7 @@ public class DoodadsScript : MonoBehaviour
                 if(other.CompareTag("Player")){
                     if(!PlayerManager.instance.isGameOver){
                     //if(PlayerManager.instance.isFalling){
-                    PlayerManager.instance.KillPlayer(0, "drowning");
+                    PlayerManager.instance.KillPlayer(20, "drowning");
                     }
                 }
                 break;

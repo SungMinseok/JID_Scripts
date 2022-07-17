@@ -209,21 +209,25 @@ public class CheatManager : MonoBehaviour
 
                     break;
 
-                case "openshop" :
+                // case "openshop" :
 
-                    //if(temp[1]==""||temp[2]==""||temp[3]=="") return;
-                    if(temp[1]=="") return;
+                //     //if(temp[1]==""||temp[2]==""||temp[3]=="") return;
+                //     if(temp[1]=="") return;
 
                     
-                    string[] tempList = temp[1].Split(',');
-                    int[] itemList = Array.ConvertAll(tempList, s => int.Parse(s));
+                //     string[] tempList = temp[1].Split(',');
+                //     int[] itemList = Array.ConvertAll(tempList, s => int.Parse(s));
+                //     ShopSales[] salesList = new ShopSales[itemList.Length]{};
+                //     for(int i=0;i<itemList.Length;i++){
+                //         salesList.Add
+                //     }
 
-                    ShopManager.instance.OpenShopUI(1,"test",itemList);
+                //     ShopManager.instance.OpenShopUI(1,"test",itemList);
                    
-                    // DBManager.instance.TrigOver(int.Parse(temp[1]));
-                    DM("Openshop itemList : "+ String.Join(",", itemList));
+                //     // DBManager.instance.TrigOver(int.Parse(temp[1]));
+                //     DM("Openshop itemList : "+ String.Join(",", itemList));
 
-                    break;
+                //     break;
                 case "addhoney" :
 
                     if(temp[1]=="") return;

@@ -136,7 +136,7 @@ public class ItemScript : MonoBehaviour
             StartCoroutine(GetItemAndRemoveCoroutine());
             DM(itemID+"번 아이템 "+amount_item+"개 획득");
             
-            InventoryManager.instance.AddItem(itemID);
+            InventoryManager.instance.AddItem(itemID,activateDialogue:true);
 
             
         }

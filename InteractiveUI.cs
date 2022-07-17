@@ -30,6 +30,7 @@ public class InteractiveUI : MonoBehaviour
             if(other.CompareTag("Player")){
                 if(!isHided
                 &&!PlayerManager.instance.isPlayingMinigame
+                &&!PlayerManager.instance.isActing
                 ){
                     Cloak();
                 }
@@ -40,12 +41,13 @@ public class InteractiveUI : MonoBehaviour
             if(other.CompareTag("Player")){
                 if(isHided
                 &&!PlayerManager.instance.isPlayingMinigame
+                &&!PlayerManager.instance.isActing
                 ){
                     Decloak();
                 }
             }
     }
-    void Cloak(float _speed = 0.1f){
+    public void Cloak(float _speed = 0.1f){
         isHided = true;
         //if(clockCoroutine) StopCoroutine(clockCoroutine);
         

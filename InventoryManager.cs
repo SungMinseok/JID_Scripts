@@ -68,6 +68,15 @@ public class InventoryManager : MonoBehaviour
             itemSlotGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>PushItemBtn(temp));
         }        
 
+        if(DBManager.instance.localData.itemCollectionOverList.Count == 0
+        && DBManager.instance.curData.itemList.Count != 0
+        ){
+            for(int i=0; i<DBManager.instance.curData.itemList.Count; i++){
+                int tempID = DBManager.instance.curData.itemList[i].itemID;
+                DBManager.instance.localData.itemCollectionOverList.Add(tempID);
+            }
+        }
+
         ResetInventory();
     }
 
@@ -98,6 +107,10 @@ public class InventoryManager : MonoBehaviour
         if(activateDialogue){
             waitGetItemDialogue = true;
             StartCoroutine(GetItemDialogue(ID, delayTime:delayTime, tutorialID:tutorialID));
+        }
+
+        if(!DBManager.instance.localData.itemCollectionOverList.Contains(ID)){
+            DBManager.instance.localData.itemCollectionOverList.Add(ID);
         }
 
         switch(ID){
@@ -542,6 +555,7 @@ public class InventoryManager : MonoBehaviour
 
         PlayerManager.instance.LockPlayer();
         PlayerManager.instance.isActing = true;
+        PlayerManager.instance.SetTalkCanvasDirection();
 
         string curItemName = "";
         string sentenceID = "123";

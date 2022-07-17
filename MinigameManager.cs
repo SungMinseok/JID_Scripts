@@ -15,10 +15,12 @@ public class MinigameManager : MonoBehaviour
     
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
     [Space]
-    [Header("[Game Objects]─────────────────")]
+    [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━")]
     public GameObject minigameGuidePopUp;
     public Text guideMainText;
     public Text guideSubText;
+    public string[] minigameBgmFileName;
+    [Header("[Debug]━━━━━━━━━━━━━━━━━━━")]
     public bool waitGuidePass;
 
     public bool success, fail;
@@ -116,6 +118,8 @@ public class MinigameManager : MonoBehaviour
         ResetMinigameResult();
         nowMinigameNum = gameNum;
 
+        SoundManager.instance.ChangeBgm(minigameBgmFileName[gameNum]);
+
         LoadManager.instance.FadeOut();
         yield return wait1000ms;
         var nowMinigame = minigameScriptTransforms[gameNum];
@@ -134,6 +138,8 @@ public class MinigameManager : MonoBehaviour
 
     }
     IEnumerator FinishMinigameCoroutine(){
+        SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
+
 
         LoadManager.instance.FadeOut();
         yield return wait1000ms;

@@ -79,8 +79,9 @@ public class DBManager : MonoBehaviour
         [Space]
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장
         public List<int> trigOverList;
-        public List<int> getItemOverList;
-        public List<DirtBundleInfo> getDirtBundleOverList;
+        public List<int> getItemOverList; // 맵 내 아이템 활성화/비활성화 체크 용도
+        //public List<DirtBundleInfo> getDirtBundleOverList;
+        public List<DirtBundleInfo> dirtBundleInfoList;
 
 
         //public Vector2 screenSize;
@@ -104,9 +105,11 @@ public class DBManager : MonoBehaviour
     
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
     public class LocalData{
+        
+        [Header("Collections")]
         public List<ClearedEndingCollection> endingCollectionOverList = new List<ClearedEndingCollection>();
-
         public List<ClearedAntCollection> antCollectionOverList = new List<ClearedAntCollection>();
+        public List<int> itemCollectionOverList = new List<int>();
         
         [Header("Options")]
         public float bgmVolume;
@@ -120,6 +123,8 @@ public class DBManager : MonoBehaviour
         public KeyCode interactKey;
         
     }
+    
+#region Non local data
     public void SaveDefaultData(){
 
         BinaryFormatter bf = new BinaryFormatter();
@@ -156,6 +161,15 @@ public class DBManager : MonoBehaviour
         curData.playerY = PlayerManager.instance.transform.position.y;
         curData.curEquipmentsID = PlayerManager.instance.equipments_id;
 
+
+        //DirtBundle
+        //DirtBundleInfo[] curDirtBundleInfo = ItemControlManager.instance.dirtBundleMother.GetComponentsInChildren<DirtBundleInfo>();
+
+        foreach(DirtScript a in ItemControlManager.instance.dirtScriptList){
+            curData.dirtBundleInfoList.Add(a.dirtBundleInfo);
+            Debug.Log("dirtbundle info saved completely");
+        }
+
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, curData);
         file.Close();
@@ -175,7 +189,8 @@ public class DBManager : MonoBehaviour
                 curData.curPlayCount ++;
 
                 if(curData.getItemOverList == null) curData.getItemOverList = new List<int>();
-                if(curData.getDirtBundleOverList == null) curData.getDirtBundleOverList = new List<DirtBundleInfo>();
+                //if(curData.getDirtBundleOverList == null) curData.getDirtBundleOverList = new List<DirtBundleInfo>();
+                if(curData.dirtBundleInfoList == null) curData.dirtBundleInfoList = new List<DirtBundleInfo>();
                 
                 //curData.honeyOverList.Add(-1);
             }
@@ -184,6 +199,9 @@ public class DBManager : MonoBehaviour
         }
 
     }
+
+#endregion  
+    
     public bool CheckSaveFile(int fileNum){
         FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
 
@@ -232,6 +250,7 @@ public class DBManager : MonoBehaviour
         ResetLocalData();
         
     }
+
 #region LocalData
     public void CallLocalDataSave(){
 
@@ -243,23 +262,30 @@ public class DBManager : MonoBehaviour
         bf.Serialize(file, localData);
         file.Close();
     }
-    public void CallLocalDataLoad(){
+    public void CallLocalDataLoad()
+    {
 
         localData.endingCollectionOverList.Clear();
         localData.antCollectionOverList.Clear();
+        localData.itemCollectionOverList.Clear();
 
         BinaryFormatter bf = new BinaryFormatter();
-        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat");
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory + "/LocalDataFile.dat");
 
-        if(fileCheck.Exists){
-            FileStream file = File.Open(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat", FileMode.Open);
-        
-            if(file != null && file.Length >0){
-                localData =(LocalData)bf.Deserialize(file);
+        if (fileCheck.Exists)
+        {
+            FileStream file = File.Open(Application.persistentDataPath + dataDirectory + "/LocalDataFile.dat", FileMode.Open);
+
+            if (file != null && file.Length > 0)
+            {
+                localData = (LocalData)bf.Deserialize(file);
             }
 
-            if(localData.antCollectionOverList==null)
+            if (localData.antCollectionOverList == null)
                 localData.antCollectionOverList = new List<ClearedAntCollection>();
+
+            if (localData.itemCollectionOverList == null)
+                localData.itemCollectionOverList = new List<int>();
 
             // if(localData.jumpKey==KeyCode.None){
             //     localData.jumpKey = KeyCode.Space;
@@ -268,7 +294,7 @@ public class DBManager : MonoBehaviour
             //     localData.interactKey = KeyCode.E;
             // }
             //language = localData.language;
-            
+
             file.Close();
         }
 
@@ -399,6 +425,7 @@ public class DBManager : MonoBehaviour
         if(GetClearedEndingCollectionID(collectionNum) == -1){
             localData.endingCollectionOverList.Add(new ClearedEndingCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
             CallLocalDataSave();
+            DM("EndingCollectionOver : "+collectionNum);
         }
     }
     //엔딩 컬렉션 달성되었는지 확인
@@ -413,13 +440,18 @@ public class DBManager : MonoBehaviour
         CallLocalDataSave();
     }
 #endregion
+
 #region AntCollection
 
-    //엔딩 컬렉션 달성 등록
+    //엔딩 컬렉션 달성 등록 ( ID는 sysmsg 문서 내 301번 부터, -300값으로 적용 )
     public void AntCollectionOver(int collectionNum){
         if(GetClearedAntCollectionIndex(collectionNum) == -1){
             localData.antCollectionOverList.Add(new ClearedAntCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
+            UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+            
+            
             CallLocalDataSave();
+            DM("AntCollectionOver : "+collectionNum);
         }
     }
     //엔딩 컬렉션 달성되었는지 확인
@@ -434,6 +466,7 @@ public class DBManager : MonoBehaviour
         CallLocalDataSave();
     }
 #endregion
+    
     void Awake(){
         //Application.targetFrameRate = 60;
         if (null == instance)
@@ -684,6 +717,7 @@ public class ClearedEndingCollection{
     
     public string clearedDate;
     public int clearedPlayCount;
+    public bool isRecognized;
 
     public ClearedEndingCollection(int _ID, string _clearedDate, int _clearedPlayCount){
         ID = _ID;
@@ -696,6 +730,7 @@ public class ClearedAntCollection{
     public int ID;
     public string clearedDate;
     public int clearedPlayCount;
+    public bool isRecognized;
 
     public ClearedAntCollection(int _ID, string _clearedDate, int _clearedPlayCount){
         ID = _ID;
@@ -704,6 +739,12 @@ public class ClearedAntCollection{
     }
 }
 
+[System.Serializable]
+public class ClearedItemCollection{
+    public int itemID;
+    public bool isRecognized;
+
+}
 [System.Serializable]
 public class ItemList{
     public int itemID;
@@ -734,6 +775,7 @@ public class GameEndList{
 [System.Serializable]
 public class Story{
     public Sprite sprite;
+    //public bool noSprite;
     //[TextArea(2,4)]
     public string soundFileName;
     public int soundOrder;

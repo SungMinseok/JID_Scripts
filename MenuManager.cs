@@ -69,7 +69,7 @@ public class MenuManager : MonoBehaviour
     public Animator animator;
     public GameObject collectionEndingNumberVessel;
     public Text collectionEndingNumberText;
-    public Text collectionNameText;
+    public TextMeshProUGUI collectionNameText;
     public Text collectionPlayCountText;
     public Text collectionRateText;
     public Text collectionTimeText;
@@ -88,6 +88,7 @@ public class MenuManager : MonoBehaviour
     [Header("UI_ETC")]
     public Sprite nullSprite;
     public Font[] fonts ;
+    public GameObject ui_coupon;
     [Header("Debug────────────────────")]
     public string curPopUpType;
     public int curSaveNum;
@@ -143,6 +144,8 @@ public class MenuManager : MonoBehaviour
         collectionScrollArrows[0].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollRightBtn());
         collectionScrollArrows[1].GetComponent<Button>().onClick.AddListener(()=>CollectionScrollLeftBtn());
         
+        RearrangeCardOrder();
+        ResetCardOrder();
 #endregion
 
 #region Reset Save&Load
@@ -222,9 +225,12 @@ public class MenuManager : MonoBehaviour
     }
 
     public void OpenLoadPanel(){
-    
+        loadPanel.SetActive(true);
     }
     
+    public void CloseCurrentUI(){
+        this.transform.parent.gameObject.SetActive(false);
+    }
 
 
     // void Update(){
@@ -536,17 +542,20 @@ public class MenuManager : MonoBehaviour
         popUpPanel.SetActive(true);
     }
     
-    public void OpenPopUpPanel_SetStringByIndex(string mainIndex, string okayIndex = "0"){
+    public void OpenPopUpPanel_OneAnswer(string mainIndex, string okayIndex = "0", string[] mainArguments = null){
 
         popUpText1[0].text = mainIndex;
         //확인
         popUpText1[1].text = okayIndex;
 
         
-        for(int i=0;i<2;i++){
-            if(popUpText1[i].text != "")
-                popUpText1[i].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText1[i].text),"sysmsg");
-        }
+            if(popUpText1[0].text != "")
+                popUpText1[0].text = 
+                string.Format(CSVReader.instance.GetIndexToString(int.Parse(popUpText1[0].text),"sysmsg"),mainArguments);
+        
+            if(popUpText1[1].text != "")
+                popUpText1[1].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText1[1].text),"sysmsg");
+        
 
         popUpPanel1.SetActive(true);
     }
@@ -837,10 +846,10 @@ public class MenuManager : MonoBehaviour
         switch (keyName)
         {
             case "Jump" :  
-                OpenPopUpPanel_SetStringByIndex("70","1");
+                OpenPopUpPanel_OneAnswer("70","1");
                 break;
             case "Interact" :  
-                OpenPopUpPanel_SetStringByIndex("71","1");
+                OpenPopUpPanel_OneAnswer("71","1");
                 break;
             default:
                 break;
@@ -888,9 +897,10 @@ public class MenuManager : MonoBehaviour
 
         if(pageNum==0){
             ResetAntCollectionUI();
-            RefreshAntCollectionUI();
+            //RefreshAntCollectionUI();
         }
         else{
+            RearrangeCardOrder();
         }
 
 
@@ -937,4 +947,8 @@ public class MenuManager : MonoBehaviour
 
 
 #endregion
+
+    public void CheckCoupon(){
+
+    }
 }

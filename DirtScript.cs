@@ -5,9 +5,13 @@ using UnityEngine;
 public class DirtBundleInfo{
     public int objectID;
     public int curHp;
-    public DirtBundleInfo(int _objectID, int _curHp){
+    public bool isRecreatable = true;
+    public float recreateCoolTime;
+    public DirtBundleInfo(int _objectID, int _curHp, bool _isRecreatable ,float _recreateCoolTime){
         objectID = _objectID;
         curHp = _curHp;
+        isRecreatable = _isRecreatable;
+        recreateCoolTime = _recreateCoolTime;
     }
 }
 public class DirtScript : MonoBehaviour
@@ -67,16 +71,18 @@ public class DirtScript : MonoBehaviour
         if(dirtBundleInfo.curHp>0){
             dirtBundleInfo.curHp--;
 
-            if(!DBManager.instance.curData.getDirtBundleOverList.Exists(x=> x.objectID == dirtBundleInfo.objectID)){
-                DBManager.instance.curData.getDirtBundleOverList.Add(new DirtBundleInfo(dirtBundleInfo.objectID,dirtBundleInfo.curHp));
-            }
-            else{
-                int index = DBManager.instance.curData.getDirtBundleOverList.FindIndex(x=>x.objectID == dirtBundleInfo.objectID);
-                DBManager.instance.curData.getDirtBundleOverList[index].curHp = dirtBundleInfo.curHp;
-            }
+            // if(!DBManager.instance.curData.getDirtBundleOverList.Exists(x=> x.objectID == dirtBundleInfo.objectID)){
+            //     DBManager.instance.curData.getDirtBundleOverList.Add(new DirtBundleInfo(dirtBundleInfo.objectID,dirtBundleInfo.curHp));
+            // }
+            // else{
+            //     int index = DBManager.instance.curData.getDirtBundleOverList.FindIndex(x=>x.objectID == dirtBundleInfo.objectID);
+            //     DBManager.instance.curData.getDirtBundleOverList[index].curHp = dirtBundleInfo.curHp;
+            // }
 
             if(dirtBundleInfo.curHp==0){
-                if(keyTutorial!=null) keyTutorial.SetActive(false);
+                //if(keyTutorial!=null) keyTutorial.SetActive(false);
+                
+                UIManager.instance.HideKeyTutorial();
                 dirtPhases[0].SetActive(false);
                 CreatePiece(0);
 
@@ -141,6 +147,14 @@ public class DirtScript : MonoBehaviour
             GetComponent<BoxCollider2D>().enabled =false;
         }
 
+    }
+    void OnTriggerEnter2D(Collider2D other){
+        if(other.CompareTag("Player"))
+            UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey("Interact"));
+    }
+    void OnTriggerExit2D(Collider2D other){
+        if(other.CompareTag("Player"))
+            UIManager.instance.HideKeyTutorial();
     }
 
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
@@ -42,6 +43,8 @@ public class UIManager : MonoBehaviour
     public GameObject gameEndSkipBtn;
     public GameObject gameEndNextBtn;
     public bool gameEndCanSkip;
+    public float gameEndMainTextPos_center;
+    public float gameEndMainTextPos_lower;
     [Header("UI_Fader")]
     public Animator ui_fader;
     [Header("UI_HUD")]
@@ -51,6 +54,12 @@ public class UIManager : MonoBehaviour
     public GameObject hud_sub_endingGuide;
     public GameObject hud_sub_map;
     public GameObject hud_block;
+    public bool getNewEndingCollection;
+    public bool getNewAntCollection;
+    public bool getNewItemCollection;
+    public GameObject hud_sub_collection_redDot;
+    public GameObject hud_sub_endingGuide_redDot;
+
     [Header("UI_Book")]
     public GameObject ui_book;
     public Image bookMainImage;
@@ -67,6 +76,7 @@ public class UIManager : MonoBehaviour
     [Header("UI_Screen")]
     public GameObject ui_screen;
     public Transform screenMother;
+    public GameObject ui_map;
     public bool screenOn;
     [Header("UI_EndingGuide")]
     public GameObject ui_endingGuide;
@@ -100,6 +110,15 @@ public class UIManager : MonoBehaviour
         calculatedHoney = 0;
         honeyText.text = "0";
         ResetGameOverUI();
+
+        
+        //전부 인식 완료됐으면 메인 레드닷 제거
+        if(UIManager.instance.CheckAntCollectionOverListAllRecognized()){
+            UIManager.instance.hud_sub_collection_redDot.SetActive(false);
+        }
+        else{
+            UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+        }
         //playerOriginPos = thePlayer.transform.position;
         // offset = transform.position - worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position);
     }
@@ -302,7 +321,7 @@ public class UIManager : MonoBehaviour
             ui_gameOver.SetActive(true);
             LoadManager.instance.FadeIn();
 
-            SoundManager.instance.PlaySound("gameover" + Random.Range(0, 3));
+            SoundManager.instance.PlaySound("gameover" + UnityEngine.Random.Range(0, 3));
             yield return new WaitForSeconds(2f);
             gameOverBtns.gameObject.SetActive(true);
 
@@ -355,6 +374,8 @@ public class UIManager : MonoBehaviour
         gameEndTextCanvas0.alpha = 0;
         gameEndTextCanvas1.alpha = 0;
         gameEndNextBtn.SetActive(false);
+        gameEndImageCanvas.gameObject.SetActive(false);
+
         //gameEndSkipBtn.SetActive(false);
 
         ui_gameEnd.SetActive(true);
@@ -376,14 +397,30 @@ public class UIManager : MonoBehaviour
         }
         //for(int i=0;i<curGameEndList.storySprites.Length;i++){
 
-        gameEndImage.sprite = curGameEndList.stories[0].sprite;
-
-        gameEndImageCanvas.alpha = 0;
-        while (gameEndImageCanvas.alpha < 1)
+        //gameEndImage.sprite = curGameEndList.stories[0].sprite;
+        if (curGameEndList.stories[0].sprite != null/*  && i != 0 */)
         {
-            gameEndImageCanvas.alpha += 0.02f;
-            yield return wait10ms;
+            gameEndTextCanvas0.transform.GetChild(0).localPosition = new Vector2(0,gameEndMainTextPos_lower);
+
+            gameEndImage.sprite = curGameEndList.stories[0].sprite;
+            gameEndImageCanvas.gameObject.SetActive(true);
+            gameEndImageCanvas.GetComponent<Animator>().SetBool("fadeIn", true);
+            
+            // gameEndImageCanvas.alpha = 0;
+            // while (gameEndImageCanvas.alpha < 1)
+            // {
+            //     gameEndImageCanvas.alpha += 0.02f;
+            //     yield return wait10ms;
+            // }
         }
+        else{
+
+            gameEndTextCanvas0.transform.GetChild(0).localPosition = new Vector2(0,gameEndMainTextPos_center);
+
+            gameEndImage.sprite = null;
+            gameEndImageCanvas.gameObject.SetActive(false);
+        }
+
 
         yield return wait500ms;
         
@@ -394,7 +431,15 @@ public class UIManager : MonoBehaviour
 
             if (curGameEndList.stories[i].sprite != null/*  && i != 0 */)
             {
+                gameEndTextCanvas0.transform.GetChild(0).localPosition = new Vector2(0,gameEndMainTextPos_lower);
                 gameEndImage.sprite = curGameEndList.stories[i].sprite;
+                gameEndImageCanvas.gameObject.SetActive(true);
+                
+            }
+            else{
+                gameEndTextCanvas0.transform.GetChild(0).localPosition = new Vector2(0,gameEndMainTextPos_center);
+                gameEndImage.sprite = null;
+                gameEndImageCanvas.gameObject.SetActive(false);
             }
 
             if (!string.IsNullOrEmpty(curGameEndList.stories[i].soundFileName))
@@ -420,11 +465,12 @@ public class UIManager : MonoBehaviour
 
         }
 
+        gameEndImageCanvas.GetComponent<Animator>().SetBool("fadeIn", false);
 
         while (gameEndTextCanvas0.alpha > 0)
         {
-            gameEndImageCanvas.alpha -= 0.03f;
-            gameEndTextCanvas0.alpha -= 0.03f;
+            //gameEndImageCanvas.alpha -= 0.03f;
+            gameEndTextCanvas0.alpha -= 0.05f;
             yield return wait10ms;
         }
 
@@ -475,6 +521,21 @@ public class UIManager : MonoBehaviour
     public void OpenBookUI(int bookMainNum, int bookTextNum)
     {
         bookMainImage.sprite = bookMainSprites[bookMainNum];
+
+        if(DBManager.instance.language == "kr"){
+            bookTextNum=bookTextNum*3+2;
+
+        }
+        else if(DBManager.instance.language == "en"){
+            bookTextNum=bookTextNum*3;
+        }
+        else if(DBManager.instance.language == "jp"){
+            bookTextNum=bookTextNum*3+1;
+
+        }
+
+
+
         bookTextImage.sprite = bookTextSprites[bookTextNum];
         ui_book.SetActive(true);
     }
@@ -569,7 +630,7 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-
+    #region HUD
     public void SetHUD(bool active)
     {
         //hud_state.SetActive(active);
@@ -598,14 +659,21 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-    public void SetFadeHUD(bool active)
-    {
-    }
-    public void ChangeSprite(Sprite sprite)
-    {
+    public void OpenCollectionPage(){
+        if(MenuManager.instance==null) return;
 
+        MenuManager.instance.collectionPanel.SetActive(true);
+        //hud_sub_collection_new.SetActive(false);
     }
-
+    public bool CheckAntCollectionOverListAllRecognized(){
+        if(DBManager.instance.localData.antCollectionOverList.Exists(x=>!x.isRecognized)){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    #endregion
     //0 : 중앙 분홍 박스 내 노출, 1 : 아래 노출
     public void ShowKeyTutorial(string keyString,string argumentIndex ="", int boxType = 0){
         //Debug.Log("show");
@@ -692,6 +760,7 @@ public class UIManager : MonoBehaviour
         ui_endingGuide.SetActive(active);
         if(active){
             PlayerManager.instance.LockPlayer();
+            //hud_sub_endingGuide_redDot.gameObject.SetActive(false);
         }
         else{
             PlayerManager.instance.UnlockPlayer();
@@ -717,5 +786,13 @@ public class UIManager : MonoBehaviour
     //     //Convert the local point to world point
     //     return parentCanvas.transform.TransformPoint(movePos);
     // }
+    public void LinkMenuManager(string name){
+        try{
+            MenuManager.instance.SendMessage(name);
+        }
+        catch{
 
+        }
+
+    }
 }

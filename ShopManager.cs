@@ -13,6 +13,16 @@ public class ShopSlot
     public Image goldTypeImage;
     
 }
+[System.Serializable]
+public class ShopSales
+{
+    public int itemID;
+    public int itemAmount;
+    public ShopSales(int _itemID, int _itemAmount = 1){
+        itemID = _itemID;
+        itemAmount = _itemAmount;
+    }
+}
 public class ShopManager : MonoBehaviour
 {
     public static ShopManager instance;
@@ -25,6 +35,13 @@ public class ShopManager : MonoBehaviour
     public Transform shopSlotGrid;
     public ShopSlot[] shopSlots;
     public Sprite[] shopIconSprites;
+    [Space]
+    public GameObject ui_shop_check;
+    public Image check_iconImage;
+    public TextMeshProUGUI check_nameText;
+    public Image check_goldTypeImage;
+    public Text check_priceText;
+    public TextMeshProUGUI check_desText;
 
 
 
@@ -33,26 +50,33 @@ public class ShopManager : MonoBehaviour
     public int curShopIconIndex;
     public string curShopName;
     public int curItemPrice;
-    public int[] curShopSalesItemIndexes;
+    //public int[] curShopSalesItemIndexes;
+    public ShopSales[] curShopSales;
     public int lastBuyItemIndex;    //마지막 구매 아이템 체크용
 
+    [Space]
+    public int selectedSlotNum;
+    // public int selectedItemID;
+    // public string selectedItemName;
+    // public string selectedItemPrice;
+    // public Sprite selectedItemIconSprite;
+    // public Sprite selectedItemGoldResourceSprite;
 
 
 
 
 
+    // public int curSelectedNum;
+    // public int maxSelectedNum;
+    // public int lastSelectedNum;
 
-    public int curSelectedNum;
-    public int maxSelectedNum;
-    public int lastSelectedNum;
 
-
-    bool revealTextFlag;
-    bool revealTextFlag_NPC;
-    bool dialogueFlag;
-    public bool canSkip;
-    public bool canSkip2;
-    public bool goSkip;
+    // bool revealTextFlag;
+    // bool revealTextFlag_NPC;
+    // bool dialogueFlag;
+    // public bool canSkip;
+    // public bool canSkip2;
+    // public bool goSkip;
     
     WaitForSeconds wait250ms = new WaitForSeconds(0.25f);
     WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
@@ -63,11 +87,11 @@ public class ShopManager : MonoBehaviour
     }
     void Start(){
         
-        shopSlotGrid.GetChild(0).GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(()=>CloseShopUI());
+        //shopSlotGrid.GetChild(0).GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(()=>CloseShopUI());
         
         for(int i=0;i<shopSlotGrid.childCount-1;i++){
             int temp = i;
-            shopSlotGrid.GetChild(temp+1).GetChild(0).GetChild(5).GetComponent<Button>().onClick.AddListener(()=>BuyItem(temp));
+            shopSlotGrid.GetChild(temp+1).GetChild(0).GetComponent<Button>().onClick.AddListener(()=>OpenBuyCheckPopUp(temp));
         }
         
         for(int i=0;i<shopSlotGrid.childCount-1;i++){
@@ -174,16 +198,17 @@ public class ShopManager : MonoBehaviour
             shopSlotGrid.GetChild(i).gameObject.SetActive(false);
         }
     }
-    public void OpenShopUI(int shopIconIndex, string shopName, int[] shopSalesItemIndexes){
+    public void OpenShopUI(int shopIconIndex, string shopName, ShopSales[] shopSales){
 
         PlayerManager.instance.isShopping = true;
         
         ResetShopUI();
-        
+        UIManager.instance.SetHUD(true);
 
         DBManager theDB = DBManager.instance;
 
-        curShopSalesItemIndexes = shopSalesItemIndexes;
+        //curShopSalesItemIndexes = shopSalesItemIndexes;
+        curShopSales = shopSales;
 
         //curShopIconIndex = shopIconIndex;
         shopIconImage.sprite = shopIconSprites[shopIconIndex];
@@ -191,19 +216,21 @@ public class ShopManager : MonoBehaviour
         curShopName = shopName;
         shopNameText.text = curShopName;
 
-        for(int i=0;i<shopSalesItemIndexes.Length;i++){
+        for(int i=0;i<curShopSales.Length;i++){
+            int curShopSalesID = curShopSales[i].itemID;
+            int curShopSalesAmount = curShopSales[i].itemAmount;
 
-            shopSlots[i].itemImage.sprite = theDB.cache_ItemDataList[shopSalesItemIndexes[i]].icon;
-            shopSlots[i].itemNameText.text = theDB.cache_ItemDataList[shopSalesItemIndexes[i]].name;
-            shopSlots[i].itemPriceText.text = theDB.cache_ItemDataList[shopSalesItemIndexes[i]].price.ToString();
-            shopSlots[i].goldTypeImage.sprite = theDB.cache_ItemDataList[shopSalesItemIndexes[i]].goldIcon;
+            shopSlots[i].itemImage.sprite = theDB.cache_ItemDataList[curShopSalesID].icon;
+            shopSlots[i].itemNameText.text = theDB.cache_ItemDataList[curShopSalesID].name + " x " +curShopSalesAmount.ToString();
+            shopSlots[i].itemPriceText.text = (theDB.cache_ItemDataList[curShopSalesID].price * curShopSalesAmount).ToString();
+            shopSlots[i].goldTypeImage.sprite = theDB.cache_ItemDataList[curShopSalesID].goldIcon;
 
             shopSlotGrid.GetChild(i+1).gameObject.SetActive(true);
         }
 
         ui_shop.SetActive(true);
 
-        StartCoroutine(SlotAnimationCoroutine(shopSalesItemIndexes.Length));
+        StartCoroutine(SlotAnimationCoroutine(curShopSales.Length));
 
     }
     IEnumerator SlotAnimationCoroutine(int slotCount){
@@ -216,40 +243,81 @@ public class ShopManager : MonoBehaviour
         PlayerManager.instance.isShopping = false;
         ui_shop.SetActive(false);
     }
-    public void BuyItem(int slotNum){
+    public void BuyItem(){
+        int slotNum = selectedSlotNum;
+        
+        ui_shop_check.SetActive(false);
+
         int curHoneyAmount = DBManager.instance.curData.curHoneyAmount;
 
         curItemPrice = int.Parse(shopSlots[slotNum].itemPriceText.text);
 
-        //골드로 구매가능한 아이템
-        if(DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID == "Honey Drop"){
+        //아이템 구매에 필요한 재화 구분 (goldResourceID)
+        if(DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldResourceID == "Honey Drop"){
+            //구매 성공
             if(curHoneyAmount >= curItemPrice){
                 DBManager.instance.curData.curHoneyAmount -= curItemPrice;
-                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
-                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+                InventoryManager.instance.AddItem(curShopSales[slotNum].itemID,curShopSales[slotNum].itemAmount);
+                lastBuyItemIndex = curShopSales[slotNum].itemID;
+                
+                string[] tempArg = new string[1]{
+                    shopSlots[slotNum].itemNameText.text
+                    //DBManager.instance.cache_ItemDataList[lastBuyItemIndex].name.ToString(),
+                };
+                MenuManager.instance.OpenPopUpPanel_OneAnswer("89",mainArguments: tempArg);
+
             }   
+            //구매 실패
             else{
-                DM("구매 실패 : 골드 부족");
+                DM("구매 실패 : 골드 부족 - "+ curItemPrice);
+                string[] tempArg = new string[1]{
+                    DBManager.instance.cache_ItemDataList[7].name.ToString(),
+                };
+                MenuManager.instance.OpenPopUpPanel_OneAnswer("90",mainArguments: tempArg);
             }
         }
         //골드 제외 아이템으로 구매가능한 아이템
         else{
-            var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSalesItemIndexes[slotNum]].goldResourceID;
+            var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldResourceID;
 
             var tempItemID = DBManager.instance.cache_ItemDataList.FindIndex(x => x.resourceID == goldTypeIndex);
 
             if(InventoryManager.instance.CheckHaveItem(tempItemID)){
                 InventoryManager.instance.RemoveItem(tempItemID);
-                InventoryManager.instance.AddItem(curShopSalesItemIndexes[slotNum]);
-                lastBuyItemIndex = curShopSalesItemIndexes[slotNum];
+                InventoryManager.instance.AddItem(curShopSales[slotNum].itemID,curShopSales[slotNum].itemAmount);
+                lastBuyItemIndex = curShopSales[slotNum].itemID;
+
+                string[] tempArg = new string[1]{
+                    //DBManager.instance.cache_ItemDataList[lastBuyItemIndex].name.ToString(),
+                    shopSlots[slotNum].itemNameText.text
+                };
+                MenuManager.instance.OpenPopUpPanel_OneAnswer("89",mainArguments: tempArg);
+
             }
             else{
                 DM("구매 실패 : "+tempItemID+"번 아이템 부족");
+                string[] tempArg = new string[1]{
+                    DBManager.instance.cache_ItemDataList[tempItemID].name.ToString(),
+                };
+                MenuManager.instance.OpenPopUpPanel_OneAnswer("90",mainArguments: tempArg);
             }
         }
 
 
 
+    }
+    public void OpenBuyCheckPopUp(int slotNum){
+        selectedSlotNum = slotNum;
+
+        check_iconImage.sprite = shopSlots[slotNum].itemImage.sprite;
+        check_nameText.text = shopSlots[slotNum].itemNameText.text;
+        check_goldTypeImage.sprite = shopSlots[slotNum].goldTypeImage.sprite;
+        check_priceText.text = shopSlots[slotNum].itemPriceText.text;
+
+
+        check_desText.text = DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].description;
+
+        ui_shop_check.SetActive(true);
     }
 
     

@@ -35,6 +35,7 @@ public class NPCScript : CharacterScript
     public bool isNonStop;
     public bool isPaused;
     bool JYDFlag;
+    [Header("대화 중 플레이어를 바라봄 (mainbody 필수)")]
     public bool lookPlayer;
     [Header("감시 모드")]
     public bool onPatrol;
@@ -92,9 +93,19 @@ public class NPCScript : CharacterScript
         if(haveTalk && talkCanvas == null) talkCanvas = transform.GetChild(0).GetChild(0);
         if((haveWalk || !isSpriteRenderer)&&transform.childCount>=2 && mainBody == null) mainBody = transform.GetChild(1);
 
+
         thePlayer = PlayerManager.instance;
         rb = GetComponent<Rigidbody2D>();
         circleCollider2D = GetComponent<CircleCollider2D>();
+
+        
+        if(noCollision){
+            if(circleCollider2D == null) return;            
+            Physics2D.IgnoreCollision(thePlayer.bodyCollider2D, circleCollider2D, true);
+            Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
+        }
+
+        
         //if(mainBody!=null) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
         if(isSpriteRenderer) spriteRenderer = mainBody.GetComponent<SpriteRenderer>();
         //else spriteRenderer = GetComponent<SpriteRenderer>();
@@ -103,11 +114,6 @@ public class NPCScript : CharacterScript
         else animator = GetComponent<Animator>();
         if(haveTalk) defaultTalkCanvasHolderPosX = talkCanvas.GetComponent<RectTransform>().localPosition.x;
 
-        if(noCollision){
-                
-            Physics2D.IgnoreCollision(thePlayer.bodyCollider2D, circleCollider2D, true);
-            Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
-        }
         
         if(rader!=null){
             raderFlipX = rader.transform.localScale.x;
@@ -508,17 +514,22 @@ public class NPCScript : CharacterScript
     }
     public void Look(string direction){
         if(mainBody == null) return;
-
+        Debug.Log("look : " + direction);
         switch(direction){
             case "left" : 
                 //wSet = -1;
                 if(spriteRenderer!=null) spriteRenderer.flipX = true;
-               // mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+                else{
+                    mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
+                }
                 break;
             case "right" : 
                 //wSet = 1;
                 if(spriteRenderer!=null) spriteRenderer.flipX = false;
-                //mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
+                else{
+                mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+
+                }
                 break;
         }
         SetTalkCanvasDirection();

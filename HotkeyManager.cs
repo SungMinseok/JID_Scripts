@@ -38,6 +38,12 @@ public class HotkeyManager : MonoBehaviour
             else if(Input.GetKeyDown(KeyCode.Alpha0)){
                 theInven.PushItemBtn(9);
             }
+            else if(Input.GetKeyDown(KeyCode.M)){
+                if(DBManager.instance.CheckTrigOver(17)||DBManager.instance.CheckTrigOver(18)){
+                    theUI.ui_map.SetActive(!theUI.ui_map.activeSelf);
+
+                }
+            }
         }
 
         if(Input.GetKey(KeyCode.LeftControl)&&Input.GetKeyDown(KeyCode.M)){
@@ -73,6 +79,12 @@ public class HotkeyManager : MonoBehaviour
                 else if(theUI.ui_endingGuide.activeSelf){
                     //theUI.ui_endingGuide.SetActive(false);
                     theUI.ToggleEndingGuide(false);
+                }
+                else if(theUI.ui_map.activeSelf){
+                    theUI.ui_map.SetActive(false);
+                }
+                else if(theMenu.ui_coupon.activeSelf){
+                    theMenu.ui_coupon.SetActive(false);
                 }
                 else{
                     //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);

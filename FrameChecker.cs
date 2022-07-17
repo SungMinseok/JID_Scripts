@@ -6,12 +6,12 @@ public class FrameChecker : MonoBehaviour
 {
   float deltaTime = 0.0f;
 
-  GUIStyle style0, style1;
-  Rect rect0, rect1;
+  GUIStyle style0, style1, style2;
+  Rect rect0, rect1, rect2;
+  string text0, text1,text2;
   float msec;
   float fps;
   float worstFps=100f;
-  string text0, text1;
 
   void Awake()
   {
@@ -28,10 +28,16 @@ public class FrameChecker : MonoBehaviour
     style1.alignment = TextAnchor.UpperLeft;
     style1.fontSize = h * 2 / 100;
     style1.normal.textColor = Color.cyan;
+    
+    style2 = new GUIStyle();
+    style2.alignment = TextAnchor.UpperRight;
+    style2.fontSize = h * 2 / 100;
+    style2.normal.textColor = Color.cyan;
 
 
     rect0 = new Rect(0, h - style0.fontSize, w, style0.fontSize);
     rect1 = new Rect(0, 0, w, style1.fontSize);
+    rect2 = new Rect(-130, 0, w, style2.fontSize);
 
     //StartCoroutine ("worstReset");
   }
@@ -54,8 +60,9 @@ public class FrameChecker : MonoBehaviour
       //GUI.Label(rect0, text0, GUIStyle.none);
       var curAlphaState = style0.normal.textColor.a ;
       var setAlphaState = curAlphaState == 0 ? 1 : 0;
-      style1.normal.textColor = new Color(0,1,1,setAlphaState);
       style0.normal.textColor = new Color(0,1,1,setAlphaState);
+      style1.normal.textColor = new Color(0,1,1,setAlphaState);
+      style2.normal.textColor = new Color(0,1,1,setAlphaState);
 
         
     }
@@ -72,11 +79,13 @@ public class FrameChecker : MonoBehaviour
     //   worstFps = fps;
     // text = msec.ToString ("F1") + "ms (" + fps.ToString ("F1") + ") //worst : " + worstFps.ToString ("F1");
 
-    text0 = "FPS:"+fps.ToString ("F1");
+    text0 = "FPS:"+fps.ToString ("F1") + " / F11 : on/off";
     GUI.Label(rect0, text0, style0);
     text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + 
-            " / "+ DBManager.instance.buildDate;  ;
-    GUI.Label(rect1, text1, style1);
+            " / "+ DBManager.instance.buildDate;  
+    GUI.Label(rect1, text1, style1);  
+    text2 = "0먹이창고\n	1절벽\n	2복도\n	3노개미 방\n	4세 갈래 길\n	5유치원\n	6수개미 방\n	7수개미 끝방\n	8광장\n	9식당\n	10부화장\n	11대왕 일개미방\n	12농장가는 길\n	13냉동굴\n	14버섯농장\n	15진딧물농장\n	16나가는 길\n	17병원\n	18시장가는 길\n	19야시장\n	20두 갈래 길\n	21히든월드\n	22귀족의 길\n	23공주개미 방\n	24여왕개미 방\n";
+    GUI.Label(rect2, text2, style2);
   }
 } 
 

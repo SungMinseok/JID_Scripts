@@ -81,6 +81,20 @@ public class DialogueManager : MonoBehaviour
 
         if(dialogue.talker.TryGetComponent<NPCScript>(out NPCScript tempNpcScript)){
             tempNpcScript.isTalkingWithPlayer = true;
+
+            if(tempNpcScript.lookPlayer /* && tempNpcScript.mainBody !=null */){
+                
+                if(tempNpcScript.mainBody.position.x > PlayerManager.instance.transform.position.x){
+                    tempNpcScript.Look("left");
+                }
+                else{
+                    tempNpcScript.Look("right");
+
+                }
+                
+            }
+
+
         }
 
         for(int i=0; i<dialogue.sentences.Length;i++){

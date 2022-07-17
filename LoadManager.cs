@@ -44,6 +44,7 @@ public class LoadManager : MonoBehaviour
     public string mainSceneName;
 
     WaitForSeconds wait1s = new WaitForSeconds(1);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     void Awake(){
         
         if (null == instance)
@@ -295,7 +296,7 @@ public class LoadManager : MonoBehaviour
         yield return wait1s;
         // yield return wait1s;
         // yield return wait1s;
-        if(PlayerManager.instance!=null){
+        if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){
             Debug.Log("33344");
             yield return wait1s;
             PlayerManager.instance.canMove = true;
@@ -399,5 +400,11 @@ public class LoadManager : MonoBehaviour
 
     void OnApplicationQuit(){
         DBManager.instance.CallLocalDataSave();
+    }
+
+    public void LoadScene(string sceneName){
+        
+        SceneManager.LoadScene(sceneName);
+        
     }
 }

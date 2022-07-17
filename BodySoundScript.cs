@@ -84,6 +84,9 @@ public class BodySoundScript : MonoBehaviour
             case "pick" : 
                 SoundManager.instance.PlaySound("icebreak_0"+Random.Range(1,5));
                 break;
+            case "antwalk" : 
+                SoundManager.instance.PlaySound("AntWalk"+Random.Range(0,4));
+                break;
         }
     }
     public void PlaySound(string fileName){

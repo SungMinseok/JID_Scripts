@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class ItemControlManager : MonoBehaviour
 {
+    public static ItemControlManager instance;
     //public GameObject[] honeyObjects;
     // Start is called before the first frame update
     public Transform itemMother;
     public Transform dirtBundleMother;
+    public List<DirtScript> dirtScriptList;
+    void Awake(){
+        instance = this;
+    }
     void Start()
     {
         for(int i=0;i<itemMother.childCount;i++){
@@ -16,7 +21,14 @@ public class ItemControlManager : MonoBehaviour
 
         for(int i=0;i<dirtBundleMother.childCount;i++){
             dirtBundleMother.GetChild(i).GetComponent<DirtScript>().dirtBundleInfo.objectID = i;
+            dirtScriptList.Add(dirtBundleMother.GetChild(i).GetComponent<DirtScript>());
         }
+
+        
+        //for(int i=0;i<dirtBundleMother.childCount;i++){
+        // foreach(DirtScript a in dirtScriptList){
+        //     dirtScriptList.Add(a);
+        // }
 
         SetItemActivationState();
     }
@@ -27,9 +39,10 @@ public class ItemControlManager : MonoBehaviour
                 int id = DBManager.instance.curData.getItemOverList[i];
                 itemMother.GetChild(id).gameObject.SetActive(false);
         }
-        for(int i=0;i<DBManager.instance.curData.getDirtBundleOverList.Count;i++){
-            int id = DBManager.instance.curData.getDirtBundleOverList[i].objectID;
-            int hp = DBManager.instance.curData.getDirtBundleOverList[i].curHp;
+        for(int i=0;i<DBManager.instance.curData.dirtBundleInfoList.Count;i++){
+            int id = DBManager.instance.curData.dirtBundleInfoList[i].objectID;
+            int hp = DBManager.instance.curData.dirtBundleInfoList[i].curHp;
+            float recreateCoolTime = DBManager.instance.curData.dirtBundleInfoList[i].recreateCoolTime;
             if(hp==0){
                 dirtBundleMother.GetChild(id).gameObject.SetActive(false);
 
@@ -37,6 +50,8 @@ public class ItemControlManager : MonoBehaviour
             else{
                 dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.curHp = hp;
                 dirtBundleMother.GetChild(id).GetComponent<DirtScript>().ResetSprite();
+
+                dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.recreateCoolTime = recreateCoolTime;
 
             }
         }

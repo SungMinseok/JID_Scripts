@@ -20,6 +20,8 @@ public class MainControlScript : MonoBehaviour
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
 
     void Start(){
+
+
         StartCoroutine(IntroCoroutine());
 
         titleVideoName = videoClips[0].ToString();
@@ -38,11 +40,16 @@ public class MainControlScript : MonoBehaviour
         demoImage.SetActive(true);
 #endif
 
+        //LoadManager.instance.LoadScene("Menu");
+
+        //yield return wait1000ms;
             //yield return wait1000ms;
 
         // while(DBManager.instance==null){
         //     yield return wait100ms;
         // }
+        // yield return new WaitUntil(()=>MenuManager.instance);
+        // Debug.Log
 
         MenuManager.instance.SetResolutionByValue(DBManager.instance.localData.resolutionValue);
         MenuManager.instance.SetFrameRateByValue(DBManager.instance.localData.frameRateValue);
