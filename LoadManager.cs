@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UB.Simple2dWeatherEffects.Standard;
 using TMPro;
+using Steamworks;
 
 #region 앱 실행/종료 관련  처리
 #endregion
@@ -72,6 +73,24 @@ public class LoadManager : MonoBehaviour
         // + "_" 
         // + DBManager.instance.buildDate
         ;
+
+#if alpha
+
+        SteamUserStats.RequestCurrentStats();
+        SteamUserStats.GetStat("pt", out int a);
+        Debug.Log("a : " + a);
+
+        SteamUserStats.RequestGlobalStats(1);
+        SteamUserStats.GetGlobalStat("pt",out long pt);
+        Debug.Log("pt : " + pt);
+
+        SteamUserStats.RequestGlobalStats(1);
+        SteamUserStats.GetGlobalStat("test",out long test);
+        Debug.Log("test : " + test);
+        SteamUserStats.RequestCurrentStats();
+        SteamUserStats.GetStat("test", out int b);
+        Debug.Log("b : " + b);
+#endif
     }
 
     public void MainToGame()

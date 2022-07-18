@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using UnityEngine.UI;
+using Steamworks;
 
 public class TriggerScript : MonoBehaviour
 {    
@@ -174,6 +175,13 @@ public class TriggerScript : MonoBehaviour
                 case 76 :
                     objects[0].gameObject.SetActive(true);
                     objects[1].gameObject.SetActive(false);
+                    break;   
+                case 87 :
+                    if(!InventoryManager.instance.CheckHaveItem(38)){
+                        InventoryManager.instance.AddItem(38);
+                    }
+                    objects[0].gameObject.SetActive(false);
+                    objects[1].gameObject.SetActive(true);
                     break;   
 
 
@@ -1058,6 +1066,7 @@ public class TriggerScript : MonoBehaviour
                 objects[3].gameObject.SetActive(true);
                 objects[5].gameObject.SetActive(false);
                 objects[6].gameObject.SetActive(true);
+                objects[4].gameObject.SetActive(true);
 
 #if demo
 
@@ -1069,7 +1078,6 @@ public class TriggerScript : MonoBehaviour
                 SceneController.instance.SetConfiner(4, true);
                 PlayerManager.instance.Look("left");
                 PlayerManager.instance.SetTalkCanvasDirection("right");
-                objects[4].gameObject.SetActive(true);
                 FadeIn();
                 
                 for(int i=2;i<3;i++){
@@ -1312,6 +1320,11 @@ DBManager.instance.AntCollectionOver(12);
                     FadeIn();
 
 
+                    DBManager.instance.TrigOver(74);
+                //FadeIn();
+                
+                    objects[19].gameObject.SetActive(false);
+                    objects[20].gameObject.SetActive(false);
 
                 }
                 else{
@@ -1319,11 +1332,6 @@ DBManager.instance.AntCollectionOver(12);
 
                 }
 
-                DBManager.instance.TrigOver(74);
-                //FadeIn();
-                
-                    objects[19].gameObject.SetActive(false);
-                    objects[20].gameObject.SetActive(false);
                 break;
 #endregion
             
@@ -1434,7 +1442,7 @@ DBManager.instance.AntCollectionOver(14);
                 else{
                         location.selectPhase = -1;
 DBManager.instance.AntCollectionOver(16);
-
+                    CameraView(dialogues[0].talker);
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
                     SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
@@ -1445,6 +1453,7 @@ DBManager.instance.AntCollectionOver(16);
                     
                     if(GetSelect()==0){
                         for(int i=1;i<6;i++){
+                    CameraView(dialogues[i].talker);
                             SetDialogue(dialogues[i]);
                             yield return waitTalking;
                         }
@@ -1453,20 +1462,24 @@ DBManager.instance.AntCollectionOver(16);
                         ||InventoryManager.instance.CheckHaveItem(19)
                         ){
                                     
+                    CameraView(dialogues[6].talker);
                             SetDialogue(dialogues[6]);
                             yield return waitTalking;
+                    CameraView(dialogues[7].talker);
                             SetDialogue(dialogues[7]);
                             yield return waitTalking;
                             SetSelect(selects[1]);
                             yield return waitSelecting;
                             if(GetSelect()==0){
                                 for(int i=8;i<14;i++){
+                    CameraView(dialogues[i].talker);
                                     SetDialogue(dialogues[i]);
                                     yield return waitTalking;
                                 }
                                 location.selectPhase = -1;
                             }
                             else{
+                    CameraView(dialogues[15].talker);
                                 SetDialogue(dialogues[15]);
                                 yield return waitTalking;
                                 FadeOut();
@@ -1475,6 +1488,7 @@ DBManager.instance.AntCollectionOver(16);
                                 PlayerManager.instance.transform.position = objects[0].transform.position;
                                 FadeIn();
                                 
+                    CameraView(dialogues[16].talker);
                                 SetDialogue(dialogues[16]);
                                 yield return waitTalking;
 
@@ -1491,11 +1505,13 @@ DBManager.instance.AntCollectionOver(16);
                                 FadeIn();
 
                                 
+                    CameraView(dialogues[16].talker);
                                 SetDialogue(dialogues[16]);
                                 yield return waitTalking;
                         }
                     }
                     else{
+                    CameraView(dialogues[14].talker);
                         SetDialogue(dialogues[14]);
                         yield return waitTalking;
 
@@ -2542,6 +2558,11 @@ DBManager.instance.AntCollectionOver(15);
 
 #region t56 세갈래길 자동저장
             case 56 :
+                SteamUserStats.GetStat("pt",out int abc);
+                SteamUserStats.SetStat("pt",abc + 1);
+                SteamUserStats.GetStat("test",out int abc1);
+                SteamUserStats.SetStat("test",abc1 + 22);
+                SteamUserStats.StoreStats();
                 AutoSave();
                 break;
 #endregion

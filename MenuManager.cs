@@ -548,11 +548,12 @@ public class MenuManager : MonoBehaviour
         //확인
         popUpText1[1].text = okayIndex;
 
-        
+
             if(popUpText1[0].text != "")
-                popUpText1[0].text = 
-                string.Format(CSVReader.instance.GetIndexToString(int.Parse(popUpText1[0].text),"sysmsg"),mainArguments);
-        
+                popUpText1[0].text = mainArguments == null ?
+                CSVReader.instance.GetIndexToString(int.Parse(popUpText1[0].text),"sysmsg")
+                : string.Format(CSVReader.instance.GetIndexToString(int.Parse(popUpText1[0].text),"sysmsg"),mainArguments);
+
             if(popUpText1[1].text != "")
                 popUpText1[1].text = CSVReader.instance.GetIndexToString(int.Parse(popUpText1[1].text),"sysmsg");
         
@@ -684,7 +685,7 @@ public class MenuManager : MonoBehaviour
         LoadManager.instance.isLoadingInGameToLastPoint = true;
         //LoadManager.instance.lastLoadFileNum = curLoadNum;
         LoadManager.instance.LoadGame();
-        Debug.Log(LoadManager.instance.lastLoadFileNum + "번 파일 로드 시도 (마지막 저장)");
+        Debug.Log("Try to load last saved file..., FileNum : " + LoadManager.instance.lastLoadFileNum);
 
     }
 #endregion

@@ -66,32 +66,44 @@ public class MinigameManager : MonoBehaviour
         
     }
     public void SuccessMinigameTest(){
-        for(int i=0;i<instance.transform.childCount;i++){
-            instance.transform.GetChild(i).gameObject.SetActive(false);
-        }
-        //success = true;
-        PlayerManager.instance.isPlayingMinigame = false;
+        // for(int i=0;i<instance.transform.childCount;i++){
+        //     instance.transform.GetChild(i).gameObject.SetActive(false);
+        // }
+        // //success = true;
+        // PlayerManager.instance.isPlayingMinigame = false;
+        
+        MinigameManager.instance.successBtn.SetActive(false);
+        MinigameManager.instance.failBtn.SetActive(false);
         success = true;
         Debug.Log(nowMinigameNum + "번 미니게임 강제 성공 (테스트)");
         if(nowMinigameNum == 2){
             Minigame2Script.instance.Success();
         }
+        else{
+            StartCoroutine(FinishMinigameCoroutine());
+
+        }
     }
     public void FailMinigameTest(){
+        
+        MinigameManager.instance.successBtn.SetActive(false);
+        MinigameManager.instance.failBtn.SetActive(false);
         if(nowMinigameNum == 0){
             Minigame0Script.instance.ActivateGameOver();
         }
         else{
 
-            for(int i=0;i<instance.transform.childCount;i++){
-                instance.transform.GetChild(i).gameObject.SetActive(false);
-            }
+            // for(int i=0;i<instance.transform.childCount;i++){
+            //     instance.transform.GetChild(i).gameObject.SetActive(false);
+            // }
             //success = true;
             PlayerManager.instance.isPlayingMinigame = false;
             fail = true;
         }
 
             Debug.Log(nowMinigameNum + "번 미니게임 강제 실패 (테스트)");
+            
+            StartCoroutine(FinishMinigameCoroutine());
     }
     public void GiveReward(int gameNum){
         switch(gameNum){

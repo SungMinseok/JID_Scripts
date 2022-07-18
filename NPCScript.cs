@@ -185,6 +185,15 @@ public class NPCScript : CharacterScript
             randomDialogueFlag = false;
         }
     }
+    void OnEnable(){
+        
+        if(noCollision){
+            if(circleCollider2D == null) return;            
+            Physics2D.IgnoreCollision(thePlayer.bodyCollider2D, circleCollider2D, true);
+            Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
+        }
+
+    }
 
     void Update(){
 

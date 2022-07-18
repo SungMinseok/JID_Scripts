@@ -47,8 +47,8 @@ public class PasswordBoxScript : MonoBehaviour
         Debug.Log(temp);
         if(temp.Equals(answer)){
             isPlaying = false;
-            Debug.Log("Pass");
-            InventoryManager.instance.AddItem(32);
+            Debug.Log("[PasswordBoxScript] Success to unlock box.");
+            DBManager.instance.TrigOver(87);
             StartCoroutine(SuccessCoroutine());
         }
     }
@@ -59,6 +59,7 @@ public class PasswordBoxScript : MonoBehaviour
         yield return new WaitForSeconds(2f);
         //LoadManager.instance.FadeIn();
         //InventoryManager.instance.AddItem(32);
+        InventoryManager.instance.AddItem(38,activateDialogue:true);
         UIManager.instance.CloseScreen();
     }
 }

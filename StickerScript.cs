@@ -75,7 +75,9 @@ public class StickerScript : MonoBehaviour
             
             if(!DBManager.instance.localData.antCollectionOverList[trueID].isRecognized){
                 redDot.SetActive(true);
-                UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+
+                if(UIManager.instance!=null)
+                    UIManager.instance.hud_sub_collection_redDot.SetActive(true);
             }
             else{
                 redDot.SetActive(false);
@@ -110,7 +112,7 @@ public class StickerScript : MonoBehaviour
         DBManager.instance.localData.antCollectionOverList[trueID].isRecognized = true;
 
         //전부 인식 완료됐으면 메인 레드닷 제거
-        if(UIManager.instance.CheckAntCollectionOverListAllRecognized()){
+        if(UIManager.instance!=null && UIManager.instance.CheckAntCollectionOverListAllRecognized()){
             UIManager.instance.hud_sub_collection_redDot.SetActive(false);
         }
 
