@@ -19,6 +19,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioClip[] bgmClips; // 오디오 소스들 지정.
     [SerializeField] AudioClip[] audioClips; // 오디오 소스들 지정.
     Dictionary<string, AudioClip> audioClipsDic;
+    Dictionary<string, AudioClip> bgmClipsDic;
     public AudioSource sfxPlayer;
     public AudioSource bgmPlayer;
     WaitForSeconds wait10ms = new WaitForSeconds(0.01f);
@@ -46,7 +47,7 @@ public class SoundManager : MonoBehaviour
         Debug.Log("bgmVolume : "+bgmPlayer.volume);
         StopAllCoroutines();
     }
-    void Start()
+    void Update()
     {
         //sfxPlayer = GetComponent<AudioSource>();
         //SetupBGM();
@@ -54,14 +55,15 @@ public class SoundManager : MonoBehaviour
         //PlayBGM("ant mill");
         //SetBgmByMapNum(0);
 
-        Debug.Log("bgmVolume : "+bgmPlayer.volume);
+//        Debug.Log("bgmVolume : "+bgmPlayer.volume);
 
     }
-    public Sprite[] itemSprites;
+    //public Sprite[] itemSprites;
     void LoadResources(){
-        audioClips = Resources.LoadAll<AudioClip>("Sounds");
+        audioClips = Resources.LoadAll<AudioClip>("Sounds/SFX");
+        bgmClips = Resources.LoadAll<AudioClip>("Sounds/BGM");
         //bgmClips = Resources.LoadAll<AudioClip>("BGM");
-        itemSprites = Resources.LoadAll<Sprite>("Sprites/Items");
+        //itemSprites = Resources.LoadAll<Sprite>("Sprites/Items");
     }
     void PutSoundsToDictionary(){
 
@@ -71,6 +73,18 @@ public class SoundManager : MonoBehaviour
             if (audioClipsDic.ContainsKey(a.name) == false){
 
                 audioClipsDic.Add(a.name, a);
+                //print(a.name);
+            }
+        }
+
+        
+        bgmClipsDic = new Dictionary<string, AudioClip>();
+        foreach (AudioClip a in bgmClips)
+        {
+            if (bgmClipsDic.ContainsKey(a.name) == false){
+
+                bgmClipsDic.Add(a.name, a);
+                
                 //print(a.name);
             }
         }
@@ -117,13 +131,13 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayBGM(string soundFileName)
     {
-        if (audioClipsDic.ContainsKey(soundFileName) == false)
+        if (bgmClipsDic.ContainsKey(soundFileName) == false)
         {
             Debug.LogError(soundFileName + " is not Contained audioClipsDic");
             return;
         }
-        bgmPlayer.clip = audioClipsDic[soundFileName];
-        sfxPlayer.loop = true;
+        bgmPlayer.clip = bgmClipsDic[soundFileName];
+        bgmPlayer.loop = true;
         bgmPlayer.Play();
         
     }
@@ -151,12 +165,12 @@ public class SoundManager : MonoBehaviour
         ChangeBgm(soundFileName);
     }
     public void ChangeBgm(string soundFileName){
-        if(!audioClipsDic.ContainsKey(soundFileName)){
+        if(!bgmClipsDic.ContainsKey(soundFileName)){
             Debug.Log("bgm 파일 없음 : "+soundFileName);
             return;
         }
 
-        if(bgmPlayer.clip != audioClipsDic[soundFileName]){
+        if(bgmPlayer.clip != bgmClipsDic[soundFileName]){
             //Debug.Log("브금변경");
             if(curChangeBgmCoroutine!=null) StopCoroutine(curChangeBgmCoroutine);
             curChangeBgmCoroutine = StartCoroutine(ChangeBgmCoroutine(soundFileName));
@@ -183,7 +197,7 @@ public class SoundManager : MonoBehaviour
                 yield return wait10ms;
             }
             if(soundFileName != "off"){
-                bgmPlayer.clip = audioClipsDic[soundFileName];
+                bgmPlayer.clip = bgmClipsDic[soundFileName];
                 bgmPlayer.Play();
             }
             //소리 감소 하면서 아예 정지
@@ -195,12 +209,13 @@ public class SoundManager : MonoBehaviour
                 bgmPlayer.volume += tempDelta;
                 yield return wait10ms;
             }
+            bgmPlayer.volume -= tempDelta;
         }
         //이전에 재생중인게 없으면 바로 시작
         else{
             if(soundFileName != "off"){
 
-                bgmPlayer.clip = audioClipsDic[soundFileName];
+                bgmPlayer.clip = bgmClipsDic[soundFileName];
                 bgmPlayer.Play();
             }
         }
@@ -229,14 +244,16 @@ public class SoundManager : MonoBehaviour
     #region 옵션에서 볼륨조절
     public void SetVolumeSFX(float value)
     {
+        value *= 0.7f;
         DBManager.instance.localData.sfxVolume = value;
-        sfxPlayer.volume = value * 0.5f;
+        sfxPlayer.volume = value;// * 0.5f;
     }
 
     public void SetVolumeBGM(float value)
     {
+        value *= 0.3f;
         DBManager.instance.localData.bgmVolume = value;
-        bgmPlayer.volume = value * 0.5f;
+        bgmPlayer.volume = value;// * 0.5f;
     }
     // public void SetVolumeBGM(float value)
     // {

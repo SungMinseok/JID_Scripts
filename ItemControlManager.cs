@@ -24,6 +24,7 @@ public class ItemControlManager : MonoBehaviour
             dirtScriptList.Add(dirtBundleMother.GetChild(i).GetComponent<DirtScript>());
         }
 
+        //Debug.Log(dirtBundleMother.childCount);
         
         //for(int i=0;i<dirtBundleMother.childCount;i++){
         // foreach(DirtScript a in dirtScriptList){
@@ -41,17 +42,22 @@ public class ItemControlManager : MonoBehaviour
         }
         for(int i=0;i<DBManager.instance.curData.dirtBundleInfoList.Count;i++){
             int id = DBManager.instance.curData.dirtBundleInfoList[i].objectID;
+
+            var curDirtBundle = dirtBundleMother.GetChild(id).GetComponent<DirtScript>();
+
             int hp = DBManager.instance.curData.dirtBundleInfoList[i].curHp;
-            float recreateCoolTime = DBManager.instance.curData.dirtBundleInfoList[i].recreateCoolTime;
+            float recreateCoolTime = DBManager.instance.curData.dirtBundleInfoList[i].curRecreateCoolTime;
             if(hp==0){
                 dirtBundleMother.GetChild(id).gameObject.SetActive(false);
 
             }
             else{
-                dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.curHp = hp;
-                dirtBundleMother.GetChild(id).GetComponent<DirtScript>().ResetSprite();
-
-                dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.recreateCoolTime = recreateCoolTime;
+                //dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.curHp = hp;
+                //dirtBundleMother.GetChild(id).GetComponent<DirtScript>().dirtBundleInfo.curRecreateCoolTime = recreateCoolTime;
+                //dirtBundleMother.GetChild(id).GetComponent<DirtScript>().ResetSprite();
+                curDirtBundle.dirtBundleInfo.curHp = hp;
+                curDirtBundle.dirtBundleInfo.curRecreateCoolTime = recreateCoolTime;
+                curDirtBundle.ResetSprite();
 
             }
         }

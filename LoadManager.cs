@@ -46,6 +46,8 @@ public class LoadManager : MonoBehaviour
 
     WaitForSeconds wait1s = new WaitForSeconds(1);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
+    WaitForSeconds wait1ms = new WaitForSeconds(0.001f);
+    WaitUntil waitPlayer = new WaitUntil(()=>PlayerManager.instance);
     void Awake(){
         
         if (null == instance)
@@ -204,6 +206,7 @@ public class LoadManager : MonoBehaviour
 #region [ 데이터 로드 완료 후 ]
 
         AsyncOperation asyncScene = SceneManager.LoadSceneAsync(nextScene);
+        //SceneManager.LoadSceneAsync("Menu",LoadSceneMode.Additive);
         asyncScene.allowSceneActivation = false;
         while (!asyncScene.isDone)
         {
@@ -241,6 +244,7 @@ public class LoadManager : MonoBehaviour
             
             var tempData = DBManager.instance.curData;
             yield return wait1s;
+           // yield return waitPlayer;
 
             //SceneController.instance.SetConfiner(tempData.curMapNum);
             //StartCoroutine(SetCameraPos(tempData.curMapNum));
@@ -248,7 +252,7 @@ public class LoadManager : MonoBehaviour
             SceneController.instance.SetPlayerPosition();
             SceneController.instance.SetPlayerEquipments();
             InventoryManager.instance.ResetInventory();
-            SceneController.instance.SetConfiner(tempData.curMapNum);
+            SceneController.instance.SetConfiner(tempData.curMapNum,isDirect:true);
             SoundManager.instance.SoundOff();
             SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
@@ -259,6 +263,7 @@ public class LoadManager : MonoBehaviour
             
             var tempData = DBManager.instance.curData;
             yield return wait1s;
+            //yield return waitPlayer;
 
             //SceneController.instance.SetConfiner(tempData.curMapNum);
             //StartCoroutine(SetCameraPos(tempData.curMapNum));
@@ -285,6 +290,7 @@ public class LoadManager : MonoBehaviour
             SoundManager.instance.SoundOff();
                 SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
+                Debug.Log("맵번호 : " + tempData.curMapNum);
             }
 
         }
@@ -292,7 +298,9 @@ public class LoadManager : MonoBehaviour
     
             //DBManager.instance.curData = DBManager.instance.emptyData;
 
-            yield return wait1s;
+            yield return wait1s;            
+            //yield return waitPlayer;
+
             SceneController.instance.SetFirstLoad();
         }
 
@@ -305,19 +313,19 @@ public class LoadManager : MonoBehaviour
 
 
 
-        yield return wait1s;
+        //yield return wait1s;
             //Debug.Log("A");
         FadeIn();
 
         loadFlag = false;
         reloadScene = false;
         
-        yield return wait1s;
+        yield return wait500ms;
         // yield return wait1s;
         // yield return wait1s;
         if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){
-            Debug.Log("33344");
-            yield return wait1s;
+            //Debug.Log("33344");
+            //yield return wait1s;
             PlayerManager.instance.canMove = true;
         }
         //loadFader.GetComponent<Animator>().SetTrigger("fadeIn");

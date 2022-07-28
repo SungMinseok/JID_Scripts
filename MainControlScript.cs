@@ -30,6 +30,7 @@ public class MainControlScript : MonoBehaviour
         mainBtns.transform.GetChild(0).GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("load"));
         mainBtns.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
         mainBtns.transform.GetChild(0).GetChild(3).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("setting"));
+        mainBtns.transform.GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("language"));
         //mainBtns.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
         
     }
@@ -39,7 +40,6 @@ public class MainControlScript : MonoBehaviour
 #if demo
         demoImage.SetActive(true);
 #endif
-
         //LoadManager.instance.LoadScene("Menu");
 
         //yield return wait1000ms;
@@ -48,7 +48,7 @@ public class MainControlScript : MonoBehaviour
         // while(DBManager.instance==null){
         //     yield return wait100ms;
         // }
-        // yield return new WaitUntil(()=>MenuManager.instance);
+        yield return new WaitUntil(()=>MenuManager.instance);
         // Debug.Log
 
         MenuManager.instance.SetResolutionByValue(DBManager.instance.localData.resolutionValue);

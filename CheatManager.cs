@@ -351,6 +351,18 @@ public class CheatManager : MonoBehaviour
 
                     break;
                     
+                case "set" :
+
+                    if(temp[1]=="") return;
+                    switch(temp[1]){
+                        case "0" :
+                            InventoryManager.instance.AddItem(5,100);
+                            InventoryManager.instance.AddItem(2,1);
+                            InventoryManager.instance.AddItem(21,1);
+                            InventoryManager.instance.AddItem(38,1);
+                            break;
+                    }
+                    break;
             }
 //EndingCollectionOver
 //DeleteSaveFile

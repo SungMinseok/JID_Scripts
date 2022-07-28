@@ -172,6 +172,8 @@ public class MinigameManager : MonoBehaviour
         fail = false;
     }
     public void OpenGuide(int mainSysMsgIndex, int subSysMsgIndex){
+        MenuManager.instance.ApplyFont(guideMainText);
+        MenuManager.instance.ApplyFont(guideSubText);
         guideMainText.text = CSVReader.instance.GetIndexToString(mainSysMsgIndex,"sysmsg");
         guideSubText.text = CSVReader.instance.GetIndexToString(subSysMsgIndex,"sysmsg");
         minigameGuidePopUp.SetActive(true);

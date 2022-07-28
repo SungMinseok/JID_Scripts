@@ -25,12 +25,10 @@ public class PlayerManager : CharacterScript
 
     public static PlayerManager instance;
     [Header("Objects━━━━━━━━━━━━━━━━━━━")]
-    public SpriteRenderer sr_helmet;
-    public SpriteRenderer sr_back_helmet;
-    public SpriteRenderer sr_armor;
-    public SpriteRenderer sr_back_armor;
+    public bool useWearableScript;
     public Armor[] armors;
     public Helmet[] helmets;
+    public WearableScript wearable;
     
     [Header("Wearable Objects")]
     //public SpriteRenderer[] helmets;
@@ -502,7 +500,7 @@ public class PlayerManager : CharacterScript
     }
     void Jump(float multiple = 1)
     {
-        Debug.Log("Jump");
+//        Debug.Log("Jump");
         //if(jumpDelay) return;
         //isJumping = true;
         //Debug.Log("jumpDelay : " + jumpDelay);
@@ -872,19 +870,19 @@ public class PlayerManager : CharacterScript
             }
         }
 
-
-
-
-        for(int i=0;i<armors.Length;i++){
-            foreach(GameObject curArmor in armors[i].objects){
-                curArmor.SetActive(false);
+        //프리팹
+        var curArmor = !useWearableScript ? armors : wearable.wearables;
+        Debug.Log(curArmor.Length);
+        for(int i=0;i<curArmor.Length;i++){
+            foreach(GameObject a in curArmor[i].objects){
+                a.SetActive(false);
             }
         }
-        var armorIndex = Array.FindIndex(armors, x => x.itemID == equipments_id[1]);
+        var armorIndex = Array.FindIndex(curArmor, x => x.itemID == equipments_id[1]);
 
         if(armorIndex != -1){
-            foreach(GameObject curArmor in armors[armorIndex].objects){
-                curArmor.SetActive(true);
+            foreach(GameObject a in curArmor[armorIndex].objects){
+                a.SetActive(true);
             }
         }
 

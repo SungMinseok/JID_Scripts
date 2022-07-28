@@ -95,45 +95,57 @@ public class CSVReader : MonoBehaviour
 
                     result = data_dialogue[index][curLanguage];
                     string resultString = result.ToString();
-                                
-                    if(!resultString.Contains("</color>")){
-                        //한 줄 최소 텍스트 갯수(공백 포함)
-                        int dialogueMaxCountPerRow = 18;
 
-                        switch(DBManager.instance.language){
-                            case "kr" : 
-                            case "jp" : 
-                                dialogueMaxCountPerRow = 18;
-                                break;
-                            case "en" : 
-                                dialogueMaxCountPerRow = 25;
-                                break;
-                            default :
-                                break;
-                        }
+                    
+                    // switch(DBManager.instance.language){
+                    //     case "kr":
+                    //     case "en":
+                            if(!resultString.Contains("</color>")){
+                                //한 줄 최소 텍스트 갯수(공백 포함)
+                                int dialogueMaxCountPerRow = 18;
 
-                        var quotient = resultString.Length / dialogueMaxCountPerRow ;
+                                switch(DBManager.instance.language){
+                                    case "kr" : 
+                                    case "jp" : 
+                                        dialogueMaxCountPerRow = 18;
+                                        break;
+                                    case "en" : 
+                                        dialogueMaxCountPerRow = 25;
+                                        break;
+                                    default :
+                                        break;
+                                }
 
-                        if(quotient == 0){
-                            break;
-                        }
+                                var quotient = resultString.Length / dialogueMaxCountPerRow ;
 
-                        int add = 0;
+                                if(quotient == 0){
+                                    break;
+                                }
 
-                        for(int i=1;i<=quotient;i++){
-                            int startIndex = dialogueMaxCountPerRow * i + add;
-                            add = 0;
-                            //단어가 중간에 안잘리도록 함.
-                            while( startIndex + add < resultString.Length && resultString[startIndex + add]!=' '){
-                                add++;
+                                int add = 0;
+
+                                for(int i=1;i<=quotient;i++){
+                                    int startIndex = dialogueMaxCountPerRow * i + add;
+                                    add = 0;
+                                    //단어가 중간에 안잘리도록 함.
+                                    if(DBManager.instance.language=="en"&&DBManager.instance.language=="kr"){
+
+                                        while( startIndex + add < resultString.Length && resultString[startIndex + add]!=' '){
+                                            add++;
+                                        }
+                                    }
+                                    if(startIndex + add >= resultString.Length) break;
+                                    resultString = resultString.Insert(startIndex + add + 1,"\n");
+
+                                }
+
+
                             }
-                            if(startIndex + add >= resultString.Length) break;
-                            resultString = resultString.Insert(startIndex + add + 1,"\n");
-
-                        }
-
-
-                    }
+                    //         break;
+                    //     case "jp":
+                    //         break;
+                    // }
+                                
 
 
                     result = resultString;

@@ -523,7 +523,7 @@ public class NPCScript : CharacterScript
     }
     public void Look(string direction){
         if(mainBody == null) return;
-        Debug.Log("look : " + direction);
+//        Debug.Log("look : " + direction);
         switch(direction){
             case "left" : 
                 //wSet = -1;
@@ -554,7 +554,7 @@ public class NPCScript : CharacterScript
             // else{
             //     var v = 1;
             // }
-            Debug.Log(defaultTalkCanvasHolderPosX);
+//            Debug.Log(defaultTalkCanvasHolderPosX);
 
             var tempRect = talkCanvas.GetComponent<RectTransform>();
             tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);

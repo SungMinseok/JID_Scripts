@@ -31,8 +31,8 @@ public class TranslateText : MonoBehaviour
         }
         
         if(key!=-1){
-            ApplyTranslation(curText);
-            ApplyFont(curText);
+            ApplyTranslation();
+            MenuManager.instance.ApplyFont(curText);
             
         }
 
@@ -42,11 +42,11 @@ public class TranslateText : MonoBehaviour
             Debug.LogError("텍스트 키 설정값 없음" + DebugManager.GetGameObjectPath(this.gameObject));
         }
 
-        Text curText = GetComponent<Text>();
-        ApplyTranslation(curText);
-        ApplyFont(curText);
+        ApplyTranslation();
+        //MenuManager.instance.ApplyFont(curText);
     }
-    public void ApplyTranslation(Text curText){
+    public void ApplyTranslation(){
+        Text curText = GetComponent<Text>();
 
         if(isKeyTutorial){
             if(keyMap == string.Empty) keyMap = "Interact";
@@ -72,18 +72,21 @@ public class TranslateText : MonoBehaviour
                 curText.text = CSVReader.instance.data_collection[key]["name_"+language].ToString();
                 break;
         }
+
+        MenuManager.instance.ApplyFont(curText);
+
     }
-    public void ApplyFont(Text curText){
-        string curLang = DBManager.instance.language;
-        switch(curLang){
-            case "kr" :
-            case "en" :
-                curText.font = MenuManager.instance.fonts[0];
-                break;
+    // public void ApplyFont(Text curText){
+    //     string curLang = DBManager.instance.language;
+    //     switch(curLang){
+    //         case "kr" :
+    //         case "en" :
+    //             curText.font = MenuManager.instance.fonts[0];
+    //             break;
                 
-            case "jp" :
-                curText.font = MenuManager.instance.fonts[1];
-                break;
-        }
-    }
+    //         case "jp" :
+    //             curText.font = MenuManager.instance.fonts[1];
+    //             break;
+    //     }
+    // }
 }

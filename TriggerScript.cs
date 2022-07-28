@@ -175,11 +175,14 @@ public class TriggerScript : MonoBehaviour
                 case 76 :
                     objects[0].gameObject.SetActive(true);
                     objects[1].gameObject.SetActive(false);
-                    break;   
+                    break;  
+                case 80 :
+                    objects[1].gameObject.SetActive(false);
+                    break; 
                 case 87 :
-                    if(!InventoryManager.instance.CheckHaveItem(38)){
-                        InventoryManager.instance.AddItem(38);
-                    }
+                    // if(!InventoryManager.instance.CheckHaveItem(38)){
+                    //     InventoryManager.instance.AddItem(38);
+                    // }
                     objects[0].gameObject.SetActive(false);
                     objects[1].gameObject.SetActive(true);
                     break;   
@@ -453,15 +456,16 @@ public class TriggerScript : MonoBehaviour
 
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
-
-                if(!DBManager.instance.CheckTrigOver(40)){
-                    ShopManager.instance.OpenShopUI(3,shopName:CSVReader.instance.GetIndexToString(254,"sysmsg")
-                    ,/* new int[]{23,20} */new ShopSales[]{new ShopSales(23),new ShopSales(20)});//23빨대, 20비밀쪽지
-                }
-                else{
-                    ShopManager.instance.OpenShopUI(3,shopName:CSVReader.instance.GetIndexToString(254,"sysmsg")
-                    ,new ShopSales[]{new ShopSales(20)});//20비밀쪽지
-                }
+                ShopManager.instance.OpenShopUI(3,shopName:CSVReader.instance.GetIndexToString(254,"sysmsg")
+                ,/* new int[]{23,20} */new ShopSales[]{new ShopSales(23),new ShopSales(20)});//23빨대, 20비밀쪽지
+                // if(!DBManager.instance.CheckTrigOver(40)){
+                //     ShopManager.instance.OpenShopUI(3,shopName:CSVReader.instance.GetIndexToString(254,"sysmsg")
+                //     ,/* new int[]{23,20} */new ShopSales[]{new ShopSales(23),new ShopSales(20)});//23빨대, 20비밀쪽지
+                // }
+                // else{
+                //     ShopManager.instance.OpenShopUI(3,shopName:CSVReader.instance.GetIndexToString(254,"sysmsg")
+                //     ,new ShopSales[]{new ShopSales(20)});//20비밀쪽지
+                // }
                 yield return waitShopping;
 
 
@@ -533,7 +537,10 @@ public class TriggerScript : MonoBehaviour
             case 1 :
                 SetDialogue(dialogues[0]);
                 yield return wait500ms;
-                UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey("Interact"),argumentIndex:"82",boxType:1);
+                PlayerManager.instance.tutorialBox_Right.gameObject.SetActive(true);
+                
+                PlayerManager.instance.tutorialBox_Right.GetChild(1).GetComponent<Animator>().SetBool("activate",true);
+                //UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey("Interact"),argumentIndex:"82",boxType:1);
                 yield return waitTalking;
                 UIManager.instance.HideKeyTutorial();
 
@@ -1468,8 +1475,35 @@ DBManager.instance.AntCollectionOver(16);
                     CameraView(dialogues[7].talker);
                             SetDialogue(dialogues[7]);
                             yield return waitTalking;
-                            SetSelect(selects[1]);
-                            yield return waitSelecting;
+
+                            int[] tempIntArr26 = new int[3]{3,16,19};
+                            List<string> tempStringList26 = new List<string>();
+                            List<string> tempStringList26_1 = new List<string>();
+                            for(int i=0;i<3;i++){
+                                if(InventoryManager.instance.CheckHaveItem(tempIntArr26[i])){
+                                    tempStringList26_1.Add(DBManager.instance.cache_ItemDataList[tempIntArr26[i]].name.ToString());
+                                    tempStringList26.Add("131");
+                                }
+                            }
+
+                            string [] tempArg26 = tempStringList26_1.ToArray();
+
+                            Select tempSelect26 = new Select();
+                            tempSelect26.answers = tempStringList26.ToArray();
+                            // string[] tempArg26 = new string[3]{
+                            //     DBManager.instance.cache_ItemDataList[9].name.ToString(),
+                            //     DBManager.instance.cache_ItemDataList[33].name.ToString(),
+                            //     DBManager.instance.cache_ItemDataList[34].name.ToString()
+                            // };
+
+                            //Debug.Log(DBManager.instance.cache_ItemDataList[9].name.ToString());
+
+                            SetSelect(tempSelect26, tempArg26);
+                            yield return waitSelecting;     
+    
+
+                            // SetSelect(selects[1]);
+                            // yield return waitSelecting;
                             if(GetSelect()==0){
                                 for(int i=8;i<14;i++){
                     CameraView(dialogues[i].talker);
@@ -2401,57 +2435,6 @@ DBManager.instance.AntCollectionOver(15);
                 }
                 
 
-                // else{
-                //     if(InventoryManager.instance.CheckHaveItem(20)){
-
-                //         for(int i=22 ;i<24;i++){
-                //             SetDialogue(dialogues[i]);
-                //             yield return waitTalking;
-                //         }
-                        
-                //         for(int i=4 ;i<9;i++){
-                //             SetDialogue(dialogues[i]);
-                //             yield return waitTalking;
-                //         }
-
-                //         dialogues[8].talker.GetComponent<NPCScript>().wSet = -1;
-                //         yield return wait2000ms;
-                //         dialogues[8].talker.GetComponent<NPCScript>().wSet = 0;
-                //         dialogues[8].talker.GetComponent<NPCScript>().NpcLookObject(PlayerManager.instance.transform);
-                //         //CameraView(dialogues[9].talker);
-                //         SetDialogue(dialogues[9]);
-                //         yield return waitTalking;
-                //         //CameraView(dialogues[10].talker);
-                //         SetDialogue(dialogues[10]);
-                //         yield return waitTalking;
-                //         dialogues[8].talker.GetComponent<NPCScript>().wSet = -1;
-                //         dialogues[8].talker.GetComponent<NPCScript>().Look("left");
-                //         FadeOut();
-                //         yield return wait2000ms;
-                //         objects[0].gameObject.SetActive(false);
-                //         FadeIn();
-                //         yield return wait1000ms;
-                //         //CameraView(dialogues[11].talker);
-                //         SetDialogue(dialogues[11]);
-                //         yield return waitTalking;
-                //         ShakeCamera();
-                //         //CameraView(dialogues[12].talker);
-                //         SetDialogue(dialogues[12]);
-                //         yield return waitTalking;
-
-                //         location.selectPhase = -1;
-                        
-                //     }
-                //     else{
-
-                //         SetDialogue(dialogues[21]);
-                //         yield return waitTalking;
-                //     }
-                // }
-
-                
-
-
                 break;
 #endregion
 
@@ -2518,7 +2501,7 @@ DBManager.instance.AntCollectionOver(15);
 
                 objects[0].gameObject.SetActive(false);
                 objects[1].gameObject.SetActive(true);
-                InventoryManager.instance.AddItem(36);
+                InventoryManager.instance.AddItem(36,activateDialogue:true);
 
 
                 break;
@@ -3413,7 +3396,7 @@ DBManager.instance.AntCollectionOver(17);
         SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
         
 //트리거 종료 후 배경음 볼륨 복구
-        SoundManager.instance.bgmPlayer.volume = MenuManager.instance.slider_bgm.value;
+        SoundManager.instance.bgmPlayer.volume = DBManager.instance.localData.bgmVolume;//MenuManager.instance.slider_bgm.value;
 
 
 //타겟 지정된 트리거(타겟이 움직임)일 경우 트리거 종료 후 다시 이동

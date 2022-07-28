@@ -5,13 +5,13 @@ using UnityEngine;
 public class DirtBundleInfo{
     public int objectID;
     public int curHp;
-    public bool isRecreatable = true;
-    public float recreateCoolTime;
-    public DirtBundleInfo(int _objectID, int _curHp, bool _isRecreatable ,float _recreateCoolTime){
+    //public bool isRecreatable = true;
+    public float curRecreateCoolTime;
+    public DirtBundleInfo(int _objectID, int _curHp, float _recreateCoolTime){
         objectID = _objectID;
         curHp = _curHp;
-        isRecreatable = _isRecreatable;
-        recreateCoolTime = _recreateCoolTime;
+        //isRecreatable = _isRecreatable;
+        curRecreateCoolTime = _recreateCoolTime;
     }
 }
 public class DirtScript : MonoBehaviour
@@ -20,29 +20,36 @@ public class DirtScript : MonoBehaviour
         Dirt,
         Icicle,
     }
-    public DirtBundleInfo dirtBundleInfo;
+    [Space]
+    [Header("[Settings]━━━━━━━━━━━━━━━━━━━━━━━")]
+    public BundleType bundleType;
+    public int maxHp = 6;
     //public int objectID;
     //public bool isBundle;
-    public BundleType bundleType;
-    public bool phaseOn;
+    public int innerItemIndex = -1;
+    public int innerHoneyAmount = 0;
+    public bool isRecreatable;
+    public float recreateCoolTime;
+    public bool phaseOn;//스프라이트 변경될 경우 트루
+    [Header("[Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
     public GameObject[] dirtPhases;
     //public bool pieceOn;
     public Transform[] dirtPieces;
-    public int innerItemIndex = -1;
-    public int innerHoneyAmount = 0;
-    public int maxHp = 6;
     public int remainPieceCount;
-    public GameObject keyTutorial;
+    WaitForSeconds waitRecreateCoolTime;
+    //public GameObject keyTutorial;
     WaitForSeconds wait180ms = new WaitForSeconds(0.18f);
     [Space]
     [Header("[Debug]━━━━━━━━━━━━━━━━━━━━━━━")]
     //public float curHp;
     public float amountPerPiece;
+    public DirtBundleInfo dirtBundleInfo;
 
 
     void Start(){
         dirtBundleInfo.curHp = maxHp;
         remainPieceCount = dirtPieces.Length;
+        waitRecreateCoolTime = new WaitForSeconds(recreateCoolTime);
         
         if(bundleType == BundleType.Dirt){
 
@@ -70,17 +77,12 @@ public class DirtScript : MonoBehaviour
         yield return wait180ms;
         if(dirtBundleInfo.curHp>0){
             dirtBundleInfo.curHp--;
+            if(bundleType == BundleType.Icicle){
+                CreatePiece(dirtBundleInfo.curHp);
+            }
 
-            // if(!DBManager.instance.curData.getDirtBundleOverList.Exists(x=> x.objectID == dirtBundleInfo.objectID)){
-            //     DBManager.instance.curData.getDirtBundleOverList.Add(new DirtBundleInfo(dirtBundleInfo.objectID,dirtBundleInfo.curHp));
-            // }
-            // else{
-            //     int index = DBManager.instance.curData.getDirtBundleOverList.FindIndex(x=>x.objectID == dirtBundleInfo.objectID);
-            //     DBManager.instance.curData.getDirtBundleOverList[index].curHp = dirtBundleInfo.curHp;
-            // }
 
             if(dirtBundleInfo.curHp==0){
-                //if(keyTutorial!=null) keyTutorial.SetActive(false);
                 
                 UIManager.instance.HideKeyTutorial();
                 dirtPhases[0].SetActive(false);
@@ -95,16 +97,20 @@ public class DirtScript : MonoBehaviour
                     }
                 }
 
-            }
-            else if(dirtBundleInfo.curHp/maxHp<0.334f && remainPieceCount==2){
-                //if(phaseOn) dirtPhases[1].SetActive(false);
-                if(bundleType==BundleType.Icicle) CreatePiece(1);
+                if(isRecreatable){
+                    StartCoroutine(RecreateCoroutine());
+                }
 
             }
-            else if(dirtBundleInfo.curHp/maxHp<0.667f && remainPieceCount==3){
-                //if(phaseOn) dirtPhases[2].SetActive(false);
-                if(bundleType==BundleType.Icicle) CreatePiece(2);
-            }
+            // else if(dirtBundleInfo.curHp/maxHp<0.334f && remainPieceCount==2){
+            //     //if(phaseOn) dirtPhases[1].SetActive(false);
+            //     if(bundleType==BundleType.Icicle) CreatePiece(1);
+
+            // }
+            // else if(dirtBundleInfo.curHp/maxHp<0.667f && remainPieceCount==3){
+            //     //if(phaseOn) dirtPhases[2].SetActive(false);
+            //     if(bundleType==BundleType.Icicle) CreatePiece(2);
+            // }
 
             if(phaseOn){
                 SetSprite();
@@ -126,11 +132,22 @@ public class DirtScript : MonoBehaviour
     }
     public void ResetSprite(){
     
-        int temp = maxHp / dirtPhases.Length;
+        int temp0 = maxHp / dirtPhases.Length; // 6 / 2
+        int temp1 = dirtBundleInfo.curHp / temp0;
 
-        for(int i=dirtBundleInfo.curHp/temp;i<dirtPhases.Length;i++){
-            if(i+1<dirtPhases.Length) dirtPhases[i+1].SetActive(false);
+
+        for(int i=0;i<temp1; i++){
+            dirtPhases[i].SetActive(true);
         }
+        for(int i=temp1;i<dirtPhases.Length;i++){
+            dirtPhases[i].SetActive(false);
+        }
+
+        GetComponent<BoxCollider2D>().enabled =true;
+
+        // for(int i=dirtBundleInfo.curHp/temp;i<dirtPhases.Length;i++){
+        //     if(i+1<dirtPhases.Length) dirtPhases[i+1].SetActive(false);
+        // }
     }
     public void CreatePiece(int num){
         if(dirtPieces.Length < num) return;
@@ -157,4 +174,20 @@ public class DirtScript : MonoBehaviour
             UIManager.instance.HideKeyTutorial();
     }
 
+    IEnumerator RecreateCoroutine(float coolTime = 0){
+        if(coolTime == 0){
+            yield return waitRecreateCoolTime;
+        }
+        else{
+            yield return new WaitForSeconds(coolTime);
+        }
+
+        dirtBundleInfo.curHp = maxHp;
+        dirtBundleInfo.curRecreateCoolTime = recreateCoolTime;
+
+        ResetSprite();
+    }
+    void OnDisable(){
+        StopAllCoroutines();
+    }
 }

@@ -8,6 +8,7 @@ public class Minigame3Script : MonoBehaviour
 {
     public static Minigame3Script instance;
 
+    [Header("0 : 죽은척물약(4), 1 : 회복물약(8)")]
     //x : 7.5  y : 4
     [Header("[Game Settings]─────────────────")]
     public string[] recipes = new string[3];

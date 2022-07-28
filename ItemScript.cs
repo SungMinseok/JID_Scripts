@@ -136,7 +136,14 @@ public class ItemScript : MonoBehaviour
             StartCoroutine(GetItemAndRemoveCoroutine());
             DM(itemID+"번 아이템 "+amount_item+"개 획득");
             
-            InventoryManager.instance.AddItem(itemID,activateDialogue:true);
+            if(useDialogue){
+                InventoryManager.instance.AddItem(itemID);
+
+            }
+            else{
+                InventoryManager.instance.AddItem(itemID,activateDialogue:true);
+
+            }
 
             
         }
@@ -161,7 +168,7 @@ public class ItemScript : MonoBehaviour
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
             //트리거 시작시 배경음 감소
             SoundManager.instance.bgmPlayer.volume = SoundManager.instance.bgmPlayer.volume * 0.3f;
-
+            Debug.Log(getItemDialogue.sentences[1]);
             DialogueManager.instance.SetDialogue(getItemDialogue);
             yield return waitTalking;
 

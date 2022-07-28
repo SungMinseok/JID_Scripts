@@ -8,6 +8,7 @@ using System;
 
 public class MenuManager : MonoBehaviour
 {
+    public Text versionText;
     public static MenuManager instance;
     [Header("[Game Objects]━━━━━━━━━━━━━━━━━━━━━━━")]
     //public GameObject btnGridObject;
@@ -89,6 +90,10 @@ public class MenuManager : MonoBehaviour
     public Sprite nullSprite;
     public Font[] fonts ;
     public GameObject ui_coupon;
+    [Header("UI_Language")]
+    public GameObject languagePanel;
+    public Transform languagePanelBtnGrid;
+    public TranslateText languagePanelMainText;
     [Header("Debug────────────────────")]
     public string curPopUpType;
     public int curSaveNum;
@@ -98,7 +103,15 @@ public class MenuManager : MonoBehaviour
     public int[] tempCardNum = new int[5];
 
     void Awake(){
-        instance = this;
+        if (null == instance)
+        {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
     }    
     void Update(){
         if(Input.GetButtonUp("Cancel")){
@@ -136,6 +149,8 @@ public class MenuManager : MonoBehaviour
         fonts = new Font[2];
         fonts[0] = Resources.Load<Font>("Cafe24Ssurround");
         fonts[1] = Resources.Load<Font>("uzura");
+
+        versionText.text = string.Format("ver.{0}",DBManager.instance.buildNum);
 
 #region Reset Collection
         //totalPage = DBManager.instance.endingCollectionSprites.Length;
@@ -194,14 +209,15 @@ public class MenuManager : MonoBehaviour
         for(int i=0;i<setting_languagePage.childCount;i++){
             int temp = i;
             setting_languagePage.GetChild(i).GetComponent<Button>().onClick.AddListener(()=>ChangeLanguage(temp));
+            setting_languagePage.GetChild(i).GetComponent<Button>().onClick.AddListener(()=>languagePanelMainText.ApplyTranslation());
 
         }
 
 
         SoundManager.instance.SetVolumeBGM(DBManager.instance.localData.bgmVolume);
-        slider_bgm.value = DBManager.instance.localData.bgmVolume;
+        //slider_bgm.value = DBManager.instance.localData.bgmVolume;
         SoundManager.instance.SetVolumeSFX(DBManager.instance.localData.sfxVolume);
-        slider_sound.value = DBManager.instance.localData.sfxVolume;
+        //slider_sound.value = DBManager.instance.localData.sfxVolume;
         ToggleTalkSound(DBManager.instance.localData.onTalkingSound);
 
         ChangeLanguage(DBManager.instance.localData.languageValue, resetUI : false);
@@ -221,6 +237,18 @@ public class MenuManager : MonoBehaviour
         }
 
         ResetAntCollectionUI();
+#endregion
+
+
+#region 
+
+        for(int i=0;i<languagePanelBtnGrid.childCount;i++){
+            int temp = i;
+            languagePanelBtnGrid.GetChild(i).GetComponent<Button>().onClick.AddListener(()=>ChangeLanguage(temp,false));
+            languagePanelBtnGrid.GetChild(i).GetComponent<Button>().onClick.AddListener(()=>languagePanelMainText.ApplyTranslation());
+
+        }
+
 #endregion
     }
 
@@ -306,7 +334,7 @@ public class MenuManager : MonoBehaviour
             collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
 
             int tempTrueEndingNum = 0;  //트루엔딩 번호
-            Debug.Log(tempCardNum[2]);
+//            Debug.Log(tempCardNum[2]);
 
             if(theDB.cache_GameEndDataList.FindIndex(x => x.endingCollectionNum == tempCenterCollectionID)!=-1){
                 collectionEndingNumberVessel.SetActive(true);
@@ -321,7 +349,7 @@ public class MenuManager : MonoBehaviour
                 tempTrueEndingNum = 0;
             }
 
-            Debug.Log(tempEndedIndex);
+//            Debug.Log(tempEndedIndex);
 
             collectionEndingNumberText.text = string.Format("Ending no.{0}",tempTrueEndingNum);//[tempCardNum[2]].endingNum);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].clearedCount +"번 째 플레이";
             collectionPlayCountText.text = string.Format("{0}",DBManager.instance.localData.endingCollectionOverList[tempEndedIndex].clearedPlayCount);//"획득 : "+DBManager.instance.cache_EndingCollectionDataList[tempCenterCollectionID].clearedCount +"번 째 플레이";
@@ -388,6 +416,9 @@ public class MenuManager : MonoBehaviour
             var getData = DBManager.instance.GetData(slotNum);
             var getItemList = getData.itemList;
 
+            //if(UIManager.instance!=null)
+                MenuManager.instance.ApplyFont(curSlot.saveNameText);
+
             curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(getData.curMapNum,"map");
             curSlot.playTimeText.text = ConvertSeconds2TimeString(getData.curPlayTime);
             curSlot.saveDateText.text = getData.curPlayDate;
@@ -427,6 +458,10 @@ public class MenuManager : MonoBehaviour
             
         }
         else{
+
+            //if(UIManager.instance!=null)
+                MenuManager.instance.ApplyFont(curSlot.saveNameText);
+
             curSlot.saveNameText.text = CSVReader.instance.GetIndexToString(69,"sysmsg");
             curSlot.playTimeText.text = "-";
             curSlot.saveDateText.text = "-";
@@ -440,6 +475,7 @@ public class MenuManager : MonoBehaviour
             }
         }
     }
+    
     //저장 슬롯 터치 시
     public void TrySave(int num){
         curSaveNum = num;
@@ -612,6 +648,7 @@ public class MenuManager : MonoBehaviour
                 break;
 
         }
+        curPopUpType = "";
 
     }
     public void ResetPopUpOkayCheck(){
@@ -673,6 +710,9 @@ public class MenuManager : MonoBehaviour
                 break;
             case "setting" :
                 settingPanel.SetActive(true);
+                break;
+            case "language" :
+                languagePanel.SetActive(true);
                 break;
         }
 
@@ -951,5 +991,20 @@ public class MenuManager : MonoBehaviour
 
     public void CheckCoupon(){
 
+    }
+    
+    //해당 텍스트가 Text일 경우(TMP가 아닐 경우), 해당 Text.text 설정 전, 폰트 별도 적용 필요
+    public void ApplyFont(Text curText){
+        string curLang = DBManager.instance.language;
+        switch(curLang){
+            case "kr" :
+            case "en" :
+                curText.font = MenuManager.instance.fonts[0];
+                break;
+                
+            case "jp" :
+                curText.font = MenuManager.instance.fonts[1];
+                break;
+        }
     }
 }

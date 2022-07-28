@@ -69,7 +69,9 @@ public class SceneController : MonoBehaviour
             virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
             virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
             confiner2D.m_BoundingShape2D = mapBounds[mapNum];
+            Debug.Log("A : "+DBManager.instance.curData.curMapNum);
             SetCurrentMapName(mapNum);
+            Debug.Log("B : "+DBManager.instance.curData.curMapNum);
             Invoke("RecoverConfinerDamping",1f);
 
         }
