@@ -128,7 +128,7 @@ public class CSVReader : MonoBehaviour
                                     int startIndex = dialogueMaxCountPerRow * i + add;
                                     add = 0;
                                     //단어가 중간에 안잘리도록 함.
-                                    if(DBManager.instance.language=="en"&&DBManager.instance.language=="kr"){
+                                    if(DBManager.instance.language=="en"||DBManager.instance.language=="kr"){
 
                                         while( startIndex + add < resultString.Length && resultString[startIndex + add]!=' '){
                                             add++;

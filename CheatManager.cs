@@ -359,7 +359,10 @@ public class CheatManager : MonoBehaviour
                             InventoryManager.instance.AddItem(5,100);
                             InventoryManager.instance.AddItem(2,1);
                             InventoryManager.instance.AddItem(21,1);
-                            InventoryManager.instance.AddItem(38,1);
+                            InventoryManager.instance.AddItem(24,1);
+                            InventoryManager.instance.AddItem(3,1);
+                            InventoryManager.instance.AddItem(16,1);
+                            InventoryManager.instance.AddItem(19,1);
                             break;
                     }
                     break;

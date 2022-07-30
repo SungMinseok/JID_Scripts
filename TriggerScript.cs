@@ -1476,27 +1476,30 @@ DBManager.instance.AntCollectionOver(16);
                             SetDialogue(dialogues[7]);
                             yield return waitTalking;
 
+                            //보유한 과일에 따른 선택지 노출 220729
                             int[] tempIntArr26 = new int[3]{3,16,19};
-                            List<string> tempStringList26 = new List<string>();
-                            List<string> tempStringList26_1 = new List<string>();
+
+
+
+
+
+                            List<string> tempStringList26 = new List<string>(){};//선택지 배열 전환용
+                            List<string> tempStringList26_1 = new List<string>();//아이템 ID 스트링 배열 전환용
+                            List<int> tempIntList = new List<int>();//아이템 ID
                             for(int i=0;i<3;i++){
                                 if(InventoryManager.instance.CheckHaveItem(tempIntArr26[i])){
                                     tempStringList26_1.Add(DBManager.instance.cache_ItemDataList[tempIntArr26[i]].name.ToString());
-                                    tempStringList26.Add("131");
+                                    tempIntList.Add(tempIntArr26[i]);
+                                    tempStringList26.Add("191");
                                 }
                             }
+                            tempStringList26_1.Add("44");//배열 길이 초과 떄문에 넣음(의미X)
+                            tempStringList26.Add("44");
 
                             string [] tempArg26 = tempStringList26_1.ToArray();
 
                             Select tempSelect26 = new Select();
                             tempSelect26.answers = tempStringList26.ToArray();
-                            // string[] tempArg26 = new string[3]{
-                            //     DBManager.instance.cache_ItemDataList[9].name.ToString(),
-                            //     DBManager.instance.cache_ItemDataList[33].name.ToString(),
-                            //     DBManager.instance.cache_ItemDataList[34].name.ToString()
-                            // };
-
-                            //Debug.Log(DBManager.instance.cache_ItemDataList[9].name.ToString());
 
                             SetSelect(tempSelect26, tempArg26);
                             yield return waitSelecting;     
@@ -1504,15 +1507,8 @@ DBManager.instance.AntCollectionOver(16);
 
                             // SetSelect(selects[1]);
                             // yield return waitSelecting;
-                            if(GetSelect()==0){
-                                for(int i=8;i<14;i++){
-                    CameraView(dialogues[i].talker);
-                                    SetDialogue(dialogues[i]);
-                                    yield return waitTalking;
-                                }
-                                location.selectPhase = -1;
-                            }
-                            else{
+                            if(GetSelect()==tempSelect26.answers.Length-1){//주지 않는다.
+                                
                     CameraView(dialogues[15].talker);
                                 SetDialogue(dialogues[15]);
                                 yield return waitTalking;
@@ -1527,6 +1523,17 @@ DBManager.instance.AntCollectionOver(16);
                                 yield return waitTalking;
 
                                 //방나가짐
+                            }
+                            else{//과일을 준다.
+                                //선택한 과일에 맞는 아이템 ID 삭제
+                                InventoryManager.instance.RemoveItem(tempIntList[GetSelect()]);
+
+                                for(int i=8;i<14;i++){
+                    CameraView(dialogues[i].talker);
+                                    SetDialogue(dialogues[i]);
+                                    yield return waitTalking;
+                                }
+                                location.selectPhase = -1;
                             }
 
                         }
