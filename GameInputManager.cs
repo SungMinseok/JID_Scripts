@@ -6,20 +6,21 @@ using System;
 public static class GameInputManager
 {
     static Dictionary<string, KeyCode> keyMapping;
-    static string[] keyMaps = new string[2]
+    static string[] keyMaps = new string[3]
     {
         "Jump",
         "Interact",
+        "Pet",
         //"Forward",
         //"Backward",
         //"Left",
         //"Right"
     };
-    static KeyCode[] defaults = new KeyCode[2]
+    static KeyCode[] defaults = new KeyCode[3]
     {
         KeyCode.Space,
         KeyCode.E,
-        //KeyCode.W,
+        KeyCode.R,
         //KeyCode.S,
         //KeyCode.A,
         //KeyCode.D
@@ -45,13 +46,18 @@ public static class GameInputManager
         if(localData.interactKey==KeyCode.None){
             localData.interactKey = KeyCode.E;
         }
+        if(localData.petKey==KeyCode.None){
+            localData.petKey = KeyCode.R;
+        }
 
         SetKeyMap("Jump",localData.jumpKey);
         SetKeyMap("Interact",localData.interactKey);
+        SetKeyMap("Pet",localData.petKey);
         
         
         MenuManager.instance.keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
         MenuManager.instance.keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
+        //MenuManager.instance.keyText_pet.text = DBManager.instance.localData.petKey.ToString();
     }
  
     public static void SetKeyMap(string keyMap,KeyCode key)

@@ -202,21 +202,30 @@ public class DialogueManager : MonoBehaviour
 
                 if(i<totalVisibleCharacters && curSentence[i] != '.'&& curSentence[i] != ' ' && i%2 == 0){
 
+                    bool isNPC = dialogue.talker.TryGetComponent<NPCScript>(out NPCScript npcScript);
+
                     if(dialogue.talker == PlayerManager.instance.transform){
                         if(!dialogue.isMonologue)
                             SoundManager.instance.PlaySound("lucky_talk_"+Random.Range(1,11));
 
                     }
-                    else if(dialogue.talker.GetComponent<NPCScript>().isMerchant){
-                        SoundManager.instance.PlaySound("merchant_0"+Random.Range(1,8));
+                    else if(isNPC){
 
-                    }
-                    else if(dialogue.talker.GetComponent<NPCScript>().isKid){
-                        SoundManager.instance.PlaySound("little_ant_talking_"+Random.Range(1,7));
+                        if(dialogue.talker.GetComponent<NPCScript>().isMerchant){
+                            SoundManager.instance.PlaySound("merchant_0"+Random.Range(1,8));
 
+                        }
+                        else if(dialogue.talker.GetComponent<NPCScript>().isKid){
+                            SoundManager.instance.PlaySound("little_ant_talking_"+Random.Range(1,7));
+
+                        }
+                        else{
+                            SoundManager.instance.PlaySound("ant_talking_"+Random.Range(1,10));
+
+                        }
                     }
+                    //반딧불이
                     else{
-                        SoundManager.instance.PlaySound("ant_talking_"+Random.Range(1,10));
 
                     }
 

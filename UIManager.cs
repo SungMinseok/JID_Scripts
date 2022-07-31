@@ -59,6 +59,7 @@ public class UIManager : MonoBehaviour
     public bool getNewItemCollection;
     public GameObject hud_sub_collection_redDot;
     public GameObject hud_sub_endingGuide_redDot;
+    public bool blockUseItem;
 
     [Header("UI_Book")]
     public GameObject ui_book;
@@ -338,6 +339,7 @@ public class UIManager : MonoBehaviour
     {
         PlayerManager.instance.watchingGameEnding = true;
         PlayerManager.instance.LockPlayer();
+        PlayerManager.instance.isActing =true;
 
         var index = DBManager.instance.cache_GameEndDataList.FindIndex(x=> x.endingNum == num);
 
@@ -347,12 +349,12 @@ public class UIManager : MonoBehaviour
             //if (DBManager.instance.cache_GameEndDataList[i].endingNum == num)
             if(index != -1)
             {
-                Debug.Log(num + "번 엔딩 시작");
+                Debug.Log(num + "번 진엔딩 시작");
                 gameEndCoroutine = StartCoroutine(SetGameEndUICoroutine(index));
                 return;
             }
             else{
-                Debug.Log(num + "번 엔딩 없음");
+                Debug.Log(num + "번 진엔딩 없음");
 
             }
         //}
@@ -485,6 +487,8 @@ public class UIManager : MonoBehaviour
 
         yield return wait500ms;
 
+        gameEndSkipBtn.SetActive(false);
+
         gameEndText1_0.text = "<color=yellow>ending no." + curGameEndList.endingNum + "</color>";
         //gameEndText1_1.text = curGameEndList.name;
         gameEndText1_1.text = reader0[curGameEndList.endingCollectionNum]["name_" + language].ToString();
@@ -501,6 +505,18 @@ public class UIManager : MonoBehaviour
             yield return wait10ms;
         }
         yield return wait500ms;
+
+        if(curGameEndList.endingCollectionNum==7){
+        LoadManager.instance.FadeOut();
+            yield return wait1000ms;
+            SoundManager.instance.BgmOff();
+        LoadManager.instance.FadeIn();
+            //yield return wait500ms;
+            VideoManager.instance.PlayVideo(ResourceManager.instance.videoClips[0],isSkippable:true);
+            yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
+        LoadManager.instance.FadeOut();
+            yield return wait500ms;
+        }
 
         LoadManager.instance.LoadMain();
     }
@@ -634,6 +650,12 @@ public class UIManager : MonoBehaviour
     public void SetHUD(bool active)
     {
         //hud_state.SetActive(active);
+        // if(active){
+        //     hud_block.SetActive(false);
+        // }
+        // else{
+        //     hud_block.SetActive(true);
+        // }
         
         if(active){
             hud_state.GetComponent<CanvasGroup>().alpha = 1;
@@ -796,4 +818,7 @@ public class UIManager : MonoBehaviour
 
     }
 
+    public void ClearStringArray(string[] array){
+        Array.Clear(array,0,array.Length);
+    }
 }

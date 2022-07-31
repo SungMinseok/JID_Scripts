@@ -76,23 +76,6 @@ public class LoadManager : MonoBehaviour
         // + DBManager.instance.buildDate
         ;
 
-#if alpha
-
-        SteamUserStats.RequestCurrentStats();
-        SteamUserStats.GetStat("pt", out int a);
-        Debug.Log("a : " + a);
-
-        SteamUserStats.RequestGlobalStats(1);
-        SteamUserStats.GetGlobalStat("pt",out long pt);
-        Debug.Log("pt : " + pt);
-
-        SteamUserStats.RequestGlobalStats(1);
-        SteamUserStats.GetGlobalStat("test",out long test);
-        Debug.Log("test : " + test);
-        SteamUserStats.RequestCurrentStats();
-        SteamUserStats.GetStat("test", out int b);
-        Debug.Log("b : " + b);
-#endif
     }
 
     public void MainToGame()
@@ -257,6 +240,10 @@ public class LoadManager : MonoBehaviour
             SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
 
+            // if(lastLoadFileNum == -1){
+            //     InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
+
+            // }
         }
         else if(isLoadingInGameToLastPoint){
             isLoadingInGameToLastPoint = false;
@@ -279,6 +266,7 @@ public class LoadManager : MonoBehaviour
             SoundManager.instance.SoundOff();
                 SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log("빈 파일 로드 완료");
+                // InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
             }
             else{
                     
@@ -321,6 +309,15 @@ public class LoadManager : MonoBehaviour
         reloadScene = false;
         
         yield return wait500ms;
+
+        
+        if(lastLoadFileNum == -1){
+            if(InventoryManager.instance!=null){
+                InventoryManager.instance.GiveReward();
+
+            }
+
+        }
         // yield return wait1s;
         // yield return wait1s;
         if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){

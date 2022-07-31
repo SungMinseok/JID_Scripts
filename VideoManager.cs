@@ -10,6 +10,7 @@ public class VideoManager : MonoBehaviour
     public RenderTexture texture;
     public GameObject videoRenderer;
     public bool isPlayingVideo;
+    public bool canSkip;
     //WaitForSeconds waitTime = new WaitForSeconds(0.1f);
     
     void Awake(){
@@ -27,16 +28,22 @@ public class VideoManager : MonoBehaviour
         //StartCoroutine(IntroCoroutine());
     }
 
-    public void PlayVideo(VideoClip curVideo, bool isLooping = false, float delayTime = 0f, bool needClear = true, float volume = 1f){
+    public void PlayVideo(VideoClip curVideo, bool isLooping = false, float delayTime = 0f, bool needClear = true, float volume = 1f, float playSpeed = 1f, bool isSkippable = false){
+        if(isSkippable){
+            canSkip = true;
+        }
         //Debug.Log("1");
         if(needClear)
             ClearOutRenderTexture();
-        StartCoroutine(PlayVideoCoroutine(curVideo, isLooping,delayTime,volume));
+        StartCoroutine(PlayVideoCoroutine(curVideo, isLooping,delayTime,volume,playSpeed));
 
         isPlayingVideo = true;
     }
 
-    IEnumerator PlayVideoCoroutine(VideoClip curVideo, bool isLooping, float delayTime, float volume){
+    IEnumerator PlayVideoCoroutine(VideoClip curVideo, bool isLooping, float delayTime, float volume,float playSpeed){
+        videoPlayer.playbackSpeed = playSpeed;
+        
+        
         if(delayTime == 0){
             yield return null;
         }
@@ -66,10 +73,13 @@ public class VideoManager : MonoBehaviour
         //LoadManager.instance.loadFader.gameObject.SetActive(false);
 
 //        Debug.Log("B");
-        while(videoPlayer.isPlaying){
-            yield return waitTime;
-        }
-        isPlayingVideo = false;
+        // while(videoPlayer.isPlaying){
+        //     yield return waitTime;
+        // }
+        yield return new WaitUntil(()=>!videoPlayer.isPlaying);
+        
+        
+        VideoIsEnd();
     }
     public void StopVideo(){
         videoPlayer.Stop();
@@ -90,9 +100,20 @@ public class VideoManager : MonoBehaviour
     }
     public void SkipPlayingVideo(){
         Debug.Log("skip");
-        VideoManager.instance.isPlayingVideo = false;
+        VideoIsEnd();//VideoManager.instance.isPlayingVideo = false;
     }
     // IEnumerator IntroCoroutine(){
 
     // }
+    public void VideoIsEnd(){
+        Debug.Log("VideoIsEnd");
+        isPlayingVideo = false;
+
+    }
+    void Update(){
+        if(canSkip && Input.GetKeyDown(KeyCode.Escape)){
+            canSkip = false;
+            VideoIsEnd();
+        }
+    }
 }

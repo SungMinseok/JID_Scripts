@@ -101,7 +101,7 @@ public class InventoryManager : MonoBehaviour
         RefreshInventory(0);
     }
     
-    public void AddItem(int ID, int amount = 1, bool activateDialogue = false, float delayTime = 0, int tutorialID = -1){
+    public void AddItem(int ID, int amount = 1, bool activateDialogue = false, float delayTime = 0, int tutorialID = -1, bool mute = false){
         if(amount<1) return;
 
         if(activateDialogue){
@@ -113,17 +113,20 @@ public class InventoryManager : MonoBehaviour
             DBManager.instance.localData.itemCollectionOverList.Add(ID);
         }
 
-        switch(ID){
-            case 15 : 
-                SoundManager.instance.PlaySound("paperflip");
-                break;
-            case 30 : 
-            case 31 : 
-                SoundManager.instance.PlaySound("get_item_ice");
-                break;
-            default :   
-                SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
-                break;
+        if(!mute){
+
+            switch(ID){
+                case 15 : 
+                    SoundManager.instance.PlaySound("paperflip");
+                    break;
+                case 30 : 
+                case 31 : 
+                    SoundManager.instance.PlaySound("get_item_ice");
+                    break;
+                default :   
+                    SoundManager.instance.PlaySound(SoundManager.instance.defaultGetItemSoundName);
+                    break;
+            }
         }
         //DBManager.instance.curData.itemList.Add(ID);
         //스택형 아이템이면
@@ -326,6 +329,10 @@ public class InventoryManager : MonoBehaviour
         
     }
     public void PushItemBtn(int slotNum){
+        if(PlayerManager.instance.isPlayingMinigame){
+            return;
+        }
+
         int curSlotNum = curPage * slotCountPerPage + slotNum;
         
         if(curSlotNum >= DBManager.instance.curData.itemList.Count){
@@ -378,8 +385,6 @@ public class InventoryManager : MonoBehaviour
         
                                     AddDirt(5);
                                     SoundManager.instance.PlaySound("dirt_charge");
-
-                                
                                     break;
                                 
                                 default :
@@ -480,6 +485,7 @@ public class InventoryManager : MonoBehaviour
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
                 }
+        PlayerManager.instance.UnlockPlayer();
                 break;
             case 34 ://소총(기관총)
                 tempSelect.answers = new string[2]{"161","162"};
@@ -498,6 +504,7 @@ public class InventoryManager : MonoBehaviour
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
                 }
+        PlayerManager.instance.UnlockPlayer();
                 break;
             case 39 ://거대물약
                 tempSelect.answers = new string[2]{"163","164"};
@@ -533,11 +540,42 @@ public class InventoryManager : MonoBehaviour
                     //     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     // }
                 }
+        PlayerManager.instance.UnlockPlayer();
+                break;
+
+                
+            case 46:
+                RemoveItem(46);
+                SoundManager.instance.PlaySound("item_use");
+                AddHoney(10000);
+                AddItem(40);
+                AddItem(41,mute:true);
+                AddItem(42,mute:true);
+                AddItem(43,mute:true);
+                AddItem(44,mute:true);
+                AddItem(45,mute:true);
+                AddItem(48,mute:true);
+                break;
+            case 47:
+                RemoveItem(47);
+                SoundManager.instance.PlaySound("item_use");
+                AddHoney(10000);
+                AddItem(40);
+                AddItem(41,mute:true);
+                AddItem(42,mute:true);
+                AddItem(43,mute:true);
+                AddItem(44,mute:true);
+                AddItem(45,mute:true);
+                AddItem(48,mute:true);
+                break;
+            case 48:
+                RemoveItem(48);
+                PlayerManager.instance.SummonPet();
+                SoundManager.instance.PlaySound("item_use");
                 break;
         }
 
         selectFlag = false;
-        PlayerManager.instance.UnlockPlayer();
     }
     public void CleanUpInventory(){
         DBManager.instance.curData.itemList.Clear();
@@ -606,6 +644,11 @@ public class InventoryManager : MonoBehaviour
         string selectVal = (lastName - 0xAC00) % 28 > 0 ? "을" : "를";
 
         return name + selectVal;
+    }
+
+    public void GiveReward(){
+        if(DBManager.instance.localData.usedCouponRewardItemID!=0)//0번아이템 있는데 예외처리 안했음;;
+            InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID, mute: true);
     }
              
 }

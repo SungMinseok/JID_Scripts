@@ -209,7 +209,7 @@ public class SoundManager : MonoBehaviour
                 bgmPlayer.volume += tempDelta;
                 yield return wait10ms;
             }
-            bgmPlayer.volume -= tempDelta;
+            //bgmPlayer.volume -= tempDelta;
         }
         //이전에 재생중인게 없으면 바로 시작
         else{
@@ -244,14 +244,14 @@ public class SoundManager : MonoBehaviour
     #region 옵션에서 볼륨조절
     public void SetVolumeSFX(float value)
     {
-        value *= 0.7f;
+        value *=  DBManager.instance.sfxAdjustVal;
         DBManager.instance.localData.sfxVolume = value;
         sfxPlayer.volume = value;// * 0.5f;
     }
 
     public void SetVolumeBGM(float value)
     {
-        value *= 0.3f;
+        value *=  DBManager.instance.bgmAdjustVal;
         DBManager.instance.localData.bgmVolume = value;
         bgmPlayer.volume = value;// * 0.5f;
     }

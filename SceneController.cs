@@ -128,6 +128,9 @@ public class SceneController : MonoBehaviour
     public void SetFirstLoad(){
         
         SceneController.instance.SetCurrentMapName(0);
+
+        // if(InventoryManager.instance!=null)
+        //         InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
         //DBManager.instance.curData.playerX = PlayerManager.instance.transform.position.x;
         //DBManager.instance.curData.playerY = PlayerManager.instance.transform.position.y;
     }

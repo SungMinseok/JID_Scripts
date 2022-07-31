@@ -49,7 +49,8 @@ public class LocationRader : MonoBehaviour
             }
         }
         else if(other.CompareTag("NPC")) {
-            if(PlayerManager.instance.equipments_id[0]==-1 && !PlayerManager.instance.isCaught && other.GetComponent<NPCScript>().isGuard){
+            if(PlayerManager.instance.equipments_id[0]==-1
+             && !PlayerManager.instance.isCaught && other.GetComponent<NPCScript>().isGuard){
                 PlayerManager.instance.isCaught = true;
                 other.GetComponent<NPCScript>().CatchPlayerAsGuard();
             }

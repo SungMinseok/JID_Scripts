@@ -98,6 +98,9 @@ public class ItemScript : MonoBehaviour
             }
         }
     }
+    void OnEnable(){
+        getFlag = false;
+    }
 
     void OnTriggerStay2D(Collider2D other) {
         

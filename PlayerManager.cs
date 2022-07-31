@@ -61,7 +61,7 @@ public class PlayerManager : CharacterScript
     [Header("Input Check")]
     public float wInput;
     public float hInput;
-    public bool jumpInput, downInput, interactInput, interactKeepInput;
+    public bool jumpInput, downInput, interactInput, interactKeepInput,petInput;
     [Space]
     public float wSet;
     [Header("States────────────────────")]
@@ -98,6 +98,7 @@ public class PlayerManager : CharacterScript
     public bool onMonologue;//독백중 애니메이션 X
     public byte flagID;//특수 설정을 위한 플래그값(권총 엔딩 등)
     public bool watchingGameEnding;//트루 엔딩 UI 발동 시 트루, 트리거 발동 제한
+    public bool isSummoning;
     [Header("────────────────────────────")]
     public float delayTime_WaitingInteract;
     public float delayTime_Jump;
@@ -153,6 +154,7 @@ public class PlayerManager : CharacterScript
     
     [Header("────────────────────────────")]
     public GameObject petHolder;
+    public PetScript petScript;
     void Awake()
     {
         //Application.targetFrameRate = 120;
@@ -204,6 +206,13 @@ public class PlayerManager : CharacterScript
 
             interactInput = GameInputManager.GetKeyDown("Interact") ? true : false;
             interactKeepInput = GameInputManager.GetKey("Interact") ? true : false;
+
+            if(isSummoning){
+                if(GameInputManager.GetKeyDown("Pet")&&!isTalking&&!isActing&&!isPlayingMinigame){
+                    petScript.TrySave();
+                }
+                //petInput = GameInputManager.GetKeyDown("Pet") ? true : false;
+            }
         //}
 
         if(isGameOver /* || UIManager.instance.ui_gameEnd.activeSelf */){
@@ -989,5 +998,10 @@ public class PlayerManager : CharacterScript
             yield return waitSpeed;
 
         }
+    }
+    public void SummonPet(){
+        PlayerManager.instance.isSummoning = true;
+        petHolder.SetActive(true);
+        PlayerManager.instance.petScript.SetStartDialogue();
     }
 }

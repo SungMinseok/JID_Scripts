@@ -12,12 +12,15 @@ public class MainControlScript : MonoBehaviour
     //public RenderTexture texture;
     public GameObject mainBtns;
     public GameObject demoImage;
+    public GameObject creditBtn;
     public bool splashFlag;
     public bool canSkip;
     public string titleVideoName;
     public string splashVideoName;
     WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
+    WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
     WaitForSeconds wait1000ms = new WaitForSeconds(1f);
+    WaitForSeconds waitCreditVideo;
 
     void Start(){
 
@@ -33,6 +36,11 @@ public class MainControlScript : MonoBehaviour
         mainBtns.transform.GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("language"));
         //mainBtns.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
         
+        waitCreditVideo = new WaitForSeconds((float)videoClips[2].length);
+
+        if(DBManager.instance.GetClearedEndingCollectionID(7)==-1){
+            creditBtn.SetActive(false);
+        }
     }
 
     IEnumerator IntroCoroutine(){
@@ -107,9 +115,36 @@ SoundManager.instance.ChangeBgm("jelly in the dark");
             /* || VideoManager.instance.GetPlayingVideoName()==splashVideoName */)
             && VideoManager.instance.isPlayingVideo
             ){
+                Debug.Log("35355");
                 VideoManager.instance.isPlayingVideo = false;
                 //VideoManager.instance.SkipPlayingVideo();
             }
         //}
+    }
+    public void PlayCreditVideo(){
+        StartCoroutine(PlayCreditVideoCoroutine());
+
+    }
+    IEnumerator PlayCreditVideoCoroutine(){
+        
+        LoadManager.instance.FadeOut();
+        yield return wait1000ms;
+        VideoManager.instance.StopVideo();
+        yield return wait500ms;
+        SoundManager.instance.BgmOff();
+        mainBtns.gameObject.SetActive(false);
+        LoadManager.instance.FadeIn();
+        VideoManager.instance.PlayVideo(videoClips[2], volume : 0.5f, isSkippable:true);
+        VideoManager.instance.isPlayingVideo = true;
+        //yield return waitCreditVideo;
+        yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
+        LoadManager.instance.FadeOut();
+        yield return wait1000ms;
+        VideoManager.instance.StopVideo();
+        yield return wait500ms;
+        VideoManager.instance.PlayVideo(videoClips[1], volume : 0.5f);
+        SoundManager.instance.ChangeBgm("jelly in the dark");
+        mainBtns.gameObject.SetActive(true);
+        LoadManager.instance.FadeIn();
     }
 }

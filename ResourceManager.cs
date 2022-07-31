@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Video;
 using UnityEngine;
 
 public class ResourceManager : MonoBehaviour
@@ -23,12 +24,14 @@ public class ResourceManager : MonoBehaviour
     
     
     public Sprite[] itemSprites;
+    public VideoClip[] videoClips;
     Dictionary<string, Sprite> itemSpritesDic;
 
     void LoadResources(){
         //audioClips = Resources.LoadAll<AudioClip>("Sounds");
         //bgmClips = Resources.LoadAll<AudioClip>("BGM");
         itemSprites = Resources.LoadAll<Sprite>("Sprites/Items");
+        videoClips = Resources.LoadAll<VideoClip>("Videos");
     }
     void PutDictionary(){
 

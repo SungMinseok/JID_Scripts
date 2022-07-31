@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using Steamworks;
 using System;
 
 public class MenuManager : MonoBehaviour
@@ -53,6 +54,7 @@ public class MenuManager : MonoBehaviour
     public string curChangingKeyName;
     public Text keyText_jump;
     public Text keyText_interact;
+    public Text keyText_pet;
 
     // [System.Serializable]
     // public class SaveLoadSlot{
@@ -89,11 +91,13 @@ public class MenuManager : MonoBehaviour
     [Header("UI_ETC")]
     public Sprite nullSprite;
     public Font[] fonts ;
-    public GameObject ui_coupon;
     [Header("UI_Language")]
     public GameObject languagePanel;
     public Transform languagePanelBtnGrid;
     public TranslateText languagePanelMainText;
+    [Header("UI_Coupon")]
+    public GameObject ui_coupon;
+    public InputField couponInputField;
     [Header("Debug────────────────────")]
     public string curPopUpType;
     public int curSaveNum;
@@ -214,10 +218,10 @@ public class MenuManager : MonoBehaviour
         }
 
 
-        SoundManager.instance.SetVolumeBGM(DBManager.instance.localData.bgmVolume);
-        //slider_bgm.value = DBManager.instance.localData.bgmVolume;
-        SoundManager.instance.SetVolumeSFX(DBManager.instance.localData.sfxVolume);
-        //slider_sound.value = DBManager.instance.localData.sfxVolume;
+        SoundManager.instance.SetVolumeBGM(DBManager.instance.localData.bgmVolume / DBManager.instance.bgmAdjustVal);
+        slider_bgm.value = DBManager.instance.localData.bgmVolume  / DBManager.instance.bgmAdjustVal;
+        SoundManager.instance.SetVolumeSFX(DBManager.instance.localData.sfxVolume / DBManager.instance.sfxAdjustVal);
+        slider_sound.value = DBManager.instance.localData.sfxVolume  / DBManager.instance.sfxAdjustVal;
         ToggleTalkSound(DBManager.instance.localData.onTalkingSound);
 
         ChangeLanguage(DBManager.instance.localData.languageValue, resetUI : false);
@@ -990,7 +994,46 @@ public class MenuManager : MonoBehaviour
 #endregion
 
     public void CheckCoupon(){
+        var couponList = DBManager.instance.cache_couponList;
+        string curCode = couponInputField.text;
+        int index = couponList.FindIndex(x => x.code == curCode);
+        Debug.Log("쿠폰 " + index);
 
+        if(index==-1){
+            OpenPopUpPanel_OneAnswer("95");
+        }
+        else{
+
+
+            SteamUserStats.RequestGlobalStats(60);
+            SteamUserStats.RequestCurrentStats();
+            SteamUserStats.GetGlobalStat("cp"+index,out long cpGlobal);
+            SteamUserStats.GetStat("cp"+index,out int cpLocal);
+            if(cpGlobal==1){
+                OpenPopUpPanel_OneAnswer("95");
+                Debug.Log("서버에 이미 누가 등록함");
+            }
+            else if(cpLocal==1){
+                OpenPopUpPanel_OneAnswer("95");
+                Debug.Log("내가 이미 등록함");
+            }
+            else if(DBManager.instance.localData.usedCouponRewardItemID != 0){
+
+                OpenPopUpPanel_OneAnswer("95");
+                Debug.Log("이미 등록한 쿠폰이 있음");
+            }
+
+            //if(index!=-1 && DBManager.instance.localData.usedCouponRewardItemID == 0){
+            else{
+                int rewardItemID = couponList[index].rewardItemID;
+                string[] tempArr = {DBManager.instance.cache_ItemDataList[rewardItemID].name};
+                DBManager.instance.localData.usedCouponRewardItemID = rewardItemID;
+                OpenPopUpPanel_OneAnswer("94",mainArguments:tempArr);
+                ui_coupon.SetActive(false);
+                SteamUserStats.SetStat("cp"+index,1);
+                SteamUserStats.StoreStats();
+            }
+        }
     }
     
     //해당 텍스트가 Text일 경우(TMP가 아닐 경우), 해당 Text.text 설정 전, 폰트 별도 적용 필요

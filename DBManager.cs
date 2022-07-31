@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System; 
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Steamworks;
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
@@ -22,6 +23,9 @@ public class DBManager : MonoBehaviour
     [Header("[Dialogue]")]
     public float waitTime_dialogueInterval;
     public float waitTime_dialogueTypingInterval;
+    [Header("[Sound]")]
+    public float bgmAdjustVal;
+    public float sfxAdjustVal;
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     [Space]
@@ -39,7 +43,7 @@ public class DBManager : MonoBehaviour
     public List<Item> cache_ItemDataList;
     public List<EndingCollection> cache_EndingCollectionDataList;
     public List<GameEndList> cache_GameEndDataList;
-    
+    public List<Coupon> cache_couponList;
     [Header("[Sprites Files]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public Sprite[] endingCollectionSprites;
     //public Sprite[] itemSprites;
@@ -121,6 +125,8 @@ public class DBManager : MonoBehaviour
         public int frameRateValue;
         public KeyCode jumpKey;
         public KeyCode interactKey;
+        public KeyCode petKey;
+        public int usedCouponRewardItemID;
         
     }
     
@@ -508,6 +514,7 @@ public class DBManager : MonoBehaviour
         //ApplyNewLanguage();
         ApplyItemInfo();
         ApplyCollectionInfo();
+        ApplyCouponInfo();
         //ApplyStoryInfo();
         //CallLocalDataLoad();
     }
@@ -539,6 +546,19 @@ public class DBManager : MonoBehaviour
 
     void Start()
     {
+        SteamUserStats.RequestCurrentStats();
+#if !alpha
+
+        if(!File.Exists(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat")){
+          
+            //게임 최초 실행 확인 token : fs
+            SteamUserStats.GetStat("fs",out int fs);
+            SteamUserStats.SetStat("fs",fs + 1);
+            SteamUserStats.StoreStats();
+
+        }
+        
+#endif
     }
     void Update(){
         //System.DateTime dateTime = System.DateTime.Now;
@@ -617,7 +637,19 @@ public class DBManager : MonoBehaviour
 
         }
     }
-
+    void ApplyCouponInfo(){
+        //var a = TextLoader.instance.dictionaryItemText;
+        var a = CSVReader.instance.data_coupon;
+        cache_couponList.Clear();
+        for(int i=0; i<a.Count; i++){
+            //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
+            cache_couponList.Add(new Coupon(
+                a[i]["code"].ToString()
+                ,int.Parse(a[i]["type"].ToString())                
+                ,int.Parse(a[i]["rewardItemID"].ToString())
+            ));
+        }
+    }
     // public void ApplySysMsgText(){
     //     // for(int i=0;i<SceneController.instance.translateTexts.Count;i++){
     //     //     SceneController.instance.translateTexts[i].tra
@@ -780,4 +812,16 @@ public class Story{
     public string soundFileName;
     public int soundOrder;
     public string descriptions;
+}
+[System.Serializable]
+public class Coupon{
+    public string code;
+    public int type;
+    public int rewardItemID;
+    public Coupon(string _code, int _type, int _rewardItemID){
+        code = _code;
+        type = _type;
+        rewardItemID = _rewardItemID;
+
+    }
 }

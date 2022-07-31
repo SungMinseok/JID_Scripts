@@ -50,7 +50,10 @@ public class DirtScript : MonoBehaviour
         dirtBundleInfo.curHp = maxHp;
         remainPieceCount = dirtPieces.Length;
         waitRecreateCoolTime = new WaitForSeconds(recreateCoolTime);
-        
+        IgnoreCollision();
+    }
+    void IgnoreCollision(){
+
         if(bundleType == BundleType.Dirt){
 
             for(int i=0;i<dirtPieces.Length;i++){
@@ -65,6 +68,8 @@ public class DirtScript : MonoBehaviour
                     Physics2D.IgnoreCollision(dirtPieces[i].GetComponent<PolygonCollider2D>(), dirtPieces[0].GetComponent<PolygonCollider2D>(), true);
 
                 }
+
+                dirtPieces[i].localPosition = Vector2.zero;
             }
         }
     }
@@ -185,7 +190,7 @@ public class DirtScript : MonoBehaviour
         dirtBundleInfo.curHp = maxHp;
         dirtBundleInfo.curRecreateCoolTime = recreateCoolTime;
 
-        ResetSprite();
+        ResetSprite(); IgnoreCollision();
     }
     void OnDisable(){
         StopAllCoroutines();

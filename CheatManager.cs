@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System; 
+using Steamworks;
 public class CheatManager : MonoBehaviour
 {
     public static CheatManager instance;
@@ -365,6 +366,17 @@ public class CheatManager : MonoBehaviour
                             InventoryManager.instance.AddItem(19,1);
                             break;
                     }
+                    break;
+
+                    
+                case "getstat" :
+
+                    if(temp[1]=="") return;
+
+                    SteamUserStats.RequestGlobalStats(60);
+                    SteamUserStats.GetGlobalStat(temp[1], out long stat);
+                    Debug.Log(temp[1] + " : " + stat);
+                    
                     break;
             }
 //EndingCollectionOver

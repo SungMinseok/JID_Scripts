@@ -16,6 +16,7 @@ public class Minigame5Script : MonoBehaviour
     public int firstGetAmount = 100;
     public float multipleAmount = 2;
     public Select goStopSelect;
+    public Select failSelect;
 
 
     
@@ -69,6 +70,8 @@ public class Minigame5Script : MonoBehaviour
         currentHoneyText.text = DBManager.instance.curData.curHoneyAmount.ToString();
     }
     public void StartRoulette(){
+        SoundManager.instance.PlaySound("roulette_button");
+
         if(curStage == 0){
            
             if(DBManager.instance.curData.curHoneyAmount>=firstGetAmount){
@@ -100,12 +103,14 @@ public class Minigame5Script : MonoBehaviour
 
     }
     public void PushStopBtn(){
+        SoundManager.instance.PlaySound("roulette_button");
         stopBtn.gameObject.SetActive(false);
         stop = true;
         startBtn.gameObject.SetActive(true);
     }
     IEnumerator RouletteCoroutine(){
         startBtn.interactable = false;
+        SoundManager.instance.PlayLoopSound("roulette_win_half");
 
         for(int i=0;i<3;i++){
             rouletteImages[i].GetComponent<Animator>().enabled = true;
@@ -136,6 +141,8 @@ public class Minigame5Script : MonoBehaviour
         yield return wait1000ms;
 
         for(int i=0;i<3;i++){
+            SoundManager.instance.StopLoopSound();
+            SoundManager.instance.PlaySound("roulette_check_0"+Random.Range(1,4));
             rouletteImages[i].GetComponent<Animator>().SetBool("rotate",false);
             rouletteImages[i].GetComponent<Animator>().enabled = false;
             rouletteImages[i].sprite = rouletteSprites[order[i]];
@@ -144,22 +151,36 @@ public class Minigame5Script : MonoBehaviour
         }
 
         if(isSuccessed){
+            SoundManager.instance.PlaySound("roulette_yay");
             resultEffectAnimator.SetBool("success",true);
             curStage ++;
             for(int i=0;i<3;i++){
                 fruitBursts[i].SetActive(true);
             }
+            nextHoneyText.text = (firstGetAmount*Mathf.Pow(multipleAmount,curStage)).ToString();
         }
         else{
+            SoundManager.instance.PlaySound("roulette_fail");
             resultEffectAnimator.SetBool("fail",true);
             curStage = 0;
+            nextHoneyText.text = "0";
         }
-        nextHoneyText.text = (firstGetAmount*Mathf.Pow(multipleAmount,curStage)).ToString();
         
         yield return wait1000ms;
-        string[] tempStrings = new string[]{(int.Parse(nextHoneyText.text)*2).ToString(),nextHoneyText.text};
-        SelectManager.instance.SetSelect(goStopSelect, tempStrings);
+        string[] tempStrings = new string[]{};
+
+        if(isSuccessed){
+            tempStrings = new string[]{(int.Parse(nextHoneyText.text)*2).ToString(),nextHoneyText.text};
+            SelectManager.instance.SetSelect(goStopSelect, tempStrings);
+        }
+        else{
+            tempStrings = new string[]{(firstGetAmount*multipleAmount).ToString(),""};
+            SelectManager.instance.SetSelect(failSelect, tempStrings);
+        }
+        
+
         yield return waitSelecting;
+        UIManager.instance.ClearStringArray(tempStrings);
         resultEffectAnimator.SetBool("success",false);
         resultEffectAnimator.SetBool("fail",false);
         
@@ -172,7 +193,11 @@ public class Minigame5Script : MonoBehaviour
             StartRoulette();
         }
         else if(SelectManager.instance.GetSelect()==1){
-            DBManager.instance.curData.curHoneyAmount += int.Parse(nextHoneyText.text);
+            if(isSuccessed){
+                DBManager.instance.curData.curHoneyAmount += int.Parse(nextHoneyText.text);
+                
+            }
+            
            
             ResetGameSettings();
         }
