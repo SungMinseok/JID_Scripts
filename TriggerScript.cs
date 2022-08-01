@@ -63,8 +63,13 @@ public class TriggerScript : MonoBehaviour
                     objects[2].gameObject.SetActive(false);
                     //objects[2].GetComponent<NPCScript>().onJYD = false;
                     //objects[2].transform.position = objects[3].transform.position;
-                    if(!DBManager.instance.CheckTrigOver(50)){
-                    objects[5].gameObject.SetActive(true);
+
+
+                    if(!DBManager.instance.CheckTrigOver(51)){//광장 노개미 완료 안했으면
+                        objects[5].gameObject.SetActive(true);//광장 노개미
+                    }
+                    if(!DBManager.instance.CheckTrigOver(62)){//버섯농장 앞 수레개미 완료 안했으면
+                        objects[6].gameObject.SetActive(true);//버섯농장 수레개미
                     }
 
                     break;
@@ -75,16 +80,16 @@ public class TriggerScript : MonoBehaviour
                     objects[5].gameObject.SetActive(false);
                     objects[6].gameObject.SetActive(true);
                     
-                    if(DBManager.instance.CheckTrigOver(62)){
-                        objects[3].gameObject.SetActive(false);
+                    if(!DBManager.instance.CheckTrigOver(62)){//버섯농장 앞 수레개미 완료 안했으면
+                        objects[3].gameObject.SetActive(true);//버섯농장 수레개미
                     }
-                    else{
-                        objects[3].gameObject.SetActive(true);
-                    }
+                    // else{
+                    //     objects[3].gameObject.SetActive(true);
+                    // }
                     
-                    if(!DBManager.instance.CheckTrigOver(50)){
-                        //objects[7].gameObject.SetActive(true);
-                        SetObjectActive(objects,7,true);
+                    if(!DBManager.instance.CheckTrigOver(51)){//광장 노개미 완료 안했으면
+                        objects[7].gameObject.SetActive(true);//광장 노개미
+                        //SetObjectActive(objects,7,true);
 
                     }
                     break;
@@ -150,7 +155,7 @@ public class TriggerScript : MonoBehaviour
                     objects[2].gameObject.SetActive(false);
                     DBManager.instance.TrigOver(52);
                     break;
-                case 50 :
+                case 51 :
                     objects[0].gameObject.SetActive(false);
                     break;
                 case 53 :
@@ -166,6 +171,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 case 62 :
                     objects[0].GetComponent<Location>().isLocked = false;
+                    objects[1].gameObject.SetActive(false);
                     break;           
                 case 74 :
                     //objects = location.poses;
@@ -208,8 +214,11 @@ public class TriggerScript : MonoBehaviour
                     objects[0].gameObject.SetActive(false);
                     break;
 
-                case 17 :
-                    objects[5].gameObject.SetActive(false);
+                case 17 ://미친수개미에서 노개미 선택
+                    objects[5].gameObject.SetActive(false);//광장 노개미
+                    break;
+                case 18 ://미친수개미에서 수레개미 선택
+                    objects[3].gameObject.SetActive(false);//버섯농장 수레개미
                     break;
                     
                 case 201 :
@@ -1129,6 +1138,8 @@ public class TriggerScript : MonoBehaviour
 #endif
                 FadeIn();
                 
+                //220801
+                //DBManager.instance.TrigOver(17);
                 break;
                 
 #endregion
@@ -2419,6 +2430,8 @@ DBManager.instance.AntCollectionOver(15);
                     
                     SetSelect(selects[0]);
                     yield return waitSelecting;
+
+                    //쪽지를 줌
                     if(GetSelect()==0){
                         
                         //location.selectPhase = -1;
@@ -3303,7 +3316,8 @@ DBManager.instance.AntCollectionOver(17);
                 PlayerManager.instance.animator.SetBool("dead0", true);
                 yield return wait1000ms;
                 FadeIn();
-                ShakeCamera();
+                ShakeCamera(2,2);
+                SoundManager.instance.BgmOff();
                 yield return wait2000ms;
 
 
@@ -3316,7 +3330,7 @@ DBManager.instance.AntCollectionOver(17);
 DBManager.instance.AntCollectionOver(17);
                 FadeOut();
                 yield return wait1000ms;
-                TeleportPlayer(objects[1]);
+                TeleportPlayer(objects[3]);
                 PlayerManager.instance.Look("right");
                 PlayerManager.instance.SetTalkCanvasDirection();
                 yield return wait1000ms;
@@ -3590,9 +3604,11 @@ DBManager.instance.AntCollectionOver(17);
         }
 
         //아이템 획득 대화 있을 경우, 트리거 진행중 상태 유지
-        if(!location.holdPlayer && !InventoryManager.instance.waitGetItemDialogue){
-            PlayerManager.instance.canMove =true;   
-            PlayerManager.instance.isActing =false;   
+        //찐엔딩 시 상태 유지 추가 220801
+        if(!location.holdPlayer && !InventoryManager.instance.waitGetItemDialogue && !PlayerManager.instance.watchingGameEnding){
+            //PlayerManager.instance.canMove =true;  
+            PlayerManager.instance.UnlockPlayer(); 
+            //PlayerManager.instance.isActing =false;   
             //상호작용 키 연타로 인한 트리거 즉시 재시작 방지
             PlayerManager.instance.ActivateWaitInteract(PlayerManager.instance.delayTime_WaitingInteract);
 

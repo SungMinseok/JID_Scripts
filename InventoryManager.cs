@@ -485,7 +485,7 @@ public class InventoryManager : MonoBehaviour
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
                 }
-        PlayerManager.instance.UnlockPlayer();
+        //PlayerManager.instance.UnlockPlayer();
                 break;
             case 34 ://소총(기관총)
                 tempSelect.answers = new string[2]{"161","162"};
@@ -504,7 +504,7 @@ public class InventoryManager : MonoBehaviour
                         yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     }
                 }
-        PlayerManager.instance.UnlockPlayer();
+        //PlayerManager.instance.UnlockPlayer();
                 break;
             case 39 ://거대물약
                 tempSelect.answers = new string[2]{"163","164"};
@@ -540,7 +540,7 @@ public class InventoryManager : MonoBehaviour
                     //     yield return new WaitUntil(()=>!PlayerManager.instance.isTalking);
                     // }
                 }
-        PlayerManager.instance.UnlockPlayer();
+        //PlayerManager.instance.UnlockPlayer();
                 break;
 
                 
@@ -573,8 +573,21 @@ public class InventoryManager : MonoBehaviour
                 PlayerManager.instance.SummonPet();
                 SoundManager.instance.PlaySound("item_use");
                 break;
+            case 49:
+                RemoveItem(49);
+                AddHoney(5000);
+                SoundManager.instance.PlaySound("item_use");
+                break;
+            case 50:
+                RemoveItem(50);
+                AddHoney(5000);
+                SoundManager.instance.PlaySound("item_use");
+                break;
         }
+        if(!PlayerManager.instance.watchingGameEnding && itemID != 48){
+            PlayerManager.instance.UnlockPlayer();
 
+        }
         selectFlag = false;
     }
     public void CleanUpInventory(){

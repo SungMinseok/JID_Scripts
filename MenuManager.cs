@@ -154,7 +154,7 @@ public class MenuManager : MonoBehaviour
         fonts[0] = Resources.Load<Font>("Cafe24Ssurround");
         fonts[1] = Resources.Load<Font>("uzura");
 
-        versionText.text = string.Format("ver.{0}",DBManager.instance.buildNum);
+        versionText.text = string.Format("ver {0}.{1}",DBManager.instance.buildNum,DBManager.instance.buildSubNum);
 
 #region Reset Collection
         //totalPage = DBManager.instance.endingCollectionSprites.Length;

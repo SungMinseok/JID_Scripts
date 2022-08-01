@@ -11,6 +11,7 @@ public class DBManager : MonoBehaviour
     public static DBManager instance;
     [Header("[Game Info]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public uint buildNum;
+    public uint buildSubNum;
     public string buildDate;
     public string buildVersion;
     public string language;
@@ -547,10 +548,11 @@ public class DBManager : MonoBehaviour
     void Start()
     {
         SteamUserStats.RequestCurrentStats();
+        SteamUserStats.RequestGlobalStats(60);
 #if !alpha
 
         if(!File.Exists(Application.persistentDataPath + dataDirectory +"/LocalDataFile.dat")){
-          
+            Debug.Log("no");
             //게임 최초 실행 확인 token : fs
             SteamUserStats.GetStat("fs",out int fs);
             SteamUserStats.SetStat("fs",fs + 1);

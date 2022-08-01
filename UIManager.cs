@@ -517,6 +517,7 @@ public class UIManager : MonoBehaviour
         LoadManager.instance.FadeOut();
             yield return wait500ms;
         }
+        SoundManager.instance.BgmOff();
 
         LoadManager.instance.LoadMain();
     }

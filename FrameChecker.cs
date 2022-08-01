@@ -81,8 +81,16 @@ public class FrameChecker : MonoBehaviour
 
     text0 = "FPS:"+fps.ToString ("F1") + " / F11 : on/off";
     GUI.Label(rect0, text0, style0);
-    text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + 
+    //if(DBManager.instance.buildSubNum==0){
+
+    // text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + 
+    //         " / "+ DBManager.instance.buildDate;  
+    // }
+    // else{
+      
+    text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + "." + DBManager.instance.buildSubNum +
             " / "+ DBManager.instance.buildDate;  
+    //}
     GUI.Label(rect1, text1, style1);  
     text2 = "0먹이창고\n	1절벽\n	2복도\n	3노개미 방\n	4세 갈래 길\n	5유치원\n	6수개미 방\n	7수개미 끝방\n	8광장\n	9식당\n	10부화장\n	11대왕 일개미방\n	12농장가는 길\n	13냉동굴\n	14버섯농장\n	15진딧물농장\n	16나가는 길\n	17병원\n	18시장가는 길\n	19야시장\n	20두 갈래 길\n	21히든월드\n	22귀족의 길\n	23공주개미 방\n	24여왕개미 방\n";
     GUI.Label(rect2, text2, style2);
