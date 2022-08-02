@@ -296,6 +296,10 @@ public class MenuManager : MonoBehaviour
         curPage = 0;
         RearrangeCardOrder();
         RearrangeCards();
+
+        if(DBManager.instance.localData.endingCollectionOverList.Count == DBManager.instance.cache_EndingCollectionDataList.Count){
+            SteamAchievement.instance.ApplyAchievements(0);
+        }
     }
     public void RearrangeCardOrder(){
         tempCardNum = new int[]{curPage-2,curPage-1,curPage,curPage+1,curPage+2};

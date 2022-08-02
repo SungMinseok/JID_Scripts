@@ -125,7 +125,9 @@ public class ItemScript : MonoBehaviour
         if(type == ItemType.Honey){
             StartCoroutine(GetItemAndRemoveCoroutine());
             //DM("꿀 충전 : "+amount_honey);
-            DBManager.instance.curData.curHoneyAmount+=amount_honey;
+            
+            InventoryManager.instance.AddHoney(amount_honey);
+            //DBManager.instance.curData.curHoneyAmount+=amount_honey;
             SoundManager.instance.PlaySound("get_honeydrop");
         }
         else if(type == ItemType.Dirt){

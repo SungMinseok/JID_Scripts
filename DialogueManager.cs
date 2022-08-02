@@ -227,6 +227,7 @@ public class DialogueManager : MonoBehaviour
                     //반딧불이
                     else{
 
+                            SoundManager.instance.PlaySound("little_ant_talking_"+Random.Range(1,7));
                     }
 
                 }

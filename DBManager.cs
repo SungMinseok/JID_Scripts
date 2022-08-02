@@ -27,6 +27,8 @@ public class DBManager : MonoBehaviour
     [Header("[Sound]")]
     public float bgmAdjustVal;
     public float sfxAdjustVal;
+    [Header("[Steam]")]
+    public bool achievementIsAvailable;
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     [Space]
@@ -75,11 +77,12 @@ public class DBManager : MonoBehaviour
         public float curDirtAmount;
         public int curHoneyAmount;
         public int[] curEquipmentsID = new int[3];
+        public bool isSummoning;
 
 
 
 
-        
+
 
         [Space]
         public List<ItemList> itemList;// = new List<ItemList>();  //현재 보유한 아이템 ID 저장

@@ -41,8 +41,10 @@ public class HotkeyManager : MonoBehaviour
             else if(Input.GetKeyDown(KeyCode.M)){
                 if(DBManager.instance.CheckTrigOver(17)||DBManager.instance.CheckTrigOver(18)){
                     theUI.ui_map.SetActive(!theUI.ui_map.activeSelf);
-
                 }
+            }
+            else if(Input.GetKeyDown(KeyCode.Tab)){
+                theInven.BtnNextPage();
             }
         }
 

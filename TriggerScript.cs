@@ -59,6 +59,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 case 17 :
                     UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
+                DBManager.instance.TrigOver(91);
 
                     objects[2].gameObject.SetActive(false);
                     //objects[2].GetComponent<NPCScript>().onJYD = false;
@@ -555,9 +556,9 @@ public class TriggerScript : MonoBehaviour
 #endregion
 
 
-#region t1 여긴 어디?
+#region @1 여긴 어디?
             case 1 :
-
+                SteamAchievement.instance.ApplyAchievements(0);
 #if !alpha
                 //첫 대화 시작 확인
                 SteamUserStats.GetStat("gs",out int gs);
@@ -1035,8 +1036,10 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region t17 "도망" 미니게임 성공 후, 노개미 만남
+#region @17 "도망" 미니게임 성공 후, 노개미 만남
             case 17 :   
+
+                DBManager.instance.TrigOver(91);
                 objects[2].gameObject.SetActive(false);
                 //objects[2].GetComponent<NPCScript>().onJYD = false;
                 //objects[2].transform.position = objects[3].transform.position;
@@ -2395,23 +2398,13 @@ DBManager.instance.AntCollectionOver(15);
                 break;
 #endregion
 
-#region tn50 노개미 재방문
+#region @50 노개미 재방문
             case 50 :
                 location.selectPhase = -1;
                 //미친수개미 > 노개미 선택
                 if(DBManager.instance.CheckTrigOver(17)){
 
                     for(int i=0 ;i<3;i++){
-                        
-                        //CameraView(dialogues[i].talker);
-                        SetDialogue(dialogues[i]);
-                        yield return waitTalking;
-                    }
-                }
-                //미친수개미 > 수레개미 선택
-                else if(DBManager.instance.CheckTrigOver(18)){
-
-                    for(int i=25 ;i<29;i++){
                         
                         //CameraView(dialogues[i].talker);
                         SetDialogue(dialogues[i]);
@@ -3107,7 +3100,7 @@ DBManager.instance.AntCollectionOver(12);
                 
                 break;
 #endregion
-#region tn90 공주개미 재배치
+#region @90 공주개미 재배치
             case 90 :
                 objects[0].transform.position = objects[1].transform.position;
                 objects[0].transform.GetComponent<NPCScript>().animator.SetBool("think", false);
@@ -3116,6 +3109,18 @@ DBManager.instance.AntCollectionOver(12);
 
                 break;
 #endregion
+#region @91 광장 노개미 (수레개미 선택 후)
+            case 91 :
+                
+                for(int i=25 ;i<29;i++){
+                    
+                    //CameraView(dialogues[i].talker);
+                    SetDialogue(dialogues[i]);
+                    yield return waitTalking;
+                }
+                break;
+#endregion
+
 
 #region t899 자동저장
             case 899 :

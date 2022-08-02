@@ -378,6 +378,24 @@ public class CheatManager : MonoBehaviour
                     Debug.Log(temp[1] + " : " + stat);
                     
                     break;
+
+                case "resetsteamach" :
+
+                    for(int i=0;i<20;i++){
+                        SteamUserStats.ClearAchievement("ach"+i.ToString());
+                        Debug.Log("resetsteamach all");
+                    }
+                    break;
+
+                case "setsteamach" :
+                
+                    if(temp[1]=="") return;
+                    Debug.Log("Try to set achievement... : "+temp[1]);
+
+                    SteamAchievement.instance.ApplyAchievements(int.Parse(temp[1]));
+                    
+                    
+                    break;
             }
 //EndingCollectionOver
 //DeleteSaveFile

@@ -448,7 +448,13 @@ public class InventoryManager : MonoBehaviour
     }
     public void AddHoney(int honeyAmount, bool activateDialogue = false, float delayTime = 0){
         DBManager.instance.curData.curHoneyAmount += honeyAmount;
-        
+        //Debug.Log(DBManager.instance.curData.curHoneyAmount + honeyAmount);
+
+        if(DBManager.instance.curData.curHoneyAmount + honeyAmount > 1000){
+            SteamAchievement.instance.ApplyAchievements(1);
+        }
+
+
         if(activateDialogue){
             waitGetItemDialogue = true;
             StartCoroutine(GetItemDialogue(999, honeyAmount:honeyAmount ,delayTime:delayTime));

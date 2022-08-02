@@ -197,6 +197,7 @@ public class PlayerManager : CharacterScript
             weapons[i].gameObject.SetActive(false);
         }
         ApplyEquipments();
+        if(DBManager.instance.curData.isSummoning) ApplyPet();
     }
 
 
@@ -1001,7 +1002,13 @@ public class PlayerManager : CharacterScript
     }
     public void SummonPet(){
         PlayerManager.instance.isSummoning = true;
+        DBManager.instance.curData.isSummoning = true;
         petHolder.SetActive(true);
         PlayerManager.instance.petScript.SetStartDialogue();
+    }
+    public void ApplyPet(){
+        PlayerManager.instance.isSummoning = true;
+        petHolder.SetActive(true);
+
     }
 }

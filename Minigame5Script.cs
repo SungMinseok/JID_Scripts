@@ -153,7 +153,17 @@ public class Minigame5Script : MonoBehaviour
         if(isSuccessed){
             SoundManager.instance.PlaySound("roulette_yay");
             resultEffectAnimator.SetBool("success",true);
-            curStage ++;
+
+            curStage ++ ;
+
+            if(curStage == 2){
+                SteamAchievement.instance.ApplyAchievements(3);
+            }
+            else if(curStage == 5){
+                SteamAchievement.instance.ApplyAchievements(2);
+
+            }
+
             for(int i=0;i<3;i++){
                 fruitBursts[i].SetActive(true);
             }

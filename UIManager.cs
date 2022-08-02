@@ -276,6 +276,10 @@ public class UIManager : MonoBehaviour
         if (DBManager.instance.GetClearedEndingCollectionID(collectionID) == -1)
         {
             DBManager.instance.EndingCollectionOver(collectionID);
+            
+            //스팀업적 0 체크용
+            MenuManager.instance.ResetCardOrder();
+
             endingAlreadyOver = false;
         }
         else
