@@ -523,8 +523,10 @@ public class TriggerScript : MonoBehaviour
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
 
-                    ShopManager.instance.OpenShopUI(4,shopName:CSVReader.instance.GetIndexToString(255,"sysmsg")
-                    ,new ShopSales[]{new ShopSales(14),new ShopSales(11)});
+                    ShopManager.instance.OpenShopUI(4,shopName:CSVReader.instance.GetIndexToString(255,"sysmsg"),
+                    //new ShopSales[]{new ShopSales(14),new ShopSales(11)}//11 : 콩젤리
+                    new ShopSales[]{new ShopSales(14)}
+                    );
                     yield return waitShopping;
 
                     if(ShopManager.instance.lastBuyItemIndex == 14){
@@ -819,7 +821,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region t7 화난 노개미에게 말을 다시 건다.
+#region @7 화난 노개미에게 말을 다시 건다.
             case 7 :
                 
                 dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", true);
@@ -829,7 +831,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region t8 [미니게임0 - 종이 오리기] 유치원 센세에게 말을 건다.
+#region @8 [미니게임0 - 종이 오리기] 유치원 센세에게 말을 건다.
             case 8 :
             
                 DBManager.instance.AntCollectionOver(6);
@@ -1183,7 +1185,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region t21 요리사개미
+#region @21 요리사개미
             case 21 :
                 
                 DBManager.instance.AntCollectionOver(8);
@@ -1208,7 +1210,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region t22 요리사 로메슈제
+#region @22 요리사 로메슈제 (노랑젤리 구출)
             case 22 :   
                 
                 
@@ -1254,6 +1256,8 @@ public class TriggerScript : MonoBehaviour
                         yield return wait1000ms;
                         FadeIn();
 
+                        SteamAchievement.instance.ApplyAchievements(7);
+
                     }
                     else if(GetSelect()==1){
                         
@@ -1270,7 +1274,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
            
-#region t23 진딧물농장 미니게임4
+#region @23 진딧물농장 미니게임4
             case 23 :
 
                 FadeOut();
@@ -1364,6 +1368,16 @@ DBManager.instance.AntCollectionOver(12);
 
                     FadeIn();
 
+                    //지키기 : 여왕지지자
+                    if(GetSelect()==0){
+                        SteamAchievement.instance.ApplyAchievements(9);
+
+                    }
+                    //훔치는거 도와주기 : 공주지지자
+                    else if(GetSelect()==1){
+                        SteamAchievement.instance.ApplyAchievements(8);
+
+                    }
 
                     DBManager.instance.TrigOver(74);
                 //FadeIn();
@@ -1707,7 +1721,7 @@ DBManager.instance.AntCollectionOver(16);
                 break;
 #endregion
 
-#region t28 과학자개미의 완성품 획득
+#region t28 과학자/박사개미의 완성품 획득
             case 28 :
                 if(location.selectPhase == 0){
                     location.selectPhase = 1;
@@ -1722,6 +1736,8 @@ DBManager.instance.AntCollectionOver(16);
                     InventoryManager.instance.AddItem(1);
                 }
                 else{
+                    SteamAchievement.instance.ApplyAchievements(15);
+
                 }
 
                 //location.selectPhase = -1;
@@ -1830,7 +1846,7 @@ DBManager.instance.AntCollectionOver(15);
                 break;
 #endregion 
 //룰렛 ( 미니게임 5 )
-#region 31
+#region @31
             case 31 :
                 PlayerManager.instance.Look("left");
 
@@ -1857,9 +1873,14 @@ DBManager.instance.AntCollectionOver(15);
                     
                     SetDialogue(dialogues[1]);
                     yield return waitTalking;
-                    MinigameManager.instance.minigameScriptTransforms[5].gameObject.SetActive(true);
-                    yield return waitMoving;
+                    
+                    MinigameManager.instance.StartMinigame(5);
+                    //MinigameManager.instance.minigameScriptTransforms[5].gameObject.SetActive(true);
+                    //yield return waitMoving;
+                    yield return new WaitUntil(()=>MinigameManager.instance.success);
+                
                 }
+
                 else{
                     
                     SetDialogue(dialogues[2]);
@@ -1871,12 +1892,14 @@ DBManager.instance.AntCollectionOver(15);
 #endregion 
              
 //물약제조 ( 미니게임 3 )
-#region t32 물약제조 ( 미니게임 3 )
+#region @32 물약제조 ( 미니게임 3 )
             case 32 :
                 if(location.selectPhase ==0 ){
 
-                    MinigameManager.instance.minigameScriptTransforms[3].gameObject.SetActive(true);
-                    yield return waitMoving;
+                    MinigameManager.instance.StartMinigame(3);
+                    //MinigameManager.instance.minigameScriptTransforms[3].gameObject.SetActive(true);
+                    yield return new WaitUntil(()=>MinigameManager.instance.success);
+
                 }
                 else{
                     SetDialogue(dialogues[0]);

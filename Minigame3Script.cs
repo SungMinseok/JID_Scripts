@@ -104,6 +104,10 @@ public class Minigame3Script : MonoBehaviour
                     madeEffect.SetTrigger("fail");
                     SoundManager.instance.PlaySound("potion_fail");
                     failedBottle.SetActive(true);
+
+                    //스팀업적5 (실패물약 제조)
+                    SteamAchievement.instance.ApplyAchievements(5);
+
                     break;
             }
         }
@@ -200,6 +204,7 @@ public class Minigame3Script : MonoBehaviour
         //UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
+        MinigameManager.instance.ExitMinigame();
         //SceneController.instance.SetConfiner(DBManager.instance.curData.curMapNum);
         //SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
         PlayerManager.instance.UnlockPlayer();

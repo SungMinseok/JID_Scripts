@@ -303,8 +303,10 @@ public class LoadManager : MonoBehaviour
 
         //yield return wait1s;
             //Debug.Log("A");
-            
+        if(!string.Equals(nextScene, "Main")){
         VideoManager.instance.videoRenderer.gameObject.SetActive(false);
+
+        }
         FadeIn();
 
         loadFlag = false;

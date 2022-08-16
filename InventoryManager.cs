@@ -445,6 +445,11 @@ public class InventoryManager : MonoBehaviour
         if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
             DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;
         }
+
+        DBManager.instance.localData.useDirtCount += 1;
+        if(DBManager.instance.localData.useDirtCount >= 100){
+            SteamAchievement.instance.ApplyAchievements(16);
+        }
     }
     public void AddHoney(int honeyAmount, bool activateDialogue = false, float delayTime = 0){
         DBManager.instance.curData.curHoneyAmount += honeyAmount;
@@ -471,6 +476,11 @@ public class InventoryManager : MonoBehaviour
         Dialogue tempDialogue = new Dialogue();
 
         switch(itemID){
+            case 0:
+                UIManager.instance.OpenScreen(2);
+                yield return new WaitUntil(()=>!UIManager.instance.screenOn);
+                SoundManager.instance.PlaySound("hintpaper_open");
+                break;
             case 33 ://권총
                 tempSelect.answers = new string[2]{"161","162"};
                 SelectManager.instance.SetSelect(tempSelect,null);

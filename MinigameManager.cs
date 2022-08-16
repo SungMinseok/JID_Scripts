@@ -49,14 +49,14 @@ public class MinigameManager : MonoBehaviour
 //#endif
     public void SuccessMinigame(){
         success = true;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 성공");
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : SUCCESS");
         SoundManager.instance.PlaySound("minigame_complete");
         StartCoroutine(FinishMinigameCoroutine());
     }
     //-1이면 setgameoverui 실행 x
     public void FailMinigame(int gameOverSpriteNum = -1){
         fail = true;
-        Debug.Log(nowMinigameNum + "번 미니게임 종료 : 실패");
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : FAIL");
         if(gameOverSpriteNum != -1){
             UIManager.instance.SetGameOverUI(gameOverSpriteNum);
         }
@@ -64,6 +64,13 @@ public class MinigameManager : MonoBehaviour
             StartCoroutine(FinishMinigameCoroutine());
         }
         
+    }
+    //재실행 가능한 미니게임 나가기
+    public void ExitMinigame(){
+        success = true;
+        Debug.Log(nowMinigameNum + "번 미니게임 종료 : EXIT");
+        //SoundManager.instance.PlaySound("minigame_complete");
+        StartCoroutine(FinishMinigameCoroutine(true));
     }
     public void SuccessMinigameTest(){
         // for(int i=0;i<instance.transform.childCount;i++){
@@ -149,20 +156,23 @@ public class MinigameManager : MonoBehaviour
     void FinishMinigame(int gameOverSpriteNum){
 
     }
-    IEnumerator FinishMinigameCoroutine(){
+    IEnumerator FinishMinigameCoroutine(bool isDirect = false){
         SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
 
+        if(!isDirect){
 
-        LoadManager.instance.FadeOut();
-        yield return wait1000ms;
-        yield return wait1000ms;
-        if(nowMinigameNum == 4){
+            LoadManager.instance.FadeOut();
             yield return wait1000ms;
+            yield return wait1000ms;
+            if(nowMinigameNum == 4){
+                yield return wait1000ms;
 
+            }
+            var nowMinigame = minigameScriptTransforms[nowMinigameNum];
+            nowMinigame.gameObject.SetActive(false);
+            LoadManager.instance.FadeIn();
         }
-        var nowMinigame = minigameScriptTransforms[nowMinigameNum];
-        nowMinigame.gameObject.SetActive(false);
-        LoadManager.instance.FadeIn();
+
         nowMinigameNum = -1;
         PlayerManager.instance.isPlayingMinigame = false;
         //ResetMinigameResult();

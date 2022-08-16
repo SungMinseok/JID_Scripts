@@ -347,7 +347,9 @@ public class CheatManager : MonoBehaviour
                     for(int i=0;i<MenuManager.instance.antStickersMother.childCount;i++){
                         DBManager.instance.AntCollectionOver(i+1);
                     }
-                    MenuManager.instance.RefreshAntCollectionUI();
+                    //MenuManager.instance.RefreshAntCollectionUI();
+                    MenuManager.instance.ResetAntCollectionUI();
+                    
                     DM("complete all ant collection");
 
                     break;
@@ -376,6 +378,22 @@ public class CheatManager : MonoBehaviour
                     SteamUserStats.RequestGlobalStats(60);
                     SteamUserStats.GetGlobalStat(temp[1], out long stat);
                     Debug.Log(temp[1] + " : " + stat);
+                    
+                    break;
+
+                case "getcp" :
+
+                    if(temp[1]=="") return;
+
+                    SteamUserStats.RequestGlobalStats(60);
+
+                    var tempCpCount = 0;
+                    for(int i=int.Parse(temp[1]);i<int.Parse(temp[2]);i++){
+
+                        SteamUserStats.GetGlobalStat("cp"+i.ToString(), out long stata);
+                        tempCpCount = tempCpCount + (int)stata;
+                    }
+                    Debug.Log(string.Format("total cp {0}~{1} : {2}",temp[1],temp[2],tempCpCount));// temp[1] + " : " + stat);
                     
                     break;
 

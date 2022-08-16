@@ -27,7 +27,7 @@ public class TranslateText : MonoBehaviour
         Text curText = GetComponent<Text>();
 
         if(isEndingGuideItemMapName){
-            key = GetComponentInParent<EndingGuideItemSlot>().itemGetMapID;
+            key = GetComponentInParent<EndingGuideItemSlot>().getMapID;
         }
         
         if(key!=-1){

@@ -297,9 +297,6 @@ public class MenuManager : MonoBehaviour
         RearrangeCardOrder();
         RearrangeCards();
 
-        if(DBManager.instance.localData.endingCollectionOverList.Count == DBManager.instance.cache_EndingCollectionDataList.Count){
-            SteamAchievement.instance.ApplyAchievements(0);
-        }
     }
     public void RearrangeCardOrder(){
         tempCardNum = new int[]{curPage-2,curPage-1,curPage,curPage+1,curPage+2};
@@ -586,7 +583,12 @@ public class MenuManager : MonoBehaviour
         popUpPanel.SetActive(true);
     }
     
-    public void OpenPopUpPanel_OneAnswer(string mainIndex, string okayIndex = "0", string[] mainArguments = null){
+    public void OpenPopUpPanel_OneAnswer(string mainIndex, string okayIndex = "0", string[] mainArguments = null, string type = ""){
+
+        if(string.IsNullOrEmpty(type)){
+            curPopUpType = string.Empty;
+        }
+
 
         popUpText1[0].text = mainIndex;
         //확인
@@ -647,6 +649,9 @@ public class MenuManager : MonoBehaviour
             case "resetData" :
                 
                 DBManager.instance.ResetAllData();
+                settingPanel.SetActive(false);
+                menuPanel.SetActive(false);
+                SoundManager.instance.BgmOff();
                 LoadManager.instance.LoadMain();
                 break;
             default:
@@ -715,6 +720,12 @@ public class MenuManager : MonoBehaviour
             case "collection" :
                 ResetCardOrder();
                 collectionPanel.SetActive(true);
+
+                        
+                if(DBManager.instance.localData.endingCollectionOverList.Count == DBManager.instance.cache_EndingCollectionDataList.Count){
+                    SteamAchievement.instance.ApplyAchievements(0);
+                }
+
                 break;
             case "setting" :
                 settingPanel.SetActive(true);
@@ -961,6 +972,8 @@ public class MenuManager : MonoBehaviour
         antMainImage.sprite = nullSprite;
         antMainNameTextHolderObj.SetActive(false);
 
+        //RefreshAntCollectionUI();
+
         // for(int i=0;i<antStickersMother.childCount;i++){
         //     if(DBManager.instance.localData.antCollectionOverList.Exists(x=>x.ID == i+301)){
         //         antStickers[i].ActivateSticker();
@@ -969,6 +982,11 @@ public class MenuManager : MonoBehaviour
         //         antStickers[i].DeactivateSticker();
         //     }
         // }
+
+        
+        if(DBManager.instance.localData.antCollectionOverList.Count == MenuManager.instance.antStickersMother.childCount){
+            SteamAchievement.instance.ApplyAchievements(14);
+        }
     }
     public void RefreshAntCollectionUI(){
         //antMainImage.sprite = nullSprite;

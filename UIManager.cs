@@ -277,8 +277,6 @@ public class UIManager : MonoBehaviour
         {
             DBManager.instance.EndingCollectionOver(collectionID);
             
-            //스팀업적 0 체크용
-            MenuManager.instance.ResetCardOrder();
 
             endingAlreadyOver = false;
         }
@@ -315,8 +313,16 @@ public class UIManager : MonoBehaviour
                 //     break;
         }
 
+        //일반 죽음 횟수 체크
+        if(DBManager.instance.cache_EndingCollectionDataList.Find(x=>x.ID == collectionID).trueID == 0){
+            DBManager.instance.localData.deathCount += 1;
+            if(DBManager.instance.localData.deathCount>=10){
+                SteamAchievement.instance.ApplyAchievements(12);
+            }
+        }
 
 
+        //이미 획득한 경우, 바로 마지막 불러오기
         if (!endingAlreadyOver)
         {
 

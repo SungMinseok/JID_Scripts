@@ -259,6 +259,8 @@ public class ShopManager : MonoBehaviour
                 DBManager.instance.curData.curHoneyAmount -= curItemPrice;
                 InventoryManager.instance.AddItem(curShopSales[slotNum].itemID,curShopSales[slotNum].itemAmount);
                 lastBuyItemIndex = curShopSales[slotNum].itemID;
+
+                DBManager.instance.ItemPurchaseOver(curShopSales[slotNum].itemID);
                 
                 string[] tempArg = new string[1]{
                     shopSlots[slotNum].itemNameText.text

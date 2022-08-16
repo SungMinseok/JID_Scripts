@@ -227,6 +227,7 @@ public class Minigame5Script : MonoBehaviour
         UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
+        MinigameManager.instance.ExitMinigame();
         PlayerManager.instance.UnlockPlayer();
         
         UIManager.instance.SetHUD(true);

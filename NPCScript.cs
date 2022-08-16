@@ -590,6 +590,7 @@ public class NPCScript : CharacterScript
             //NpcLookObject(PlayerManager.instance.transform);
 
             SceneController.instance.virtualCamera.Follow = this.transform;
+            SetTalkCanvasDirection();
             DialogueManager.instance.SetDialogue(guardDialogue);
             
             UIManager.instance.SetGameOverUI(21);

@@ -82,6 +82,7 @@ public class VideoManager : MonoBehaviour
         VideoIsEnd();
     }
     public void StopVideo(){
+        Debug.Log("stopVideo");
         videoPlayer.Stop();
         videoRenderer.gameObject.SetActive(false);
     }

@@ -36,7 +36,7 @@ public class MainControlScript : MonoBehaviour
         mainBtns.transform.GetChild(0).GetChild(4).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("language"));
         //mainBtns.transform.GetChild(1).GetComponent<Button>().onClick.AddListener(()=>MenuManager.instance.OpenPanel("collection"));
         
-        waitCreditVideo = new WaitForSeconds((float)videoClips[2].length);
+        waitCreditVideo = new WaitForSeconds((float)ResourceManager.instance.videoClips[0].length);
 
         if(DBManager.instance.GetClearedEndingCollectionID(7)==-1){
             creditBtn.SetActive(false);
@@ -134,7 +134,7 @@ SoundManager.instance.ChangeBgm("jelly in the dark");
         SoundManager.instance.BgmOff();
         mainBtns.gameObject.SetActive(false);
         LoadManager.instance.FadeIn();
-        VideoManager.instance.PlayVideo(videoClips[2], volume : 0.5f, isSkippable:true);
+        VideoManager.instance.PlayVideo(ResourceManager.instance.videoClips[0], isSkippable:true);
         VideoManager.instance.isPlayingVideo = true;
         //yield return waitCreditVideo;
         yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);

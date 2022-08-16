@@ -39,6 +39,11 @@ public class SteamAchievement : MonoBehaviour
 #if !DISABLESTEAMWORKS
         //TestSteamAchievement(num);
         if(isAvailable){
+            SteamUserStats.GetAchievement("ach"+num.ToString(),out bool isAchieved);
+            if(isAchieved){
+                Debug.Log("Set Achievement Fail (already achieved): "+num);
+                return;
+            }
             SteamUserStats.SetAchievement("ach"+num.ToString());
             SteamUserStats.StoreStats();
             Debug.Log("Set Achievement Success : "+num);

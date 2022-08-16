@@ -207,6 +207,12 @@ public class Minigame0Script : MonoBehaviour
         //gameObject.SetActive(false);
         
         isPaused = true;
+
+        DBManager.instance.localData.gameCount_success_0 += 1;
+        if(DBManager.instance.localData.gameCount_success_0>=5){
+            SteamAchievement.instance.ApplyAchievements(6);
+        }
+
         MinigameManager.instance.SuccessMinigame();
         
     }

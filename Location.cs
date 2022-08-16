@@ -243,6 +243,7 @@ public class Location : MonoBehaviour
                                 PlayerManager.instance.transform.position = desLoc.position;
                                 SceneController.instance.SetConfiner(desMapNum,true);
                                 SoundManager.instance.SetBgmByMapNum(desMapNum);
+                                DBManager.instance.MapOver(desMapNum);
 
                                 if(isDoor){
                                     if(doorSoundFileName == ""){

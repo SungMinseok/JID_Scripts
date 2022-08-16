@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,19 +7,40 @@ using TMPro;
 
 public class EndingGuideItemSlot : MonoBehaviour
 {
-    public int itemID;
-    public int itemGetMapID;
+    public enum EndingGuideSlotType{
+        Item,
+        Trigger,
+    }
+    public EndingGuideSlotType slotType;
+    public int ID;
+    public int getMapID;
+    [Header("[If this is item slot]")]
     public Image itemImage;
-    public Image triggerImage;
     public bool onX;
     GameObject xImage;
-    public bool isTrigger;
+
+    [Header("[If this is trigger slot]")]
+    public Image triggerImage;
     //public Text itemNameText;
     //TranslateText translateText;
+
+
+
+
+    [Space]
+    public bool isTrigger;
+
     void Awake(){
-        itemImage = transform.GetChild(0).GetComponent<Image>();
-        xImage = transform.GetChild(1).gameObject;
-        itemImage.sprite = DBManager.instance.cache_ItemDataList[itemID].icon;
+        if(isTrigger){
+            slotType = EndingGuideSlotType.Trigger;
+        }
+
+        if(slotType==EndingGuideSlotType.Item){
+
+            itemImage = transform.GetChild(0).GetComponent<Image>();
+            itemImage.sprite = DBManager.instance.cache_ItemDataList[ID].icon;
+        }
+            xImage = transform.GetChild(1).gameObject;
         if(onX){
             xImage.SetActive(true);
         }
@@ -32,7 +54,7 @@ public class EndingGuideItemSlot : MonoBehaviour
     void OnEnable(){
         if(!isTrigger){
 
-            if(InventoryManager.instance.CheckHaveItem(itemID)){
+            if(InventoryManager.instance.CheckHaveItem(ID)){
                 itemImage.color = new Color(1,1,1);
             }
             else{
@@ -41,7 +63,7 @@ public class EndingGuideItemSlot : MonoBehaviour
         }
         else if(isTrigger){
             
-            if(DBManager.instance.CheckTrigOver(itemID)){
+            if(DBManager.instance.CheckTrigOver(ID)){
                 triggerImage.color = new Color(1,1,1);
             }
             else{

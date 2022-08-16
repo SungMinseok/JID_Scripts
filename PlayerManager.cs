@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-[System.Serializable]
-public class EquipmentSprite{
-    public int id;
-    public Sprite sprite;
-    public Sprite sprite_back;
-}
+// [System.Serializable]
+// public class EquipmentSprite{
+//     public int id;
+//     public Sprite sprite;
+//     public Sprite sprite_back;
+// }
 [System.Serializable]
 public class Armor{
     public string name;
@@ -155,6 +155,10 @@ public class PlayerManager : CharacterScript
     [Header("────────────────────────────")]
     public GameObject petHolder;
     public PetScript petScript;
+    public bool keepAlertStateFlag;//흙부족 알람 체크용
+    public float keepAlertStateTime;//흙부족 유지 시간
+    Coroutine keepAlertStateCoroutine;
+    WaitForSecondsRealtime waitForSecondsRealtime ;
     void Awake()
     {
         //Application.targetFrameRate = 120;
@@ -178,6 +182,7 @@ public class PlayerManager : CharacterScript
     {
         d = DebugManager.instance;
         defaultScale = playerBody.transform.localScale;
+        waitForSecondsRealtime = new WaitForSecondsRealtime(1);
 
         //canMove = true;
 
@@ -356,14 +361,24 @@ public class PlayerManager : CharacterScript
 
             }
         }
-
-        if(DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount <= 0.1f
+//심장박동 + 레드비넷
+        if(DBManager.instance.curData.curDirtAmount / DBManager.instance.maxDirtAmount <= DBManager.instance.dirtAlertAmount
         ||(isGameOver&&!UIManager.instance.ui_gameOver.activeSelf)
         ){
             redVignette.SetActive(true);
+            
+            if(!keepAlertStateFlag){
+                keepAlertStateFlag = true;
+                keepAlertStateCoroutine = StartCoroutine(KeepAlertStateCoroutine());
+            }
         }
         else{
             redVignette.SetActive(false);
+            
+            if(keepAlertStateCoroutine != null){
+                keepAlertStateFlag = false;
+                StopCoroutine(keepAlertStateCoroutine);
+            }
         }
 #endregion
 
@@ -1010,5 +1025,17 @@ public class PlayerManager : CharacterScript
         PlayerManager.instance.isSummoning = true;
         petHolder.SetActive(true);
 
+    }
+    IEnumerator KeepAlertStateCoroutine(){
+        keepAlertStateTime = 0f;
+
+        while(true){
+            yield return waitForSecondsRealtime ;
+            keepAlertStateTime += 1f;
+
+            if(keepAlertStateTime>=30){
+                SteamAchievement.instance.ApplyAchievements(10);
+            }
+        }
     }
 }

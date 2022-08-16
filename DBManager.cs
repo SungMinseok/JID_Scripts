@@ -21,6 +21,7 @@ public class DBManager : MonoBehaviour
     [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public float maxDirtAmount;
     public float dirtAmountPaneltyPerSeconds;
+    public float dirtAlertAmount;
     [Header("[Dialogue]")]
     public float waitTime_dialogueInterval;
     public float waitTime_dialogueTypingInterval;
@@ -90,6 +91,8 @@ public class DBManager : MonoBehaviour
         public List<int> getItemOverList; // 맵 내 아이템 활성화/비활성화 체크 용도
         //public List<DirtBundleInfo> getDirtBundleOverList;
         public List<DirtBundleInfo> dirtBundleInfoList;
+        public List<int> mapOverList;
+        public List<int> itemPurchaseList;
 
 
         //public Vector2 screenSize;
@@ -114,12 +117,12 @@ public class DBManager : MonoBehaviour
     [System.Serializable]//컬렉션 등(영구 저장_컴퓨터 귀속)
     public class LocalData{
         
-        [Header("Collections")]
+        [Header("Collections ━━━━━━━━━━━")]
         public List<ClearedEndingCollection> endingCollectionOverList = new List<ClearedEndingCollection>();
         public List<ClearedAntCollection> antCollectionOverList = new List<ClearedAntCollection>();
         public List<int> itemCollectionOverList = new List<int>();
         
-        [Header("Options")]
+        [Header("Options ━━━━━━━━━━━")]
         public float bgmVolume;
         public float sfxVolume;
         public bool onTalkingSound;
@@ -132,6 +135,13 @@ public class DBManager : MonoBehaviour
         public KeyCode petKey;
         public int usedCouponRewardItemID;
         
+        [Space]
+        [Header("Steam Achievements ━━━━━━━━━━━")]
+        //업적용
+        public int useDirtCount;
+        public int deathCount;//일반 죽음
+        public int deathCount_noDirt;//흙고갈 죽음
+        public int gameCount_success_0;//미니게임0 성공횟수(종이오리기)
     }
     
 #region Non local data
@@ -201,6 +211,8 @@ public class DBManager : MonoBehaviour
                 if(curData.getItemOverList == null) curData.getItemOverList = new List<int>();
                 //if(curData.getDirtBundleOverList == null) curData.getDirtBundleOverList = new List<DirtBundleInfo>();
                 if(curData.dirtBundleInfoList == null) curData.dirtBundleInfoList = new List<DirtBundleInfo>();
+                if(curData.mapOverList == null) curData.mapOverList = new List<int>();
+                if(curData.itemPurchaseList == null) curData.itemPurchaseList = new List<int>();
                 
                 //curData.honeyOverList.Add(-1);
             }
@@ -434,6 +446,13 @@ public class DBManager : MonoBehaviour
     public void EndingCollectionOver(int collectionNum){
         if(GetClearedEndingCollectionID(collectionNum) == -1){
             localData.endingCollectionOverList.Add(new ClearedEndingCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
+            
+            //스팀업적 0 체크용
+            Debug.Log("A : " + DBManager.instance.cache_EndingCollectionDataList.Count);
+            if(DBManager.instance.localData.endingCollectionOverList.Count == DBManager.instance.cache_EndingCollectionDataList.Count){
+                SteamAchievement.instance.ApplyAchievements(0);
+            }
+            
             CallLocalDataSave();
             DM("EndingCollectionOver : "+collectionNum);
         }
@@ -459,6 +478,9 @@ public class DBManager : MonoBehaviour
             localData.antCollectionOverList.Add(new ClearedAntCollection(collectionNum,DBManager.instance.curData.curPlayDate.Substring(0,10),DBManager.instance.curData.curPlayCount));
             UIManager.instance.hud_sub_collection_redDot.SetActive(true);
             
+            if(DBManager.instance.localData.antCollectionOverList.Count == MenuManager.instance.antStickersMother.childCount){
+                SteamAchievement.instance.ApplyAchievements(14);
+            }
             
             CallLocalDataSave();
             DM("AntCollectionOver : "+collectionNum);
@@ -576,7 +598,11 @@ public class DBManager : MonoBehaviour
 
         if(PlayerManager.instance != null){
 
-            if(PlayerManager.instance.isMoving && !PlayerManager.instance.isActing && !PlayerManager.instance.isInvincible && !PlayerManager.instance.isPlayingMinigame){
+            if(PlayerManager.instance.isMoving 
+            && !PlayerManager.instance.isActing 
+            && !PlayerManager.instance.isInvincible 
+            && !PlayerManager.instance.isPlayingMinigame
+            ){
                 if(curData.curDirtAmount>0) curData.curDirtAmount -= dirtAmountPaneltyPerSeconds;
             }
         }
@@ -616,6 +642,7 @@ public class DBManager : MonoBehaviour
                         int.Parse(a[i]["ID"].ToString())
                         ,a[i]["name_"+language].ToString()
                         ,int.Parse(a[i]["resourceID"].ToString())
+                        ,int.Parse(a[i]["trueID"].ToString())
                         //byte.Parse(a[i]["type"].ToString()),
                         //int.Parse(a[i]["resourceID"].ToString()),
                         //bool.Parse(a[i]["isStack"].ToString())
@@ -655,6 +682,64 @@ public class DBManager : MonoBehaviour
             ));
         }
     }
+
+#region Check Map Data
+    public void MapOver(int mapNum){
+        if(!CheckMapOver(mapNum)){
+            curData.mapOverList.Add(mapNum);
+
+            if(mapNum == 9 && curData.mapOverList.Count>=2){
+                var molCount = curData.mapOverList.Count;
+                if(curData.mapOverList[molCount-2]==8){
+                    SteamAchievement.instance.ApplyAchievements(13);
+                }
+            }
+
+            //0,1,2 맵 제외 모두 방문 시 업적 달성
+            if(curData.mapOverList.Count == CSVReader.instance.data_map.Count - 3){
+                SteamAchievement.instance.ApplyAchievements(11);
+
+            }
+        }
+    }
+    public bool CheckMapOver(int mapNum){
+        if(curData.mapOverList.Contains(mapNum)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+#endregion
+
+#region Check Item Purchase Data
+    public void ItemPurchaseOver(int _id){
+        if(!CheckMapOver(_id)){
+            curData.itemPurchaseList.Add(_id);
+
+            // if(mapNum == 9 && curData.itemPurchaseList.Count>=2){
+            //     var molCount = curData.itemPurchaseList.Count;
+            //     if(curData.itemPurchaseList[molCount-2]==8){
+            //         SteamAchievement.instance.ApplyAchievements(13);
+            //     }
+            // }
+
+            //0,1,2 맵 제외 모두 방문 시 업적 달성
+            if(curData.itemPurchaseList.Count >= 9){
+                SteamAchievement.instance.ApplyAchievements(4);
+
+            }
+        }
+    }
+    public bool CheckItemPurchaseOver(int _id){
+        if(curData.itemPurchaseList.Contains(_id)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+#endregion
     // public void ApplySysMsgText(){
     //     // for(int i=0;i<SceneController.instance.translateTexts.Count;i++){
     //     //     SceneController.instance.translateTexts[i].tra
@@ -733,16 +818,18 @@ public class EndingCollection{
 
     
     public int resourceID;
+    public int trueID;
     public Sprite sprite;
 
 
-    public EndingCollection(int a, string b, int c){
+    public EndingCollection(int a, string b, int c,int d){
         ID = a;
         name = b;
         //description = c;
         //date = d;
         //count = e;
         resourceID = c;
+        trueID = d;
         if(DBManager.instance.endingCollectionSprites.Length > resourceID)
         sprite = DBManager.instance.endingCollectionSprites[resourceID];
     }
