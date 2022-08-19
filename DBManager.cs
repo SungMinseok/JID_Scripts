@@ -22,6 +22,7 @@ public class DBManager : MonoBehaviour
     public float maxDirtAmount;
     public float dirtAmountPaneltyPerSeconds;
     public float dirtAlertAmount;
+    public float defaultGetDirtAmount = 5;
     [Header("[Dialogue]")]
     public float waitTime_dialogueInterval;
     public float waitTime_dialogueTypingInterval;
@@ -30,6 +31,8 @@ public class DBManager : MonoBehaviour
     public float sfxAdjustVal;
     [Header("[Steam]")]
     public bool achievementIsAvailable;
+    [Header("[Contents On/Off]")]
+    public bool dirtOnlyHUD;
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     [Space]
@@ -79,6 +82,7 @@ public class DBManager : MonoBehaviour
         public int curHoneyAmount;
         public int[] curEquipmentsID = new int[3];
         public bool isSummoning;
+        public int curDirtItemCount;
 
 
 
@@ -132,6 +136,7 @@ public class DBManager : MonoBehaviour
         public int frameRateValue;
         public KeyCode jumpKey;
         public KeyCode interactKey;
+        public KeyCode AddDirtKey;
         public KeyCode petKey;
         public int usedCouponRewardItemID;
         

@@ -12,6 +12,7 @@ public class SoundManager : MonoBehaviour
     public string defaultBtnSoundName;
     public string defaultGetItemSoundName = "item_get";
     public string defaultDoorSoundName = "opendoor";
+    public string defaultAddDirtName = "dirt_charge";
     public float changeBgmDelta = 0.005f;
 
     //public float masterVolumeSFX = 1f;

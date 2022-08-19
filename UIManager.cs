@@ -16,6 +16,9 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI honeyText;
     public Transform iceGaugeMother;
     public float iceGaugeCoolTime = 20f;
+    public GameObject dirtHolder;
+    public Text dirtHolderCountText;
+    public Text dirtHolderHotKeyText;
     [Header("UI_Select")]
     public GameObject ui_select;
     public Transform ui_select_grid;
@@ -122,6 +125,8 @@ public class UIManager : MonoBehaviour
         }
         //playerOriginPos = thePlayer.transform.position;
         // offset = transform.position - worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position);
+    
+//        UIManager.instance.SetDirtOnlyHUD(DBManager.instance.dirtOnlyHUD);
     }
     void OnDisable()
     {
@@ -831,5 +836,28 @@ public class UIManager : MonoBehaviour
 
     public void ClearStringArray(string[] array){
         Array.Clear(array,0,array.Length);
+    }
+
+    public void RefreshDirtHolder(){
+        dirtHolderCountText.text = DBManager.instance.curData.curDirtItemCount.ToString();
+    }
+    public void PushDirtHolder(){
+        
+        if(DBManager.instance.curData.curDirtItemCount > 0){
+            DBManager.instance.curData.curDirtItemCount -= 1;
+            
+            InventoryManager.instance.AddDirt(DBManager.instance.defaultGetDirtAmount);
+            RefreshDirtHolder();
+        }
+        //InventoryManager.instance.UseItem(DBManager.instance.cache_ItemDataList[5]);
+    }
+    public void SetDirtOnlyHUD(bool active){
+        DBManager.instance.dirtOnlyHUD = active;
+        
+        dirtHolder.SetActive(active);
+        
+        if(InventoryManager.instance.itemSlot.Length!=0)
+            InventoryManager.instance.ChangeDirtItemPostion(active);
+
     }
 }

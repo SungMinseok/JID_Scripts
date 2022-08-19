@@ -49,14 +49,19 @@ public static class GameInputManager
         if(localData.petKey==KeyCode.None){
             localData.petKey = KeyCode.R;
         }
+        if(localData.AddDirtKey==KeyCode.None){
+            localData.AddDirtKey = KeyCode.Q;
+        }
 
         SetKeyMap("Jump",localData.jumpKey);
         SetKeyMap("Interact",localData.interactKey);
         SetKeyMap("Pet",localData.petKey);
+        SetKeyMap("AddDirt",localData.AddDirtKey);
         
         
         MenuManager.instance.keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
         MenuManager.instance.keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
+        MenuManager.instance.keyText_adddirt.text = DBManager.instance.localData.AddDirtKey.ToString();
         //MenuManager.instance.keyText_pet.text = DBManager.instance.localData.petKey.ToString();
     }
  

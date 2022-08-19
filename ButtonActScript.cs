@@ -11,6 +11,7 @@ public class ButtonActScript : MonoBehaviour,IPointerEnterHandler
     }
     public enum ButtonClickSound{
         button0,
+        none,
     }
     public ButtonHoverSound buttonHoverSound;
     public ButtonClickSound buttonClickSound;

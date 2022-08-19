@@ -2732,6 +2732,16 @@ DBManager.instance.AntCollectionOver(12);
 
                     FadeIn();
 
+                    //지키기 : 여왕지지자
+                    if(GetSelect()==0){
+                        SteamAchievement.instance.ApplyAchievements(9);
+
+                    }
+                    //훔치는거 도와주기 : 공주지지자
+                    else if(GetSelect()==1){
+                        SteamAchievement.instance.ApplyAchievements(8);
+
+                    }
 
                 }
                 else{
@@ -3141,6 +3151,13 @@ DBManager.instance.AntCollectionOver(12);
                     SetDialogue(dialogues[i]);
                     yield return waitTalking;
                 }
+                break;
+#endregion
+#region @93 제작대 레시피
+            case 93 :
+                
+                UIManager.instance.OpenScreen(3);
+                yield return new WaitUntil(()=>!UIManager.instance.screenOn);
                 break;
 #endregion
 

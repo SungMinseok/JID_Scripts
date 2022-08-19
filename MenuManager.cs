@@ -50,11 +50,13 @@ public class MenuManager : MonoBehaviour
     public GameObject checkedBtn_window;
     public TMP_Dropdown dropdown_resolution;
     public TMP_Dropdown dropdown_frameRate;
+    public TMP_Dropdown dropdown_dirtOnlyHUD;
     public bool waitKeyChange;
     public string curChangingKeyName;
     public Text keyText_jump;
     public Text keyText_interact;
     public Text keyText_pet;
+    public Text keyText_adddirt;
 
     // [System.Serializable]
     // public class SaveLoadSlot{
@@ -209,6 +211,7 @@ public class MenuManager : MonoBehaviour
         slider_sound.onValueChanged.AddListener(delegate{SoundManager.instance.SetVolumeSFX(MenuManager.instance.slider_sound.value);});
         dropdown_resolution.onValueChanged.AddListener(delegate{SetResolutionByValue(dropdown_resolution.value);});
         dropdown_frameRate.onValueChanged.AddListener(delegate{SetFrameRateByValue(dropdown_frameRate.value);});
+        dropdown_dirtOnlyHUD.onValueChanged.AddListener(delegate{SetDirtOnlyHUD(dropdown_dirtOnlyHUD.value);});
 
         for(int i=0;i<setting_languagePage.childCount;i++){
             int temp = i;
@@ -885,12 +888,16 @@ public class MenuManager : MonoBehaviour
                     case "Interact" :  
                         DBManager.instance.localData.interactKey = e.keyCode;
                         break;
+                    case "AddDirt" :  
+                        DBManager.instance.localData.AddDirtKey = e.keyCode;
+                        break;
                     default:
                         break;
                 }
 
                 keyText_jump.text = DBManager.instance.localData.jumpKey.ToString();
                 keyText_interact.text = DBManager.instance.localData.interactKey.ToString();
+                keyText_adddirt.text = DBManager.instance.localData.AddDirtKey.ToString();
 
                 popUpPanel.SetActive(false);
                 popUpPanel1.SetActive(false);
@@ -911,6 +918,9 @@ public class MenuManager : MonoBehaviour
             case "Interact" :  
                 OpenPopUpPanel_OneAnswer("71","1");
                 break;
+            case "AddDirt" :  
+                OpenPopUpPanel_OneAnswer("97","1");
+                break;
             default:
                 break;
         }
@@ -919,6 +929,14 @@ public class MenuManager : MonoBehaviour
     public void TryResetData(){
         
         OpenPopUpPanel("resetData");
+    }
+
+    public void SetDirtOnlyHUD(int num){
+        DBManager.instance.dirtOnlyHUD = num == 0 ? true : false;
+
+        if(UIManager.instance != null){
+            UIManager.instance.SetDirtOnlyHUD(DBManager.instance.dirtOnlyHUD);
+        }
     }
 #endregion
 

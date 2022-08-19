@@ -78,6 +78,11 @@ public class InventoryManager : MonoBehaviour
         }
 
         ResetInventory();
+        ChangeDirtItemPostion(DBManager.instance.dirtOnlyHUD);
+        if(DBManager.instance.dirtOnlyHUD){
+            UIManager.instance.RefreshDirtHolder();
+        }
+        
     }
 
     // Update is called once per frame
@@ -136,15 +141,40 @@ public class InventoryManager : MonoBehaviour
                 //인벤토리에 이미 있으면 개수만 추가해줌
                 if(DBManager.instance.curData.itemList[i].itemID == ID){
                     DBManager.instance.curData.itemList[i].itemAmount += amount;
-                    RefreshInventory(curPage);
+                        RefreshInventory(curPage);
+
+                    // if(ID==5 && DBManager.instance.dirtOnlyHUD){
+                    //     //DBManager.instance.curData.itemList[i].itemAmount += amount;
+                    //     ChangeDirtItemPostion(DBManager.instance.dirtOnlyHUD);
+
+                    // }
+                    // else{
+
+                    // }
 //                    Debug.Log("a");
                     return;
                 }
             }
-            //인벤토리에 없으면 새로 추가해줌
-            DBManager.instance.curData.itemList.Add(new ItemList(ID,amount));
             //Debug.Log("b");
+                    DBManager.instance.curData.itemList.Add(new ItemList(ID,amount));
             
+            //220816 추가 흙전용 HUD용으로 이전
+            //if(DBManager.instance.dirtOnlyHUD){
+                if(ID==5){
+                    if(DBManager.instance.dirtOnlyHUD){
+                        ChangeDirtItemPostion(DBManager.instance.dirtOnlyHUD);
+                    }
+                    else{
+                        RemoveItem(ID,amount);
+                        DBManager.instance.curData.itemList.Insert(0, new ItemList(ID,amount));
+                        RefreshInventory(curPage);
+                    }
+                }
+                else{
+
+                    //인벤토리에 없으면 새로 추가해줌
+                }
+            //}
         }
         //스택형 아이템이 아니면
         else{
@@ -383,8 +413,8 @@ public class InventoryManager : MonoBehaviour
                             switch(curItem.ID){
                                 case 5:
         
-                                    AddDirt(5);
-                                    SoundManager.instance.PlaySound("dirt_charge");
+                                    AddDirt(DBManager.instance.defaultGetDirtAmount);
+                                    //SoundManager.instance.PlaySound(SoundManager.inst);
                                     break;
                                 
                                 default :
@@ -450,6 +480,8 @@ public class InventoryManager : MonoBehaviour
         if(DBManager.instance.localData.useDirtCount >= 100){
             SteamAchievement.instance.ApplyAchievements(16);
         }
+        
+        SoundManager.instance.PlaySound(SoundManager.instance.defaultAddDirtName);
     }
     public void AddHoney(int honeyAmount, bool activateDialogue = false, float delayTime = 0){
         DBManager.instance.curData.curHoneyAmount += honeyAmount;
@@ -680,4 +712,39 @@ public class InventoryManager : MonoBehaviour
             InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID, mute: true);
     }
              
+    public void ChangeDirtItemPostion(bool active){
+
+        var myItemList = DBManager.instance.curData.itemList;
+        int curItemIndex = myItemList.FindIndex(x => x.itemID == 5);
+        
+        //Debug.Log("curItemAmount " + curItemAmount);
+        //Debug.Log("theDB.cache_ItemDataList " + DBManager.instance.cache_ItemDataList.Count);
+
+        //흙 첫번째 고정하기
+        if(!active){
+            if(DBManager.instance.curData.curDirtItemCount == 0) return;
+
+            UIManager.instance.dirtHolder.SetActive(false);
+            DBManager.instance.curData.itemList.Insert(0, new ItemList(5, DBManager.instance.curData.curDirtItemCount));
+            DBManager.instance.curData.curDirtItemCount = 0;
+            RefreshInventory(curPage);
+        }
+        //흙 전용 HUD 활성화
+        else{
+
+            if(curItemIndex != -1){
+                    
+                int curItemAmount = myItemList[curItemIndex].itemAmount;
+
+                DBManager.instance.curData.curDirtItemCount += curItemAmount;
+                RemoveItem(5,curItemAmount);
+            }
+
+                UIManager.instance.RefreshDirtHolder();
+        }
+
+
+        //if(curItemIndex!=-1){
+        //}
+    }
 }

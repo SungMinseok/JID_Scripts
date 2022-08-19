@@ -241,6 +241,13 @@ public class PlayerManager : CharacterScript
                 StartCoroutine(DepletedDirt());
             }
 
+            //220817 추가
+            if(DBManager.instance.dirtOnlyHUD){
+                if(GameInputManager.GetKeyDown("AddDirt")){
+                    UIManager.instance.PushDirtHolder();
+                }
+            }
+
             //가만히 있어도 OnTriggerStay2D 발동하게 함
             rb.AddForce(Vector2.zero);
             
