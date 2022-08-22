@@ -350,7 +350,7 @@ public class TriggerScript : MonoBehaviour
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
             //트리거 시작시 배경음 감소
-            SoundManager.instance.bgmPlayer.volume = SoundManager.instance.bgmPlayer.volume * 0.3f;
+            SoundManager.instance.bgmPlayer.volume *= DBManager.instance.bgmFadeValueInTrigger;
 
         
         }
@@ -2129,10 +2129,11 @@ DBManager.instance.AntCollectionOver(15);
                 SetDialogue(dialogues[1]);
                 yield return waitTalking;
 
-                string[] tempArg = new string[3]{
+                string[] tempArg = new string[4]{
                     DBManager.instance.cache_ItemDataList[9].name.ToString(),
                     DBManager.instance.cache_ItemDataList[33].name.ToString(),
-                    DBManager.instance.cache_ItemDataList[34].name.ToString()
+                    DBManager.instance.cache_ItemDataList[34].name.ToString(),
+                    ""
                 };
 
                 //Debug.Log(DBManager.instance.cache_ItemDataList[9].name.ToString());
@@ -3513,7 +3514,7 @@ DBManager.instance.AntCollectionOver(17);
                 break;
 #endregion 
 
-#region t208 [엔딩8 - 산제물]
+#region @208 [엔딩8 - 산제물]
             case 208 :
                 PlayerManager.instance.Look("right");
                 PlayerManager.instance.SetTalkCanvasDirection();
@@ -3554,12 +3555,19 @@ DBManager.instance.AntCollectionOver(17);
                         PlayerManager.instance.wSet = 1;
                         objects[1].gameObject.SetActive(false);
                         //objects[1].GetComponent<Location>().isLocked = false;
-                        yield return wait3000ms;
-                        yield return wait1000ms;
+                        yield return wait2000ms;
                         objects[2].gameObject.SetActive(true);
-                        PlayerManager.instance.wSet = 0;
 
+
+                        TeleportPlayer(objects[3]);
+                        SceneController.instance.SetSomeConfiner(objects[4].GetComponent<PolygonCollider2D>());                        
+                        //SceneController.instance.virtualCamera.Follow = null;
+                        yield return wait2000ms;
                         UIManager.instance.SetGameEndUI(8);
+                        yield return wait1000ms;
+
+                        PlayerManager.instance.wSet = 0;
+                        yield return wait1000ms;
                     }
                     else{
                     }

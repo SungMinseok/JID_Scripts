@@ -29,6 +29,7 @@ public class DBManager : MonoBehaviour
     [Header("[Sound]")]
     public float bgmAdjustVal;
     public float sfxAdjustVal;
+    public float bgmFadeValueInTrigger;
     [Header("[Steam]")]
     public bool achievementIsAvailable;
     [Header("[Contents On/Off]")]

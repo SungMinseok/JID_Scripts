@@ -691,9 +691,9 @@ public class UIManager : MonoBehaviour
 
         if (!active)
         {
-            for (int i = 0; i < InventoryManager.instance.itemSlot.Length; i++)
+            for (int i = 0; i < InventoryManager.instance.itemSlotScripts.Length; i++)
             {
-                InventoryManager.instance.itemSlot[i].itemDescriptionWindow.SetActive(false);
+                InventoryManager.instance.itemSlotScripts[i].itemSlot.itemDescriptionWindow.SetActive(false);
             }
         }
     }
@@ -856,7 +856,7 @@ public class UIManager : MonoBehaviour
         
         dirtHolder.SetActive(active);
         
-        if(InventoryManager.instance.itemSlot.Length!=0)
+        //if(InventoryManager.instance.itemSlot.Length!=0)
             InventoryManager.instance.ChangeDirtItemPostion(active);
 
     }

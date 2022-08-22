@@ -17,6 +17,8 @@ public class ItemSlot{
     public GameObject itemDescriptionWindow;
     public TextMeshProUGUI itemName;
     public TextMeshProUGUI itemDescription;
+    public GameObject itemUseableMark;
+    public GameObject itemUseableBox;
     
     //public ItemSlot(GameObject a)
 }
@@ -27,14 +29,16 @@ public class InventoryManager : MonoBehaviour
     
     [Header("UI_Inventory───────────────")]
     public Transform itemSlotGrid;
+    public ItemSlotScript[] itemSlotScripts;
     //[SerializeField]
-    public ItemSlot[] itemSlot;
+    //public ItemSlot[] itemSlot;
     //public ItemSlot[] temp;
     public GameObject upArrow, downArrow;
    // public Sprite[] itemSprites;
     public Sprite nullSprite;
     public Animator inventoryAnimator;
     public Button toggleBtn;
+    public Image movingItemImage;
     [Header("Debug───────────────")]
     public int curPage;
     public int slotCountPerPage;
@@ -42,6 +46,12 @@ public class InventoryManager : MonoBehaviour
     public bool selectFlag;
     public bool waitGetItemDialogue;//트루 시, 트리거 종료 후에도 이동 불가
     Dialogue tempDialogue;
+    public bool itemMoveAccepted;//true 시(드래그 성공 시 트루), 인벤 리셋
+    public int itemMoveEndIndex;
+    public bool itemIsMoving;
+    public bool inventoryTabHovering;
+    WaitForSecondsRealtime waitForSecondsRealtime ; 
+    WaitForSeconds wait1s;
     void Awake(){
         instance = this;
 
@@ -52,16 +62,18 @@ public class InventoryManager : MonoBehaviour
     void Start()
     {
         //itemSlot = new ItemSlot[7];
-        for(int i=0;i<slotCountPerPage;i++){
-            //itemSlot[i].equippedMark = PlayerManager.instance.gameObject;
-            itemSlot[i].itemSlotBtn = itemSlotGrid.GetChild(i).GetComponent<Button>();
-            itemSlot[i].equippedMark = itemSlotGrid.GetChild(i).GetChild(0).gameObject;
-            itemSlot[i].itemAmount = itemSlotGrid.GetChild(i).GetChild(2).GetComponent<Text>();
-            itemSlot[i].itemImage = itemSlotGrid.GetChild(i).GetChild(1).GetComponent<Image>();
-            itemSlot[i].itemDescriptionWindow = itemSlotGrid.GetChild(i).GetChild(3).gameObject;
-            itemSlot[i].itemName = itemSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
-            itemSlot[i].itemDescription = itemSlotGrid.GetChild(i).GetChild(3).GetChild(1).GetComponent<TextMeshProUGUI>();
-        }
+        // for(int i=0;i<slotCountPerPage;i++){
+        //     itemSlot[i].equippedMark = PlayerManager.instance.gameObject;
+        //     itemSlot[i].itemSlotBtn = itemSlotGrid.GetChild(i).GetComponent<Button>();
+        //     itemSlot[i].equippedMark = itemSlotGrid.GetChild(i).GetChild(0).gameObject;
+        //     itemSlot[i].itemAmount = itemSlotGrid.GetChild(i).GetChild(2).GetComponent<Text>();
+        //     itemSlot[i].itemImage = itemSlotGrid.GetChild(i).GetChild(1).GetComponent<Image>();
+        //     itemSlot[i].itemDescriptionWindow = itemSlotGrid.GetChild(i).GetChild(3).gameObject;
+        //     itemSlot[i].itemName = itemSlotGrid.GetChild(i).GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+        //     itemSlot[i].itemDescription = itemSlotGrid.GetChild(i).GetChild(3).GetChild(1).GetComponent<TextMeshProUGUI>();
+        //     itemSlot[i].itemUseableMark = itemSlotGrid.GetChild(i).GetChild(3).GetChild(2).gameObject;
+        //     itemSlot[i].itemUseableBox = itemSlotGrid.GetChild(i).GetChild(3).GetChild(3).gameObject;
+        // }
 
         for(int i=0;i<itemSlotGrid.transform.childCount;i++){
             int temp = i;
@@ -82,6 +94,8 @@ public class InventoryManager : MonoBehaviour
         if(DBManager.instance.dirtOnlyHUD){
             UIManager.instance.RefreshDirtHolder();
         }
+
+        wait1s = new WaitForSeconds(1f);
         
     }
 
@@ -251,23 +265,26 @@ public class InventoryManager : MonoBehaviour
         var theDB = DBManager.instance;
 
         for(int i= pageNum * slotCountPerPage ; i< (pageNum + 1) * slotCountPerPage ;i++){
+
+            int curSlotNum = i%slotCountPerPage ;
+
             //아이템 있을 경우
             if(i<theDB.curData.itemList.Count){
                 int itemID = DBManager.instance.curData.itemList[i].itemID;
 
                 //아이템 이미지 불러오기
-                itemSlot[i%slotCountPerPage].itemImage.sprite = theDB.cache_ItemDataList[itemID].icon;
+                itemSlotScripts[curSlotNum].itemSlot.itemImage.sprite = theDB.cache_ItemDataList[itemID].icon;
 
                 //아이템 정보 불러오기
-                itemSlot[i%slotCountPerPage].itemName.text = theDB.cache_ItemDataList[itemID].name;
-                itemSlot[i%slotCountPerPage].itemDescription.text = theDB.cache_ItemDataList[itemID].description;
+                itemSlotScripts[curSlotNum].itemSlot.itemName.text = theDB.cache_ItemDataList[itemID].name;
+                itemSlotScripts[curSlotNum].itemSlot.itemDescription.text = theDB.cache_ItemDataList[itemID].description;
 
                 if(theDB.cache_ItemDataList[itemID].isStack){
-                    itemSlot[i%slotCountPerPage].itemAmount.text = DBManager.instance.curData.itemList[i].itemAmount.ToString();
-                    itemSlot[i%slotCountPerPage].itemAmount.gameObject.SetActive(true);
+                    itemSlotScripts[curSlotNum].itemSlot.itemAmount.text = DBManager.instance.curData.itemList[i].itemAmount.ToString();
+                    itemSlotScripts[curSlotNum].itemSlot.itemAmount.gameObject.SetActive(true);
                 }
                 else{
-                    itemSlot[i%slotCountPerPage].itemAmount.gameObject.SetActive(false);
+                    itemSlotScripts[curSlotNum].itemSlot.itemAmount.gameObject.SetActive(false);
 
                 }
 
@@ -281,36 +298,58 @@ public class InventoryManager : MonoBehaviour
                 ){
                     for(var j=0;j<PlayerManager.instance.equipments_id.Length;j++){
                         if(PlayerManager.instance.equipments_id[j]==itemID){
-                            itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);
+                            itemSlotScripts[curSlotNum].itemSlot.equippedMark.SetActive(true);
                             break;
                         }
-                        itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
+                        itemSlotScripts[curSlotNum].itemSlot.equippedMark.SetActive(false);
                     }
                 }
                 //삽, 곡괭이 자동 장착 ON
                 else if(theDB.cache_ItemDataList[itemID].type == 6){
 
-                    itemSlot[i%slotCountPerPage].equippedMark.SetActive(true);
+                    itemSlotScripts[curSlotNum].itemSlot.equippedMark.SetActive(true);
                 }
                 else{
-                    itemSlot[i%slotCountPerPage].equippedMark.SetActive(false);
+                    itemSlotScripts[curSlotNum].itemSlot.equippedMark.SetActive(false);
 
+                }
+
+                
+                //사용 가능아이템 처리 220821
+                if(theDB.cache_ItemDataList[itemID].type == 1
+                ||theDB.cache_ItemDataList[itemID].type == 2
+                ||theDB.cache_ItemDataList[itemID].type == 4
+                ||theDB.cache_ItemDataList[itemID].type == 5
+                ){
+                    itemSlotScripts[curSlotNum].itemSlot.itemUseableBox.SetActive(true);
+                    itemSlotScripts[curSlotNum].itemSlot.itemUseableMark.SetActive(true);
+                    //itemSlot[curSlotNum].equippedMark.SetActive(true);
+                }
+                else{
+
+                    itemSlotScripts[curSlotNum].itemSlot.itemUseableBox.SetActive(false);
+                    itemSlotScripts[curSlotNum].itemSlot.itemUseableMark.SetActive(false);
                 }
 
                 //아이템 버튼 활성화
-                itemSlot[i%slotCountPerPage].itemSlotBtn.interactable = true;
+                itemSlotScripts[curSlotNum].itemSlot.itemSlotBtn.interactable = true;
             }
             //아이템 없을 경우
             else{
-                //itemSlotGrid.GetChild(i%slotCountPerPage).GetComponent<Image>().sprite = nullSprite;
-                //Debug.Log(itemSlot[i%slotCountPerPage].itemImage.sprite);
-                itemSlot[i%slotCountPerPage].itemImage.sprite = nullSprite;
-                itemSlot[i%slotCountPerPage].equippedMark.gameObject.SetActive(false);
+                //itemSlotGrid.GetChild(curSlotNum).GetComponent<Image>().sprite = nullSprite;
+                //Debug.Log(itemSlotScripts[curSlotNum].itemSlot.itemImage.sprite);
+                itemSlotScripts[curSlotNum].itemSlot.itemImage.sprite = nullSprite;
+                itemSlotScripts[curSlotNum].itemSlot.equippedMark.gameObject.SetActive(false);
                 
-                itemSlot[i%slotCountPerPage].itemAmount.gameObject.SetActive(false);
+                itemSlotScripts[curSlotNum].itemSlot.itemAmount.gameObject.SetActive(false);
 
                 //아이템 버튼 비활성화
-                itemSlot[i%slotCountPerPage].itemSlotBtn.interactable = false;
+                itemSlotScripts[curSlotNum].itemSlot.itemSlotBtn.interactable = false;
+
+                //사용 가능아이템 처리 220821
+                itemSlotScripts[curSlotNum].itemSlot.itemUseableBox.SetActive(false);
+                itemSlotScripts[curSlotNum].itemSlot.itemUseableMark.SetActive(false);
+
             }
         }
         BtnActivateCheck();
@@ -398,43 +437,54 @@ public class InventoryManager : MonoBehaviour
             //     break;
             case 4 :
                 if(curItem.isStack){
-                    for(var i=0;i< theDB.curData.itemList.Count;i++){
-                        //인벤토리에 이미 있으면 개수만 추가해줌
-                        if(theDB.curData.itemList[i].itemID == curItem.ID){
 
-                            if(theDB.curData.itemList[i].itemAmount > 1){
-                                theDB.curData.itemList[i].itemAmount -= 1;
-                            }
-                            else{
-                                RemoveItem(curItem.ID);
-                            }
-                            RefreshInventory(curPage);
-#region 아이템 별 사용 내용
-                            switch(curItem.ID){
-                                case 5:
-        
-                                    AddDirt(DBManager.instance.defaultGetDirtAmount);
-                                    //SoundManager.instance.PlaySound(SoundManager.inst);
-                                    break;
-                                
-                                default :
-                                    SoundManager.instance.PlaySound("item_use");
-                                    break;
-                            }
-#endregion
+                    var curItemListIndex = theDB.curData.itemList.FindIndex(x => x.itemID == curItem.ID);
 
+                    if(curItem.ID == 5){
 
-
-
-
-
-
-
-                            
-                            return;
+                        if(theDB.curData.itemList[curItemListIndex].itemAmount > 0){
+                            theDB.curData.itemList[curItemListIndex].itemAmount -= 1;
+                            AddDirt(DBManager.instance.defaultGetDirtAmount);
                         }
                     }
+
+                    else if(curItemListIndex != -1){
+                        if(theDB.curData.itemList[curItemListIndex].itemAmount > 1){
+                            theDB.curData.itemList[curItemListIndex].itemAmount -= 1;
+                        }
+                        else{
+                            RemoveItem(curItem.ID);
+                        }
+                    }
+
+                    // for(var i=0;i< theDB.curData.itemList.Count;i++){
+                    //     //인벤토리에 이미 있으면 개수만 빼줌
+                    //     if(theDB.curData.itemList[i].itemID == curItem.ID){
+                            
+                    //         if(curItem.ID!=5){
+
+                    //         }
+                    //         else{
+                    //         //220823 흙은 0으로 표시
+                                
+                    //         }
+                    //         RefreshInventory(curPage);
+#region 아이템 별 사용 내용
+                        switch(curItem.ID){
+                            case 5:
+                                //SoundManager.instance.PlaySound(SoundManager.inst);dirt_charge
+                                if(theDB.curData.itemList[curItemListIndex].itemAmount!=0)
+                                    SoundManager.instance.PlaySound("dirt_charge");
+                                break;
+                            
+                            default :
+                                SoundManager.instance.PlaySound("item_use");
+                                break;
+                        }
+#endregion      
                 }
+                    
+                
                 break;
             case 5:
                 // switch(curItem.ID){
@@ -722,11 +772,27 @@ public class InventoryManager : MonoBehaviour
 
         //흙 첫번째 고정하기
         if(!active){
-            if(DBManager.instance.curData.curDirtItemCount == 0) return;
-
+            //if(DBManager.instance.curData.curDirtItemCount == 0) return;
             UIManager.instance.dirtHolder.SetActive(false);
-            DBManager.instance.curData.itemList.Insert(0, new ItemList(5, DBManager.instance.curData.curDirtItemCount));
-            DBManager.instance.curData.curDirtItemCount = 0;
+
+            if(!DBManager.instance.CheckTrigOver(1)) return;
+
+            var curDirtIndexInItemList = DBManager.instance.curData.itemList.FindIndex(x=>x.itemID==5);
+
+            if(curDirtIndexInItemList!=-1){
+                var curDirtAmount = DBManager.instance.curData.itemList[curDirtIndexInItemList].itemAmount;
+
+                InventoryManager.instance.RemoveItem(5,curDirtAmount);
+                DBManager.instance.curData.itemList.Insert(0, new ItemList(5, curDirtAmount));
+                DBManager.instance.curData.curDirtItemCount = 0;
+            }
+
+            else{
+
+                DBManager.instance.curData.itemList.Insert(0, new ItemList(5, DBManager.instance.curData.curDirtItemCount));
+                DBManager.instance.curData.curDirtItemCount = 0;
+            }
+
             RefreshInventory(curPage);
         }
         //흙 전용 HUD 활성화
@@ -745,6 +811,40 @@ public class InventoryManager : MonoBehaviour
 
 
         //if(curItemIndex!=-1){
+        //}
+    }
+
+    public void ChangeItemSlotPosition(int startIndex, int endIndex){//출발지 > 선택지
+
+        var startItemID = DBManager.instance.curData.itemList[startIndex].itemID;
+        var startItemAmount = DBManager.instance.curData.itemList[startIndex].itemAmount;
+
+        var endItemID = DBManager.instance.curData.itemList[endIndex].itemID;
+        var endItemAmount = DBManager.instance.curData.itemList[endIndex].itemAmount;
+
+
+        RemoveItem(startItemID, startItemAmount);
+        DBManager.instance.curData.itemList.Insert(endIndex, new ItemList(startItemID, startItemAmount));
+        RemoveItem(endItemID, endItemAmount);
+        DBManager.instance.curData.itemList.Insert(startIndex, new ItemList(endItemID, endItemAmount));
+
+        RefreshInventory(curPage);
+
+        SoundManager.instance.PlaySound("button0");
+
+    }
+    public IEnumerator InventoryTabHoveringCoroutine(){
+        //inventoryTabHoveringTime = 0;
+        Debug.Log("34134");
+
+        while(true){
+            yield return wait1s ;
+            //yield return wait1s ;
+            //inventoryTabHoveringTime += 1;
+
+                //if(inventoryTabHoveringTime>=1){
+            BtnNextPage();
+        }
         //}
     }
 }

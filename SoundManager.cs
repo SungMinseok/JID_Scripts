@@ -210,7 +210,7 @@ public class SoundManager : MonoBehaviour
                 bgmPlayer.volume += tempDelta;
                 yield return wait10ms;
             }
-            //bgmPlayer.volume -= tempDelta;
+            bgmPlayer.volume = curBgmVolume;
         }
         //이전에 재생중인게 없으면 바로 시작
         else{

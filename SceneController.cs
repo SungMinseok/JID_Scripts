@@ -93,7 +93,7 @@ public class SceneController : MonoBehaviour
         virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
         virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
     }
-    public void SetSomeConfiner(Collider2D boundCollider = null, bool isDirect = false){
+    public void SetSomeConfiner(PolygonCollider2D boundCollider = null, bool isDirect = false){
         if(isDirect){
             virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
             virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;

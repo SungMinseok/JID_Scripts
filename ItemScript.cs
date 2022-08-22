@@ -172,7 +172,7 @@ public class ItemScript : MonoBehaviour
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
             //트리거 시작시 배경음 감소
-            SoundManager.instance.bgmPlayer.volume = SoundManager.instance.bgmPlayer.volume * 0.3f;
+            SoundManager.instance.bgmPlayer.volume *= DBManager.instance.bgmFadeValueInTrigger;
             Debug.Log(getItemDialogue.sentences[1]);
             DialogueManager.instance.SetDialogue(getItemDialogue);
             yield return waitTalking;
@@ -207,6 +207,7 @@ public class ItemScript : MonoBehaviour
             }
         }
         
+        SoundManager.instance.bgmPlayer.volume = DBManager.instance.localData.bgmVolume;//MenuManager.instance.slider_bgm.value;
         
         itemObject.gameObject.SetActive(false);
     }
