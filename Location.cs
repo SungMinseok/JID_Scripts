@@ -140,6 +140,7 @@ public class Location : MonoBehaviour
                 &&!PlayerManager.instance.isWaitingInteract
                 &&!PlayerManager.instance.isActing
                 &&!PlayerManager.instance.watchingGameEnding
+                &&!PlayerManager.instance.isGameOver
                 ){
                     //Debug.Log("AAA");
                     //if(Input.GetButton("Interact_OnlyKey")){
@@ -186,7 +187,10 @@ public class Location : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other) {
         if(type != LocationType.Comment){
             if(other.CompareTag("Player")){
-                if(!waitKey && !locFlag&&!PlayerManager.instance.isActing&&!PlayerManager.instance.isTalking ){
+                if(!waitKey && !locFlag
+                &&!PlayerManager.instance.isActing
+                &&!PlayerManager.instance.isTalking
+                 ){
 
                     if(PlayerManager.instance.ladderDelay && PlayerManager.instance.jumpDelay ){
                         return;

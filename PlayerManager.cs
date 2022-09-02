@@ -145,6 +145,7 @@ public class PlayerManager : CharacterScript
     public GameObject vignette;
     public GameObject darkerVignette;
     public GameObject redVignette;
+    public GameObject iceVignette;
     public GameObject[] redEyes;
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
@@ -268,7 +269,7 @@ public class PlayerManager : CharacterScript
         }
 
 
-#region case 1 : 가만히 있거나 걸을 때(공중에 떠 있지 않을 때)
+#region case 1-1 : 가만히 있거나 걸을 때(공중에 떠 있지 않을 때)
         if (isGrounded)
         {
             isJumping = false;
@@ -297,10 +298,11 @@ public class PlayerManager : CharacterScript
 
             }
 
+            playerBody.localPosition = new Vector2(0,-0.03f);
         }
 #endregion
 
-#region case 2 : 공중에 떠 있을 때
+#region case 1-2 : 공중에 떠 있을 때
         else
         {
             //점프안하고 추락 시 점프 가능한 것 방지
@@ -310,10 +312,11 @@ public class PlayerManager : CharacterScript
 
             isFalling = rb.velocity.y < 0 ? true : false;
 
+            playerBody.localPosition = new Vector2(0,0.15f);
         }
 #endregion
 
-#region case 3 : 좌우 이동 중
+#region case 2-1 : 좌우 이동 중
         if ((wInput != 0 || wSet != 0 || isForcedRun) )   
         {
             if(!isForcedRun) animator.SetBool("run", true);
@@ -329,7 +332,7 @@ public class PlayerManager : CharacterScript
         }
 #endregion
 
-#region case 4 : 좌우로 이동 중이지 않을 때
+#region case 2-2 : 좌우로 이동 중이지 않을 때
         else
         {
             
@@ -389,17 +392,40 @@ public class PlayerManager : CharacterScript
         }
 #endregion
 
+        if(isFalling){
+                animator.SetBool("fall", true);
 
-        if(talkCanvas.gameObject.activeSelf && !DialogueManager.instance.canSkip2){
+        }
+        else{
+                animator.SetBool("fall", false);
+
+        }
+
+        if(talkCanvas.gameObject.activeSelf){
             if(!onMonologue){
-                animator.SetBool("talk", true);
+                if(!DialogueManager.instance.canSkip2){
+                    animator.SetBool("think", false);
+                    animator.SetBool("talk", true);
+
+                }
+                else{
+                    animator.SetBool("talk", false);
+                    
+                }
+
+            }
+            else{
+                animator.SetBool("talk", false);
+                animator.SetBool("think", true);
 
             }
         }
         else{
             animator.SetBool("talk", false);
+            animator.SetBool("think", false);
 
         }
+        
     }
 
     void FixedUpdate()
@@ -768,6 +794,14 @@ public class PlayerManager : CharacterScript
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.isActing = false;
     }
+    public void SetLockPlayer(bool active){
+        if(active){
+            LockPlayer();
+        }
+        else{
+            UnlockPlayer();
+        }
+    }
     public void ToggleInteract(bool active){//false : 트리거 상호작용 잠그기
         if(active){
             PlayerManager.instance.isActing = false;
@@ -983,6 +1017,8 @@ public class PlayerManager : CharacterScript
         }
         yield return wait1000ms;
         SoundManager.instance.StopLoopSound();
+        //흙 고갈 사망 시 최초 지급용 220831
+        LoadManager.instance.isDeadByDepletingDirt = true;
         UIManager.instance.SetGameOverUI(2);
     }
 

@@ -40,7 +40,8 @@ public class HotkeyManager : MonoBehaviour
             }
             else if(Input.GetKeyDown(KeyCode.M)){
                 if(DBManager.instance.CheckTrigOver(17)||DBManager.instance.CheckTrigOver(18)){
-                    theUI.ui_map.SetActive(!theUI.ui_map.activeSelf);
+                    //theUI.ui_map.SetActive(!theUI.ui_map.activeSelf);
+                    theUI.SetActiveMapUI(!theUI.ui_map.activeSelf);
                 }
             }
             else if(Input.GetKeyDown(KeyCode.Tab)){
@@ -83,7 +84,8 @@ public class HotkeyManager : MonoBehaviour
                     theUI.ToggleEndingGuide(false);
                 }
                 else if(theUI.ui_map.activeSelf){
-                    theUI.ui_map.SetActive(false);
+                    //theUI.ui_map.SetActive(false);
+                    theUI.SetActiveMapUI(false);
                 }
                 else if(theMenu.ui_coupon.activeSelf){
                     theMenu.ui_coupon.SetActive(false);

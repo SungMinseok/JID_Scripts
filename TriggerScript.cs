@@ -62,6 +62,7 @@ public class TriggerScript : MonoBehaviour
                 DBManager.instance.TrigOver(91);
 
                     objects[2].gameObject.SetActive(false);
+                    objects[7].gameObject.SetActive(false);//표지판
                     //objects[2].GetComponent<NPCScript>().onJYD = false;
                     //objects[2].transform.position = objects[3].transform.position;
 
@@ -218,9 +219,10 @@ public class TriggerScript : MonoBehaviour
                 case 17 ://미친수개미에서 노개미 선택
                     objects[5].gameObject.SetActive(false);//광장 노개미
                     break;
-                case 18 ://미친수개미에서 수레개미 선택
-                    objects[3].gameObject.SetActive(false);//버섯농장 수레개미
-                    break;
+                //220901 제거
+                // case 18 ://미친수개미에서 수레개미 선택
+                //     objects[3].gameObject.SetActive(false);//버섯농장 수레개미
+                //     break;
                     
                 case 201 :
                     objects[0].gameObject.SetActive(false);
@@ -361,7 +363,7 @@ public class TriggerScript : MonoBehaviour
             switch(location.trigNum){
 #endregion
 
-#region t999 저장개미 첫만남
+#region @999 저장개미 첫만남
             case 999 :
                 location.selectPhase = -1;
                 DBManager.instance.TrigOver(999);
@@ -1079,7 +1081,7 @@ public class TriggerScript : MonoBehaviour
                 }
                 
                 InventoryManager.instance.AddItem(12,activateDialogue:true,delayTime:1.5f,tutorialID:5);
-                UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
+                //UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
                 
                 // SetDialogue(dialogues[10]);
                 // yield return waitTalking;
@@ -1087,14 +1089,16 @@ public class TriggerScript : MonoBehaviour
                 
                 FadeOut();
                 yield return wait1000ms;
-                objects[4].gameObject.SetActive(false);
+                objects[4].gameObject.SetActive(false);//노개미방의 노개미
+                objects[7].gameObject.SetActive(false);//표지판
                 FadeIn();
                 objects[5].gameObject.SetActive(true);
+                objects[6].gameObject.SetActive(true);
 
                 break;
 #endregion
 
-#region t18 "도망" 미니게임 성공 후, 수레개미 만남
+#region @18 "도망" 미니게임 성공 후, 수레개미 만남
             case 18 :   
                 
                 SetDialogue(dialogues[0]);
@@ -1132,7 +1136,7 @@ public class TriggerScript : MonoBehaviour
                 }
                 
                 InventoryManager.instance.AddItem(12,activateDialogue:true,delayTime:1.5f,tutorialID:5);
-                UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
+                //UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
                 
 
                 
@@ -1443,7 +1447,7 @@ DBManager.instance.AntCollectionOver(14);
                 break;
 #endregion
             
-#region t25 대왕일개미방 입구
+#region @25 대왕일개미방 입구
             case 25 :
 
                 if(!DBManager.instance.CheckTrigOver(24)){
@@ -1469,6 +1473,8 @@ DBManager.instance.AntCollectionOver(14);
                         
                         Action(objects[3].GetComponent<Location>());
                         SoundManager.instance.SetBgmByMapNum(11);
+
+                        DBManager.instance.MapOver(11);
                         
                                 
             // SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
@@ -1485,7 +1491,7 @@ DBManager.instance.AntCollectionOver(14);
                 break;
 #endregion        
 
-#region t26 대왕일개미방 내부 
+#region @26 대왕일개미방 내부 
             case 26 :
 
                 if(PlayerManager.instance.equipments_id[1] == -1){
@@ -1630,26 +1636,10 @@ DBManager.instance.AntCollectionOver(16);
                 break;
 #endregion
 
-#region t27 과학자개미와 대화
+#region @27 과학자개미와 대화
             case 27 :
 
                 DBManager.instance.AntCollectionOver(11);
-                //병원 방문 후
-                //if(DBManager.instance.curData.trigOverList.Contains(40)){
-                // if(DBManager.instance.CheckTrigOver(40)){
-                //     if(location.selectPhase ==0 ){
-                //         location.selectPhase = 1;
-                //         //CameraView(dialogues[6].talker);
-                //         SetDialogue(dialogues[6]);
-                //         yield return waitTalking;
-                //     }
-                //     else{
-                //         //CameraView(dialogues[7].talker);
-                //         SetDialogue(dialogues[7]);
-                //         yield return waitTalking;
-                //     }
-                // }
-                // else{
 
                     PlayerManager.instance.SetTalkCanvasDirection();
 
@@ -1657,6 +1647,14 @@ DBManager.instance.AntCollectionOver(16);
 
                     if(location.selectPhase == 0){
                         location.selectPhase = 1;
+
+                        for(int i=8;i<=14;i++){
+                            if(i==12) animator.SetBool("stand",true);
+                            
+                            SetDialogue(dialogues[i]);
+                            yield return waitTalking;
+
+                        }
                         
                         //CameraView(dialogues[0].talker);
                         //yield return new WaitUntil(()=>animator.GetCurrentAnimatorStateInfo(0).IsName("Ant_Scientist_idle"));
@@ -1664,6 +1662,7 @@ DBManager.instance.AntCollectionOver(16);
                         yield return waitTalking;
                     }
 
+                    animator.SetBool("stand",true);
                     SetDialogue(dialogues[6]);
                     yield return waitTalking;
                     
@@ -1684,11 +1683,15 @@ DBManager.instance.AntCollectionOver(16);
                             //CameraView(dialogues[3].talker);
                             SetDialogue(dialogues[3]);
                             yield return waitTalking;
+                            animator.SetBool("stand",false);
                             animator.SetBool("mess", true);
                             SoundManager.instance.PlaySound("makingsound");
+                            objects[2].GetComponent<ParticleSystem>().Play();
 
                             yield return new WaitForSeconds(5.3f);
 
+                            SoundManager.instance.PlaySound("minigame_complete");
+                            objects[2].GetComponent<ParticleSystem>().Stop();
                             animator.SetBool("success", true);
                             animator.SetBool("mess", false);
 
@@ -1697,6 +1700,7 @@ DBManager.instance.AntCollectionOver(16);
                             //CameraView(dialogues[4].talker);
                             SetDialogue(dialogues[4]);
                             yield return waitTalking;
+                            animator.SetBool("stand",true);
                             animator.SetBool("success", false);
                             
                             SetDialogue(dialogues[5]);
@@ -1704,16 +1708,43 @@ DBManager.instance.AntCollectionOver(16);
                             FadeOut();
                             yield return wait1000ms;
                             //objects[0].gameObject.SetActive(true);
+                            animator.SetBool("stand",false);
                             animator.SetBool("sleep", true);
                             //objects[1].gameObject.SetActive(false);
                             yield return wait1000ms;
                             FadeIn();
                         }
+                        //내가 웃기게 생겼다니.. 제발 달라고 해도 안줄래.
                         else{
+                            
+                            for(int i=18;i<=19;i++){
+                                
+                                SetDialogue(dialogues[i]);
+                                yield return waitTalking;
+                            }
+                            animator.SetBool("stand",false);
                         }
                     }
                     else{
-                        
+
+                        //로메슈제 미소지시 첫번째 상호작용>
+                        if(location.selectPhase == 1){
+                            location.selectPhase = 2;
+                            for(int i=15;i<=17;i++){
+                                
+                                SetDialogue(dialogues[i]);
+                                yield return waitTalking;
+                            }
+                            animator.SetBool("stand",false);
+                        }
+                        else{
+                            for(int i=18;i<=19;i++){
+                                
+                                SetDialogue(dialogues[i]);
+                                yield return waitTalking;
+                            }
+                            animator.SetBool("stand",false);
+                        }
                     }
 
                 //}
@@ -1992,13 +2023,21 @@ DBManager.instance.AntCollectionOver(15);
 
                 break;
 #endregion 
-//연못앞
-#region t39
+//히든월드 입장
+#region @39
             case 39 :
                 objects[0].GetComponent<BoxCollider2D>().enabled = true;
                 objects[1].GetComponent<Location>().isLocked = true;
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
+                
+                //0,1,2,7 맵 제외 모두 방문 시 업적 달성
+                if(DBManager.instance.curData.mapOverList.Count >= 21/* CSVReader.instance.data_map.Count - 3 */
+            
+                ){
+                    SteamAchievement.instance.ApplyAchievements(11);
+
+                }
                 break;
 #endregion 
 
@@ -2486,6 +2525,7 @@ DBManager.instance.AntCollectionOver(15);
                         SetDialogue(dialogues[12]);
                         yield return waitTalking;
 
+                        InventoryManager.instance.RemoveItem(20,1);
                         DBManager.instance.TrigOver(51);
 
                         //location.selectPhase = -1;
@@ -2527,7 +2567,7 @@ DBManager.instance.AntCollectionOver(15);
                 break;
 #endregion
 
-#region tn51 노개미 재방문2(반복용)
+#region @51 노개미 재방문2(반복용)
             case 51 :
 
                     if(InventoryManager.instance.CheckHaveItem(20)){
@@ -2569,6 +2609,7 @@ DBManager.instance.AntCollectionOver(15);
                         SetDialogue(dialogues[12]);
                         yield return waitTalking;
 
+                        InventoryManager.instance.RemoveItem(20,1);
                         location.selectPhase = -1;
                         
                     }
@@ -2610,7 +2651,7 @@ DBManager.instance.AntCollectionOver(15);
                 break;
 #endregion
 
-#region t55 알번데기방 상자
+#region @55 알번데기방 상자
             case 55 :
                 UIManager.instance.OpenScreen(0);
                 yield return new WaitUntil(()=>!UIManager.instance.screenOn);
@@ -2755,7 +2796,7 @@ DBManager.instance.AntCollectionOver(12);
                 break;
 #endregion
 
-#region t61 버섯농장앞 표지판
+#region @61 버섯농장앞 표지판
             case 61 :
         
                 SetDialogue(dialogues[0]);
@@ -2763,7 +2804,7 @@ DBManager.instance.AntCollectionOver(12);
                 break;
 #endregion
 
-#region t62 버섯농장앞 수레개미
+#region @62 버섯농장앞 수레개미
             case 62 :
             
                 for(int i=0;i<dialogues.Length;i++){
@@ -3177,6 +3218,7 @@ DBManager.instance.AntCollectionOver(12);
             SteamUserStats.SetStat("fe",fe + 1);
             SteamUserStats.StoreStats();
 #endif
+                UIManager.instance.SetMovieEffectUI(true);
 DBManager.instance.AntCollectionOver(18);
 
                 FadeOut();
@@ -3246,11 +3288,18 @@ DBManager.instance.AntCollectionOver(18);
 
                 yield return wait2000ms;
                 UIManager.instance.SetGameEndUI(1);
+                yield return wait2000ms;
                 break;
 #endregion 
 
-#region t202 [엔딩2 : 여왕의 방 - 사랑의 도피]
+#region @202 [엔딩2 : 여왕의 방 - 사랑의 도피]
             case 202 :
+                UIManager.instance.SetMovieEffectUI(true);
+
+                NPCScript oldAnt202 = objects[1].GetComponent<NPCScript>();
+                NPCScript queenJelly202 = objects[2].GetComponent<NPCScript>();
+
+
 DBManager.instance.AntCollectionOver(18);
                 FadeOut();
                 yield return wait1000ms;
@@ -3262,6 +3311,7 @@ DBManager.instance.AntCollectionOver(18);
                 //노개미 등장
                 objects[1].gameObject.SetActive(true);
                 //CameraView(dialogues[0].talker);
+                        //oldAnt202.Look("right");
                 SetDialogue(dialogues[0]);
                 yield return waitTalking;
                 //CameraView(dialogues[1].talker);
@@ -3307,13 +3357,29 @@ DBManager.instance.AntCollectionOver(18);
                     SetDialogue(dialogues[k]);
                     yield return waitTalking;
                 }
-                for(int k=15;k<18;k++){
+
+                //220902 추가대사
+                for(int k=30;k<=40;k++){
                     //CameraView(dialogues[k].talker);
+                    if(k==32){
+                        oldAnt202.Look("right");
+                    }
+                    if(k==36){
+                        oldAnt202.Look("left");
+                        PlayerManager.instance.animator.SetBool("bottle",true);
+                        yield return wait1000ms;
+                    }
+
+                    SetDialogue(dialogues[k]);
+                    yield return waitTalking; 
+                }
+
+                for(int k=16;k<=17;k++){
                     SetDialogue(dialogues[k]);
                     yield return waitTalking;
                 }
-
                 UIManager.instance.SetGameEndUI(2);
+                yield return wait2000ms;
                 break;
 #endregion 
 //[엔딩3 : 개미굴에서 젤리난다.]
@@ -3655,6 +3721,16 @@ DBManager.instance.AntCollectionOver(17);
             UIManager.instance.OpenTutorialUI(4);
             yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
         }
+        else if(location.trigNum == 999){
+
+            UIManager.instance.OpenTutorialUI(7);
+            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+            UIManager.instance.OpenTutorialUI(6);
+            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+
+        }
+
+        
 
         //아이템 획득 대화 있을 경우, 트리거 진행중 상태 유지
         //찐엔딩 시 상태 유지 추가 220801

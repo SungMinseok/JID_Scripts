@@ -82,6 +82,8 @@ public class MenuManager : MonoBehaviour
     public Image[] collectionCardImages;
     public Sprite[] collectionCardSprites;
     public Button[] collectionScrollArrows;
+    public GameObject[] collectionCardRedDots;
+    public Text collectionCardOrderText;
     [Header("UI_Collection_Ant")]
     public GameObject antCollectionPanel;
     public Text antMainNameText;
@@ -273,7 +275,10 @@ public class MenuManager : MonoBehaviour
     // }
 #region Collection_Ending
     public void CollectionScrollRightBtn(){
+        EndingCollectionRedDotOff();
+
         DeactivateBtns(collectionScrollArrows);
+        
         if(curPage+1 == totalPage){
             curPage = 0;
         }
@@ -285,6 +290,8 @@ public class MenuManager : MonoBehaviour
     }
     
     public void CollectionScrollLeftBtn(){
+        EndingCollectionRedDotOff();
+
         DeactivateBtns(collectionScrollArrows);
         if(curPage == 0){
             curPage = totalPage-1;
@@ -318,16 +325,32 @@ public class MenuManager : MonoBehaviour
         DBManager theDB = DBManager.instance;
 
         for(int i=0;i<5;i++){
-
+            //cache_EndingCollectionDataList : data_collection 내 sortOrder에 의해 정렬된 캐시
             int tempCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[tempCardNum[i]].ID);
 
             if(tempCollectionID != -1){
                 //collectionCardImages[i].sprite = DBManager.instance.endingCollectionSprites[tempCardNum[i]];
                 collectionCardImages[i].sprite = theDB.cache_EndingCollectionDataList[tempCardNum[i]].sprite;
+
+                //220827 레드닷 노출
+                
+                if(!DBManager.instance.localData.endingCollectionOverList[tempCollectionID].isRecognized){
+                    collectionCardRedDots[i].SetActive(true);
+
+                    if(UIManager.instance!=null)
+                        UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+                }
+                else{
+                    collectionCardRedDots[i].SetActive(false);
+
+                }
+
+
             }
             else{
 
                 collectionCardImages[i].sprite = collectionNullImage;//collectionCardSprites[tempCardNum[i]];
+                collectionCardRedDots[i].SetActive(false);
                 //collectionNameText.text = "???";
             }
         }
@@ -373,6 +396,10 @@ public class MenuManager : MonoBehaviour
             collectionTimeText.text = "-";
 
         }
+
+        collectionCardOrderText.text = string.Format("{0}/{1}",tempCardNum[2]+1,DBManager.instance.cache_EndingCollectionDataList.Count);
+
+
         ActivateBtns(collectionScrollArrows);
     }
     public void ActivateBtns(Button[] btns){
@@ -385,7 +412,22 @@ public class MenuManager : MonoBehaviour
             btns[i].interactable = false;
         }
     }
-    
+    public void EndingCollectionRedDotOff(){
+        int centerEndingCollectionID = DBManager.instance.GetClearedEndingCollectionID(DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID);
+
+        if(centerEndingCollectionID!=-1){
+
+            collectionCardRedDots[2].SetActive(false);
+            DBManager.instance.localData.endingCollectionOverList[centerEndingCollectionID].isRecognized = true;
+
+            //전부 인식 완료됐으면 메인 레드닷 제거
+            if(UIManager.instance!=null && UIManager.instance.CheckCollectionOverListAllRecognized()){
+                UIManager.instance.hud_sub_collection_redDot.SetActive(false);
+            }
+        }
+        //var centerEndingCardID = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID;
+        
+    }
 #endregion
     
     
@@ -547,7 +589,7 @@ public class MenuManager : MonoBehaviour
                 break;
             case "load" :
                 popUpText[0].text = "8";
-                popUpText[1].text = "3";
+                popUpText[1].text = PlayerManager.instance!=null ? "3" : "";
                 break;
             case "loadLast" :
                 popUpText[0].text = "5";
@@ -984,6 +1026,8 @@ public class MenuManager : MonoBehaviour
 
         collectionPages[pageNum].SetActive(true);
         collectionTabBtns[pageNum].interactable = false;
+
+
     }
 
     public void ResetAntCollectionUI(){
@@ -1075,8 +1119,9 @@ public class MenuManager : MonoBehaviour
             }
         }
     }
-    
-    //해당 텍스트가 Text일 경우(TMP가 아닐 경우), 해당 Text.text 설정 전, 폰트 별도 적용 필요
+    ///<summary>
+    ///해당 텍스트가 Text일 경우(TMP가 아닐 경우), 해당 Text.text 설정 전, 폰트 별도 적용 필요
+    ///</summary>
     public void ApplyFont(Text curText){
         string curLang = DBManager.instance.language;
         switch(curLang){
@@ -1089,5 +1134,20 @@ public class MenuManager : MonoBehaviour
                 curText.font = MenuManager.instance.fonts[1];
                 break;
         }
+    }
+
+    
+    public void SetCollectionPage(bool active){
+        if(MenuManager.instance==null) return;
+
+        if(PlayerManager.instance!=null) PlayerManager.instance.SetLockPlayer(active);
+        MenuManager.instance.collectionPanel.SetActive(active);
+
+        if(active){
+            Debug.Log("3434");
+            collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
+
+        }
+        //hud_sub_collection_new.SetActive(false);
     }
 }

@@ -273,7 +273,7 @@ public class ShopManager : MonoBehaviour
             else{
                 DM("구매 실패 : 골드 부족 - "+ curItemPrice);
                 string[] tempArg = new string[1]{
-                    DBManager.instance.cache_ItemDataList[7].name.ToString(),
+                    InventoryManager.instance.GetCompleteWorld(DBManager.instance.cache_ItemDataList[7].name.ToString(),1),
                 };
                 MenuManager.instance.OpenPopUpPanel_OneAnswer("90",mainArguments: tempArg);
             }
@@ -298,8 +298,10 @@ public class ShopManager : MonoBehaviour
             }
             else{
                 DM("구매 실패 : "+tempItemID+"번 아이템 부족");
+                var neededItemName = DBManager.instance.cache_ItemDataList[tempItemID].name.ToString();
+                neededItemName = InventoryManager.instance.GetCompleteWorld(neededItemName,1);
                 string[] tempArg = new string[1]{
-                    DBManager.instance.cache_ItemDataList[tempItemID].name.ToString(),
+                    neededItemName,
                 };
                 MenuManager.instance.OpenPopUpPanel_OneAnswer("90",mainArguments: tempArg);
             }

@@ -9,6 +9,7 @@ public class PasswordBoxScript : MonoBehaviour
     [Header("UI_Screen_0")]
     public Sprite[] numSprites;
     public Image[] passwordBox;
+    public GameObject[] paper_lang;
     [Header("Debug")]
     public int[] curPassword;
     public bool isPlaying;
@@ -18,6 +19,23 @@ public class PasswordBoxScript : MonoBehaviour
     }
     void OnEnable(){
         isPlaying = true;
+
+        for(int i=0;i<paper_lang.Length;i++){
+            paper_lang[i].SetActive(false);
+        }
+
+        switch(DBManager.instance.language){
+            case "kr":
+                paper_lang[0].SetActive(true);
+                break;
+            case "en":
+                paper_lang[1].SetActive(true);
+                break;
+            case "jp":
+                paper_lang[2].SetActive(true);
+                break;
+
+        }
     }
     void OnDisable(){
         isPlaying = false;

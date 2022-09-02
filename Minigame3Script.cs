@@ -201,7 +201,7 @@ public class Minigame3Script : MonoBehaviour
         //SceneController.instance.SetSomeConfiner(mapCollider,true);
         //SceneController.instance.virtualCamera.Follow = mapViewPoint;
 
-        //UIManager.instance.SetHUD(false);
+        UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
         MinigameManager.instance.ExitMinigame();

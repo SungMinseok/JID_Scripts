@@ -42,6 +42,8 @@ public class LoadManager : MonoBehaviour
     public bool isLoadingInGameToLastPoint;
     public int lastLoadFileNum; // 최초 시작 : -1, 그 외 : 0 ~
 
+    [Tooltip("흙고갈로 사망 시 흙 일부 채워주기용")]
+    public bool isDeadByDepletingDirt;
     public string mainSceneName;
 
     WaitForSeconds wait1s = new WaitForSeconds(1);
@@ -237,7 +239,7 @@ public class LoadManager : MonoBehaviour
             InventoryManager.instance.ResetInventory();
             SceneController.instance.SetConfiner(tempData.curMapNum,isDirect:true);
             SoundManager.instance.SoundOff();
-            SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
+            //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
 
             // if(lastLoadFileNum == -1){
@@ -264,7 +266,7 @@ public class LoadManager : MonoBehaviour
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
             SoundManager.instance.SoundOff();
-                SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
+                //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log("빈 파일 로드 완료");
                 // InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
             }
@@ -276,7 +278,7 @@ public class LoadManager : MonoBehaviour
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
             SoundManager.instance.SoundOff();
-                SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
+                //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
                 Debug.Log("맵번호 : " + tempData.curMapNum);
             }
@@ -311,8 +313,16 @@ public class LoadManager : MonoBehaviour
 
         loadFlag = false;
         reloadScene = false;
+
+        //흙고갈로 사망시 흙 일정하게 설정
+        if(isDeadByDepletingDirt){
+            isDeadByDepletingDirt = false;
+            DBManager.instance.curData.curDirtAmount = DBManager.instance.minimumDirtAmount;
+        }
         
         yield return wait500ms;
+
+        SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
 
         
         if(lastLoadFileNum == -1){

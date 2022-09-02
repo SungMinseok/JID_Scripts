@@ -151,6 +151,7 @@ public class SoundManager : MonoBehaviour
             case 14:
             case 18:
             case 19:
+            case 21:
                 soundFileName = "ant mill";
                 break;
             case 22:

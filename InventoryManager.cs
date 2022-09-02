@@ -197,6 +197,12 @@ public class InventoryManager : MonoBehaviour
                     //Debug.Log("c");
             }
         }
+
+        //220903 미니맵 버튼 활성화
+        if(ID==12) UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
+
+
+
         RefreshInventory(curPage);
     }
     public void RemoveItem(int ID, int amount = 1){
@@ -743,7 +749,10 @@ public class InventoryManager : MonoBehaviour
 
     }
 
-    public string GetCompleteWorld(string name) {
+    //아이템명 > 아이템명+을/를
+    //type 0 : 을/를
+    //type 1 : 이/가
+    public string GetCompleteWorld(string name, int type = 0) {
         char lastName = name.ElementAt(name.Length - 1);
         int index = (lastName - 0xAC00) % 28;
         Console.WriteLine(index);
@@ -752,7 +761,17 @@ public class InventoryManager : MonoBehaviour
             return name;
         }
 
-        string selectVal = (lastName - 0xAC00) % 28 > 0 ? "을" : "를";
+        
+        string selectVal = "";
+        
+        if(type==0){
+            selectVal = (lastName - 0xAC00) % 28 > 0 ? "을" : "를";
+
+        }
+        else if(type==1){
+            selectVal = (lastName - 0xAC00) % 28 > 0 ? "이" : "가";
+
+        }
 
         return name + selectVal;
     }

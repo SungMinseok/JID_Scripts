@@ -521,9 +521,12 @@ public class NPCScript : CharacterScript
             bullets[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(1,0) * (1), ForceMode2D.Impulse);
         }
     }
+    ///<summary>
+    ///left / right
+    ///</summary>
     public void Look(string direction){
         if(mainBody == null) return;
-//        Debug.Log("look : " + direction);
+        Debug.Log("look : " + direction);
         switch(direction){
             case "left" : 
                 //wSet = -1;
@@ -534,7 +537,10 @@ public class NPCScript : CharacterScript
                 break;
             case "right" : 
                 //wSet = 1;
-                if(spriteRenderer!=null) spriteRenderer.flipX = false;
+                if(spriteRenderer!=null){
+                    spriteRenderer.flipX = false;
+                    Debug.Log("@323");
+                }
                 else{
                 mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
 
@@ -558,10 +564,10 @@ public class NPCScript : CharacterScript
 
             var tempRect = talkCanvas.GetComponent<RectTransform>();
             tempRect.localPosition = new Vector2(defaultTalkCanvasHolderPosX * v , tempRect.localPosition.y);
-            tempRect.localScale = new Vector2(v, tempRect.localScale.y);
+            tempRect.localScale = new Vector2(tempRect.localScale.y *v, tempRect.localScale.y);
             
             var tempRect1 = talkCanvas.GetChild(0).GetComponent<RectTransform>();
-            tempRect1.localScale = new Vector2(v, tempRect.localScale.y);
+            tempRect1.localScale = new Vector2(tempRect1.localScale.y *v, tempRect1.localScale.y);
         }
     }
     
@@ -599,4 +605,31 @@ public class NPCScript : CharacterScript
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 
+    ///<summary>
+    ///left / right
+    ///</summary>
+    public void LookDirection(string direction){
+        bool isSpriteRenderer = mainBody.TryGetComponent<SpriteRenderer>(out SpriteRenderer curSpriteRenderer);
+
+        Debug.Log("look : " + direction);
+        switch(direction){
+            case "left" : 
+                //wSet = -1;
+                if(isSpriteRenderer) spriteRenderer.flipX = true;
+                else{
+                    mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
+                }
+                break;
+            case "right" : 
+                //wSet = 1;
+                if(spriteRenderer!=null) spriteRenderer.flipX = false;
+                else{
+                mainBody.localScale = new Vector2(-defaultScale.x, defaultScale.y);
+
+                }
+                break;
+        }
+        SetTalkCanvasDirection();
+        PlayerManager.instance.SetTalkCanvasDirection();
+    }
 }

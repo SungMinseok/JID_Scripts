@@ -80,10 +80,15 @@ public class UIManager : MonoBehaviour
     [Header("UI_Screen")]
     public GameObject ui_screen;
     public Transform screenMother;
-    public GameObject ui_map;
     public bool screenOn;
+    [Header("UI_Map")]
+    public GameObject ui_map;
+    public Transform mapTextMother;
+    public Transform mapPointMother;
     [Header("UI_EndingGuide")]
     public GameObject ui_endingGuide;
+    [Header("UI_MovieEffect")]
+    public GameObject ui_movieEffect;
     // [Header("UI_Fog")]
     //[Header("ETC")]
     //public Sprite nullSprite;
@@ -99,6 +104,7 @@ public class UIManager : MonoBehaviour
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait2000ms = new WaitForSeconds(2);
     WaitForSeconds wait3000ms = new WaitForSeconds(3);
+    WaitForSeconds waitIceGaugeCoolTime;
 
     int calculatedHoney;
     [Header("Debug")]
@@ -117,7 +123,7 @@ public class UIManager : MonoBehaviour
 
         
         //전부 인식 완료됐으면 메인 레드닷 제거
-        if(UIManager.instance.CheckAntCollectionOverListAllRecognized()){
+        if(UIManager.instance.CheckCollectionOverListAllRecognized()){
             UIManager.instance.hud_sub_collection_redDot.SetActive(false);
         }
         else{
@@ -127,6 +133,11 @@ public class UIManager : MonoBehaviour
         // offset = transform.position - worldToUISpace(ui_fog_canvas, PlayerManager.instance.transform.position);
     
 //        UIManager.instance.SetDirtOnlyHUD(DBManager.instance.dirtOnlyHUD);
+        waitIceGaugeCoolTime = new WaitForSeconds(iceGaugeCoolTime);
+
+        for(int i=0;i<mapTextMother.childCount;i++){
+            mapTextMother.GetChild(i).GetComponent<TranslateText>().key = i;
+        }
     }
     void OnDisable()
     {
@@ -654,7 +665,10 @@ public class UIManager : MonoBehaviour
         {
             tutorialSet.GetChild(i).gameObject.SetActive(false);
         }
+        if(!PlayerManager.instance.isActing){
+
         PlayerManager.instance.UnlockPlayer();
+        }
 
 
     }
@@ -697,14 +711,16 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-    public void OpenCollectionPage(){
+    public void SetCollectionPage(bool active){
         if(MenuManager.instance==null) return;
 
-        MenuManager.instance.collectionPanel.SetActive(true);
-        //hud_sub_collection_new.SetActive(false);
+        MenuManager.instance.SetCollectionPage(active);
+
     }
-    public bool CheckAntCollectionOverListAllRecognized(){
-        if(DBManager.instance.localData.antCollectionOverList.Exists(x=>!x.isRecognized)){
+    public bool CheckCollectionOverListAllRecognized(){
+        if(DBManager.instance.localData.antCollectionOverList.Exists(x=>!x.isRecognized)
+        &&DBManager.instance.localData.endingCollectionOverList.Exists(x=>!x.isRecognized)
+        ){
             return false;
         }
         else{
@@ -762,7 +778,12 @@ public class UIManager : MonoBehaviour
         ResetIceGauge();
         for(int i=0;i<iceGaugeMother.childCount;i++){
             iceGaugeMother.GetChild(i).gameObject.SetActive(true);
-            if(i!=4) yield return new WaitForSeconds(iceGaugeCoolTime);
+            PlayerManager.instance.iceVignette.gameObject.SetActive(true);
+            if(i!=4){
+                yield return waitIceGaugeCoolTime;
+            }
+
+
         }
         PlayerManager.instance.KillPlayer(6,"shake");
         
@@ -859,5 +880,26 @@ public class UIManager : MonoBehaviour
         //if(InventoryManager.instance.itemSlot.Length!=0)
             InventoryManager.instance.ChangeDirtItemPostion(active);
 
+    }
+
+    public void SetActiveMapUI(bool active){
+        
+        for(int i=0;i<mapPointMother.childCount;i++){
+            mapPointMother.GetChild(i).gameObject.SetActive(false);
+        }
+
+        mapPointMother.GetChild(DBManager.instance.curData.curMapNum).gameObject.SetActive(true);
+        
+        ui_map.SetActive(active);
+
+    }
+    public void SetMovieEffectUI(bool active){
+        if(active){
+        ui_movieEffect.SetActive(active);
+
+        }
+        else{
+            ui_movieEffect.GetComponent<Animator>().SetBool("off",true);
+        }
     }
 }

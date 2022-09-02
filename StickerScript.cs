@@ -25,6 +25,9 @@ public class StickerScript : MonoBehaviour
             if(!isItem){
                 trueID = DBManager.instance.GetClearedAntCollectionIndex(stickerID);
             }
+            else{
+                trueID = DBManager.instance.GetClearedItemCollectionIndex(stickerID);
+            }
         }
         button = GetComponent<Button>();
         image = GetComponent<Image>();
@@ -33,6 +36,10 @@ public class StickerScript : MonoBehaviour
 
             var sprites = MenuManager.instance.antSprites;
             image.sprite = sprites[Array.FindIndex(sprites, x =>x.name == "antglass_"+ resourceName)];
+        }
+        else{
+
+            redDot.SetActive(false);
         }
 
     }
@@ -55,9 +62,10 @@ public class StickerScript : MonoBehaviour
                 DeactivateSticker();
             }
         }
+        //ITEM
         else{
             
-            if(DBManager.instance.localData.itemCollectionOverList.Contains(stickerID)){
+            if(DBManager.instance.GetClearedItemCollectionIndex(stickerID)!=-1){
                 ActivateSticker();
             }
             else{
@@ -83,6 +91,21 @@ public class StickerScript : MonoBehaviour
                 redDot.SetActive(false);
             }
         }
+        else{
+            
+            button.interactable = true;
+            lockedObject.SetActive(false);
+            
+            // if(!DBManager.instance.localData.itemCollectionOverList[trueID].isRecognized){
+            //     redDot.SetActive(true);
+
+            //     if(UIManager.instance!=null)
+            //         UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+            // }
+            // else{
+            //     redDot.SetActive(false);
+            // }
+        }
         // else{
             
         //     if(!DBManager.instance.localData.itemCollectionOverList[trueID].isRecognized){
@@ -99,25 +122,32 @@ public class StickerScript : MonoBehaviour
 
         image.color = new Color (0,0,0,1);
         button.interactable = false;
-        if(!isItem){
+        //if(!isItem){
             lockedObject.SetActive(true);
                 
             redDot.SetActive(false);
-        }
+        //}
     }
     public void ClickSticker(){
         var sprites = MenuManager.instance.antSprites;
 
         redDot.SetActive(false);
-        DBManager.instance.localData.antCollectionOverList[trueID].isRecognized = true;
 
         //전부 인식 완료됐으면 메인 레드닷 제거
-        if(UIManager.instance!=null && UIManager.instance.CheckAntCollectionOverListAllRecognized()){
+        if(UIManager.instance!=null && UIManager.instance.CheckCollectionOverListAllRecognized()){
             UIManager.instance.hud_sub_collection_redDot.SetActive(false);
         }
 
-        MenuManager.instance.antMainNameTextHolderObj.SetActive(true);
-        MenuManager.instance.antMainImage.sprite = sprites[Array.FindIndex(sprites, x =>x.name == "antglass_"+ resourceName)];
-        MenuManager.instance.antMainNameText.text = CSVReader.instance.GetIndexToString(stickerID + 300,"sysmsg");
+        if(!isItem){
+
+            DBManager.instance.localData.antCollectionOverList[trueID].isRecognized = true;
+            MenuManager.instance.antMainNameTextHolderObj.SetActive(true);
+            MenuManager.instance.antMainImage.sprite = sprites[Array.FindIndex(sprites, x =>x.name == "antglass_"+ resourceName)];
+            MenuManager.instance.antMainNameText.text = CSVReader.instance.GetIndexToString(stickerID + 300,"sysmsg");
+        }
+        // else{
+        //     DBManager.instance.localData.itemCollectionOverList[trueID].isRecognized = true;
+
+        // }
     }
 }
