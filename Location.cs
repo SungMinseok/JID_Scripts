@@ -141,6 +141,7 @@ public class Location : MonoBehaviour
                 &&!PlayerManager.instance.isActing
                 &&!PlayerManager.instance.watchingGameEnding
                 &&!PlayerManager.instance.isGameOver
+                &&PlayerManager.instance.canMove
                 ){
                     //Debug.Log("AAA");
                     //if(Input.GetButton("Interact_OnlyKey")){

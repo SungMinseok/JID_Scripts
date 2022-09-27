@@ -17,7 +17,9 @@ public class HotkeyManager : MonoBehaviour
     }
     void Update()
     {
-        if(!PlayerManager.instance.isActing){
+        if(!PlayerManager.instance.isActing
+        &&!PlayerManager.instance.isGameOver
+        ){
 
      
 #if UNITY_EDITOR || alpha
@@ -74,7 +76,8 @@ public class HotkeyManager : MonoBehaviour
                     theMenu.loadPanel.SetActive(false);
                 }
                 else if(theMenu.collectionPanel.activeSelf){
-                    theMenu.collectionPanel.SetActive(false);
+                    //theMenu.collectionPanel.SetActive(false);
+                    theMenu.SetCollectionPage(false);
                 }
                 else if(theMenu.settingPanel.activeSelf){
                     theMenu.settingPanel.SetActive(false);

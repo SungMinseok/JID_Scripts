@@ -51,7 +51,7 @@ public class TranslateText : MonoBehaviour
         if(isKeyTutorial){
             if(keyMap == string.Empty) keyMap = "Interact";
             string keyString = GameInputManager.ReadKey(keyMap);
-            Debug.Log(keyString);
+//            Debug.Log(keyString);
             curText.text = string.Format(CSVReader.instance.GetIndexToString(key,"sysmsg"), keyString);
             return;
         }

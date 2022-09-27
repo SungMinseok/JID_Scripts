@@ -203,7 +203,9 @@ public class ShopManager : MonoBehaviour
         PlayerManager.instance.isShopping = true;
         
         ResetShopUI();
+        UIManager.instance.SetOnlyHudBlock(true);
         UIManager.instance.SetHUD(true);
+        
 
         DBManager theDB = DBManager.instance;
 
@@ -223,7 +225,7 @@ public class ShopManager : MonoBehaviour
             shopSlots[i].itemImage.sprite = theDB.cache_ItemDataList[curShopSalesID].icon;
             shopSlots[i].itemNameText.text = theDB.cache_ItemDataList[curShopSalesID].name + " x " +curShopSalesAmount.ToString();
             shopSlots[i].itemPriceText.text = (theDB.cache_ItemDataList[curShopSalesID].price * curShopSalesAmount).ToString();
-            shopSlots[i].goldTypeImage.sprite = theDB.cache_ItemDataList[curShopSalesID].goldIcon;
+            shopSlots[i].goldTypeImage.sprite = theDB.cache_ItemDataList[theDB.cache_ItemDataList[curShopSalesID].goldID].icon;
 
             shopSlotGrid.GetChild(i+1).gameObject.SetActive(true);
         }
@@ -242,6 +244,7 @@ public class ShopManager : MonoBehaviour
     public void CloseShopUI(){
         PlayerManager.instance.isShopping = false;
         ui_shop.SetActive(false);
+        UIManager.instance.SetOnlyHudBlock(false);
     }
     public void BuyItem(){
         int slotNum = selectedSlotNum;
@@ -253,7 +256,8 @@ public class ShopManager : MonoBehaviour
         curItemPrice = int.Parse(shopSlots[slotNum].itemPriceText.text);
 
         //아이템 구매에 필요한 재화 구분 (goldResourceID)
-        if(DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldResourceID == "Honey Drop"){
+        //꿀방울
+        if(DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldID == 7){
             //구매 성공
             if(curHoneyAmount >= curItemPrice){
                 DBManager.instance.curData.curHoneyAmount -= curItemPrice;
@@ -280,9 +284,9 @@ public class ShopManager : MonoBehaviour
         }
         //골드 제외 아이템으로 구매가능한 아이템
         else{
-            var goldTypeIndex = DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldResourceID;
+            var curGoldID = DBManager.instance.cache_ItemDataList[curShopSales[slotNum].itemID].goldID;
 
-            var tempItemID = DBManager.instance.cache_ItemDataList.FindIndex(x => x.resourceID == goldTypeIndex);
+            var tempItemID = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == curGoldID);
 
             if(InventoryManager.instance.CheckHaveItem(tempItemID)){
                 InventoryManager.instance.RemoveItem(tempItemID);

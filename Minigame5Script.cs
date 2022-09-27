@@ -36,6 +36,7 @@ public class Minigame5Script : MonoBehaviour
     [Header("[Debug]─────────────────")]
     public bool stop;
     public int curStage;
+    public float curProbability;
 
 
 
@@ -99,7 +100,7 @@ public class Minigame5Script : MonoBehaviour
             StartCoroutine(RouletteCoroutine());
         }
 
-
+        DBManager.instance.curData.roulettePlayCount += 1;
 
     }
     public void PushStopBtn(){
@@ -120,7 +121,8 @@ public class Minigame5Script : MonoBehaviour
         stop = false;
 
         int resultValue = Random.Range(0,10000);
-        bool isSuccessed = resultValue <= 10000*probability ? true : false;
+        bool isSuccessed = resultValue <= 10000*probability*(1+PlayerManager.instance.stat.luckBonus) ? true : false;
+        Debug.Log("보정확률 : "+10000*probability*(1+PlayerManager.instance.stat.luckBonus));
 
 
         int[] order = new int[3]{0,0,0};

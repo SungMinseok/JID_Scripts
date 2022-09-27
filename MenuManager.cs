@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+#if !DISABLESTEAMWORKS
 using Steamworks;
+#endif
 using System;
 
 public class MenuManager : MonoBehaviour
@@ -84,6 +86,9 @@ public class MenuManager : MonoBehaviour
     public Button[] collectionScrollArrows;
     public GameObject[] collectionCardRedDots;
     public Text collectionCardOrderText;
+    public Transform collectionEndingGrid;
+    public Image[] collectionEndingGridImages;
+    public GameObject[] collectionEndingGridRedDots;
     [Header("UI_Collection_Ant")]
     public GameObject antCollectionPanel;
     public Text antMainNameText;
@@ -169,6 +174,23 @@ public class MenuManager : MonoBehaviour
         
         RearrangeCardOrder();
         ResetCardOrder();
+
+        collectionEndingGridImages = new Image[totalPage];
+        collectionEndingGridRedDots = new GameObject[totalPage];
+
+        for(int i=0;i<totalPage;i++){
+            collectionEndingGridImages[i] = collectionEndingGrid.GetChild(i).GetChild(0).GetComponent<Image>();
+            collectionEndingGridRedDots[i] = collectionEndingGrid.GetChild(i).GetChild(1).gameObject;
+        }
+        for(int i=totalPage;i<collectionEndingGrid.childCount;i++){
+            collectionEndingGrid.GetChild(i).gameObject.SetActive(false);
+        }
+        //ClickEndingCollectionGridSlot
+        
+        for(int i=0;i<collectionEndingGrid.childCount;i++){
+            int temp = i;
+            collectionEndingGrid.GetChild(temp).GetComponent<Button>().onClick.AddListener(()=>ClickEndingCollectionGridSlot(temp));
+        }
 #endregion
 
 #region Reset Save&Load
@@ -274,8 +296,10 @@ public class MenuManager : MonoBehaviour
 
     // }
 #region Collection_Ending
+
+    #region Collection_Ending_Slider
     public void CollectionScrollRightBtn(){
-        EndingCollectionRedDotOff();
+        EndingCollectionRedDotOff(DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID);
 
         DeactivateBtns(collectionScrollArrows);
         
@@ -290,7 +314,7 @@ public class MenuManager : MonoBehaviour
     }
     
     public void CollectionScrollLeftBtn(){
-        EndingCollectionRedDotOff();
+        EndingCollectionRedDotOff(DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID);
 
         DeactivateBtns(collectionScrollArrows);
         if(curPage == 0){
@@ -412,13 +436,17 @@ public class MenuManager : MonoBehaviour
             btns[i].interactable = false;
         }
     }
-    public void EndingCollectionRedDotOff(){
-        int centerEndingCollectionID = DBManager.instance.GetClearedEndingCollectionID(DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID);
+    public void EndingCollectionRedDotOff(int collectionID){//collectionID는 collection의 sortOrder가 아닌 실제 ID
+        int curEndingCollectionID = DBManager.instance.GetClearedEndingCollectionID(collectionID);
+        var collectionSortOrderID = DBManager.instance.cache_EndingCollectionDataList.FindIndex(x=>x.ID == collectionID);
+        
+        Debug.Log(collectionID);
 
-        if(centerEndingCollectionID!=-1){
+        if(collectionID!=-1){
 
             collectionCardRedDots[2].SetActive(false);
-            DBManager.instance.localData.endingCollectionOverList[centerEndingCollectionID].isRecognized = true;
+            collectionEndingGridRedDots[collectionSortOrderID].SetActive(false);
+            DBManager.instance.localData.endingCollectionOverList[curEndingCollectionID].isRecognized = true;
 
             //전부 인식 완료됐으면 메인 레드닷 제거
             if(UIManager.instance!=null && UIManager.instance.CheckCollectionOverListAllRecognized()){
@@ -428,6 +456,45 @@ public class MenuManager : MonoBehaviour
         //var centerEndingCardID = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID;
         
     }
+    #endregion
+
+    #region Collection_Ending_Grid
+    public void ClickEndingCollectionGridSlot(int slotNum){
+        var theDB = DBManager.instance;
+        int tempCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[slotNum].ID);
+        if(tempCollectionID!=-1)
+            EndingCollectionRedDotOff(DBManager.instance.cache_EndingCollectionDataList[slotNum].ID);
+        //Debug.Log(slotNum);
+    }
+    public void OpenEndingCollectionGridPage(){
+        var theDB = DBManager.instance;
+
+        for(int i=0;i<theDB.cache_EndingCollectionDataList.Count;i++){
+            int tempCollectionID = theDB.GetClearedEndingCollectionID(theDB.cache_EndingCollectionDataList[i].ID);
+                
+            if(tempCollectionID != -1){
+                collectionEndingGridImages[i].sprite = theDB.cache_EndingCollectionDataList[i].sprite;
+                
+                
+                if(!DBManager.instance.localData.endingCollectionOverList[tempCollectionID].isRecognized){
+                    collectionEndingGridRedDots[i].SetActive(true);
+
+                    if(UIManager.instance!=null)
+                        UIManager.instance.hud_sub_collection_redDot.SetActive(true);
+                }
+                else{
+                    collectionEndingGridRedDots[i].SetActive(false);
+                }
+
+            }
+            else{
+                collectionEndingGridImages[i].sprite = collectionNullImage;
+                collectionEndingGridRedDots[i].SetActive(false);
+            }
+        }
+
+    }
+    #endregion
 #endregion
     
     
@@ -1027,7 +1094,7 @@ public class MenuManager : MonoBehaviour
         collectionPages[pageNum].SetActive(true);
         collectionTabBtns[pageNum].interactable = false;
 
-
+        OpenEndingCollectionGridPage();
     }
 
     public void ResetAntCollectionUI(){
@@ -1088,6 +1155,7 @@ public class MenuManager : MonoBehaviour
         }
         else{
 
+#if !DISABLESTEAMWORKS
 
             SteamUserStats.RequestGlobalStats(60);
             SteamUserStats.RequestCurrentStats();
@@ -1117,6 +1185,7 @@ public class MenuManager : MonoBehaviour
                 SteamUserStats.SetStat("cp"+index,1);
                 SteamUserStats.StoreStats();
             }
+#endif
         }
     }
     ///<summary>
@@ -1140,12 +1209,18 @@ public class MenuManager : MonoBehaviour
     public void SetCollectionPage(bool active){
         if(MenuManager.instance==null) return;
 
+        ResetAntCollectionUI();
+        RearrangeCards();
+        OpenEndingCollectionGridPage();
+
         if(PlayerManager.instance!=null) PlayerManager.instance.SetLockPlayer(active);
         MenuManager.instance.collectionPanel.SetActive(active);
 
         if(active){
-            Debug.Log("3434");
-            collectionNameText.text = DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name;
+            //if(DBManager.instance.GetClearedEndingCollectionID(0)!=-1)
+            //Debug.Log("3434");
+            collectionNameText.text = DBManager.instance.GetClearedEndingCollectionID(0)!=-1 ?
+            DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].name : "???";
 
         }
         //hud_sub_collection_new.SetActive(false);

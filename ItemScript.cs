@@ -15,6 +15,7 @@ public class ItemScript : MonoBehaviour
     public int objectID;
     [Header("Honey ────────────────────")]
     public int amount_honey;
+    public bool noGetHoneyAlert;
     [Header("Dirt ────────────────────")]
     public float amount_dirt;
     [Header("Item ────────────────────")]
@@ -35,6 +36,7 @@ public class ItemScript : MonoBehaviour
     public string getItemDefaultDialogue = "4";
     [Tooltip("true일 경우, 인벤토리 내에 있을 경우 미노출")]
     public bool isDisabledWhenHold;  //true일 경우, 인벤토리 내에 있을 경우 미노출
+    public bool isPopMode; // 체크 시, 활성화 직후 튀어오르기
     [Header("Debug ────────────────────")]
     //[Header("Dirt")]
     //public float dirtAmount;
@@ -50,6 +52,9 @@ public class ItemScript : MonoBehaviour
     WaitForSeconds wait2000ms = new WaitForSeconds(2);
     [Space]
     public Transform itemObject;
+    void Awake(){
+        if(isPopMode) isAvailable = false;
+    }
     void Start(){
         if(type == ItemType.Dirt){
             itemObject = this.transform;
@@ -100,6 +105,14 @@ public class ItemScript : MonoBehaviour
     }
     void OnEnable(){
         getFlag = false;
+
+        if(isPopMode){
+            if(TryGetComponent<Rigidbody2D>(out Rigidbody2D rb)){
+                
+                rb.AddForce(new Vector2(0,1) * (7), ForceMode2D.Impulse);
+                Invoke("SetItemAvailable",1f);
+            }
+        }
     }
 
     void OnTriggerStay2D(Collider2D other) {
@@ -125,8 +138,14 @@ public class ItemScript : MonoBehaviour
         if(type == ItemType.Honey){
             StartCoroutine(GetItemAndRemoveCoroutine());
             //DM("꿀 충전 : "+amount_honey);
-            
+            if(noGetHoneyAlert){
             InventoryManager.instance.AddHoney(amount_honey);
+
+            }
+            else{
+            InventoryManager.instance.AddHoney(amount_honey,activateDialogue:true);
+
+            }
             //DBManager.instance.curData.curHoneyAmount+=amount_honey;
             SoundManager.instance.PlaySound("get_honeydrop");
         }
@@ -161,7 +180,7 @@ public class ItemScript : MonoBehaviour
             
             PlayerManager.instance.isActing =true;  
             
-            PlayerManager.instance.LockPlayer();
+            PlayerManager.instance.SetLockPlayer(true);
             PlayerManager.instance.SetTalkCanvasDirection();
             if(GameManager.instance.mode_zoomWhenInteract){
 
@@ -173,7 +192,7 @@ public class ItemScript : MonoBehaviour
             SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
             //트리거 시작시 배경음 감소
             SoundManager.instance.bgmPlayer.volume *= DBManager.instance.bgmFadeValueInTrigger;
-            Debug.Log(getItemDialogue.sentences[1]);
+//            Debug.Log(getItemDialogue.sentences[1]);
             DialogueManager.instance.SetDialogue(getItemDialogue);
             yield return waitTalking;
 
@@ -191,7 +210,7 @@ public class ItemScript : MonoBehaviour
 
 
             PlayerManager.instance.isActing =false;  
-            PlayerManager.instance.UnlockPlayer();
+            if(tutorialIds.Length == 0) PlayerManager.instance.SetLockPlayer(false);
             
         }
 
@@ -209,7 +228,11 @@ public class ItemScript : MonoBehaviour
         
         SoundManager.instance.bgmPlayer.volume = DBManager.instance.localData.bgmVolume;//MenuManager.instance.slider_bgm.value;
         
-        itemObject.gameObject.SetActive(false);
+        if(!isPopMode)
+            itemObject.gameObject.SetActive(false);
+        else{
+            gameObject.SetActive(false);
+        }
     }
 
     IEnumerator GetItemAndRemoveCoroutine(){
@@ -218,6 +241,10 @@ public class ItemScript : MonoBehaviour
         if(itemObject.TryGetComponent<PolygonCollider2D>(out PolygonCollider2D col)){
             col.enabled = false;
         }
+    }
+
+    public void SetItemAvailable(){
+        isAvailable = true;
     }
     public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
 }

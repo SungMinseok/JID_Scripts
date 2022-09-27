@@ -39,6 +39,8 @@ public class InventoryManager : MonoBehaviour
     public Animator inventoryAnimator;
     public Button toggleBtn;
     public Image movingItemImage;
+    public Queue<int> getItemAlertQueue;
+    public Queue<int> getHoneyAmountQueue;
     [Header("Debug───────────────")]
     public int curPage;
     public int slotCountPerPage;
@@ -52,11 +54,19 @@ public class InventoryManager : MonoBehaviour
     public bool inventoryTabHovering;
     WaitForSecondsRealtime waitForSecondsRealtime ; 
     WaitForSeconds wait1s;
+    public bool getItemAlertQueueFlag;
     void Awake(){
         instance = this;
 
-
+        getItemAlertQueue = new Queue<int>();
+        getHoneyAmountQueue = new Queue<int>();
         
+    }
+    void Update(){
+        if(getItemAlertQueue.Count!=0 /* && !getItemAlertQueueFlag */){
+            //getItemAlertQueueFlag = true;
+            StartCoroutine(GetItemHudAlert(getItemAlertQueue.Dequeue()));
+        }
     }
     // Start is called before the first frame update
     void Start()
@@ -124,8 +134,10 @@ public class InventoryManager : MonoBehaviour
         if(amount<1) return;
 
         if(activateDialogue){
-            waitGetItemDialogue = true;
-            StartCoroutine(GetItemDialogue(ID, delayTime:delayTime, tutorialID:tutorialID));
+            //waitGetItemDialogue = true;
+            //StartCoroutine(GetItemDialogue(ID, delayTime:delayTime, tutorialID:tutorialID));
+            EnqueueGetItemID(ID);
+
         }
 
         if(!DBManager.instance.localData.itemCollectionOverList.Contains(ID)){
@@ -549,8 +561,10 @@ public class InventoryManager : MonoBehaviour
 
 
         if(activateDialogue){
-            waitGetItemDialogue = true;
-            StartCoroutine(GetItemDialogue(999, honeyAmount:honeyAmount ,delayTime:delayTime));
+            EnqueueGetItemID(999, honeyAmount:honeyAmount);
+
+            //waitGetItemDialogue = true;
+            //StartCoroutine(GetItemDialogue(999, honeyAmount:honeyAmount ,delayTime:delayTime));
         }
     }
     IEnumerator SetSelectByUsingItem(int itemID){
@@ -576,10 +590,20 @@ public class InventoryManager : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(SelectManager.instance.GetSelect()==0){
                     if(PlayerManager.instance.flagID == 1){
+                        PlayerManager.instance.weapons[2].gameObject.SetActive(true);
+                        PlayerManager.instance.animator.SetBool("smallgun",true);
+                        yield return wait1s;
+                        yield return wait1s;
                         UIManager.instance.SetGameEndUI(11);
+                        yield return wait1s;
                     }
                     else if(DBManager.instance.curData.curMapNum==23){
+                        PlayerManager.instance.weapons[2].gameObject.SetActive(true);
+                        PlayerManager.instance.animator.SetBool("smallgun",true);
+                        yield return wait1s;
+                        yield return wait1s;
                         UIManager.instance.SetGameEndUI(12);
+                        yield return wait1s;
                     }
                     else{
                         tempDialogue.sentences = new string[1]{"863"};
@@ -598,7 +622,12 @@ public class InventoryManager : MonoBehaviour
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(SelectManager.instance.GetSelect()==0){
                     if(DBManager.instance.curData.curMapNum==8){
+                        PlayerManager.instance.weapons[3].gameObject.SetActive(true);
+                        PlayerManager.instance.animator.SetBool("biggun",true);
+                        yield return wait1s;
+                        yield return wait1s;
                         UIManager.instance.SetGameEndUI(10);
+                        yield return wait1s;
                     }
                     else{
                         tempDialogue.sentences = new string[1]{"863"};
@@ -616,8 +645,10 @@ public class InventoryManager : MonoBehaviour
                 Array.Clear(tempSelect.answers,0,tempSelect.answers.Length);
                 yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
                 if(SelectManager.instance.GetSelect()==0){
+                    //UIManager.instance.SetMovieEffectUI(true);
+                    PlayerManager.instance.animator.SetTrigger("drink");
                     SoundManager.instance.PlaySound("drinking_sth");
-                    yield return new WaitForSeconds(2f);
+                    yield return new WaitForSeconds(2.1f);
 
                     // tempDialogue.sentences = new string[3];
                     // tempDialogue.sentences[0] = "1062";
@@ -687,6 +718,11 @@ public class InventoryManager : MonoBehaviour
                 AddHoney(5000);
                 SoundManager.instance.PlaySound("item_use");
                 break;
+            case 51:
+                RemoveItem(51);
+                PlayerManager.instance.SetBodyColor("5AFF00",30f);
+                SoundManager.instance.PlaySound("item_use");
+                break;
         }
         if(!PlayerManager.instance.watchingGameEnding && itemID != 48){
             PlayerManager.instance.UnlockPlayer();
@@ -749,9 +785,11 @@ public class InventoryManager : MonoBehaviour
 
     }
 
-    //아이템명 > 아이템명+을/를
-    //type 0 : 을/를
-    //type 1 : 이/가
+    /// type 0 : 을/를
+    /// type 1 : 이/가
+    /// <summary>
+    /// <param name="type"> 0 : 을/를, 1 : 이/가 </param>
+    /// </summary>
     public string GetCompleteWorld(string name, int type = 0) {
         char lastName = name.ElementAt(name.Length - 1);
         int index = (lastName - 0xAC00) % 28;
@@ -865,5 +903,50 @@ public class InventoryManager : MonoBehaviour
             BtnNextPage();
         }
         //}
+    }
+    public void EnqueueGetItemID(int itemID , int honeyAmount = 0){
+        getItemAlertQueue.Enqueue(itemID);
+        if(honeyAmount!=0) getHoneyAmountQueue.Enqueue(honeyAmount);
+        Debug.Log("44");
+    }
+    IEnumerator GetItemHudAlert(int itemID, int honeyAmount = 0, float delayTime = 0f, int tutorialID = -1){
+        
+        if(delayTime != 0){
+            yield return new WaitForSeconds(delayTime);
+        }
+        
+        string curItemName = "";
+        string sentenceID = "17";
+
+        if(itemID != 999){
+            curItemName = DBManager.instance.cache_ItemDataList[itemID].name;
+        }
+        else{
+            //꿀
+            curItemName = getHoneyAmountQueue.Dequeue().ToString();//CSVReader.instance.GetIndexToString(15,"sysmsg");
+            sentenceID = "18";
+        }//<color=#FEDC2D>{0}</color>#D2C0A7
+
+        if(DBManager.instance.language == "kr") curItemName = GetCompleteWorld(curItemName);
+
+
+        if(itemID != 999){
+            curItemName = "<color=#D2C0A7>" + curItemName + "</color>";
+        }
+        else{
+            //꿀
+            curItemName = "<color=#FEDC2D>" + curItemName + "</color>";
+        }//<color=#FEDC2D>{0}</color>#D2C0A7
+
+        UIManager.instance.hud_alert_item_text.text = string.Format(CSVReader.instance.GetIndexToString(int.Parse(sentenceID),"sysmsg"),curItemName);
+
+
+
+        UIManager.instance.hud_alert_item.SetTrigger("pop");
+        //UIManager.instance.hud_alert_item.gameObject.SetActive(true);
+        
+        //yield return new WaitUntil(()=>!UIManager.instance.hud_alert_item.gameObject.activeSelf);
+        //getItemAlertQueueFlag = false;
+
     }
 }

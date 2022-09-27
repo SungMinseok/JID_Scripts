@@ -29,6 +29,9 @@ public class SceneController : MonoBehaviour
     
     [Header("Set Demo")]
     public Location[] locations;
+
+    Coroutine setDownLensOrthoSizeCoroutine;
+    Coroutine setUpLensOrthoSizeCoroutine;
     void Awake()
     {
         instance = this;
@@ -145,10 +148,12 @@ public class SceneController : MonoBehaviour
     
     public void SetLensOrthoSize(float value, float speed = 0.1f){
         if(virtualCamera.m_Lens.OrthographicSize > value){
-            StartCoroutine(SetDownLensOrthoSizeCoroutine(value, speed));
+            if(setUpLensOrthoSizeCoroutine!=null) StopCoroutine(setUpLensOrthoSizeCoroutine);
+            setDownLensOrthoSizeCoroutine = StartCoroutine(SetDownLensOrthoSizeCoroutine(value, speed));
         }
         else{
-            StartCoroutine(SetUpLensOrthoSizeCoroutine(value, speed));
+            if(setDownLensOrthoSizeCoroutine!=null) StopCoroutine(setDownLensOrthoSizeCoroutine);
+            setUpLensOrthoSizeCoroutine = StartCoroutine(SetUpLensOrthoSizeCoroutine(value, speed));
         }
     }
     IEnumerator SetDownLensOrthoSizeCoroutine(float value, float speed){  // size = 3.5, y= 4 

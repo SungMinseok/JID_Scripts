@@ -5,7 +5,9 @@ using UnityEngine.UI;
 using System; 
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+#if !DISABLESTEAMWORKS
 using Steamworks;
+#endif
 public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
@@ -98,6 +100,8 @@ public class DBManager : MonoBehaviour
         //public List<DirtBundleInfo> getDirtBundleOverList;
         public List<DirtBundleInfo> dirtBundleInfoList;
         public List<int> mapOverList;
+        [Header("Contents ━━━━━━━━━━━")]
+        public int roulettePlayCount;
 
 
         //public Vector2 screenSize;
@@ -613,6 +617,8 @@ public class DBManager : MonoBehaviour
 
     void Start()
     {
+#if !DISABLESTEAMWORKS
+
         SteamUserStats.RequestCurrentStats();
         SteamUserStats.RequestGlobalStats(60);
 #if !alpha
@@ -626,6 +632,7 @@ public class DBManager : MonoBehaviour
 
         }
         
+#endif
 #endif
     }
     void Update(){
@@ -653,7 +660,25 @@ public class DBManager : MonoBehaviour
         //var a = TextLoader.instance.dictionaryItemText;
         var a = CSVReader.instance.data_item;
         cache_ItemDataList.Clear();
+
+        //speed,0.5|dirtBonus,0.1
         for(int i=0; i<a.Count; i++){
+            var tempTotalItemStats = a[i]["stat"].ToString();
+            List<ItemStat> curItemStatList = new List<ItemStat>();
+            if(!string.IsNullOrEmpty(tempTotalItemStats)){
+                Debug.Log(i + "번 아이템 능력치 있어서 적용");
+                var statSplit0 = tempTotalItemStats.Split('|');
+                Debug.Log("statSplit0" + statSplit0[0]);
+                for(int j=0;j<statSplit0.Length;j++){
+                    var statSplit1 = statSplit0[j].Split(',');
+                    Debug.Log("statSplit1" + statSplit1[0]);
+                    Debug.Log("statSplit1" + statSplit1[1]);
+                    curItemStatList.Add(new ItemStat(statSplit1[0],float.Parse(statSplit1[1])));
+                    //curItemStat.statName = statSplit1[0];
+                    //curItemStat.statAmount = float.Parse(statSplit1[1]);
+                }
+            }
+
             //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
             cache_ItemDataList.Add(new Item(
                 int.Parse(a[i]["ID"].ToString())
@@ -663,7 +688,8 @@ public class DBManager : MonoBehaviour
                 ,a[i]["resourceID"].ToString()
                 ,bool.Parse(a[i]["isStack"].ToString())
                 ,int.Parse(a[i]["price"].ToString())
-                ,a[i]["goldResourceID"].ToString()
+                ,int.Parse(a[i]["goldID"].ToString())
+                ,curItemStatList
             ));
         }
     }
@@ -833,14 +859,15 @@ public class Item{
     public bool isStack;
     public Sprite icon;
     public int price;    
-    public string goldResourceID;
+    public int goldID;
     public Sprite goldIcon;
+    public List<ItemStat> itemStat;
     //public bool isStack;
 
     public enum ItemType{
         equip,
     }
-    public Item(int a, string b, string c, byte d, string _resourceID, bool f, int g, string _goldResourceID){
+    public Item(int a, string b, string c, byte d, string _resourceID, bool f, int g, int _goldID, List<ItemStat> _itemStat){
         ID = a;
         name = b;
         description = c;
@@ -849,8 +876,9 @@ public class Item{
         icon = ResourceManager.instance.GetItemSprite(resourceID);//DBManager.instance.itemSprites[resourceID];
         isStack = f;
         price = g;
-        goldResourceID = _goldResourceID;
-        goldIcon = ResourceManager.instance.GetItemSprite(goldResourceID);//DBManager.instance.itemSprites[goldResourceID];
+        goldID = _goldID;
+        itemStat = _itemStat;
+        //goldIcon = ResourceManager.instance.GetItemSprite(goldResourceID);//DBManager.instance.itemSprites[goldResourceID];
     }
 }
 

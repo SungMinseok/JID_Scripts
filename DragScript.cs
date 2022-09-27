@@ -29,7 +29,7 @@ public class DragScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if(type == DragTargetType.itemImage){
 
             curItemSlotIndex = curSlotIndex + (InventoryManager.instance.curPage * InventoryManager.instance.slotCountPerPage);
-            Debug.Log("onBegin : "+curItemSlotIndex);
+            //Debug.Log("onBegin : "+curItemSlotIndex);
 
             //원천차단
             if(DBManager.instance.curData.itemList.Count <= curItemSlotIndex){
@@ -61,13 +61,13 @@ public class DragScript : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if(type == DragTargetType.itemImage){
 
             curItemSlotIndex = curSlotIndex + (InventoryManager.instance.curPage * InventoryManager.instance.slotCountPerPage);
-            Debug.Log("OnDrop : "+curItemSlotIndex);
+            //Debug.Log("OnDrop : "+curItemSlotIndex);
             //원천차단
             if(DBManager.instance.curData.itemList.Count <= curItemSlotIndex){
                 //Debug.Log("차단");
                 return;
             }
-            Debug.Log(curItemSlotIndex + "/" + DBManager.instance.curData.itemList.Count);
+            //Debug.Log(curItemSlotIndex + "/" + DBManager.instance.curData.itemList.Count);
 
 
             InventoryManager.instance.itemMoveAccepted = true;

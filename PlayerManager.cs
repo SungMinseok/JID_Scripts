@@ -2,17 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-// [System.Serializable]
-// public class EquipmentSprite{
-//     public int id;
-//     public Sprite sprite;
-//     public Sprite sprite_back;
-// }
+[System.Serializable]
+public class PlayerStat{
+    public float speedBonus;
+    public float jumpPowerBonus;//dirtResistance,5|speed,5|
+    public float dirtResistanceBonus;
+    public float luckBonus;
+
+}
+[System.Serializable]
+public class ItemStat{
+    public string statName;
+    public float statAmount;
+    public ItemStat(string _statName, float _statAmount){
+        statName = _statName;
+        statAmount = _statAmount;
+    }
+}
 [System.Serializable]
 public class Armor{
     public string name;
     public int itemID;
     public GameObject[] objects;
+    public ItemStat[] stats;
 }
 [System.Serializable]
 public class Helmet{
@@ -37,6 +49,7 @@ public class PlayerManager : CharacterScript
     // public SpriteRenderer sr_pick;
     [Header("Current Status")]
     public float curSpeed;
+    public float curLuck;
     //public float curDirtAmount;
     //public float curHoneyAmount;
     [Header("Current Equipment : 0 Helmet/1 Armor/2 Weapon")]
@@ -49,9 +62,16 @@ public class PlayerManager : CharacterScript
     //[Header("Equipment Sprites ( Need Set ) ━━━━━━━━━━━━━━")]
     //public EquipmentSprite[] equipmentSprites;
     [Header("Set Default Status")]
-    [SerializeField] [Range(2f, 10f)] public float speed;
-    [SerializeField] [Range(10f, 50f)] public float jumpPower;
-    [SerializeField] [Range(1f, 20f)] public float gravityScale;
+    public PlayerStat stat;
+
+    [Header("Status")]
+    //[SerializeField] [Range(2f, 10f)] public float speed;
+    //[SerializeField] [Range(10f, 50f)] public float jumpPower;
+    //[SerializeField] [Range(1f, 20f)] public float gravityScale;
+    [Header("Set Real Default Status")]
+    public float defaultSpeed;
+    public float defaultJumpPower;
+    public float defaultGravityScale;
     public float maxDirtAmount;
     public float maxHoneyAmount;
 
@@ -175,9 +195,14 @@ public class PlayerManager : CharacterScript
         }
 
         equipments_id = new int[3]{-1,-1,-1};
+        //defaultSpeed=speed;
+        //defaultJumpPower=jumpPower;
+        //defaultGravityScale=gravityScale;
     }
     //public AnimationClip animation0;
+    [SerializeField]
     Color hideColor = new Color(1,1,1,0);
+    [SerializeField]
     Color unhideColor = new Color(1,1,1,1);
     void Start()
     {
@@ -298,7 +323,7 @@ public class PlayerManager : CharacterScript
 
             }
 
-            playerBody.localPosition = new Vector2(0,-0.03f);
+            //playerBody.localPosition = new Vector2(0,-0.03f);
         }
 #endregion
 
@@ -312,7 +337,7 @@ public class PlayerManager : CharacterScript
 
             isFalling = rb.velocity.y < 0 ? true : false;
 
-            playerBody.localPosition = new Vector2(0,0.15f);
+            //playerBody.localPosition = new Vector2(0,0.15f);
         }
 #endregion
 
@@ -437,8 +462,8 @@ public class PlayerManager : CharacterScript
         isGrounded = Physics2D.OverlapCircle(footPos, footRadius, groundLayer);
 
 //이속 제어
-        curSpeed = speed * (1-isSlowDown);
-        animator.SetFloat("walkSpeed", 1-isSlowDown);
+        curSpeed = defaultSpeed * (1 + PlayerManager.instance.stat.speedBonus) * (1 - isSlowDown);
+        animator.SetFloat("walkSpeed", (1 + PlayerManager.instance.stat.speedBonus) * (1 - isSlowDown));
 
         if (wInput != 0)
         {
@@ -501,13 +526,13 @@ public class PlayerManager : CharacterScript
 
             if(isGrounded&&wInput!=0&&hInput==0){
                 onLadder = false;
-                rb.gravityScale = gravityScale;
+                rb.gravityScale = defaultGravityScale;
                 ToggleBodyMode(1);
             }
 
         }
         else{
-            rb.gravityScale = gravityScale;
+            rb.gravityScale = defaultGravityScale;
             ToggleBodyMode(1);
         }
 
@@ -568,7 +593,7 @@ public class PlayerManager : CharacterScript
         jumpDelayCoroutine = StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
         //Debug.Log("Jump");
-        rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * (defaultJumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
     void JumpFromLadder(float multiple = 1)
@@ -581,7 +606,7 @@ public class PlayerManager : CharacterScript
         jumpDelayCoroutine = StartCoroutine(JumpDelay());
         rb.velocity = Vector2.zero;
         Debug.Log("JumpFromLadder");
-        rb.AddForce(Vector2.up * (jumpPower * multiple), ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * (defaultJumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
     IEnumerator JumpDelay()
@@ -825,6 +850,14 @@ public class PlayerManager : CharacterScript
 
         switch(type){
             case 1:
+                if(equipments_id[0] != -1){
+                    //var curArmor = !useWearableScript ? armors : wearable.wearables;
+                    var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[0]);
+
+                    for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
+                        ClearItemStat(DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat[i]);
+                    }
+                }
                 if(equipments_id[0]!=itemID){
                     equipments_id[0] = itemID;
                     // for(int i=0;i<equipmentSprites.Length;i++){
@@ -842,6 +875,17 @@ public class PlayerManager : CharacterScript
                 }
                 break;   
             case 2: //옷
+
+                if(equipments_id[1] != -1){
+                    //var curArmor = !useWearableScript ? armors : wearable.wearables;
+                    var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[1]);
+
+                    for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
+                        ClearItemStat(DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat[i]);
+                    }
+                }
+
+
                 if(equipments_id[1]!=itemID){
                     equipments_id[1] = itemID;
                     // for(int i=0;i<equipmentSprites.Length;i++){
@@ -892,73 +936,47 @@ public class PlayerManager : CharacterScript
         ApplyEquipments();
     }
     public void ApplyEquipments(){
-        // for(int i=0;i<equipmentSprites.Length;i++){
-        //     if(equipmentSprites[i].id == equipments_id[0]){
-        //         sr_helmet.sprite = equipmentSprites[i].sprite;
-        //     sr_back_helmet.enabled = true;
-        //         sr_back_helmet.sprite = equipmentSprites[i].sprite_back;
-        //         break;
-        //     }
-        //     sr_helmet.sprite = null;
-        //     sr_back_helmet.enabled = false;
-            
-        // }
-        // var helmetIndex = Array.FindIndex(equipmentSprites, x => x.id == equipments_id[0]);
+        //헬멧 적용 방식 변경 > wearableScript
+        //220925
+        var curHelmet = wearable.helmets;
+        var curHelmetSpriteIndex = Array.FindIndex(curHelmet, x => x.itemID == equipments_id[0]);
+        var curHelmetItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[0]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
 
-        // if(helmetIndex != -1){
-            
-        // }
-
-
-
-        // for(int i=0;i<equipmentSprites.Length;i++){
-        //     if(equipmentSprites[i].id == equipments_id[1]){
-        //         sr_armor.sprite = equipmentSprites[i].sprite;
-        //         sr_back_armor.sprite = equipmentSprites[i].sprite_back;
-        //         break;
-        //     }
-        //     sr_armor.sprite = null;
-        //     sr_back_armor.sprite = null;
-            
-        // }
-
-
-        for(int i=0;i<helmets.Length;i++){
-            foreach(GameObject curHelmet in helmets[i].objects){
-                curHelmet.SetActive(false);
+        for(int i=0;i<curHelmet.Length;i++){
+            foreach(GameObject a in curHelmet[i].objects){
+                a.SetActive(false);
             }
         }
-        var helmetIndex = Array.FindIndex(helmets, x => x.itemID == equipments_id[0]);
-
-        if(helmetIndex != -1){
-            foreach(GameObject curHelmet in helmets[helmetIndex].objects){
-                curHelmet.SetActive(true);
+        
+        if(curHelmetSpriteIndex != -1){
+            foreach(GameObject a in curHelmet[curHelmetSpriteIndex].objects){
+                a.SetActive(true);
+            }
+            for(int i=0;i<DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat.Count;i++){
+                ApplyItemStat(DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat[i]);
             }
         }
 
-        //프리팹
+        //옷 적용 방식 변경 > wearableScript
         var curArmor = !useWearableScript ? armors : wearable.wearables;
-        Debug.Log(curArmor.Length);
+        var armorSpriteIndex = Array.FindIndex(curArmor, x => x.itemID == equipments_id[1]);
+        var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[1]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
+
         for(int i=0;i<curArmor.Length;i++){
             foreach(GameObject a in curArmor[i].objects){
                 a.SetActive(false);
             }
         }
-        var armorIndex = Array.FindIndex(curArmor, x => x.itemID == equipments_id[1]);
-
-        if(armorIndex != -1){
-            foreach(GameObject a in curArmor[armorIndex].objects){
+        if(armorSpriteIndex != -1){
+            foreach(GameObject a in curArmor[armorSpriteIndex].objects){
                 a.SetActive(true);
             }
-        }
 
-        // for(int i=0;i<equipmentSprites.Length;i++){
-        //     if(equipmentSprites[i].id == equipments_id[2]){
-        //         sr_shovel.sprite = equipmentSprites[i].sprite;
-        //         break;
-        //     }
-        //     sr_weapon.sprite = null;
-        // }
+            for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
+                ApplyItemStat(DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat[i]);
+            }
+        }
+        //SetPlayerStat();
 
     }
     public void SetTalkCanvasDirection(string direction = ""){
@@ -1075,10 +1093,76 @@ public class PlayerManager : CharacterScript
         while(true){
             yield return waitForSecondsRealtime ;
             keepAlertStateTime += 1f;
-
+//5AFF00
             if(keepAlertStateTime>=30){
                 SteamAchievement.instance.ApplyAchievements(10);
             }
         }
+    }
+    public void SetBodyColor(string hexaCode,float duration){
+        StartCoroutine(SetBodyColorCoroutine(hexaCode,duration));
+    }
+    IEnumerator SetBodyColorCoroutine(string hexaCode,float duration){
+//unhideColor
+        var curCoolTime = 0f;
+
+        ColorUtility.TryParseHtmlString("#"+hexaCode+"FF", out unhideColor);//5AFF00FF
+        ColorUtility.TryParseHtmlString("#"+hexaCode+"00", out hideColor);//5AFF0000
+
+        while(true){
+            yield return waitForSecondsRealtime ;
+            curCoolTime += 1f;
+//5AFF00
+            if(curCoolTime>=duration){
+                        
+                ColorUtility.TryParseHtmlString("#FFFFFFFF", out unhideColor);//FFFFFFFF
+                ColorUtility.TryParseHtmlString("#FFFFFF00", out hideColor);//FFFFFF00
+            }
+        }
+    }
+
+    public void ApplyItemStat(ItemStat itemStat){
+        string curStatName = itemStat.statName;
+        float curStatAmount = itemStat.statAmount;
+
+        switch(curStatName){
+            case "speed" :
+                PlayerManager.instance.stat.speedBonus += curStatAmount;
+                break;
+
+            case "luck" :
+                PlayerManager.instance.stat.luckBonus += curStatAmount;
+                break;
+
+            default : 
+                Debug.Log("no stat name.");
+                break;
+        }
+    }
+    
+    public void ClearItemStat(ItemStat itemStat){
+
+        string curStatName = itemStat.statName;
+        float curStatAmount = itemStat.statAmount;
+
+        switch(curStatName){
+            case "speed" :
+                PlayerManager.instance.stat.speedBonus -= curStatAmount;
+                break;
+            case "luck" :
+                PlayerManager.instance.stat.luckBonus -= curStatAmount;
+                break;
+
+            default : 
+                Debug.Log("no stat name.");
+                break;
+        }
+
+
+
+    }
+    public void SetPlayerStat(){
+
+        //PlayerManager.instance.speed = PlayerManager.instance.defaultSpeed *(1 + PlayerManager.instance.stat.speedBonus);
     }
 }

@@ -4,5 +4,7 @@ using UnityEngine;
 
 public class WearableScript : MonoBehaviour
 {
+    public Armor[] helmets;
     public Armor[] wearables;
+    
 }

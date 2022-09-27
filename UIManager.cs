@@ -63,6 +63,9 @@ public class UIManager : MonoBehaviour
     public GameObject hud_sub_collection_redDot;
     public GameObject hud_sub_endingGuide_redDot;
     public bool blockUseItem;
+    public GameObject ui_block_only_hud;
+    public Animator hud_alert_item;
+    public TextMeshProUGUI hud_alert_item_text;
 
     [Header("UI_Book")]
     public GameObject ui_book;
@@ -540,7 +543,7 @@ public class UIManager : MonoBehaviour
             //yield return wait500ms;
             VideoManager.instance.PlayVideo(ResourceManager.instance.videoClips[0],isSkippable:true);
             yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
-        LoadManager.instance.FadeOut();
+        //LoadManager.instance.FadeOut();
             yield return wait500ms;
         }
         SoundManager.instance.BgmOff();
@@ -901,5 +904,8 @@ public class UIManager : MonoBehaviour
         else{
             ui_movieEffect.GetComponent<Animator>().SetBool("off",true);
         }
+    }
+    public void SetOnlyHudBlock(bool active){
+        ui_block_only_hud.SetActive(active);
     }
 }

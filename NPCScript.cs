@@ -13,11 +13,13 @@ public class NPCScript : CharacterScript
     public bool haveWalk = false;
     public bool haveTalk = false;
     public string defaultAnimatorBoolVal;
+    public bool setAnimatorSpeedParameter;//애니메이터 걷는 속도 사용 시 체크
     [Header("Setting")]
     //public bool canMove;
     //public bool canTalk;
     [Tooltip("스프라이트 스킨아닐 시 체크")]
     public bool isSpriteRenderer;
+    public bool defaultBodyDirectionIsLeft;
     [Header("Holder")]
     [Header("Sub things")]
     public Transform talkCanvas;
@@ -157,7 +159,11 @@ public class NPCScript : CharacterScript
             // }
         }
         
-        if(mainBody!=null) defaultScale = mainBody.transform.localScale;
+        if(mainBody!=null){
+            defaultScale = defaultBodyDirectionIsLeft ? 
+            new Vector2(-mainBody.transform.localScale.x, mainBody.transform.localScale.y)
+             : new Vector2(mainBody.transform.localScale.x, mainBody.transform.localScale.y);
+        }
         else defaultScale = transform.localScale;
 
         //랜덤대화
@@ -176,6 +182,10 @@ public class NPCScript : CharacterScript
             guardDialogue.sentences = new string[1];
             if(guardDialogueIndex == 0){guardDialogueIndex = 18;}
             guardDialogue.sentences[0] = guardDialogueIndex.ToString();
+        }
+
+        if(setAnimatorSpeedParameter){
+            animator.SetFloat("speed",speed);
         }
     }
     void OnDisable(){
@@ -230,7 +240,7 @@ public class NPCScript : CharacterScript
                 if(haveWalk&&animator!=null) animator.SetBool("walk", true);
                 if(wSet>0){
                     if(isSpriteRenderer){
-                        spriteRenderer.flipX = false;
+                        spriteRenderer.flipX = defaultBodyDirectionIsLeft ? true : false;
                     }
                     else{
                         mainBody.localScale = new Vector2(defaultScale.x, defaultScale.y);
@@ -242,7 +252,7 @@ public class NPCScript : CharacterScript
                 }
                 else if(wSet<0){
                     if(isSpriteRenderer){
-                        spriteRenderer.flipX = true;
+                        spriteRenderer.flipX  = defaultBodyDirectionIsLeft ? false : true;;
                     }
                     else{
 
@@ -595,6 +605,9 @@ public class NPCScript : CharacterScript
 
             //NpcLookObject(PlayerManager.instance.transform);
 
+                    SceneController.instance.SetCameraDefaultZoomIn();
+                    SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
+                
             SceneController.instance.virtualCamera.Follow = this.transform;
             SetTalkCanvasDirection();
             DialogueManager.instance.SetDialogue(guardDialogue);

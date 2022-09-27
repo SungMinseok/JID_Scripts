@@ -5,7 +5,9 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UB.Simple2dWeatherEffects.Standard;
 using TMPro;
+#if !DISABLESTEAMWORKS
 using Steamworks;
+#endif
 
 #region 앱 실행/종료 관련  처리
 #endregion
@@ -183,6 +185,7 @@ public class LoadManager : MonoBehaviour
         }
         else{
             DBManager.instance.LoadDefaultData();
+            //FadeIn();
             //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
         }
 
@@ -322,7 +325,7 @@ public class LoadManager : MonoBehaviour
         
         yield return wait500ms;
 
-        SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
+        if(nextScene != "Main") SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
 
         
         if(lastLoadFileNum == -1){
@@ -358,7 +361,7 @@ public class LoadManager : MonoBehaviour
         }
 
         loadFader.gameObject.SetActive(true);
-        Debug.Log("fadeOut");
+        Debug.Log("LoadManager.FadeOut()");
         //ResetFader(0f);
         loadFader.GetComponent<Animator>().SetTrigger("fadeOut");
 
@@ -368,8 +371,9 @@ public class LoadManager : MonoBehaviour
         //     yield return null;
         // }
     }
-    public void FadeIn(){
-        Debug.Log("fadeIn");
+    public void FadeIn(){        
+        Debug.Log("LoadManager.FadeIn()");
+
         //ResetFader(1);
         //loadFader.gameObject.SetActive(true);
         loadFader.GetComponent<Animator>().SetTrigger("fadeIn");

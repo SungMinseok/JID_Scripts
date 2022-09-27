@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System; 
+#if !DISABLESTEAMWORKS
 using Steamworks;
+#endif
 public class CheatManager : MonoBehaviour
 {
     public static CheatManager instance;
@@ -370,6 +372,7 @@ public class CheatManager : MonoBehaviour
                     }
                     break;
 
+#if !DISABLESTEAMWORKS
                     
                 case "getstat" :
 
@@ -414,6 +417,8 @@ public class CheatManager : MonoBehaviour
                     
                     
                     break;
+
+#endif
             }
 //EndingCollectionOver
 //DeleteSaveFile

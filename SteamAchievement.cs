@@ -110,4 +110,20 @@ public class SteamAchievement : MonoBehaviour
     // }
 #endif
 
+    public void GetAndSetSteamUserStat(string statName, int addInt = 1){
+        if(!SteamManager.Initialized) { 
+            Debug.Log("steam initialized failed.");
+            return ; }
+
+#if !DISABLESTEAMWORKS
+        
+
+        SteamUserStats.GetStat("statName",out int gs);
+        SteamUserStats.SetStat("statName",gs + addInt);
+        SteamUserStats.StoreStats();
+        Debug.Log("Set and store stat successed. : "+statName);
+
+#endif
+    }
+    
 }

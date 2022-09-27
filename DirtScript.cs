@@ -95,10 +95,12 @@ public class DirtScript : MonoBehaviour
 
                 if(bundleType == BundleType.Icicle){
                     if(innerItemIndex != -1){
-                        InventoryManager.instance.AddItem(innerItemIndex);
+                        InventoryManager.instance.AddItem(innerItemIndex,activateDialogue:true);
                     }
                     if(innerHoneyAmount != 0){
-                        DBManager.instance.curData.curHoneyAmount += innerHoneyAmount;
+                        InventoryManager.instance.AddHoney(innerHoneyAmount,activateDialogue:true);
+
+                        //DBManager.instance.curData.curHoneyAmount += innerHoneyAmount;
                     }
                 }
 

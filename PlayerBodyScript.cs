@@ -8,6 +8,13 @@ public class PlayerBodyScript : MonoBehaviour
     [Header ("push 애니메이션 용, 본체 애니메이터 연결")]
     public Animator animator;
     public bool cantPushSoundFlag;
+    WaitForSeconds waitWeaponAnimation = new WaitForSeconds(0.65f);
+    // void Start(){
+    //     wait400ms 
+    // }
+    void OnDisable(){
+        StopAllCoroutines();
+    }
     void OnCollisionStay2D(Collision2D other){
         // // foreach(ContactPoint2D contact in other.contacts){
         // //     var colName = contact.collider.name;
@@ -69,7 +76,8 @@ public class PlayerBodyScript : MonoBehaviour
             thePlayer.getDirt = false;
             thePlayer.animator.SetBool("shoveling1", false);
             thePlayer.dirtTarget = null;
-            thePlayer.weapons[0].gameObject.SetActive(false);
+            StartCoroutine(InvokeDeactivateWeapon(0));
+            //thePlayer.weapons[0].gameObject.SetActive(false);
             //UIManager.instance.clearPanel.SetActive(true);
         }
         else if (other.CompareTag("Icicle"))
@@ -77,7 +85,8 @@ public class PlayerBodyScript : MonoBehaviour
             thePlayer.getIcicle = false;
             thePlayer.animator.SetBool("icebreak", false);
             thePlayer.dirtTarget = null;
-            thePlayer.weapons[1].gameObject.SetActive(false);
+            StartCoroutine(InvokeDeactivateWeapon(1));
+            //thePlayer.weapons[1].gameObject.SetActive(false);
             //UIManager.instance.clearPanel.SetActive(true);
         }
 
@@ -129,5 +138,10 @@ public class PlayerBodyScript : MonoBehaviour
         }
 
 
+    }
+
+    IEnumerator InvokeDeactivateWeapon(int weaponID){
+        yield return waitWeaponAnimation;
+        thePlayer.weapons[weaponID].gameObject.SetActive(false);
     }
 }
