@@ -940,13 +940,71 @@ public class InventoryManager : MonoBehaviour
 
         UIManager.instance.hud_alert_item_text.text = string.Format(CSVReader.instance.GetIndexToString(int.Parse(sentenceID),"sysmsg"),curItemName);
 
-
-
         UIManager.instance.hud_alert_item.SetTrigger("pop");
-        //UIManager.instance.hud_alert_item.gameObject.SetActive(true);
-        
-        //yield return new WaitUntil(()=>!UIManager.instance.hud_alert_item.gameObject.activeSelf);
-        //getItemAlertQueueFlag = false;
 
+
+    }
+    /// <summary>
+    /// itemID를 포함한 questState가 있다면 questState 업데이트 해줌.
+    /// </summary>
+    /// <param name="itemID"></param>
+    
+    public void SetQuestState(int _itemID){
+
+        var tempQuestIDList = //이동한 맵으로 이동시 달성 가능한 QuestInfo의 리스트에서 questID만 뽑은 리스트
+        DBManager.instance.cache_questList.FindAll(x=>x.objectives1.Exists(x=>x.itemID==_itemID)).Select(x=>x.ID).ToList();
+
+        Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
+
+        foreach(QuestState questState in DBManager.instance.curData.questStateList){//현재 QuestStateList에서
+            
+            if(tempQuestIDList.Contains(questState.questID)){//위에서 뽑은 아이디중에 해당되는게 있다면
+
+                if(questState.isCompleted) break;//예외) 완료상태면 그냥 패스함
+
+                var tempQuestInfo = //뭐가필요한지 몰라서 일단 정보 다가져옴
+                DBManager.instance.cache_questList.Find(x=>x.ID==questState.questID);
+
+                var tempItemList = tempQuestInfo.objectives1;
+
+                foreach(ItemList itemList in tempItemList){
+
+                    if(itemList.itemID != _itemID) break;
+
+                    if(itemList.itemAmount > 1){
+
+                        questState.progress ++;
+                        questState.progressList.Add(_itemID);
+
+                        var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
+                        UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                    }
+                    else{
+                        UIManager.instance.CompleteQuest(questState.questID);
+
+                    }
+
+                }
+
+                if(tempItemList.am == 1){
+                    UIManager.instance.CompleteQuest(questState.questID);
+                }
+                else if(tempQuestInfo.objectives1.Count > 1){
+
+                    if(questState.progressList.Contains(mapNum)) break;
+
+                    questState.progress ++;
+                    questState.progressList.Add(mapNum);
+
+                    var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
+                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                    
+                    if(questState.progress >= tempQuestInfo.objectives0.Count){
+                        UIManager.instance.CompleteQuest(questState.questID);
+                    }
+                }
+
+            }
+        }
     }
 }

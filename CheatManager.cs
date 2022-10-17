@@ -371,7 +371,42 @@ public class CheatManager : MonoBehaviour
                             break;
                     }
                     break;
+                    
+                case "acceptquest" :
+                case "aq" :
 
+                    if(temp[1]=="") return;
+
+                    if(temp[1]=="all"){
+                        for (int i = 0; i < DBManager.instance.cache_questList.Count;i++){
+                            UIManager.instance.AcceptQuest(i);
+                        }
+                    }
+                    else{
+                        UIManager.instance.AcceptQuest(int.Parse(temp[1]));
+                    }
+
+
+                    break;
+
+                case "completequest" :
+                case "cq" :
+
+                    if(temp[1]=="") return;
+
+                    if(temp[1]=="all"){
+                        for (int i = 0; i < DBManager.instance.cache_questList.Count;i++){
+                            UIManager.instance.CompleteQuest(i);
+                        }
+                    }
+                    else{
+                        UIManager.instance.CompleteQuest(int.Parse(temp[1]));
+                    }
+
+                    break;
+
+                    
+#region steam stats
 #if !DISABLESTEAMWORKS
                     
                 case "getstat" :
@@ -419,6 +454,7 @@ public class CheatManager : MonoBehaviour
                     break;
 
 #endif
+#endregion
             }
 //EndingCollectionOver
 //DeleteSaveFile

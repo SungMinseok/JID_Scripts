@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using System.Linq;
 public class UIManager : MonoBehaviour
 {
     public static UIManager instance;
@@ -66,7 +67,9 @@ public class UIManager : MonoBehaviour
     public GameObject ui_block_only_hud;
     public Animator hud_alert_item;
     public TextMeshProUGUI hud_alert_item_text;
-
+    public Animator hud_broadcast;//hud_alert_item과 동일하나 통일을 위해 추가(일괄 변경예정) 221011
+    public TextMeshProUGUI hud_broadcast_text;
+    Coroutine broadcastCoroutine;
     [Header("UI_Book")]
     public GameObject ui_book;
     public Image bookMainImage;
@@ -92,6 +95,12 @@ public class UIManager : MonoBehaviour
     public GameObject ui_endingGuide;
     [Header("UI_MovieEffect")]
     public GameObject ui_movieEffect;
+    [Header("UI_Quest")]
+    public Transform ui_questSlotGrid;
+    public QuestSlot[] questSlots;
+    public List<int> curQuestIdList;//HUD 퀘스트 슬롯의 ID
+    int curHudQuestSlotCount;
+
     // [Header("UI_Fog")]
     //[Header("ETC")]
     //public Sprite nullSprite;
@@ -141,6 +150,34 @@ public class UIManager : MonoBehaviour
         for(int i=0;i<mapTextMother.childCount;i++){
             mapTextMother.GetChild(i).GetComponent<TranslateText>().key = i;
         }
+
+        questSlots = new QuestSlot[ui_questSlotGrid.childCount];
+        for(int i=0;i<ui_questSlotGrid.childCount;i++){
+            int temp = i;
+            questSlots[i] = ui_questSlotGrid.GetChild(i).GetComponent<QuestSlot>();
+            questSlots[i].GetComponent<Button>().onClick.AddListener(()=>GetRewardCompletedQuest(temp));
+            questSlots[i].gameObject.SetActive(false);
+        }
+
+
+        // DBManager.instance.curData.questStateList.OrderBy(x => x.questID);
+        // List<int> tempList = new List<int>();
+        // for(int i=0; i<DBManager.instance.curData.questStateList.Count; i++){
+        //     if(!DBManager.instance.curData.questStateList[i].gotReward
+        //     &&DBManager.instance.curData.questStateList[i].isCompleted){
+        //         tempList.Add(DBManager.instance.curData.questStateList[i].questID);
+        //     }
+        // }
+        // for(int i=0; i<DBManager.instance.curData.questStateList.Count; i++){
+        //     if(!DBManager.instance.curData.questStateList[i].gotReward
+        //     &&!DBManager.instance.curData.questStateList[i].isCompleted){
+        //         tempList.Add(DBManager.instance.curData.questStateList[i].questID);
+        //     }
+        // }
+        // curQuestIdList = tempList;
+
+        SortQuestStateList();
+        SetQuestSlotGrid();
     }
     void OnDisable()
     {
@@ -907,5 +944,185 @@ public class UIManager : MonoBehaviour
     }
     public void SetOnlyHudBlock(bool active){
         ui_block_only_hud.SetActive(active);
+    }
+    
+
+#region @Quest
+    public void AcceptQuest(int questID){
+        if(DBManager.instance.curData.questStateList.Exists(x=>x.questID == questID)) return;
+
+        int curSlotNum = curHudQuestSlotCount;
+
+        Debug.Log("AcceptQuest | QuestID : " + questID);
+
+        //curQuestIdList.Add(questID);//슬롯 표시용
+        DBManager.instance.curData.questStateList.Add(new QuestState(questID));
+
+        ActivateBroadcastMsg(2f, CSVReader.instance.GetIndexToString(19,"sysmsg"));
+        //curQuestIdList.Sort();
+        SortQuestStateList();
+        SetQuestSlotGrid();
+    }
+    public void SetQuestSlotGrid(int slotNum = -1){
+        var theDB = DBManager.instance;
+        int startNum = 0;
+        int endNum = curQuestIdList.Count;
+        if(slotNum != -1){
+            startNum = slotNum;
+            endNum = slotNum + 1;
+        }
+        for(int i=startNum;i<endNum;i++){
+
+            var questID = curQuestIdList[i];
+            //var tempID = theDB.curData.questStateList.FindIndex(x=>x.questID == curQuestIdList[i]);
+            var questInfo = theDB.cache_questList.Find(x=>x.ID==questID);
+            var questState = theDB.curData.questStateList.Find(x=>x.questID == questID);
+
+            //if(!questState.gotReward){
+
+            string tempQuestMainText = "";
+
+            switch(questInfo.majorType){
+                case 2 :
+                    tempQuestMainText = string.Format(questInfo.mainText,questState.progress,questInfo.objectives0.Count);
+                    break;
+                default : 
+                    tempQuestMainText = questInfo.mainText;
+                    break;
+            }
+
+
+            questSlots[i].questID = questInfo.ID;
+            questSlots[i].questMainText.text = tempQuestMainText;
+            questSlots[i].questIcon.sprite = questInfo.icon;
+            //완료 퀘스트 (보상 수령 대기)
+            if(questState.isCompleted){
+            
+                Color completedColor = new Color(0.7f,0.7f,0.7f,1f);
+
+                questSlots[i].questSlot.color = completedColor;
+                questSlots[i].GetComponent<Button>().interactable = true;
+                questSlots[i].questIcon.color = completedColor;
+                questSlots[i].questMainText.color = completedColor;
+                questSlots[i].questMainText.fontStyle = TMPro.FontStyles.Strikethrough;
+                questSlots[i].questCheckObj.SetActive(true);
+
+            }
+            //미완료 퀘스트 (완료 대기)
+            else{
+                Color unCompletedColor = new Color(1f,1f,1f,1f);
+
+                questSlots[i].questSlot.color = unCompletedColor;
+                questSlots[i].GetComponent<Button>().interactable = false;
+                questSlots[i].questIcon.color = unCompletedColor;
+                questSlots[i].questMainText.color = unCompletedColor;
+                questSlots[i].questMainText.fontStyle = TMPro.FontStyles.Normal;
+                questSlots[i].questCheckObj.SetActive(false);
+            }
+
+            //}
+            //else{
+
+            //}
+
+        }
+
+        for (int i = 0 ; i < curQuestIdList.Count; i++)
+        {
+            questSlots[i].gameObject.SetActive(true);
+        }
+        for (int i = curQuestIdList.Count; i < theDB.curData.questStateList.Count;i++){
+            questSlots[i].gameObject.SetActive(false);
+
+        }
+
+            ui_questSlotGrid.GetComponent<GridContentsAutoSizing>().AutoHeightSize(curQuestIdList.Count);
+
+    }
+
+    public void CompleteQuest(int questID){
+        if(!curQuestIdList.Contains(questID)) return;
+
+        var tempID = DBManager.instance.curData.questStateList.FindIndex(x=>x.questID == questID);
+        DBManager.instance.curData.questStateList[tempID].isCompleted = true;
+
+        Debug.Log("CompleteQuest | QuestID : " + questID);
+
+        //221016 퀘스트 완료 시, 슬롯 스크롤 최상단으로
+        ui_questSlotGrid.localPosition = Vector2.zero;
+
+        ActivateBroadcastMsg(2f, CSVReader.instance.GetIndexToString(20,"sysmsg"));
+
+        SortQuestStateList();
+        SetQuestSlotGrid();
+    }
+    public void GetRewardCompletedQuest(int slotNum){
+        var theDB = DBManager.instance;
+        
+        var tempID = theDB.curData.questStateList.FindIndex(x=>x.questID == curQuestIdList[slotNum]);
+        DBManager.instance.curData.questStateList[tempID].gotReward = true;
+
+        //보상지급
+        var curQuest = theDB.cache_questList.Find(x=>x.ID==curQuestIdList[slotNum]);
+        if(curQuest.rewardHoneyAmount > 0){
+            InventoryManager.instance.AddHoney(curQuest.rewardHoneyAmount,activateDialogue:true);
+        }
+        if(curQuest.rewardItemList.Count != 0){
+            for(int i=0;i<curQuest.rewardItemList.Count;i++){
+                InventoryManager.instance.AddItem(curQuest.rewardItemList[i].itemID,curQuest.rewardItemList[i].itemAmount,activateDialogue: true);
+
+            }
+
+        }
+        Debug.Log("GetRewardCompletedQuest | QuestID : " + curQuestIdList[slotNum]);
+        //questSlots[curQuestIdList.Count - 1].gameObject.SetActive(false);
+
+        SortQuestStateList();
+        SetQuestSlotGrid();
+    }
+
+    //보상 수령 대기 > 진행 중 > 보상 수령 완료 순으로 정렬
+    public void SortQuestStateList(){
+        //Debug.Log("SortQuestStateList");
+        DBManager.instance.curData.questStateList =
+        DBManager.instance.curData.questStateList
+        .OrderBy(x => x.gotReward) //보상 수령 대기
+        .ThenByDescending(x => x.isCompleted) //진행 중
+        .ThenBy(x => x.questID) //보상 수령 완료 순으로 정렬
+        .ToList()
+        ;
+
+        List<int> tempQuestIdList = new List<int>();
+        tempQuestIdList = DBManager.instance.curData.questStateList.Select(x=>x.questID).ToList();
+
+        List<int> tempQuestIdList_gotReward = new List<int>();
+        tempQuestIdList_gotReward = DBManager.instance.curData.questStateList.FindAll(x => x.gotReward == true).Select(x=>x.questID).ToList();
+
+
+        //보상수령 완료한 퀘스트 제외
+        curQuestIdList = tempQuestIdList.Except(tempQuestIdList_gotReward).ToList();
+    }
+
+
+
+#endregion
+    public void ActivateBroadcastMsg(float duration = 2f, string msg = "nullText", params string[] arguments){
+        if(broadcastCoroutine!=null) StopCoroutine(broadcastCoroutine);
+        broadcastCoroutine = StartCoroutine(BroadcastMsgCoroutine(duration, msg, arguments));
+
+    }
+    IEnumerator BroadcastMsgCoroutine(float duration = 2f, string msg = "nullText", params string[] arguments){
+        //yield return null;
+        hud_broadcast_text.text = string.Format(msg,arguments);
+        hud_broadcast.SetTrigger("on");
+
+        if(duration == 2f){
+            yield return wait2000ms;
+        }
+        else{
+            
+        }
+        hud_broadcast.SetTrigger("off");
+
     }
 }

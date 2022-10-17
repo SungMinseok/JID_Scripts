@@ -84,6 +84,8 @@ public class Minigame3Script : MonoBehaviour
             checkedMushroom = false;
             SoundManager.instance.PlaySound("waterdrop");
             InventoryManager.instance.RemoveItem(13);
+            InventoryManager.instance.RemoveItem(53);
+            InventoryManager.instance.RemoveItem(54);
 
             mushroom.SetActive(false);
             makingBtnGlow.SetActive(false);
@@ -148,7 +150,10 @@ public class Minigame3Script : MonoBehaviour
     }
     public void PutMushroom(){
         //notePage.SetActive(false);
-        if(!InventoryManager.instance.CheckHaveItem(13)){
+        if(!InventoryManager.instance.CheckHaveItem(13)
+        &&!InventoryManager.instance.CheckHaveItem(53)
+        &&!InventoryManager.instance.CheckHaveItem(54)
+        ){
             return;
         }
 

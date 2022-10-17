@@ -30,7 +30,7 @@ public class ResourceManager : MonoBehaviour
     void LoadResources(){
         //audioClips = Resources.LoadAll<AudioClip>("Sounds");
         //bgmClips = Resources.LoadAll<AudioClip>("BGM");
-        itemSprites = Resources.LoadAll<Sprite>("Sprites/Items");
+        itemSprites = Resources.LoadAll<Sprite>("Sprites");
         videoClips = Resources.LoadAll<VideoClip>("Videos");
     }
     void PutDictionary(){
@@ -49,7 +49,7 @@ public class ResourceManager : MonoBehaviour
     public Sprite GetItemSprite(string spriteName){
         if (itemSpritesDic.ContainsKey(spriteName) == false)
         {
-            Debug.LogError(spriteName + " is not Contained in Resources");
+            Debug.LogError(spriteName + " is not Contained in Resources.");
             return null;
         }
         return itemSpritesDic[spriteName];

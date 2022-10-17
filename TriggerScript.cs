@@ -562,6 +562,33 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
+#region @106 상점 - 야 
+            case 106 :
+
+                if(location.selectPhase == 0){
+                    location.selectPhase = 1;
+                    
+                    SetDialogue(dialogues[0]);
+                    yield return waitTalking;
+                }
+
+                ShopManager.instance.OpenShopUI(0,shopName:CSVReader.instance.GetIndexToString(251,"sysmsg")
+                ,/* new int[]{5,12} */new ShopSales[]{
+                    new ShopSales(13,1),
+                    new ShopSales(53,1),
+                    new ShopSales(54,1)
+                    });
+                yield return waitShopping;
+
+
+                if(ShopManager.instance.lastBuyItemIndex != -1){
+
+                    SetDialogue(dialogues[1]);
+                    yield return waitTalking;
+                }
+
+                break;
+#endregion
 
 #region @1 여긴 어디?
             case 1 :
@@ -1257,7 +1284,7 @@ public class TriggerScript : MonoBehaviour
                         for(int i=1;i<9;i++){
                             objects[i].GetComponent<Animator>().SetBool("drunken", true);
                         }
-                        objects[0].GetComponent<NPCScript>().mainBody.GetComponent<Animator>().SetBool("drunken", true);
+                        objects[0].GetComponent<NPCScript>().mainBody.GetComponent<Animator>().SetBool("drunken_sleep", true);
                         objects[0].GetComponent<NPCScript>().mainBody.GetComponent<SortingGroup>().sortingOrder = 1;
                         objects[0].GetComponent<NPCScript>().mainBody.localPosition = new Vector2(0,1.61f);
                         
@@ -1795,8 +1822,8 @@ DBManager.instance.AntCollectionOver(16);
 
                 break;
 #endregion
-//병원에 누워있는 병사 개미
-#region 29
+
+#region @29 병원에 누워있는 병사 개미
             case 29 :
 DBManager.instance.AntCollectionOver(15);
 
@@ -2550,7 +2577,7 @@ DBManager.instance.AntCollectionOver(15);
                 break;
 #endregion
 
-#region @50 노개미 재방문
+#region @50 미친수개미 노개미 선택 후, 광장의 노개미
             case 50 :
                 location.selectPhase = -1;
                 //미친수개미 > 노개미 선택
@@ -2703,10 +2730,35 @@ DBManager.instance.AntCollectionOver(15);
                         
                     }
                     else{
-                        dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", true);
-                        SetDialogue(dialogues[21]);
-                        yield return waitTalking;
-                        dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", false);
+                        if(location.selectPhase == 0){
+
+                            SetDialogue(dialogues[3]);
+                            yield return waitTalking;
+                            SetSelect(selects[1]);
+                            yield return waitSelecting;
+                            
+                            if(GetSelect()==0){
+                                location.selectPhase = 1;
+
+                                //location.selectPhase = -1;
+                                for(int i=13 ;i<21;i++){
+                                    SetDialogue(dialogues[i]);
+                                    yield return waitTalking;
+                                }
+                            }
+                            else{
+                            
+                                SetDialogue(dialogues[24]);
+                                yield return waitTalking;
+                            }
+                        }
+                        else{
+
+                            dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", true);
+                            SetDialogue(dialogues[21]);
+                            yield return waitTalking;
+                            dialogues[0].talker.GetComponent<NPCScript>().animator.SetBool("mad", false);
+                        }
                     }
                 
 
@@ -2914,7 +2966,7 @@ DBManager.instance.AntCollectionOver(12);
                 break;
 #endregion
 
-#region @63 버섯농장앞 표지판
+#region @63 세갈래길 경비개미
             case 63 :
                 DBManager.instance.AntCollectionOver(3);
                 SetDialogue(dialogues[0]);
@@ -3830,20 +3882,76 @@ DBManager.instance.AntCollectionOver(17);
                 SceneController.instance.SetSomeConfiner(SceneController.instance.mapBounds[DBManager.instance.curData.curMapNum]);
             }
         }
-        //특정 트리거 종료 후, 튜토리얼 발생.
-        if(location.trigNum == 6 && location.selectPhase == -1){
 
-            UIManager.instance.OpenTutorialUI(4);
-            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+
+        //특정 트리거 종료 후, 튜토리얼 발생
+        //221011 퀘스트 획득추가
+        switch(location.trigNum){
+            case 6 :
+                if(location.selectPhase == -1){
+
+                    UIManager.instance.OpenTutorialUI(4);//노개미와 대화 후 개미탈 획득 > 개미탈 착용 튜토리얼
+                    yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+                }
+                break;
+            case 999:
+                UIManager.instance.OpenTutorialUI(7);
+                yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+                UIManager.instance.OpenTutorialUI(6);
+                yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
+
+                break;
         }
-        else if(location.trigNum == 999){
 
-            UIManager.instance.OpenTutorialUI(7);
-            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
-            UIManager.instance.OpenTutorialUI(6);
-            yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
 
+        //특정 트리거 종료 후, 퀘스트 발생
+        //221011 퀘스트 획득추가
+        switch(location.trigNum){
+            case 6 :
+                if(location.selectPhase == -1){
+                    UIManager.instance.AcceptQuest(1);//유치원으로 가자 퀘스트 획득
+                }
+                break;
+            case 49:
+                if(!DBManager.instance.CheckMapOver(8)){
+                    UIManager.instance.AcceptQuest(2);
+                }
+                break;
+            case 63:
+                UIManager.instance.AcceptQuest(3);
+                break;
+            case 18:
+                UIManager.instance.AcceptQuest(5);
+                break;
+            case 59:
+                if(!DBManager.instance.CheckMapOver(13)
+                ||!DBManager.instance.CheckMapOver(14)
+                ||!DBManager.instance.CheckMapOver(15)
+                )
+                UIManager.instance.AcceptQuest(7);
+                break;
+            case 24:
+                UIManager.instance.AcceptQuest(8);
+                break;
+            case 99:
+                if(!DBManager.instance.CheckMapOver(9))
+                    UIManager.instance.AcceptQuest(9);
+                break;
+            case 66:
+                if(!DBManager.instance.CheckMapOver(16))
+                    UIManager.instance.AcceptQuest(10);
+                break;
         }
+
+
+        // if(location.trigNum == 6 && location.selectPhase == -1){
+
+
+        // }
+        // else if(location.trigNum == 999){
+
+        // }
+        
 
         
 

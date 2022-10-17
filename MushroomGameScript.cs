@@ -29,7 +29,8 @@ public class MushroomGameScript : MonoBehaviour
     }
     public void PushPiano(int num){
         if(!animators_piano[num].GetBool("down")){
-            SoundManager.instance.PlaySound("mushroom_push_0"+Random.Range(1,4));
+            //SoundManager.instance.PlaySound("mushroom_push_0"+Random.Range(1,4));
+            SoundManager.instance.PlaySound("mushroom_sound_"+num);//221004 cid:1090
             animators_piano[num].SetBool("down",true);
             curOrder += num.ToString();
         }

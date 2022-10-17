@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System; 
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 #if !DISABLESTEAMWORKS
 using Steamworks;
@@ -33,6 +34,9 @@ public class DBManager : MonoBehaviour
     public float bgmAdjustVal;
     public float sfxAdjustVal;
     public float bgmFadeValueInTrigger;
+    public string bgmName0;
+    public string bgmName1;
+    public string bgmName2;
     [Header("[Steam]")]
     public bool achievementIsAvailable;
     [Header("[Contents On/Off]")]
@@ -55,6 +59,7 @@ public class DBManager : MonoBehaviour
     public List<EndingCollection> cache_EndingCollectionDataList;//data_collection : sortOrder에 의해 정렬된 캐시
     public List<GameEndList> cache_GameEndDataList;
     public List<Coupon> cache_couponList;
+    public List<QuestInfo> cache_questList;
     [Header("[Sprites Files]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
     public Sprite[] endingCollectionSprites;
     //public Sprite[] itemSprites;
@@ -100,6 +105,8 @@ public class DBManager : MonoBehaviour
         //public List<DirtBundleInfo> getDirtBundleOverList;
         public List<DirtBundleInfo> dirtBundleInfoList;
         public List<int> mapOverList;
+        public List<QuestState> questStateList;//221008
+        //public Dictionary<int,object> questStateDic;//221008
         [Header("Contents ━━━━━━━━━━━")]
         public int roulettePlayCount;
 
@@ -198,7 +205,7 @@ public class DBManager : MonoBehaviour
 
         foreach(DirtScript a in ItemControlManager.instance.dirtScriptList){
             curData.dirtBundleInfoList.Add(a.dirtBundleInfo);
-            Debug.Log("dirtbundle info saved completely");
+//            Debug.Log("dirtbundle info saved completely");
         }
 
         Debug.Log(Application.persistentDataPath);
@@ -223,6 +230,7 @@ public class DBManager : MonoBehaviour
                 //if(curData.getDirtBundleOverList == null) curData.getDirtBundleOverList = new List<DirtBundleInfo>();
                 if(curData.dirtBundleInfoList == null) curData.dirtBundleInfoList = new List<DirtBundleInfo>();
                 if(curData.mapOverList == null) curData.mapOverList = new List<int>();
+                if(curData.questStateList == null) curData.questStateList = new List<QuestState>();
                 
                 //curData.honeyOverList.Add(-1);
             }
@@ -586,6 +594,7 @@ public class DBManager : MonoBehaviour
         ApplyItemInfo();
         ApplyCollectionInfo();
         ApplyCouponInfo();
+        ApplyQuestInfo();
         //ApplyStoryInfo();
         //CallLocalDataLoad();
     }
@@ -655,7 +664,7 @@ public class DBManager : MonoBehaviour
             }
         }
     }
-    
+#region @ApplyResourceDataFile
     void ApplyItemInfo(){
         //var a = TextLoader.instance.dictionaryItemText;
         var a = CSVReader.instance.data_item;
@@ -666,13 +675,13 @@ public class DBManager : MonoBehaviour
             var tempTotalItemStats = a[i]["stat"].ToString();
             List<ItemStat> curItemStatList = new List<ItemStat>();
             if(!string.IsNullOrEmpty(tempTotalItemStats)){
-                Debug.Log(i + "번 아이템 능력치 있어서 적용");
+//                Debug.Log(i + "번 아이템 능력치 있어서 적용");
                 var statSplit0 = tempTotalItemStats.Split('|');
-                Debug.Log("statSplit0" + statSplit0[0]);
+//                Debug.Log("statSplit0" + statSplit0[0]);
                 for(int j=0;j<statSplit0.Length;j++){
                     var statSplit1 = statSplit0[j].Split(',');
-                    Debug.Log("statSplit1" + statSplit1[0]);
-                    Debug.Log("statSplit1" + statSplit1[1]);
+//                    Debug.Log("statSplit1" + statSplit1[0]);
+//                    Debug.Log("statSplit1" + statSplit1[1]);
                     curItemStatList.Add(new ItemStat(statSplit1[0],float.Parse(statSplit1[1])));
                     //curItemStat.statName = statSplit1[0];
                     //curItemStat.statAmount = float.Parse(statSplit1[1]);
@@ -749,6 +758,77 @@ public class DBManager : MonoBehaviour
             ));
         }
     }
+    void ApplyQuestInfo(){
+        //var a = TextLoader.instance.dictionaryItemText;
+        var a = CSVReader.instance.data_quest;
+        cache_questList.Clear();
+        
+
+        for(int i=0; i<a.Count; i++){
+            //
+            List<ItemList> curQuestRewardItemList = new List<ItemList>();
+            var tempString = a[i]["rewardItems"].ToString();
+            if(!string.IsNullOrEmpty(tempString)){
+            //if(tempString.Contains("|")){
+                var split0 = tempString.Split(';').ToList();
+                for(int j=0;j<split0.Count;j++){
+                    var split1 = split0[j].Split('|').ToList();
+                    //Debug.Log(split1[0]);
+                    //Debug.Log(split1[1]);
+                    curQuestRewardItemList.Add(new ItemList(int.Parse(split1[0]),int.Parse(split1[1])));
+                }
+            }
+
+            int curQuestMajorType = int.Parse(a[i]["majorType"].ToString());
+            var tempObjectivesString0 = a[i]["objectives0"].ToString();
+            var tempObjectivesString1 = a[i]["objectives1"].ToString();
+
+            List<int> curObjectivesList0= new List<int>();
+            List<ItemList> curObjectivesList1= new List<ItemList>();
+            List<string> curObjectivesList_split0 = new List<string>();
+            List<string> curObjectivesList_split1 = new List<string>();
+            
+            if(!string.IsNullOrEmpty(tempObjectivesString0)){ 
+                curObjectivesList_split0 = tempObjectivesString0.Split(';').ToList();
+            }
+            if(!string.IsNullOrEmpty(tempObjectivesString1)){ 
+                curObjectivesList_split1 = tempObjectivesString1.Split(';').ToList();
+            }
+
+            switch(curQuestMajorType){
+                case 0 ://트리거 번호
+                case 2 ://맵 번호
+                case 3 ://흙더미 개수
+                    for(int j=0;j<curObjectivesList_split0.Count;j++){
+                        curObjectivesList0.Add(int.Parse(curObjectivesList_split0[j]));
+                    }
+                    break;
+                case 1://아이템 ID|사용횟수
+
+                    for(int j=0;j<curObjectivesList_split1.Count;j++){
+                        for(int k=0;k<curObjectivesList_split1.Count;k++){
+                            var split1 = curObjectivesList_split1[k].Split('|').ToList();
+                            curObjectivesList1.Add(new ItemList(int.Parse(split1[0]),int.Parse(split1[1])));
+                        }
+                    }
+                    break;
+            }
+
+            
+            cache_questList.Add(new QuestInfo(
+                int.Parse(a[i]["ID"].ToString())
+                ,a[i]["main_"+language].ToString()
+                ,a[i]["iconResource"].ToString()
+                ,int.Parse(a[i]["rewardHoney"].ToString())
+                ,curQuestRewardItemList
+                ,curObjectivesList0
+                ,curObjectivesList1
+                ,curQuestMajorType
+            ));
+            //curQuestRewardItemList.Clear();
+        }
+    }
+#endregion
 
 #region Check Map Data
 ///<summary>
@@ -811,6 +891,19 @@ public class DBManager : MonoBehaviour
             return false;
         }
     }
+#endregion
+
+#region @퀘스트 체크
+    public bool CheckQuestOver(int questID){
+        if(curData.questStateList.Exists(x=>x.questID == questID)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
 #endregion
     // public void ApplySysMsgText(){
     //     // for(int i=0;i<SceneController.instance.translateTexts.Count;i++){
@@ -997,5 +1090,75 @@ public class Coupon{
         type = _type;
         rewardItemID = _rewardItemID;
 
+    }
+}
+[System.Serializable]
+public class QuestInfo{
+    public int ID;
+    public string mainText;
+    public Sprite icon;
+    public int rewardHoneyAmount;
+    public List<ItemList> rewardItemList;
+    public List<int> objectives0;
+    public List<ItemList> objectives1;
+    public int majorType;
+    //public int rewardItemID;
+    public QuestInfo(
+        int _ID, 
+        string _mainText, 
+        string _iconResource, 
+        int _rewardHoneyAmount = 0, 
+        List<ItemList> _rewardItemList = null, 
+        List<int> _objectives0 = null,
+        List<ItemList> _objectives1 = null,
+        int _majorType = 0
+    ){
+        ID = _ID;
+        mainText = _mainText;
+        icon = ResourceManager.instance.GetItemSprite(_iconResource);
+        rewardHoneyAmount = _rewardHoneyAmount;
+        rewardItemList = _rewardItemList;
+        objectives0 = _objectives0;
+        objectives1 = _objectives1;
+        majorType = _majorType;
+    }
+}
+
+//수락 > 완료 시 isCompleted > 보상 수령 시 gotReward
+[System.Serializable]
+public class QuestState{
+    public int questID;
+    public int progress;//진행도
+    public List<int> progressList;
+
+
+
+    public bool gotReward;
+    public bool isCompleted;
+    public QuestState(
+        int _questID
+
+
+        /*int _progress = 0,
+
+
+
+        bool _gotReward = false, 
+        bool _isCompleted = false*/
+    
+    ){
+        questID = _questID;
+
+        progress = 0;
+        gotReward = false;
+        isCompleted = false;
+        progressList = new List<int>();
+
+        // var questInfo = DBManager.instance.cache_questList.Find(x => x.ID == questID);
+        // switch(questInfo.majorType){
+        //     case 3 :
+        //         progressList = questInfo.objectives_map;
+        //         break;
+        // }
     }
 }

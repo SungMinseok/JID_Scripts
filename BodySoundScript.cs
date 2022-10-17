@@ -14,6 +14,9 @@ public class BodySoundScript : MonoBehaviour
     public BodyType bodyType;
     public bool isNearPlayer;
     public bool alwaysOnPlay;
+    [Header("PlayLoopSoundInCollider━━━━━━━━━━━━━━━━━━━━")]
+    public bool playLoopSound;
+    public string playLoopSoundFileName;
     [Header("pushable━━━━━━━━━━━━━━━━━━━━")]
     //public bool isPushed;
     public MovingSound[] movingSounds;
@@ -113,4 +116,23 @@ public class BodySoundScript : MonoBehaviour
         yield return movingSounds[ranNum].waitSoundLength;
         soundFlag = false;
     }
+    void OnTriggerEnter2D(Collider2D other){
+        if(playLoopSound){
+
+            if(other.CompareTag("Player")){
+                SoundManager.instance.PlayLoopSound(playLoopSoundFileName);
+            }
+        }
+
+    }
+    void OnTriggerExit2D(Collider2D other){
+        if(playLoopSound){
+
+            if(other.CompareTag("Player")){
+                SoundManager.instance.StopLoopSound();
+            }
+        }
+    }
+
+    //public void PlayLoopSoundIn
 }

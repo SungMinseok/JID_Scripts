@@ -246,9 +246,9 @@ public class Location : MonoBehaviour
                             if(desLoc!=null && !PlayerManager.instance.transferDelay){
 
                                 PlayerManager.instance.transform.position = desLoc.position;
+                                DBManager.instance.MapOver(desMapNum);
                                 SceneController.instance.SetConfiner(desMapNum,true);
                                 SoundManager.instance.SetBgmByMapNum(desMapNum);
-                                DBManager.instance.MapOver(desMapNum);
 
                                 if(isDoor){
                                     if(doorSoundFileName == ""){

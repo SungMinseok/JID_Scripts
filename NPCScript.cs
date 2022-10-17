@@ -14,6 +14,11 @@ public class NPCScript : CharacterScript
     public bool haveTalk = false;
     public string defaultAnimatorBoolVal;
     public bool setAnimatorSpeedParameter;//애니메이터 걷는 속도 사용 시 체크
+    [Header("특정 디폴트 트리거 애니메이션(쿨타임)")]
+    public string setAnimationTriggerName;
+    public float setAnimationTriggerCoolTime;
+    WaitForSeconds setAnimationTriggerCoolTimeWaitTime;
+    bool setAnimationTriggerFlag;
     [Header("Setting")]
     //public bool canMove;
     //public bool canTalk;
@@ -187,6 +192,10 @@ public class NPCScript : CharacterScript
         if(setAnimatorSpeedParameter){
             animator.SetFloat("speed",speed);
         }
+
+        if(setAnimationTriggerCoolTime != 0){
+            setAnimationTriggerCoolTimeWaitTime = new WaitForSeconds(setAnimationTriggerCoolTime);
+        }
     }
     void OnDisable(){
 
@@ -324,6 +333,10 @@ public class NPCScript : CharacterScript
         }
 #endregion
 
+        if(!string.IsNullOrEmpty(setAnimationTriggerName)&&!setAnimationTriggerFlag){
+            setAnimationTriggerFlag = true;
+            StartCoroutine(SetAnimationTriggerCoroutine());
+        }
 
     }
 
@@ -644,5 +657,10 @@ public class NPCScript : CharacterScript
         }
         SetTalkCanvasDirection();
         PlayerManager.instance.SetTalkCanvasDirection();
+    }
+    IEnumerator SetAnimationTriggerCoroutine(){
+        yield return setAnimationTriggerCoolTimeWaitTime;
+        animator.SetTrigger(setAnimationTriggerName);
+        setAnimationTriggerFlag = false;
     }
 }

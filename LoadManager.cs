@@ -322,10 +322,10 @@ public class LoadManager : MonoBehaviour
             isDeadByDepletingDirt = false;
             DBManager.instance.curData.curDirtAmount = DBManager.instance.minimumDirtAmount;
         }
+        if(nextScene != "Main") SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
         
         yield return wait500ms;
 
-        if(nextScene != "Main") SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
 
         
         if(lastLoadFileNum == -1){

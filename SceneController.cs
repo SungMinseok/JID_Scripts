@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 
@@ -43,7 +44,7 @@ public class SceneController : MonoBehaviour
             SoundManager.instance.PlayBGM("jelly in the dark");
         }
         else  */if(SceneManager.GetActiveScene().name.Substring(0,3) == "Lev"){
-            SoundManager.instance.ChangeBgm("juicy drug");
+            //SoundManager.instance.ChangeBgm("juicy drug");
             SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
 
             
@@ -88,8 +89,14 @@ public class SceneController : MonoBehaviour
         }
         //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
         //virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
-        
-           // Debug.Log(num + " : 맵번호");
+
+        // Debug.Log(num + " : 맵번호");
+
+        SetQuestStateByMap(mapNum);
+        AcceptQuestByMap(mapNum);
+
+
+
     }
     public void RecoverConfinerDamping(){
         
@@ -187,6 +194,71 @@ public class SceneController : MonoBehaviour
         yield return new WaitForSeconds(duration);
         virtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>().m_AmplitudeGain = 0;
     }
+    
+
+    /// <summary>
+    /// data_quest 내 majorType 0 or 1 인 경우,
+    /// 맵 이동 시 퀘스트 상태 업데이트
+    /// </summary>
+    /// <param name="mapNum"> 맵 번호 </param>
+    public void SetQuestStateByMap(int mapNum){
+
+        var tempQuestIDList = //이동한 맵으로 이동시 달성 가능한 QuestInfo의 리스트에서 questID만 뽑은 리스트
+        DBManager.instance.cache_questList.FindAll(x=>x.objectives0.Contains(mapNum)).Select(x=>x.ID).ToList();
+
+        Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
+
+        foreach(QuestState questState in DBManager.instance.curData.questStateList){//현재 QuestStateList에서
+            
+            if(tempQuestIDList.Contains(questState.questID)){//위에서 뽑은 아이디중에 해당되는게 있다면
+
+                if(questState.isCompleted) break;//예외) 완료상태면 그냥 패스함
+
+                var tempQuestInfo = //뭐가필요한지 몰라서 일단 정보 다가져옴
+                DBManager.instance.cache_questList.Find(x=>x.ID==questState.questID);
+        
+                if(tempQuestInfo.objectives0.Count == 1){
+                    UIManager.instance.CompleteQuest(questState.questID);
+                }
+                else if(tempQuestInfo.objectives0.Count > 1){
+
+                    if(questState.progressList.Contains(mapNum)) break;
+
+                    questState.progress ++;
+                    questState.progressList.Add(mapNum);
+
+                    var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
+                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                    
+                    if(questState.progress >= tempQuestInfo.objectives0.Count){
+                        UIManager.instance.CompleteQuest(questState.questID);
+                    }
+                }
+
+            }
+        }
+    }
+
+    public void AcceptQuestByMap(int mapNum){
+        var mapOverList = DBManager.instance.curData.mapOverList;
+        if(mapOverList == null || mapOverList.Count == 0) return;
+
+        switch(mapNum){
+            case 4 :
+                if(mapOverList[mapOverList.Count-1] == 5 
+                && !DBManager.instance.CheckMapOver(6)){
+                    UIManager.instance.AcceptQuest(4);
+                }
+                break;
+
+            case 8 :
+                if(mapOverList[mapOverList.Count-1] == 8){
+                    UIManager.instance.AcceptQuest(6);
+                }
 
 
+                break;
+
+        }
+    }
 }

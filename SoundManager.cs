@@ -23,6 +23,7 @@ public class SoundManager : MonoBehaviour
     Dictionary<string, AudioClip> bgmClipsDic;
     public AudioSource sfxPlayer;
     public AudioSource bgmPlayer;
+    public AudioSource[] audioSources;
     WaitForSeconds wait10ms = new WaitForSeconds(0.01f);
     //[SerializeField] AudioClip[] testClips; // 오디오 소스들 지정.
     public Coroutine curChangeBgmCoroutine;
@@ -39,10 +40,16 @@ public class SoundManager : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-
         LoadResources();
 
         PutSoundsToDictionary();
+    }
+    void Start(){
+        audioSources = FindObjectsOfType<AudioSource>();
+
+#if UNITY_EDITOR
+        DBManager.instance.bgmName0 = "suomi";
+#endif
     }
     void OnDisable(){
         Debug.Log("bgmVolume : "+bgmPlayer.volume);
@@ -132,6 +139,7 @@ public class SoundManager : MonoBehaviour
     }
     public void PlayBGM(string soundFileName)
     {
+        Debug.Log("PlayBGM : "+soundFileName);
         if (bgmClipsDic.ContainsKey(soundFileName) == false)
         {
             Debug.LogError(soundFileName + " is not Contained audioClipsDic");
@@ -152,17 +160,18 @@ public class SoundManager : MonoBehaviour
             case 18:
             case 19:
             case 21:
-                soundFileName = "ant mill";
+                soundFileName = DBManager.instance.bgmName1;//"ant mill";
                 break;
             case 22:
             case 23:
             case 24:
-                soundFileName = "royalroad";
+                soundFileName = DBManager.instance.bgmName2;//"royalroad";
                 break;
             default : 
-                soundFileName = "juicy drug";
+                soundFileName = DBManager.instance.bgmName0;//"juicy drug";
                 break;
         }
+        Debug.Log("SetBgmByMapNum : "+ soundFileName);
         
         ChangeBgm(soundFileName);
     }
@@ -248,7 +257,11 @@ public class SoundManager : MonoBehaviour
     {
         value *=  DBManager.instance.sfxAdjustVal;
         DBManager.instance.localData.sfxVolume = value;
-        sfxPlayer.volume = value;// * 0.5f;
+        foreach(AudioSource a in audioSources){
+            if(a == bgmPlayer) continue;
+            a.volume = value;
+        }
+        //sfxPlayer.volume = value;// * 0.5f;
     }
 
     public void SetVolumeBGM(float value)
