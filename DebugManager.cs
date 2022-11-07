@@ -46,9 +46,9 @@ public class DebugManager : MonoBehaviour
 #if UNITY_EDITOR || alpha
  		isDebugMode = true;
         debugPanel.SetActive(true);
-        buildInfoText.text = "Build # : "+ DBManager.instance.buildNum.ToString();
+        //buildInfoText.text = "Build # : "+ DBManager.instance.buildNum.ToString();
         //buildInfoText.text += "\n"+ DateTime.Now.ToString(("yyyy-MM-dd"));  
-        buildInfoText.text += "\n"+ DBManager.instance.buildDate;  
+        //buildInfoText.text += "\n"+ DBManager.instance.buildDate;  
 #else
         isDebugMode = false;
         debugPanel.SetActive(false);

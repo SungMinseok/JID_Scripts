@@ -15,7 +15,7 @@ public class GridContentsAutoSizing : MonoBehaviour
         //childCount = transform.childCount;
     }
     public void AutoHeightSize(int multiple){
-        Debug.Log("multiple : "+multiple);
+//        Debug.Log("multiple : "+multiple);
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x
         ,multiple * (gridLayoutGroup.cellSize.y + gridLayoutGroup.spacing.y));
     }

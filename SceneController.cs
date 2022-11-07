@@ -16,6 +16,8 @@ public class SceneController : MonoBehaviour
     public PolygonCollider2D[] mapZoomBounds;
     public CinemachineVirtualCamera virtualCamera;
     public CinemachineConfiner2D confiner2D;
+    [Header("AudioSource")]
+    public List<AudioSource> audioSources;
     [Header("NPC")]
     public List<NPCScript> npcs;
     [Header("오브젝트")]
@@ -36,7 +38,6 @@ public class SceneController : MonoBehaviour
     void Awake()
     {
         instance = this;
-
 
     }
     void Start(){   
@@ -63,6 +64,7 @@ public class SceneController : MonoBehaviour
         // }
         // Debug.Log("22");     
 
+        //GetAudioSources();
     }
     void OnDisable(){
         StopAllCoroutines();
@@ -92,7 +94,7 @@ public class SceneController : MonoBehaviour
 
         // Debug.Log(num + " : 맵번호");
 
-        SetQuestStateByMap(mapNum);
+        SetQuestState(mapNum);
         AcceptQuestByMap(mapNum);
 
 
@@ -132,7 +134,9 @@ public class SceneController : MonoBehaviour
 
             PlayerManager.instance.equipments_id = DBManager.instance.curData.curEquipmentsID;
         }
-        PlayerManager.instance.ApplyEquipments();
+        PlayerManager.instance.ApplyEquipments(0);
+        PlayerManager.instance.ApplyEquipments(1);
+        PlayerManager.instance.ApplyEquipments(2);
 
     }
     public void SetFirstLoad(){
@@ -197,16 +201,16 @@ public class SceneController : MonoBehaviour
     
 
     /// <summary>
-    /// data_quest 내 majorType 0 or 1 인 경우,
+    /// data_quest 내 majorType 2 인 경우,
     /// 맵 이동 시 퀘스트 상태 업데이트
     /// </summary>
     /// <param name="mapNum"> 맵 번호 </param>
-    public void SetQuestStateByMap(int mapNum){
+    public void SetQuestState(int mapNum){
 
         var tempQuestIDList = //이동한 맵으로 이동시 달성 가능한 QuestInfo의 리스트에서 questID만 뽑은 리스트
-        DBManager.instance.cache_questList.FindAll(x=>x.objectives0.Contains(mapNum)).Select(x=>x.ID).ToList();
+        DBManager.instance.cache_questList.FindAll(x=> x.majorType == 2 && x.objectives0.Contains(mapNum)).Select(x=>x.ID).ToList();
 
-        Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
+        //Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
 
         foreach(QuestState questState in DBManager.instance.curData.questStateList){//현재 QuestStateList에서
             
@@ -214,13 +218,13 @@ public class SceneController : MonoBehaviour
 
                 if(questState.isCompleted) break;//예외) 완료상태면 그냥 패스함
 
-                var tempQuestInfo = //뭐가필요한지 몰라서 일단 정보 다가져옴
+                var tempQuestInfo = //뭐가필요할지 몰라서 일단 정보 다가져옴
                 DBManager.instance.cache_questList.Find(x=>x.ID==questState.questID);
         
-                if(tempQuestInfo.objectives0.Count == 1){
+                if(tempQuestInfo.targetVal == 1){
                     UIManager.instance.CompleteQuest(questState.questID);
                 }
-                else if(tempQuestInfo.objectives0.Count > 1){
+                else if(tempQuestInfo.targetVal > 1){
 
                     if(questState.progressList.Contains(mapNum)) break;
 
@@ -228,9 +232,9 @@ public class SceneController : MonoBehaviour
                     questState.progressList.Add(mapNum);
 
                     var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
-                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 진행도 업데이트 (n/N)
                     
-                    if(questState.progress >= tempQuestInfo.objectives0.Count){
+                    if(questState.progress >= tempQuestInfo.targetVal){
                         UIManager.instance.CompleteQuest(questState.questID);
                     }
                 }
@@ -260,5 +264,15 @@ public class SceneController : MonoBehaviour
                 break;
 
         }
+    }
+    public void GetAudioSources(){
+        audioSources = new List<AudioSource>();
+        audioSources.Clear();
+        var temp = FindObjectsOfType<AudioSource>();
+        foreach(AudioSource a in temp){
+            if(a == SoundManager.instance.sfxPlayer || a == SoundManager.instance.bgmPlayer) continue;
+            audioSources.Add(a);
+        }
+
     }
 }

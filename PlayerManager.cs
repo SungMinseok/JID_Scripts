@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 [System.Serializable]
 public class PlayerStat{
     public float speedBonus;
@@ -26,20 +27,24 @@ public class Armor{
     public GameObject[] objects;
     public ItemStat[] stats;
 }
-[System.Serializable]
-public class Helmet{
-    public string name;
-    public int itemID;
-    public GameObject[] objects;
-}
+// [System.Serializable]
+// public class Helmet{
+//     public string name;
+//     public int itemID;
+//     public GameObject[] objects;
+// }
 public class PlayerManager : CharacterScript
 {
 
     public static PlayerManager instance;
     [Header("Objects━━━━━━━━━━━━━━━━━━━")]
     public bool useWearableScript;
-    public Armor[] armors;
-    public Helmet[] helmets;
+    List<Armor> armorList;
+    List<Armor> helmetList;
+    List<GameObject> armorObjList;
+    List<GameObject> helmetObjList;
+    //public Armor[] armors;
+    //public Helmet[] helmets;
     public WearableScript wearable;
     
     [Header("Wearable Objects")]
@@ -180,6 +185,8 @@ public class PlayerManager : CharacterScript
     public float keepAlertStateTime;//흙부족 유지 시간
     Coroutine keepAlertStateCoroutine;
     WaitForSecondsRealtime waitForSecondsRealtime ;
+    [Header("ETC────────────────────────────")]
+    public GameObject tempMainGround;
     void Awake()
     {
         //Application.targetFrameRate = 120;
@@ -200,10 +207,12 @@ public class PlayerManager : CharacterScript
         //defaultGravityScale=gravityScale;
     }
     //public AnimationClip animation0;
+    
     [SerializeField]
     Color hideColor = new Color(1,1,1,0);
     [SerializeField]
     Color unhideColor = new Color(1,1,1,1);
+    
     void Start()
     {
         d = DebugManager.instance;
@@ -227,7 +236,31 @@ public class PlayerManager : CharacterScript
         for(int i=0;i<weapons.Length;i++){
             weapons[i].gameObject.SetActive(false);
         }
-        ApplyEquipments();
+
+        helmetList = wearable.helmets.ToList();
+        armorList = wearable.wearables.ToList();
+
+        //for(int i=0;i<curArmor.Length;i++){
+        //}
+        helmetObjList = new List<GameObject>();
+        armorObjList = new List<GameObject>();
+        foreach(Armor a in helmetList){
+            foreach(GameObject b in a.objects){
+                b.SetActive(false);
+                helmetObjList.Add(b);
+            }
+        }
+        foreach(Armor a in armorList){
+            foreach(GameObject b in a.objects){
+                b.SetActive(false);
+                armorObjList.Add(b);
+            }
+        }
+
+
+        ApplyEquipments(0);
+        ApplyEquipments(1);
+        ApplyEquipments(2);
         if(DBManager.instance.curData.isSummoning) ApplyPet();
     }
 
@@ -453,6 +486,7 @@ public class PlayerManager : CharacterScript
         
     }
 
+    
     void FixedUpdate()
     {
 
@@ -559,6 +593,8 @@ public class PlayerManager : CharacterScript
         }
 
     }
+    
+    
     void ToggleBodyMode(int modeNum){
         //tempColor.a = 0;
         bodyMode = modeNum;
@@ -581,6 +617,10 @@ public class PlayerManager : CharacterScript
             }
         }
     }
+
+
+
+#region Jump
     void Jump(float multiple = 1)
     {
 //        Debug.Log("Jump");
@@ -596,6 +636,7 @@ public class PlayerManager : CharacterScript
         rb.AddForce(Vector2.up * (defaultJumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
+    
     void JumpFromLadder(float multiple = 1)
     {
         //if(jumpDelay) return;
@@ -609,6 +650,7 @@ public class PlayerManager : CharacterScript
         rb.AddForce(Vector2.up * (defaultJumpPower * multiple), ForceMode2D.Impulse);
         if(multiple!=0) SoundManager.instance.PlaySound("LuckyJump");
     }
+    
     IEnumerator JumpDelay()
     {
         //if (!jumpDelay)
@@ -627,20 +669,7 @@ public class PlayerManager : CharacterScript
             //Debug.Log("딜레이끝");
         //}
     }
-    IEnumerator GetLadderDelay()
-    {
-        if (!ladderDelay)
-        {
-//            Debug.Log("33");
-            getLadder = false;
-            ladderDelay = true;
-            //jumpDelay = true;
-            yield return new WaitForSeconds(delayTime_GetLadder);
-            ladderDelay = false;
-            //jumpDelay = false;
-        }
-    }
-
+    
     IEnumerator JumpDown(){
         var tempCollider = footCol;
             //Debug.Log("222");
@@ -671,54 +700,54 @@ public class PlayerManager : CharacterScript
 
         jumpDownFlag = false;
     }
-    // void OnTriggerStay2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("Ladder"))
-    //     {
-    //         if (!ladderDelay) getLadder = true;
-    //     }
 
-    //     else if (other.CompareTag("Dirt"))
-    //     {
-    //         getDirt = true;
-    //         dirtTarget = other.GetComponent<DirtScript>();
-    //         //UIManager.instance.clearPanel.SetActive(true);
-    //     }
+#endregion
+    
 
-    //     else if (other.CompareTag("Cover"))
-    //     {
-    //         Debug.Log(other.gameObject.name);
-    //         other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.5f);
-    //     }
+    IEnumerator GetLadderDelay()
+    {
+        if (!ladderDelay)
+        {
+//            Debug.Log("33");
+            getLadder = false;
+            ladderDelay = true;
+            //jumpDelay = true;
+            yield return new WaitForSeconds(delayTime_GetLadder);
+            ladderDelay = false;
+            //jumpDelay = false;
+        }
+    }
 
-    // }
 
-    // void OnTriggerExit2D(Collider2D other)
-    // {
-    //     if (other.CompareTag("Ladder"))
-    //     {
-    //         getLadder = false;
-    //     }
-    //     else if (other.CompareTag("Dirt"))
-    //     {
-    //         getDirt = false;
-    //         //UIManager.instance.clearPanel.SetActive(true);
-    //     }
+    IEnumerator CheckAnimationState(int animNum){
+        switch(animNum){
+            case 0 : 
+                yield return animDelay0;
+                break;
+            case 1 : 
+                yield return animDelay1;
+                break;
+            default :
+                yield return null;
+                break;
+        }
 
-    //     else if (other.CompareTag("Cover"))
-    //     {
-    //         other.gameObject.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
-    //     }
-    // }
-    // void OnCollisionEnter2D(Collision2D other){
-        
-        
-    //     if(other.gameObject.CompareTag("Collider_NPC")){
-    //         Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
-    //         Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), boxCollider2D, true);
-    //     }
-    // }
+        switch(animNum){
+            case 0 : 
+            case 1 : 
+                digFlag = false;
+                break;
+            default :
+                break;
+        }
+    }
 
+
+#region Set Player States
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="direction"></param>left or right
     public void Look(string direction){
         switch(direction){
             case "left" : 
@@ -738,51 +767,6 @@ public class PlayerManager : CharacterScript
             spriteRenderers[i].color = tempColor;
         }
     }
-    IEnumerator CheckAnimationState(int animNum){
-        //SpriteRenderer _spriteRenderer ;
-
-        // switch(animNum){
-        //     case 0 : 
-        //         _spriteRenderer = weapons[0];
-        //         break;
-        //     case 1 : 
-        //         _spriteRenderer = weapons[1];
-        //         break;
-        //     default :
-        //         _spriteRenderer = null;
-        //         break;
-        // }
-        // if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(true);
-
-        switch(animNum){
-            case 0 : 
-                yield return animDelay0;
-                break;
-            case 1 : 
-                yield return animDelay1;
-                break;
-            default :
-                yield return null;
-                break;
-        }
-        
-        //if(_spriteRenderer != null) _spriteRenderer.gameObject.SetActive(false);
-
-        switch(animNum){
-            case 0 : 
-            case 1 : 
-                digFlag = false;
-                break;
-            default :
-                break;
-        }
-
-
-
-//        Debug.Log("종료");
-    }
-
-
     public void RevivePlayer(){
         PlayerManager.instance.canMove = true;
         PlayerManager.instance.animator.SetBool("dead0", false);
@@ -846,6 +830,10 @@ public class PlayerManager : CharacterScript
     public void DeactivateWaitInteract(){
         isWaitingInteract = false;
     }
+#endregion
+    
+    
+#region Set Equipments
     public void SetEquipment(byte type, int itemID){//itemType 0:기타, 1:헬멧, 2:옷, 3:무기, 4.소모품
 
         switch(type){
@@ -860,24 +848,14 @@ public class PlayerManager : CharacterScript
                 }
                 if(equipments_id[0]!=itemID){
                     equipments_id[0] = itemID;
-                    // for(int i=0;i<equipmentSprites.Length;i++){
-                    //     if(equipmentSprites[i].id==itemID){
-                    //         Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
-                    //         break;
-                    //     }
-                    // }
-                    // Debug.Log("fail equip : no item");
-                    
                 }
                 else{
                     equipments_id[0] = -1;
-                    //Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;   
             case 2: //옷
 
                 if(equipments_id[1] != -1){
-                    //var curArmor = !useWearableScript ? armors : wearable.wearables;
                     var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[1]);
 
                     for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
@@ -888,97 +866,138 @@ public class PlayerManager : CharacterScript
 
                 if(equipments_id[1]!=itemID){
                     equipments_id[1] = itemID;
-                    // for(int i=0;i<equipmentSprites.Length;i++){
-                    //     if(equipmentSprites[i].id==itemID){
-                    //         Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
-                    //         break;
-                    //     }
-                    // }
-                    // Debug.Log("fail equip : no item");
-                    
                 }
                 else{
                     equipments_id[1] = -1;
-                    //Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;
          
             case 3:
-                // if(equipments_id[2]!=itemID){
-                //     equipments_id[2] = itemID;
-                //     Debug.Log("무기 착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
-                // }
-                // else{
-                //     equipments_id[2] = -1;
-                //     Debug.Log("무기 착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
-                // }
                 
                 if(equipments_id[2]!=itemID){
                     equipments_id[2] = itemID;
-                    // for(int i=0;i<equipmentSprites.Length;i++){
-                    //     if(equipmentSprites[i].id==itemID){
-                    //         Debug.Log("착용, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
-                    //         break;
-                    //     }
-                    // }
-                    // Debug.Log("fail equip : no item");
-                    
                 }
                 else{
                     equipments_id[2] = -1;
-                    //Debug.Log("착용 해제, itemID : " + itemID + ", itemName : "+ DBManager.instance.cache_ItemDataList[itemID].name);
                 }
                 break;
 
             default :
                 break;
         }
-        ApplyEquipments();
+        ApplyEquipments(type-1);
     }
-    public void ApplyEquipments(){
+    
+    /// <summary>
+    /// 0 Helmet/1 Armor/2 Weapon
+    /// </summary>
+    /// <param name="equipmentType">0 Helmet/1 Armor/2 Weapon</param>
+    public void ApplyEquipments(int equipmentType){
         //헬멧 적용 방식 변경 > wearableScript
         //220925
-        var curHelmet = wearable.helmets;
-        var curHelmetSpriteIndex = Array.FindIndex(curHelmet, x => x.itemID == equipments_id[0]);
-        var curHelmetItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[0]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
+        // Armor curEquipment = null;
 
-        for(int i=0;i<curHelmet.Length;i++){
-            foreach(GameObject a in curHelmet[i].objects){
-                a.SetActive(false);
-            }
-        }
+        // switch(equipmentType){
+        //     case 0 :
+        //         curEquipment = helmetList.Find(x => x.itemID == equipments_id[0]);
+        //         break;
+        //     case 1 :
+        //         curEquipment = armorList.Find(x => x.itemID == equipments_id[1]);
+        //         break;
+        // }
+        // var curHelmet = wearable.helmets;
+        // var curHelmetSpriteIndex = Array.FindIndex(curHelmet, x => x.itemID == equipments_id[0]);
+        // var curHelmetItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[0]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
+
+        // for(int i=0;i<curHelmet.Length;i++){
+        //     foreach(GameObject a in curHelmet[i].objects){
+        //         a.SetActive(false);
+        //     }
+        // }
+
+        // if(curHelmetSpriteIndex != -1){
+        //     foreach(GameObject a in curHelmet[curHelmetSpriteIndex].objects){
+        //         a.SetActive(true);
+        //     }
+        //     for(int i=0;i<DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat.Count;i++){
+        //         ApplyItemStat(DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat[i]);
+        //     }
+        // }
+
+        // //옷 적용 방식 변경 > wearableScript
+        // var curArmor = wearable.wearables;
+        // var armorSpriteIndex = Array.FindIndex(curArmor, x => x.itemID == equipments_id[1]);
+        // var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[1]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
+
+        // for(int i=0;i<curArmor.Length;i++){
+        //     foreach(GameObject a in curArmor[i].objects){
+        //         a.SetActive(false);
+        //     }
+        // }
+        // if(armorSpriteIndex != -1){
+        //     foreach(GameObject a in curArmor[armorSpriteIndex].objects){
+        //         a.SetActive(true);
+        //     }
+
+        //     for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
+        //         ApplyItemStat(DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat[i]);
+        //     }
+        // }
+        // //SetPlayerStat();
+        //헬멧 적용 방식 변경 > wearableScript
+        //220925
+
+
+
         
-        if(curHelmetSpriteIndex != -1){
-            foreach(GameObject a in curHelmet[curHelmetSpriteIndex].objects){
-                a.SetActive(true);
-            }
-            for(int i=0;i<DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat.Count;i++){
-                ApplyItemStat(DBManager.instance.cache_ItemDataList[curHelmetItemIndex].itemStat[i]);
-            }
+
+
+        List<Armor> curArmorList = new List<Armor>();                   //해당 아머 참조용
+        List<GameObject> curArmorAllObjList = new List<GameObject>();   //스프라이트 해제용(해당 아머타입 전체)
+        List<GameObject> curEquipmentObjList = new List<GameObject>();  //스프라이트 적용용(해당 아머)
+        List<ItemStat> curEquipmentItemStatList = new List<ItemStat>(); //해당 아머의 아이템 스탯 참조용
+
+        switch(equipmentType){
+            case 0 :
+                curArmorList = helmetList;
+                curArmorAllObjList = helmetObjList;
+                break;
+            case 1 :
+                curArmorList = armorList;
+                curArmorAllObjList = armorObjList;
+                break;
         }
 
-        //옷 적용 방식 변경 > wearableScript
-        var curArmor = !useWearableScript ? armors : wearable.wearables;
-        var armorSpriteIndex = Array.FindIndex(curArmor, x => x.itemID == equipments_id[1]);
-        var armorItemIndex = DBManager.instance.cache_ItemDataList.FindIndex(x => x.ID == equipments_id[1]);//List.FindIndex(DBManager.instance.cache_ItemDataList, x => x.itemID == equipments_id[1]);
+        foreach(GameObject a in curArmorAllObjList){
+            a.SetActive(false);
+        }
 
-        for(int i=0;i<curArmor.Length;i++){
-            foreach(GameObject a in curArmor[i].objects){
-                a.SetActive(false);
+        //해당 타입에 장착 중인 아이템 ID가 해당 타입에 없을 경우 리턴
+        //if(!curArmorList.Select(x=>x.itemID).Contains(equipments_id[equipmentType])) return;
+        if(equipments_id[equipmentType]==-1) return;
+
+        curEquipmentObjList = curArmorList.Find(x => x.itemID == equipments_id[equipmentType]).objects.ToList();
+        Debug.Log(curEquipmentObjList.Count);
+        curEquipmentItemStatList = DBManager.instance.cache_ItemDataList.Find(x => x.ID == equipments_id[equipmentType]).itemStat;
+
+
+        foreach(GameObject a in curEquipmentObjList){
+            a.SetActive(true);
+        }
+
+        if(curEquipmentItemStatList!=null){
+            foreach(ItemStat a in curEquipmentItemStatList){
+                ApplyItemStat(a);
             }
         }
-        if(armorSpriteIndex != -1){
-            foreach(GameObject a in curArmor[armorSpriteIndex].objects){
-                a.SetActive(true);
-            }
-
-            for(int i=0;i<DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat.Count;i++){
-                ApplyItemStat(DBManager.instance.cache_ItemDataList[armorItemIndex].itemStat[i]);
-            }
-        }
-        //SetPlayerStat();
-
     }
+
+
+#endregion
+/// <summary>
+/// 
+/// </summary>
+/// <param name="direction">right / left</param>
     public void SetTalkCanvasDirection(string direction = ""){
         if(talkCanvas!=null){
             //var v = 1;
@@ -1067,6 +1086,7 @@ public class PlayerManager : CharacterScript
 
         StartCoroutine(SetMainBodySizeCoroutine(scale,speed));
     }
+    
     IEnumerator SetMainBodySizeCoroutine(float scale, float speed){
         //Debug.Log(speed);
         WaitForSeconds waitSpeed = new WaitForSeconds(speed);
@@ -1076,17 +1096,20 @@ public class PlayerManager : CharacterScript
 
         }
     }
+    
     public void SummonPet(){
         PlayerManager.instance.isSummoning = true;
         DBManager.instance.curData.isSummoning = true;
         petHolder.SetActive(true);
         PlayerManager.instance.petScript.SetStartDialogue();
     }
+    
     public void ApplyPet(){
         PlayerManager.instance.isSummoning = true;
         petHolder.SetActive(true);
 
     }
+    
     IEnumerator KeepAlertStateCoroutine(){
         keepAlertStateTime = 0f;
 
@@ -1099,9 +1122,11 @@ public class PlayerManager : CharacterScript
             }
         }
     }
+    
     public void SetBodyColor(string hexaCode,float duration){
         StartCoroutine(SetBodyColorCoroutine(hexaCode,duration));
     }
+    
     IEnumerator SetBodyColorCoroutine(string hexaCode,float duration){
 //unhideColor
         var curCoolTime = 0f;
@@ -1121,9 +1146,12 @@ public class PlayerManager : CharacterScript
         }
     }
 
+
+#region ITEM STATS
     public void ApplyItemStat(ItemStat itemStat){
         string curStatName = itemStat.statName;
         float curStatAmount = itemStat.statAmount;
+        Debug.Log(curStatAmount);
 
         switch(curStatName){
             case "speed" :
@@ -1165,4 +1193,99 @@ public class PlayerManager : CharacterScript
 
         //PlayerManager.instance.speed = PlayerManager.instance.defaultSpeed *(1 + PlayerManager.instance.stat.speedBonus);
     }
+#endregion
+
+    public void CaughtByHunter(){
+        StartCoroutine(CaughtByHunterCoroutine());
+        canMove = false;
+        isActing = true;
+    }
+    
+    
+    IEnumerator CaughtByHunterCoroutine(){
+        var hunter = HunterManager.instance.hunterBody;
+        var tempDialogue = HunterManager.instance.dialogues0;
+        WaitUntil waitTalking = new WaitUntil(()=>!PlayerManager.instance.isTalking);
+
+        //darkerVignette.SetActive(true);
+        UIManager.instance.SetHUD(false);
+        SceneController.instance.SetCameraDefaultZoomIn();            
+        //SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
+        SceneController.instance.SetSomeConfiner(null);
+        SceneController.instance.SetCameraNoised(1,1);
+        SetTalkCanvasDirection("right");
+        animator.SetBool("shake", true);
+        yield return wait500ms;
+        SoundManager.instance.PlayLoopSound("lucky_afraid");
+        Look("left");
+        yield return wait500ms;
+        Look("right");
+        yield return wait500ms;
+        Look("left");
+
+        Vector2 startingPos  = new Vector2(-1.61f, 9.92f);
+        Vector2 finalPos = new Vector2(-1.61f, 0.3f);
+
+        hunter.transform.localPosition = startingPos;
+        hunter.gameObject.SetActive(true);
+        SetTempMainGround(true);
+        DialogueManager.instance.SetDialogue(tempDialogue[0]);
+
+        float elapsedTime = 0;
+        float fallingDuration = 0.8f;
+        while (elapsedTime <= fallingDuration)
+        {
+            hunter.transform.localPosition = Vector2.Lerp(startingPos, finalPos, (elapsedTime / fallingDuration));
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        hunter.animator.SetTrigger("land");
+        yield return waitTalking;
+        
+        DialogueManager.instance.SetDialogue(tempDialogue[1]);
+        yield return waitTalking;
+
+        hunter.animator.SetTrigger("paperout");
+
+        yield return wait1000ms;
+        yield return wait500ms;
+        yield return wait125ms;
+
+
+        DialogueManager.instance.SetDialogue(tempDialogue[2]);
+        yield return waitTalking;
+        DialogueManager.instance.SetDialogue(tempDialogue[3]);
+        yield return waitTalking;
+
+
+
+        //yield return wait1000ms;
+
+        SoundManager.instance.StopLoopSound();
+        //흙 고갈 사망 시 최초 지급용 220831
+        LoadManager.instance.isDeadByDepletingDirt = true;
+        UIManager.instance.SetGameOverUI(21);
+    }
+    
+    
+    public void SetTempMainGround(bool active) => tempMainGround.SetActive(active);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="equipType">0 Helmet/1 Armor/2 Weapon</param>
+    /// <param name="itemIDList"></param>
+    /// <returns></returns>
+    public bool CheckEquipments(int equipType, List<int> itemIDList){
+
+        if(itemIDList.Contains(PlayerManager.instance.equipments_id[equipType])){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+
 }

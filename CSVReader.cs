@@ -20,6 +20,8 @@ public class CSVReader : MonoBehaviour
     public List<Dictionary<string,object>> data_story;
     public List<Dictionary<string,object>> data_coupon;
     public List<Dictionary<string,object>> data_quest;
+    [SerializeField]
+    public List<Dictionary<string,object>> data_command;
 
     public int itemAmount;
     void Awake() {
@@ -42,9 +44,26 @@ public class CSVReader : MonoBehaviour
         data_story = CSVReader.Read ("data_story");
         data_coupon = CSVReader.Read ("data_coupon");
         data_quest = CSVReader.Read ("data_quest");
+        data_command = CSVReader.Read ("data_command");
         
         itemAmount = data_item.Count;
         //print(data_dialogue[0]["text_kr"]);
+
+        // foreach(Dictionary<string,object> a in data_command){
+        //     foreach(string key in a.Keys){
+        //         Debug.Log(key);
+        //     }
+        //     foreach(string value in a.Values){
+        //         Debug.Log(value);
+        //     }
+        // }
+        
+
+        var tempDic = data_command.Find(x => x["arguments"].ToString() == "개미ID");
+        Debug.Log(tempDic["cheatDescription"]);
+
+
+
     }
     // void Start(){
     //     for(int i=0;i<200;i++){
@@ -92,12 +111,12 @@ public class CSVReader : MonoBehaviour
         //Dialogue
         //object temp = index;
         object result = "null_text";
-        string curLanguage = "text_"+DBManager.instance.language;
+        //string curLanguage = "text_"+DBManager.instance.language;
         switch(target){
             case "dialogue" :
                 if(data_dialogue.Count>index){
 
-                    result = data_dialogue[index][curLanguage];
+                    result = data_dialogue[index]["text_"+DBManager.instance.language];
                     string resultString = result.ToString();
 
                     
@@ -110,8 +129,10 @@ public class CSVReader : MonoBehaviour
 
                                 switch(DBManager.instance.language){
                                     case "kr" : 
-                                    case "jp" : 
                                         dialogueMaxCountPerRow = 18;
+                                        break;
+                                    case "jp" : 
+                                        dialogueMaxCountPerRow = 15;
                                         break;
                                     case "en" : 
                                         dialogueMaxCountPerRow = 25;
@@ -171,17 +192,17 @@ public class CSVReader : MonoBehaviour
             case "select" :
                 if(data_select.Count>index){
 
-                    result = data_select[index][curLanguage];
+                    result = data_select[index]["text_"+DBManager.instance.language];
                 }
                 break;    
             case "sysmsg" :
                 if(data_sysmsg.Count>index){
-                    result = data_sysmsg[index][curLanguage];
+                    result = data_sysmsg[index]["text_"+DBManager.instance.language];
                 }
                 break;
             case "map" :
                 if(data_map.Count>index){
-                    result = data_map[index][curLanguage];
+                    result = data_map[index]["text_"+DBManager.instance.language];
                 }
                 break;
             // case "story" :

@@ -562,7 +562,7 @@ public class TriggerScript : MonoBehaviour
                 break;
 #endregion
 
-#region @106 상점 - 야 
+#region @106 상점 - 약국
             case 106 :
 
                 if(location.selectPhase == 0){
@@ -577,7 +577,8 @@ public class TriggerScript : MonoBehaviour
                     new ShopSales(13,1),
                     new ShopSales(53,1),
                     new ShopSales(54,1)
-                    });
+                    }
+                    ,shopTitleActive:false);
                 yield return waitShopping;
 
 
@@ -3345,6 +3346,45 @@ DBManager.instance.AntCollectionOver(12);
                 break;
 #endregion
 
+#region @107 젤리마을 - 최초 튜토리얼
+            case 107 :
+                //CameraView(objects[0]);
+                    SceneController.instance.virtualCamera.Follow = objects[0];
+                    yield return wait1000ms;
+
+                    
+        float elapsedTime = 0;
+        float fallingDuration = 2f;
+                    Debug.Log("ㅁ");
+                    while (elapsedTime <= fallingDuration)
+        {
+            objects[0].position = Vector2.Lerp(objects[0].position, PlayerManager.instance.transform.position, Time.deltaTime);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+                    Debug.Log("ㅂ");
+                //    objects[0].position = Vector3.MoveTowards(objects[0].position, PlayerManager.instance.transform.position, Time.deltaTime * 10f);
+                //yield return wait3000ms;
+
+            
+                 //yield return wait1000ms;
+                //CameraView(PlayerManager.instance.transform,0.5f);
+                //yield return wait1000ms;
+                SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
+    
+            //SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 2;
+           // SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 2;
+            
+
+                PlayerManager.instance.wSet = 1;
+                yield return new WaitUntil(() => PlayerManager.instance.transform.position.x >= objects[1].position.x);
+                PlayerManager.instance.wSet = 0;
+
+                SetDialogue(dialogues[0]);
+                yield return waitTalking;
+
+                break;
+#endregion
 
 #region @899 자동저장
             case 899 :
@@ -3905,12 +3945,18 @@ DBManager.instance.AntCollectionOver(17);
 
 
         //특정 트리거 종료 후, 퀘스트 발생
-        //221011 퀘스트 획득추가
+        //221011 퀘스트 획득 및 완료
         switch(location.trigNum){
             case 6 :
                 if(location.selectPhase == -1){
                     UIManager.instance.AcceptQuest(1);//유치원으로 가자 퀘스트 획득
                 }
+                break;
+            case 11:
+                UIManager.instance.CompleteQuest(4);
+                break;
+            case 18:
+                UIManager.instance.AcceptQuest(5);
                 break;
             case 49:
                 if(!DBManager.instance.CheckMapOver(8)){
@@ -3920,16 +3966,13 @@ DBManager.instance.AntCollectionOver(17);
             case 63:
                 UIManager.instance.AcceptQuest(3);
                 break;
-            case 18:
-                UIManager.instance.AcceptQuest(5);
-                break;
-            case 59:
-                if(!DBManager.instance.CheckMapOver(13)
-                ||!DBManager.instance.CheckMapOver(14)
-                ||!DBManager.instance.CheckMapOver(15)
-                )
-                UIManager.instance.AcceptQuest(7);
-                break;
+            // case 59:
+            //     if(!DBManager.instance.CheckMapOver(13)
+            //     ||!DBManager.instance.CheckMapOver(14)
+            //     ||!DBManager.instance.CheckMapOver(15)
+            //     )
+            //     UIManager.instance.AcceptQuest(7);
+            //     break;
             case 24:
                 UIManager.instance.AcceptQuest(8);
                 break;

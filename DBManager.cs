@@ -13,12 +13,12 @@ public class DBManager : MonoBehaviour
 {
     public static DBManager instance;
     [Header("[Game Info]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
-    public uint buildNum;
-    public uint buildSubNum;
-    public string buildDate;
-    public string buildVersion;
+    //public uint buildNum;
+    //public uint buildSubNum;
+    //public string buildDate;
+    //public string buildVersion;
     public string language;
-    public string dataDirectory;
+    string dataDirectory;
     [Header("[Game]")]
     
     [Header("[Game Settings]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
@@ -41,6 +41,7 @@ public class DBManager : MonoBehaviour
     public bool achievementIsAvailable;
     [Header("[Contents On/Off]")]
     public bool dirtOnlyHUD;
+    public bool activateHunter;
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     [Space]
@@ -168,7 +169,7 @@ public class DBManager : MonoBehaviour
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + dataDirectory +"/SaveFileDefault.dat");//nickName!="" ? File.Create(Application.persistentDataPath + "/SaveFile_"+nickName+".dat"): 
 
-        Debug.Log(Application.persistentDataPath);
+//        Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, emptyData);
         file.Close();
     }
@@ -211,6 +212,15 @@ public class DBManager : MonoBehaviour
         Debug.Log(Application.persistentDataPath);
         bf.Serialize(file, curData);
         file.Close();
+    }
+    public bool CheckFileExist(int fileNum){
+        FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFile" + fileNum.ToString() +".dat");
+        if(fileCheck.Exists){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
     public void CallLoad(int fileNum){
 
@@ -573,7 +583,7 @@ public class DBManager : MonoBehaviour
         buildVersion = "demo";
         dataDirectory = "/" + buildVersion + "_" + buildNum;
 #elif alpha
-        buildVersion = "alpha";
+        //buildVersion = "alpha";
         //dataDirectory = "/" + buildVersion + "_" + buildNum;
         dataDirectory = "";
 #else
@@ -708,27 +718,38 @@ public class DBManager : MonoBehaviour
         var a = CSVReader.instance.data_collection;
         cache_EndingCollectionDataList.Clear();
 
-        for(int x=0; x<a.Count; x++){
-            //itemDataList.Add(new Item(a[i].ID,a[i].name_kr,a[i].desc_kr,a[i].type,a[i].resourceID,a[i].isStack));
+        // for(int x=0; x<a.Count; x++){
+        //     for(int i=0; i<a.Count; i++){
+        //         if(int.Parse(a[i]["sortOrder"].ToString())==x){
 
-            for(int i=0; i<a.Count; i++){
-                if(int.Parse(a[i]["sortOrder"].ToString())==x){
+        //         cache_EndingCollectionDataList.Add(new EndingCollection(
+        //             int.Parse(a[i]["ID"].ToString())
+        //             ,a[i]["name_"+language].ToString()
+        //             ,int.Parse(a[i]["resourceID"].ToString())
+        //             ,int.Parse(a[i]["trueID"].ToString())
+        //             ,int.Parse(a[i]["sortOrder"].ToString())
+        //         ));
+        //         }
+        //     }
+        // }
 
-                    cache_EndingCollectionDataList.Add(new EndingCollection(
-                        int.Parse(a[i]["ID"].ToString())
-                        ,a[i]["name_"+language].ToString()
-                        ,int.Parse(a[i]["resourceID"].ToString())
-                        ,int.Parse(a[i]["trueID"].ToString())
-                        //byte.Parse(a[i]["type"].ToString()),
-                        //int.Parse(a[i]["resourceID"].ToString()),
-                        //bool.Parse(a[i]["isStack"].ToString())
-                    ));
-
-                    break;
-                }
-
-            }
+        
+        for(int i=0; i<a.Count; i++){
+            cache_EndingCollectionDataList.Add(new EndingCollection(
+                int.Parse(a[i]["ID"].ToString())
+                ,a[i]["name_"+language].ToString()
+                ,int.Parse(a[i]["resourceID"].ToString())
+                ,int.Parse(a[i]["trueID"].ToString())
+                ,int.Parse(a[i]["sortOrder"].ToString())
+            ));
         }
+        
+        cache_EndingCollectionDataList =
+        cache_EndingCollectionDataList
+        .OrderBy(x => x.sortOrder) //보상 수령 대기
+        .ThenBy(x => x.ID) //진행 중
+        .ToList()
+        ;
     }
 
     public void ApplyStoryInfo(){
@@ -799,6 +820,7 @@ public class DBManager : MonoBehaviour
                 case 0 ://트리거 번호
                 case 2 ://맵 번호
                 case 3 ://흙더미 개수
+                case 4 ://아이템
                     for(int j=0;j<curObjectivesList_split0.Count;j++){
                         curObjectivesList0.Add(int.Parse(curObjectivesList_split0[j]));
                     }
@@ -814,7 +836,11 @@ public class DBManager : MonoBehaviour
                     break;
             }
 
-            
+
+            int curTargetVal = 1;
+            var tempTargetVal = a[i]["targetVal"].ToString();
+            if(!string.IsNullOrEmpty(tempTargetVal)) curTargetVal = int.Parse(tempTargetVal);;
+
             cache_questList.Add(new QuestInfo(
                 int.Parse(a[i]["ID"].ToString())
                 ,a[i]["main_"+language].ToString()
@@ -823,6 +849,7 @@ public class DBManager : MonoBehaviour
                 ,curQuestRewardItemList
                 ,curObjectivesList0
                 ,curObjectivesList1
+                ,curTargetVal
                 ,curQuestMajorType
             ));
             //curQuestRewardItemList.Clear();
@@ -987,9 +1014,10 @@ public class EndingCollection{
     public int resourceID;
     public int trueID;
     public Sprite sprite;
+    public int sortOrder;
 
 
-    public EndingCollection(int a, string b, int c,int d){
+    public EndingCollection(int a, string b, int c,int d,int e){
         ID = a;
         name = b;
         //description = c;
@@ -999,6 +1027,7 @@ public class EndingCollection{
         trueID = d;
         if(DBManager.instance.endingCollectionSprites.Length > resourceID)
         sprite = DBManager.instance.endingCollectionSprites[resourceID];
+        sortOrder = e;
     }
 }
 
@@ -1101,16 +1130,18 @@ public class QuestInfo{
     public List<ItemList> rewardItemList;
     public List<int> objectives0;
     public List<ItemList> objectives1;
+    public int targetVal;//obj0, obj1... 이 있을 경우, 완료를 위한 목표값
     public int majorType;
     //public int rewardItemID;
     public QuestInfo(
-        int _ID, 
-        string _mainText, 
-        string _iconResource, 
-        int _rewardHoneyAmount = 0, 
-        List<ItemList> _rewardItemList = null, 
+        int _ID,
+        string _mainText,
+        string _iconResource,
+        int _rewardHoneyAmount = 0,
+        List<ItemList> _rewardItemList = null,
         List<int> _objectives0 = null,
         List<ItemList> _objectives1 = null,
+        int _targetVal = 1,
         int _majorType = 0
     ){
         ID = _ID;
@@ -1120,6 +1151,7 @@ public class QuestInfo{
         rewardItemList = _rewardItemList;
         objectives0 = _objectives0;
         objectives1 = _objectives1;
+        targetVal = _targetVal;
         majorType = _majorType;
     }
 }

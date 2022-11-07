@@ -30,6 +30,7 @@ public class ShopManager : MonoBehaviour
     [Space]
     [Header("[Game Objects]─────────────────")]
     public GameObject ui_shop;
+    public GameObject ui_shop_title;
     public Image shopIconImage;
     public TextMeshProUGUI shopNameText;
     public Transform shopSlotGrid;
@@ -198,10 +199,12 @@ public class ShopManager : MonoBehaviour
             shopSlotGrid.GetChild(i).gameObject.SetActive(false);
         }
     }
-    public void OpenShopUI(int shopIconIndex, string shopName, ShopSales[] shopSales){
+    public void OpenShopUI(int shopIconIndex, string shopName, ShopSales[] shopSales, bool shopTitleActive = true){
 
         PlayerManager.instance.isShopping = true;
-        
+
+        ui_shop_title.SetActive(shopTitleActive);
+
         ResetShopUI();
         UIManager.instance.SetOnlyHudBlock(true);
         UIManager.instance.SetHUD(true);

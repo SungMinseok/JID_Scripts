@@ -72,10 +72,10 @@ public class LoadManager : MonoBehaviour
 
         mainSceneName = 
         "Level"
-        + "_"
+        //+ "_"
         //+ DBManager.instance.buildVersion
         //+ "_"
-        + DBManager.instance.buildNum
+        //+ DBManager.instance.buildNum
         // + "_" 
         // + DBManager.instance.buildDate
         ;
@@ -138,7 +138,7 @@ public class LoadManager : MonoBehaviour
         SceneManager.LoadScene("Loading");
         yield return null;
 
-#region [ 인게임 > 파일 선택해서 불러오기, 처 ]
+#region [ 인게임(Level) > 파일 선택해서 불러오기, 처 ]
 
         if(isLoadingInGame){
             if(lastLoadFileNum == -1){
@@ -158,7 +158,7 @@ public class LoadManager : MonoBehaviour
 
 #endregion
 
-#region [ 인게임 > 마지막 저장지점 불러오기 ]
+#region [ 인게임(Level) > 마지막 저장지점 불러오기 ]
         else if(isLoadingInGameToLastPoint){
             if(lastLoadFileNum == -1){
                 //DBManager.instance.curData = DBManager.instance.emptyData.DeepCopy();
@@ -177,7 +177,7 @@ public class LoadManager : MonoBehaviour
         
 #endregion
 
-#region [ 인게임 > 메인씬 ]
+#region [ 인게임(Level) > 메인씬(Main) ]
         else if(nextScene == "Main"){
                 
             if(DDOLScript.instance!=null) Destroy(DDOLScript.instance.gameObject);
@@ -209,12 +209,14 @@ public class LoadManager : MonoBehaviour
             }
         }
 #endregion
+
     }
     IEnumerator LoadSceneFadeIn(string nextScene){
         yield return null;
         ResetFader(1);
 
-//게임 첫 시작시
+#region [ 게임 첫 시작 시 (Unused) ]
+
         // if(!isLoadingInGame){
         //     switch(nextScene){
         //         case "Level2" :
@@ -226,7 +228,10 @@ public class LoadManager : MonoBehaviour
         //     }
 
         // }
-//인게임 로드 시
+#endregion
+
+#region [ 인게임 로드 시 ]
+
         if(isLoadingInGame){
             isLoadingInGame = false;
             
@@ -295,6 +300,7 @@ public class LoadManager : MonoBehaviour
             //yield return waitPlayer;
 
             SceneController.instance.SetFirstLoad();
+            //SceneController.instance.SetFirstLoad();
         }
 
 
@@ -304,7 +310,7 @@ public class LoadManager : MonoBehaviour
         //     }
         // }
 
-
+#endregion
 
         //yield return wait1s;
             //Debug.Log("A");
@@ -335,20 +341,14 @@ public class LoadManager : MonoBehaviour
             }
 
         }
-        // yield return wait1s;
-        // yield return wait1s;
+
+            SoundManager.instance.GetAudioSources();
+
+
         if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){
-            //Debug.Log("33344");
-            //yield return wait1s;
             PlayerManager.instance.canMove = true;
         }
-        //loadFader.GetComponent<Animator>().SetTrigger("fadeIn");
     }
-    // IEnumerator SetCameraDefault(int num){
-    //     yield return new WaitForSeconds(1f);
-    //     SceneController.instance.SetConfiner(num);
-
-    // }
 
     public void ResetFader(float value){
         var defaultColor = loadFader.color;

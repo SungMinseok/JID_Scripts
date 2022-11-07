@@ -11,11 +11,31 @@ using Steamworks;
 public class CheatManager : MonoBehaviour
 {
     public static CheatManager instance;
+    public GameObject cheatPanel;
     public InputField cheat;
     public Transform checkPoint;
     public Transform checkPoint_Special;
     public Transform minigameParent;
     
+    public int cmdPage;
+    public int cmdMaxPage;
+    public GameObject cheatResultObj;
+    GUIStyle style_des, style_cmd,style_cmdResult, style0, style1;
+    Rect rect_des, rect_cmd,rect_cmdResult, rect0, rect1;
+    string COMMAND_KEY = "key";
+    string COMMAND_ARGUMENTS = "arguments";
+    string COMMAND_CHEATDESCRIPTION = "cheatDescription";
+    string ITEM_ID = "ID";
+    string ITEM_NAME = "name_kr";
+    string MAP_ID = "ID";
+    string MAP_NAME = "text_kr";
+    string cmdListString;
+    string itemListString;
+    string mapListString;
+    string endingListString;
+    string antListString;
+    string questListString;
+    string trueEndingListString;
 #if UNITY_EDITOR || alpha
     void Awake(){
         instance = this;
@@ -23,9 +43,87 @@ public class CheatManager : MonoBehaviour
     void Start()
 
     {
-        cheat.onEndEdit.AddListener(delegate { GetCheat(); });
-        
+        cmdMaxPage = 2;
 
+        cheat.onEndEdit.AddListener(delegate { GetCheat(); });
+
+        int w = Screen.width, h = Screen.height;
+
+
+        style_cmdResult = new GUIStyle();
+        style_cmdResult.alignment = TextAnchor.LowerLeft;
+        style_cmdResult.fontSize = h * 2 / 100;
+        style_cmdResult.normal.textColor = Color.red;
+        rect_cmdResult = new Rect(0, h - style_cmdResult.fontSize, w, style_cmdResult.fontSize);
+        
+        style_des = new GUIStyle();
+        style_des.alignment = TextAnchor.MiddleCenter;
+        style_des.fontSize = (int)(h * 0.025);
+        style_des.normal.textColor = Color.white;
+        style_des.fontStyle = FontStyle.Bold;
+        rect_des = new Rect(0, h- style_des.fontSize, w, style_des.fontSize);
+
+        style_cmd = new GUIStyle();
+        style_cmd.alignment = TextAnchor.UpperLeft;
+        style_cmd.fontSize = (int)(h * 0.02);
+        style_cmd.normal.textColor = Color.cyan;
+        style_cmd.fontStyle = FontStyle.Bold;
+        rect_cmd = new Rect(0, 20, 0, style_cmd.fontSize);
+        
+        style0 = new GUIStyle();
+        style0.alignment = TextAnchor.UpperLeft;
+        style0.fontSize = (int)(h * 0.02);
+        style0.normal.textColor = Color.cyan;
+        style0.fontStyle = FontStyle.Bold;
+        rect0 = new Rect(w * 0.33f, 0, 0, style0.fontSize);
+
+        style1 = new GUIStyle();
+        style1.alignment = TextAnchor.UpperLeft;
+        style1.fontSize = (int)(h * 0.02);
+        style1.normal.textColor = Color.cyan;
+        style1.fontStyle = FontStyle.Bold;
+        rect1 = new Rect(w * 0.66f, 0, w, style1.fontSize);
+
+        int i = 0;
+        cmdListString = "<color=#FFFF4D>[COMMAND] 명령어 입력 후 엔터</color>\n";
+        foreach(var a in CSVReader.instance.data_command){
+
+            string[] _arg = a[COMMAND_ARGUMENTS].ToString().Split(';');;
+            string key = string.Format(a[COMMAND_KEY].ToString(), _arg);
+            cmdListString += "<color=white>" + key + "</color> : " + a[COMMAND_CHEATDESCRIPTION];// + "\t";
+            if(++i%1==0) cmdListString += "\n";
+        }
+        
+        i = 0;
+
+        itemListString = "<color=orange>[ITEM]</color>\n";
+        foreach(var a in CSVReader.instance.data_item){
+            itemListString += "<color=white>"+ a[ITEM_ID] + "</color> " + a[ITEM_NAME] + "\t";
+            if(++i%2==0) itemListString += "\n";
+        }
+        
+        i = 0;
+        mapListString = "<color=#FF90EE90>[MAP]</color>\n";
+        foreach(var a in CSVReader.instance.data_map){
+            int mapNum = (int)a[MAP_ID]*2;
+            mapListString += "<color=white>" + mapNum + "</color>/" + "<color=white>" + (mapNum + 1) + "</color> " + a[MAP_NAME] + "\t";
+            if(++i%2==0) mapListString += "\n";
+        }
+        i = 0;
+        endingListString = "<color=#FF90EE90>[Ending]</color>\n";
+        foreach(var a in CSVReader.instance.data_collection){
+            //int mapNum = (int)a[MAP_ID]*2;
+            endingListString += "<color=white>" + a["ID"] + "</color> " + a["name_kr"];
+            if(++i%1==0) endingListString += "\n";
+        }
+        i = 0;
+        trueEndingListString = "<color=#FF90EE90>[TrueEnding]</color>\n";
+        foreach(var a in CSVReader.instance.data_collection){
+            int index = (int)a["trueID"];
+            if(index==0) continue;
+            trueEndingListString += "<color=white>" + a["trueID"] + "</color> " + a["name_kr"];
+            if(++i%1==0) trueEndingListString += "\n";
+        }
     }
     public void InputCheat(string inputCheat){
         cheat.text = inputCheat;
@@ -471,44 +569,60 @@ public class CheatManager : MonoBehaviour
 
 
 
-    public void DM(string msg) => DebugManager.instance.PrintDebug(msg);
+    public void DM(string msg){
+        DebugManager.instance.PrintDebug(msg);
+        cheatResultObj.SetActive(false);
+        cheatResultObj.SetActive(true);
+    } 
 
-    // public void GetCheat22(){
-    //     string[] temp = cheat.text.Split('\x020');
-    //     DebugManager.instance.PrintDebug(temp);
-        
-    //     DebugManager.instance.PrintDebug(temp[0]);
-    //     switch(temp[0]){
-    //         case "teleport":
-    //             switch(temp[1]){
-    //                 case "0" :
-    //                     DebugManager.instance.PrintDebug("0번이동");
-    //                     break;
-    //                 case "1" :
-    //                     DebugManager.instance.PrintDebug("1번이동");
-    //                     break;
-    //             }
-    //             break;
-    //     }
-    // }
+
     
     void Update(){
-        if(DebugManager.instance.isDebugMode){
-            if(Input.GetKeyDown(KeyCode.Return)){
-                DebugManager.instance.cheatPanel.SetActive(!DebugManager.instance.cheatPanel.activeSelf);
-                //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
-                CheatManager.instance.cheat.Select();
-                CheatManager.instance.cheat.ActivateInputField();
-                
-            }
-            if(Input.GetKeyDown(KeyCode.F10)){
-                //SceneManager.LoadScene("warehouse");
-                PlayerManager.instance.RevivePlayer();
-                CheatManager.instance.InputCheat("t 0");
-                CheatManager.instance.InputCheat("completetrigger 1");
-                //ResetPlayerPos();
+        if(Input.GetKeyDown(KeyCode.Tab)){
+            if(++cmdPage==cmdMaxPage){
+                cmdPage = 0;
             }
         }
+        if(Input.GetKeyDown(KeyCode.Return)){
+            CheatManager.instance.cheatPanel.SetActive(!CheatManager.instance.cheatPanel.activeSelf);
+            //if(PlayerManager.instance.canMove) PlayerManager.instance.canMove = !cheatPanel.activeSelf;
+            CheatManager.instance.cheat.Select();
+            CheatManager.instance.cheat.ActivateInputField();
+            
+        }
+        else if(Input.GetKeyDown(KeyCode.F10)){
+            //SceneManager.LoadScene("warehouse");
+            PlayerManager.instance.RevivePlayer();
+            CheatManager.instance.InputCheat("t 0");
+            CheatManager.instance.InputCheat("completetrigger 1");
+            //ResetPlayerPos();
+        }
+    }
+
+    void OnGUI(){
+        if(cheatPanel.gameObject.activeSelf){
+            GUI.backgroundColor = Color.black;
+
+            string column0 = "";
+            string column1 = "";
+
+            GUI.Label(rect_des, "페이지 좌우로 넘기기 : < , >", style_des); 
+            GUI.Label(rect_cmd, cmdListString, style_cmd); 
+
+            switch(cmdPage){
+                case 0 :
+                    column0 = itemListString;
+                    column1 = mapListString;
+                    break;
+                case 1 :
+                    column0 = endingListString;
+                    column1 = trueEndingListString;
+                    break;
+            }
+            GUI.Label(rect0, column0, style0); 
+            GUI.Label(rect1, column1, style1); 
+        }
+        
     }
 #endif
 }

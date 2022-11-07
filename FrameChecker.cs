@@ -1,19 +1,31 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor;
+using System;
+using System.Collections.Generic;
  
 #if UNITY_EDITOR || alpha
 public class FrameChecker : MonoBehaviour
 {
   float deltaTime = 0.0f;
 
-  GUIStyle style0, style1, style2;
-  Rect rect0, rect1, rect2;
+  GUIStyle style0, style1, style2, style3;
+  Rect rect0, rect1, rect2, rect3;
   string text0, text1,text2;
   float msec;
   float fps;
   float worstFps=100f;
+    string itemList;
 
-  void Awake()
+    //string currentTimeText;
+
+    string COMMAND_KEY = "key";
+    string COMMAND_ARGUMENTS = "arguments";
+    string COMMAND_CHEATDESCRIPTION = "cheatDescription";
+    string ITEM_ID = "ID";
+    string ITEM_NAME = "name_kr";
+
+    void Awake()
   {
     int w = Screen.width, h = Screen.height;
 
@@ -39,9 +51,31 @@ public class FrameChecker : MonoBehaviour
     rect1 = new Rect(0, 0, w, style1.fontSize);
     rect2 = new Rect(-130, 0, w, style2.fontSize);
 
+
+    
+    style3 = new GUIStyle();
+    style3.alignment = TextAnchor.UpperLeft;
+    style3.fontSize = (int)(h * 0.015);
+    style3.normal.textColor = Color.cyan;
+    rect3 = new Rect(260, 0, 0, style3.fontSize);
+
+    //currentTimeText = DateTime.Now.ToString(("yyMMdd_HHmm"));
+
     //StartCoroutine ("worstReset");
   }
+    void Start(){
+        //itemList = new List<string>();
+        int i = 0;
+        foreach(var a in CSVReader.instance.data_item){
+            itemList += a[ITEM_ID] + " " + a[ITEM_NAME] + "\t";
+            if(++i%5==0) itemList += "\n";
 
+        }
+
+        // foreach(Item a in DBManager.instance.cache_ItemDataList){
+        //     itemList += a.ID + " " + a.name + "\n";
+        // }
+    }
 
   // IEnumerator worstReset() //코루틴으로 15초 간격으로 최저 프레임 리셋해줌.
   // {
@@ -83,17 +117,20 @@ public class FrameChecker : MonoBehaviour
     GUI.Label(rect0, text0, style0);
     //if(DBManager.instance.buildSubNum==0){
 
-    // text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + 
-    //         " / "+ DBManager.instance.buildDate;  
-    // }
-    // else{
       
-    text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + "." + DBManager.instance.buildSubNum +
-            " / "+ DBManager.instance.buildDate;  
-    //}
+    //text1 = "Build # : "+ DBManager.instance.buildNum.ToString() + "." + DBManager.instance.buildSubNum +
+    //        " / "+ DBManager.instance.buildDate;
+
+    text1 = string.Format("Build v{0}",Application.version);
+
     GUI.Label(rect1, text1, style1);  
-    text2 = "0먹이창고\n	1절벽\n	2복도\n	3노개미 방\n	4세 갈래 길\n	5유치원\n	6수개미 방\n	7수개미 끝방\n	8광장\n	9식당\n	10부화장\n	11대왕 일개미방\n	12농장가는 길\n	13냉동굴\n	14버섯농장\n	15진딧물농장\n	16나가는 길\n	17병원\n	18시장가는 길\n	19야시장\n	20두 갈래 길\n	21히든월드\n	22귀족의 길\n	23공주개미 방\n	24여왕개미 방\n";
-    GUI.Label(rect2, text2, style2);
+    text2 = "먹이창고0/1\n	절벽2/3\n	복도4/5\n	노개미 방6/7\n	세 갈래 길8/9\n	유치원10/11\n	수개미 방12/13\n	수개미 끝방14/15\n	광장16/17\n	식당18/19\n	부화장20/21\n	대왕 일개미방22/23\n	농장가는 길24/25\n	냉동굴26/27\n	버섯농장28/29\n	진딧물농장30/31\n	나가는 길32/33\n  병원34/35\n	시장가는 길36/37\n	야시장38/39\n	두 갈래 길40/41\n	히든월드42/43\n	귀족의 길44/45\n	공주개미 방46/47\n	여왕개미 방48/49\n\n  맵이동명령어 : t 숫자\n ex)병원 오른쪽 : t 35";
+    //GUI.Label(rect2, text2, style2);
+    //GUI.Label(rect3, itemList, style3);
+
+    
+        
+
   }
 } 
 

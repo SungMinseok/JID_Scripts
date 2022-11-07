@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,9 +25,9 @@ public class MenuManager : MonoBehaviour
     //public GameObject antCollectionPanel;
     //public GameObject endingCollectionPanel;
     [Header("UI_PopUp")]
-    public GameObject popUpPanel;
+    public GameObject popUpPanel;//확인, 취소 버튼 총 2개
     public TextMeshProUGUI[] popUpText; //main, sub, ok, cancel
-    public GameObject popUpPanel1;
+    public GameObject popUpPanel1;//확인 버튼 한개
     public TextMeshProUGUI[] popUpText1; //main, sub, ok, cancel
     public bool popUpOkayCheck;
     public GameObject popUpOnWork;
@@ -113,7 +113,7 @@ public class MenuManager : MonoBehaviour
     public int curLoadNum;
     public int totalPage;
     public int curPage;
-    public int[] tempCardNum = new int[5];
+    public int[] tempCardNum = new int[5]; //sortOrder와 일치
 
     void Awake(){
         if (null == instance)
@@ -163,7 +163,12 @@ public class MenuManager : MonoBehaviour
         fonts[0] = Resources.Load<Font>("Cafe24Ssurround");
         fonts[1] = Resources.Load<Font>("uzura");
 
-        versionText.text = string.Format("ver {0}.{1}",DBManager.instance.buildNum,DBManager.instance.buildSubNum);
+        string[] tempVer = Application.version.Split('-');
+        string subText = "";
+#if alpha
+        subText = "alpha";
+#endif
+        versionText.text = string.Format("v{0}-{1}{2}",tempVer[0],subText,tempVer[1]);
 
 #region Reset Collection
         //totalPage = DBManager.instance.endingCollectionSprites.Length;
@@ -299,6 +304,9 @@ public class MenuManager : MonoBehaviour
 
     #region Collection_Ending_Slider
     public void CollectionScrollRightBtn(){
+        //var tempCollectionRealID = DBManager.instance.cache_EndingCollectionDataList.Find(x=>x.sort)
+
+
         EndingCollectionRedDotOff(DBManager.instance.cache_EndingCollectionDataList[tempCardNum[2]].ID);
 
         DeactivateBtns(collectionScrollArrows);
@@ -439,14 +447,16 @@ public class MenuManager : MonoBehaviour
     public void EndingCollectionRedDotOff(int collectionID){//collectionID는 collection의 sortOrder가 아닌 실제 ID
         int curEndingCollectionID = DBManager.instance.GetClearedEndingCollectionID(collectionID);
         var collectionSortOrderID = DBManager.instance.cache_EndingCollectionDataList.FindIndex(x=>x.ID == collectionID);
-        
+        var tempEndingCollection = DBManager.instance.localData.endingCollectionOverList.Find(x => x.ID == collectionID);
+
         Debug.Log(collectionID);
 
         if(collectionID!=-1){
 
             collectionCardRedDots[2].SetActive(false);
             collectionEndingGridRedDots[collectionSortOrderID].SetActive(false);
-            DBManager.instance.localData.endingCollectionOverList[curEndingCollectionID].isRecognized = true;
+            //DBManager.instance.localData.endingCollectionOverList[curEndingCollectionID].isRecognized = true;
+            if(tempEndingCollection != null) tempEndingCollection.isRecognized = true;
 
             //전부 인식 완료됐으면 메인 레드닷 제거
             if(UIManager.instance!=null && UIManager.instance.CheckCollectionOverListAllRecognized()){
@@ -495,6 +505,7 @@ public class MenuManager : MonoBehaviour
 
     }
     #endregion
+
 #endregion
     
     
@@ -795,6 +806,8 @@ public class MenuManager : MonoBehaviour
         
     }
     public void Load(int curLoadNum){
+        if(!DBManager.instance.CheckFileExist(curLoadNum)) return;
+
         CloseAllPanels();
         CloseMenuPanel();
         LoadManager.instance.isLoadingInGame = true;

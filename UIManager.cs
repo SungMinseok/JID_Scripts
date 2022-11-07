@@ -984,7 +984,8 @@ public class UIManager : MonoBehaviour
 
             switch(questInfo.majorType){
                 case 2 :
-                    tempQuestMainText = string.Format(questInfo.mainText,questState.progress,questInfo.objectives0.Count);
+                case 4 :
+                    tempQuestMainText = string.Format(questInfo.mainText,questState.progress,questInfo.targetVal);
                     break;
                 default : 
                     tempQuestMainText = questInfo.mainText;

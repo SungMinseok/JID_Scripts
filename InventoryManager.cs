@@ -518,6 +518,7 @@ public class InventoryManager : MonoBehaviour
                 break;
         }
 
+        SetQuestState(curItem.ID);
         RefreshInventory(curPage);
 
     }
@@ -951,10 +952,55 @@ public class InventoryManager : MonoBehaviour
     
     public void SetQuestState(int _itemID){
 
-        var tempQuestIDList = //이동한 맵으로 이동시 달성 가능한 QuestInfo의 리스트에서 questID만 뽑은 리스트
-        DBManager.instance.cache_questList.FindAll(x=>x.objectives1.Exists(x=>x.itemID==_itemID)).Select(x=>x.ID).ToList();
+#region majorType 1 (unused)
+        // var tempQuestIDList = //이동한 맵으로 이동시 달성 가능한 QuestInfo의 리스트에서 questID만 뽑은 리스트
+        // DBManager.instance.cache_questList.FindAll(x=>x.objectives1.Exists(y=>y.itemID==_itemID)).Select(x=>x.ID).ToList();
 
-        Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
+        // Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
+
+        // foreach(QuestState questState in DBManager.instance.curData.questStateList){//현재 QuestStateList에서
+            
+        //     if(tempQuestIDList.Contains(questState.questID)){//위에서 뽑은 아이디중에 해당되는게 있다면
+
+        //         if(questState.isCompleted) break;//예외) 완료상태면 그냥 패스함
+
+        //         var tempQuestInfo = //뭐가필요한지 몰라서 일단 정보 다가져옴
+        //         DBManager.instance.cache_questList.Find(x=>x.ID==questState.questID);
+
+        //         var tempItemList = tempQuestInfo.objectives1;
+
+        //         foreach(ItemList itemList in tempItemList){
+
+        //             if(itemList.itemID != _itemID) break;
+
+        //             if(tempQuestInfo.targetVal > 1){
+
+        //                 questState.progress ++;
+        //                 questState.progressList.Add(_itemID);
+
+        //                 var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
+        //                 UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                        
+        //                 if(questState.progress >= tempQuestInfo.targetVal){
+        //                     UIManager.instance.CompleteQuest(questState.questID);
+        //                 }
+        //             }
+        //             else{
+        //                 UIManager.instance.CompleteQuest(questState.questID);
+
+        //             }
+
+        //         }
+
+        //     }
+        // }
+        #endregion
+   
+   
+        var tempQuestIDList = //QuestInfo의 리스트에서 조건에 맞는 questID만 뽑은 리스트
+        DBManager.instance.cache_questList.FindAll(x=> x.majorType == 4 && x.objectives0.Contains(_itemID) ).Select(x=>x.ID).ToList();
+
+        //Debug.Log("tempQuestIDList.Count : " + tempQuestIDList.Count);
 
         foreach(QuestState questState in DBManager.instance.curData.questStateList){//현재 QuestStateList에서
             
@@ -962,49 +1008,31 @@ public class InventoryManager : MonoBehaviour
 
                 if(questState.isCompleted) break;//예외) 완료상태면 그냥 패스함
 
-                var tempQuestInfo = //뭐가필요한지 몰라서 일단 정보 다가져옴
+                var tempQuestInfo = //뭐가필요할지 몰라서 일단 정보 다가져옴
                 DBManager.instance.cache_questList.Find(x=>x.ID==questState.questID);
-
-                var tempItemList = tempQuestInfo.objectives1;
-
-                foreach(ItemList itemList in tempItemList){
-
-                    if(itemList.itemID != _itemID) break;
-
-                    if(itemList.itemAmount > 1){
-
-                        questState.progress ++;
-                        questState.progressList.Add(_itemID);
-
-                        var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
-                        UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
-                    }
-                    else{
-                        UIManager.instance.CompleteQuest(questState.questID);
-
-                    }
-
-                }
-
-                if(tempItemList.am == 1){
+        
+                if(tempQuestInfo.targetVal == 1){ // 아이템 1회사용이면 즉시 완료
                     UIManager.instance.CompleteQuest(questState.questID);
                 }
-                else if(tempQuestInfo.objectives1.Count > 1){
+                else if(tempQuestInfo.targetVal > 1){
 
-                    if(questState.progressList.Contains(mapNum)) break;
+                    //if(questState.progressList.Contains(mapNum)) break;
 
                     questState.progress ++;
-                    questState.progressList.Add(mapNum);
+                    questState.progressList.Add(_itemID);
 
                     var slotIndex = UIManager.instance.curQuestIdList.IndexOf(questState.questID);
-                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 상태변경해줌.
+                    UIManager.instance.SetQuestSlotGrid(slotIndex);//그 슬롯만 진행도 업데이트 (n/N)
                     
-                    if(questState.progress >= tempQuestInfo.objectives0.Count){
+                    if(questState.progress >= tempQuestInfo.targetVal){
                         UIManager.instance.CompleteQuest(questState.questID);
                     }
                 }
 
             }
         }
+   
+   
+   
     }
 }

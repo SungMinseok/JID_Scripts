@@ -205,7 +205,7 @@ public class Minigame3Script : MonoBehaviour
 
         //SceneController.instance.SetSomeConfiner(mapCollider,true);
         //SceneController.instance.virtualCamera.Follow = mapViewPoint;
-
+        UIManager.instance.SetOnlyHudBlock(true);
         UIManager.instance.SetHUD(false);
     }
     void OnDisable(){
@@ -214,6 +214,7 @@ public class Minigame3Script : MonoBehaviour
         //SceneController.instance.virtualCamera.Follow = PlayerManager.instance.transform;
         PlayerManager.instance.UnlockPlayer();
         UIManager.instance.SetHUD(true);
+        UIManager.instance.SetOnlyHudBlock(false);
         StopAllCoroutines();
     }
 }

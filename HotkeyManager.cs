@@ -8,12 +8,14 @@ public class HotkeyManager : MonoBehaviour
     SoundManager theSound;
     MenuManager theMenu;
     UIManager theUI;
+    ShopManager theShop;
 
     void Start(){
         theInven = InventoryManager.instance;
         theSound = SoundManager.instance;
         theMenu = MenuManager.instance;
         theUI = UIManager.instance;
+        theShop = ShopManager.instance;
     }
     void Update()
     {
@@ -23,9 +25,11 @@ public class HotkeyManager : MonoBehaviour
 
      
 #if UNITY_EDITOR || alpha
-            if(CheatManager.instance.cheat.gameObject.activeSelf){
-                return;
-            }
+        
+        if(CheatManager.instance.cheatPanel.gameObject.activeSelf){
+            return;
+        }
+            
 #endif
        
 
@@ -58,11 +62,19 @@ public class HotkeyManager : MonoBehaviour
 
 
         if(Input.GetButtonUp("Cancel")){
-            if(!PlayerManager.instance.isActing && !UIManager.instance.waitTutorial && !PlayerManager.instance.isPlayingMinigame){
+            Debug.Log("4542525");
+            if(!PlayerManager.instance.isActing 
+            && !UIManager.instance.waitTutorial 
+            && !PlayerManager.instance.isPlayingMinigame
+            && !PlayerManager.instance.isCaught //221019 추가
+            && !PlayerManager.instance.isGameOver   //221019 추가
+            ){
+            Debug.Log("11");
 
                 if(theMenu.popUpOnWork.activeSelf){
                     theMenu.popUpOnWork.SetActive(false);
                 }
+
                 // else if(theMenu.savePanel.activeSelf){
                 //     theMenu.savePanel.SetActive(false);
                 // }
@@ -96,6 +108,20 @@ public class HotkeyManager : MonoBehaviour
                 else{
                     //MenuManager.instance.menuPanel.SetActive(!MenuManager.instance.menuPanel.activeSelf);
                     MenuManager.instance.ToggleMenuPanel(!MenuManager.instance.menuPanel.activeSelf);
+                }
+
+            }
+            //상점
+            else if(PlayerManager.instance.isShopping){
+                
+                if(theMenu.popUpPanel1.activeSelf){
+                    theMenu.popUpPanel1.SetActive(false);
+                }
+                else if(theShop.ui_shop_check.activeSelf){
+                    theShop.ui_shop_check.SetActive(false);
+                }
+                else if(theShop.ui_shop.activeSelf){
+                    theShop.CloseShopUI();
                 }
 
             }

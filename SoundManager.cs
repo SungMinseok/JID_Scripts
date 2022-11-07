@@ -43,16 +43,26 @@ public class SoundManager : MonoBehaviour
         LoadResources();
 
         PutSoundsToDictionary();
+
+        GetAudioSources();
     }
     void Start(){
-        audioSources = FindObjectsOfType<AudioSource>();
+        //audioSources = FindObjectsOfType<AudioSource>();
 
 #if UNITY_EDITOR
         DBManager.instance.bgmName0 = "suomi";
 #endif
     }
+    public void GetAudioSources(){
+        Debug.Log("Getaudiosource");
+
+        if(audioSources!=null) Array.Clear(audioSources,0,audioSources.Length);
+
+        audioSources = FindObjectsOfType<AudioSource>();
+
+    }
     void OnDisable(){
-        Debug.Log("bgmVolume : "+bgmPlayer.volume);
+//        Debug.Log("bgmVolume : "+bgmPlayer.volume);
         StopAllCoroutines();
     }
     void Update()
@@ -260,6 +270,11 @@ public class SoundManager : MonoBehaviour
         foreach(AudioSource a in audioSources){
             if(a == bgmPlayer) continue;
             a.volume = value;
+        }
+        if(SceneController.instance.audioSources!=null){
+            foreach(AudioSource b in SceneController.instance.audioSources){
+                b.volume = value;
+            }
         }
         //sfxPlayer.volume = value;// * 0.5f;
     }

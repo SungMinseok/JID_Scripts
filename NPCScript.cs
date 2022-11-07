@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+public enum NpcType
+{
+    ant_default,
+    hunter,
+}
 //[RequireComponent (typeof (Rigidbody2D))]
 [RequireComponent (typeof (CircleCollider2D))]
 public class NPCScript : CharacterScript
 {
+    public NpcType npcType;
     //public bool isNearPlayer;//플레이어 근처에서 발걸음 소리 on/off용
     public bool isMerchant;//대사 소리 분리용
     public bool isKid;//대사 소리 분리용
@@ -110,6 +116,17 @@ public class NPCScript : CharacterScript
             if(circleCollider2D == null) return;            
             Physics2D.IgnoreCollision(thePlayer.bodyCollider2D, circleCollider2D, true);
             Physics2D.IgnoreCollision(thePlayer.circleCollider2D, circleCollider2D, true);
+        }
+
+        switch(npcType){
+            case NpcType.hunter :
+                
+                
+                
+                
+                
+                
+                break;
         }
 
         
@@ -449,9 +466,17 @@ public class NPCScript : CharacterScript
             patrolInput = patrolInput == 1? -1 : 1;
             //Physics2D.IgnoreCollision(other.gameObject.GetComponent<BoxCollider2D>(), circleCollider2D, true);
         }
-        // if(other.gameObject.CompareTag("Player")){
-        //     Physics2D.IgnoreCollision(other.gameObject.GetComponent<CircleCollider2D>(), circleCollider2D, true);
-        // }
+        
+        
+        if(npcType == NpcType.hunter){
+
+            if(!other.gameObject.CompareTag("MainGround")){
+
+                Physics2D.IgnoreCollision(other.gameObject.GetComponent<Collider2D>(), circleCollider2D, true);
+
+            }
+        }
+
     }    
     void OnTriggerStay2D(Collider2D other) {
         if(onPatrol){
