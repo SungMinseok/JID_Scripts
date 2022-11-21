@@ -182,11 +182,20 @@ public class Location : MonoBehaviour
                 }
             }
         }
+        // else if (type == LocationType.KeyTutorial)
+        // {
+        //     if(!locFlag){
+        //         locFlag = true;
+        //         LocationScript(other);
+
+        //     }
+
+        // }
 
     }
     //키 안입력해도 발동
     void OnTriggerEnter2D(Collider2D other) {
-        if(type != LocationType.Comment){
+        if(type != LocationType.Comment /*&& type != LocationType.KeyTutorial*/){
             if(other.CompareTag("Player")){
                 if(!waitKey && !locFlag
                 &&!PlayerManager.instance.isActing
@@ -480,12 +489,10 @@ public class Location : MonoBehaviour
                     }
                     break;
                 case LocationType.KeyTutorial :
+                    if(!PlayerManager.instance.isActing){
                     UIManager.instance.ShowKeyTutorial(GameInputManager.ReadKey(keyMap), tutorialArgumentIndex);
-                    // var tutorialBox = PlayerManager.instance.tutorialBox;
-                    // tutorialBox.GetChild(0).gameObject.SetActive(true);
-                    // tutorialBox.GetChild(1).GetChild(0).GetComponent<Text>().text = 
-                    // tutorialFrontStringIndex + GameInputManager.ReadKey(keyMap) + tutorialBackStringIndex;
-                    // tutorialBox.GetChild(1).GetComponent<Animator>().SetBool("activate",true);
+
+                    }
                     break;
                 default :
                     DebugManager.instance.PrintDebug("로케이션 오류");

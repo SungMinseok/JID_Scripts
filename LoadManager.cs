@@ -130,6 +130,10 @@ public class LoadManager : MonoBehaviour
         if(VideoManager.instance.isPlayingVideo){
             VideoManager.instance.StopVideo();
         }
+
+        if(MenuManager.instance.menuPanel.activeSelf){
+            MenuManager.instance.menuPanel.SetActive(false);
+        }
     }
     
     IEnumerator LoadNextScene(string nextScene)
@@ -215,6 +219,22 @@ public class LoadManager : MonoBehaviour
         yield return null;
         ResetFader(1);
 
+//프롤로그 체크 221110
+        var tempData = DBManager.instance.curData;
+        
+        if(tempData.version_minor == 0 && tempData.version_build <= 45){
+            DBManager.instance.curData.passPrologue = true;
+            DBManager.instance.localData.canSkipPrologue = true;
+            Debug.Log("1.0.45버전 이하 저장파일은 스킵가능");
+        }
+        else if(DBManager.instance.CheckTrigOver(110)){
+            
+            DBManager.instance.curData.passPrologue = true;
+            DBManager.instance.localData.canSkipPrologue = true;
+            Debug.Log("110번 트리거 완료하여 프롤로그 패스처리");
+        }
+
+
 #region [ 게임 첫 시작 시 (Unused) ]
 
         // if(!isLoadingInGame){
@@ -235,7 +255,9 @@ public class LoadManager : MonoBehaviour
         if(isLoadingInGame){
             isLoadingInGame = false;
             
-            var tempData = DBManager.instance.curData;
+            //var tempData = DBManager.instance.curData;
+
+
             yield return wait1s;
            // yield return waitPlayer;
 
@@ -250,23 +272,14 @@ public class LoadManager : MonoBehaviour
             //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
 
-            // if(lastLoadFileNum == -1){
-            //     InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
-
-            // }
         }
         else if(isLoadingInGameToLastPoint){
             isLoadingInGameToLastPoint = false;
             
-            var tempData = DBManager.instance.curData;
+            //var tempData = DBManager.instance.curData;
             yield return wait1s;
-            //yield return waitPlayer;
-
-            //SceneController.instance.SetConfiner(tempData.curMapNum);
-            //StartCoroutine(SetCameraPos(tempData.curMapNum));
             if(lastLoadFileNum == -1){
 
-                //SceneController.instance.SetFirstLoad();
                 SceneController.instance.CameraView(PlayerManager.instance.transform);
                 SceneController.instance.SetPlayerPosition();
                 SceneController.instance.SetPlayerEquipments();
@@ -274,7 +287,6 @@ public class LoadManager : MonoBehaviour
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
             SoundManager.instance.SoundOff();
-                //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log("빈 파일 로드 완료");
                 // InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
             }
@@ -293,22 +305,11 @@ public class LoadManager : MonoBehaviour
 
         }
         else{
-    
-            //DBManager.instance.curData = DBManager.instance.emptyData;
-
             yield return wait1s;            
-            //yield return waitPlayer;
 
             SceneController.instance.SetFirstLoad();
-            //SceneController.instance.SetFirstLoad();
         }
 
-
-        // if(PlayerManager.instance!=null){
-        //     if(PlayerManager.instance.isGameOver){
-        //         PlayerManager.instance.RevivePlayer();
-        //     }
-        // }
 
 #endregion
 
@@ -328,7 +329,7 @@ public class LoadManager : MonoBehaviour
             isDeadByDepletingDirt = false;
             DBManager.instance.curData.curDirtAmount = DBManager.instance.minimumDirtAmount;
         }
-        if(nextScene != "Main") SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
+        //if(nextScene != "Main") SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
         
         yield return wait500ms;
 

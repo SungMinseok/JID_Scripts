@@ -61,7 +61,7 @@ public class MainControlScript : MonoBehaviour
 
         MenuManager.instance.SetResolutionByValue(DBManager.instance.localData.resolutionValue);
         MenuManager.instance.SetFrameRateByValue(DBManager.instance.localData.frameRateValue);
-
+#if !UNITY_EDITOR
         if(!LoadManager.instance.checkFirstRun){
             LoadManager.instance.checkFirstRun = true;
             splashFlag = true;
@@ -77,6 +77,7 @@ SoundManager.instance.PlayBGM("jelly in the dark");
             VideoManager.instance.PlayVideo(videoClips[0], volume : 0.5f);
             yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
         }
+#endif
 
 SoundManager.instance.ChangeBgm("jelly in the dark");
         mainBtns.SetActive(true);

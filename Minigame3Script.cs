@@ -83,9 +83,9 @@ public class Minigame3Script : MonoBehaviour
         if(checkedMushroom){
             checkedMushroom = false;
             SoundManager.instance.PlaySound("waterdrop");
-            InventoryManager.instance.RemoveItem(13);
-            InventoryManager.instance.RemoveItem(53);
-            InventoryManager.instance.RemoveItem(54);
+            // InventoryManager.instance.RemoveItem(13);
+            // InventoryManager.instance.RemoveItem(53);
+            // InventoryManager.instance.RemoveItem(54);
 
             mushroom.SetActive(false);
             makingBtnGlow.SetActive(false);
@@ -135,6 +135,10 @@ public class Minigame3Script : MonoBehaviour
                 InventoryManager.instance.AddItem(32);
                 break;
         }
+        
+        InventoryManager.instance.RemoveItem(13);
+        InventoryManager.instance.RemoveItem(53);
+        InventoryManager.instance.RemoveItem(54);
 
         trigLocation.selectPhase = 1;
     }
@@ -157,6 +161,7 @@ public class Minigame3Script : MonoBehaviour
             return;
         }
 
+        mushroom.SetActive(true);
         openedCapsule.SetActive(true);
         closedCapsule.SetActive(false);
 

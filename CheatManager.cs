@@ -68,7 +68,7 @@ public class CheatManager : MonoBehaviour
         style_cmd.fontSize = (int)(h * 0.02);
         style_cmd.normal.textColor = Color.cyan;
         style_cmd.fontStyle = FontStyle.Bold;
-        rect_cmd = new Rect(0, 20, 0, style_cmd.fontSize);
+        rect_cmd = new Rect(20, 20, 0, style_cmd.fontSize);
         
         style0 = new GUIStyle();
         style0.alignment = TextAnchor.UpperLeft;
@@ -103,21 +103,21 @@ public class CheatManager : MonoBehaviour
         }
         
         i = 0;
-        mapListString = "<color=#FF90EE90>[MAP]</color>\n";
+        mapListString = "<color=#FF90EE90>[맵] : t [번호]</color>\n";
         foreach(var a in CSVReader.instance.data_map){
             int mapNum = (int)a[MAP_ID]*2;
             mapListString += "<color=white>" + mapNum + "</color>/" + "<color=white>" + (mapNum + 1) + "</color> " + a[MAP_NAME] + "\t";
             if(++i%2==0) mapListString += "\n";
         }
         i = 0;
-        endingListString = "<color=#FF90EE90>[Ending]</color>\n";
+        endingListString = "<color=#FF90EE90>[엔딩]</color>\n";
         foreach(var a in CSVReader.instance.data_collection){
             //int mapNum = (int)a[MAP_ID]*2;
             endingListString += "<color=white>" + a["ID"] + "</color> " + a["name_kr"];
             if(++i%1==0) endingListString += "\n";
         }
         i = 0;
-        trueEndingListString = "<color=#FF90EE90>[TrueEnding]</color>\n";
+        trueEndingListString = "<color=#FF90EE90>[진엔딩]</color>\n";
         foreach(var a in CSVReader.instance.data_collection){
             int index = (int)a["trueID"];
             if(index==0) continue;
@@ -503,6 +503,9 @@ public class CheatManager : MonoBehaviour
 
                     break;
 
+                case "resetprologue" :
+                    DBManager.instance.localData.canSkipPrologue = false;
+                    break;
                     
 #region steam stats
 #if !DISABLESTEAMWORKS
@@ -590,7 +593,7 @@ public class CheatManager : MonoBehaviour
             CheatManager.instance.cheat.ActivateInputField();
             
         }
-        else if(Input.GetKeyDown(KeyCode.F10)){
+        if(Input.GetKeyDown(KeyCode.F10)){
             //SceneManager.LoadScene("warehouse");
             PlayerManager.instance.RevivePlayer();
             CheatManager.instance.InputCheat("t 0");
@@ -606,7 +609,7 @@ public class CheatManager : MonoBehaviour
             string column0 = "";
             string column1 = "";
 
-            GUI.Label(rect_des, "페이지 좌우로 넘기기 : < , >", style_des); 
+            GUI.Label(rect_des, "페이지 넘기기 : Tab", style_des); 
             GUI.Label(rect_cmd, cmdListString, style_cmd); 
 
             switch(cmdPage){

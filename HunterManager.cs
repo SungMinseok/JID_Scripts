@@ -61,7 +61,7 @@ public class HunterManager : MonoBehaviour
 
         else{
 
-            Debug.Log("조건 불충족");
+//            Debug.Log("조건 불충족");
             if(timerCoroutine!=null){
                 StopCoroutine(timerCoroutine);
                 timerCoroutine = null;
@@ -80,7 +80,9 @@ public class HunterManager : MonoBehaviour
 
         WaitForSeconds wait100ms = new WaitForSeconds(0.1f);
 
-        while(!isSpawned){
+        while(!isSpawned
+        &&!PlayerManager.instance.CheckPlayerDoSomething()
+        ){
             yield return wait100ms ;
             requiredTime += 0.1f;
             

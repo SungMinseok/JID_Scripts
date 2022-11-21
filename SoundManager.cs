@@ -177,6 +177,9 @@ public class SoundManager : MonoBehaviour
             case 24:
                 soundFileName = DBManager.instance.bgmName2;//"royalroad";
                 break;
+            case 25:
+                soundFileName = DBManager.instance.bgmName3;//"JellyVillage";
+                break;
             default : 
                 soundFileName = DBManager.instance.bgmName0;//"juicy drug";
                 break;

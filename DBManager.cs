@@ -37,11 +37,15 @@ public class DBManager : MonoBehaviour
     public string bgmName0;
     public string bgmName1;
     public string bgmName2;
+    public string bgmName3 = "JellyVillage";
     [Header("[Steam]")]
     public bool achievementIsAvailable;
     [Header("[Contents On/Off]")]
     public bool dirtOnlyHUD;
     public bool activateHunter;
+    [Header("[Debugging _ Only UNITY]")]
+    public bool debug_passPrologue;//체크시, 먹창에서 시작
+    public bool debug_passPrologue1;//체크시, 집 안 시작
     [Header("[Current Data]━━━━━━━━━━━━━━━━━━━━━━━━━━━")]
 
     [Space]
@@ -81,7 +85,6 @@ public class DBManager : MonoBehaviour
     [System.Serializable]
     public class Data{
         //public List<int> endingCollectionOverList = new List<int>();
-
         public float playerX, playerY;
         //public int curMapIndex;
         public int curMapNum;
@@ -93,6 +96,11 @@ public class DBManager : MonoBehaviour
         public int[] curEquipmentsID = new int[3];
         public bool isSummoning;
         public int curDirtItemCount;
+        public int version_major;
+        public int version_minor;
+        public int version_build;
+        public int version_hotfix;
+        public bool passPrologue;
 
 
 
@@ -152,7 +160,8 @@ public class DBManager : MonoBehaviour
         public KeyCode AddDirtKey;
         public KeyCode petKey;
         public int usedCouponRewardItemID;
-        
+        public bool canSkipPrologue;//체크시 프롤로그시 스킵 버튼 활성화
+
         [Space]
         [Header("Steam Achievements ━━━━━━━━━━━")]
         //업적용
@@ -174,6 +183,8 @@ public class DBManager : MonoBehaviour
         file.Close();
     }
     public void LoadDefaultData(){
+        
+        //DBManager.instance.skipPrologue = true;
         
         BinaryFormatter bf = new BinaryFormatter();
         FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory +"/SaveFileDefault.dat");
@@ -199,6 +210,14 @@ public class DBManager : MonoBehaviour
         curData.playerX = PlayerManager.instance.transform.position.x;
         curData.playerY = PlayerManager.instance.transform.position.y;
         curData.curEquipmentsID = PlayerManager.instance.equipments_id;
+
+        string[] verStr0 = Application.version.Split('-');
+        string[] verStr1 = verStr0[0].Split('.');
+        curData.version_major = int.Parse(verStr1[0]);
+        curData.version_minor = int.Parse(verStr1[1]);
+        curData.version_build = int.Parse(verStr1[2]);
+        curData.version_hotfix = int.Parse(verStr0[1]);
+        //curData.buildVersion = 
 
 
         //DirtBundle

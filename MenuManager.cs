@@ -158,6 +158,10 @@ public class MenuManager : MonoBehaviour
 
     }
     void Start(){
+        string[] verStr0 = Application.version.Split('-');
+        string[] verStr1 = verStr0[0].Split('.');
+
+        Debug.Log("454545 : " + int.Parse(verStr1[0] + verStr1[1] + verStr1[2]));
 
         fonts = new Font[2];
         fonts[0] = Resources.Load<Font>("Cafe24Ssurround");
@@ -803,10 +807,10 @@ public class MenuManager : MonoBehaviour
         // saveSlots[curSaveNum].saveDateText.text = DBManager.instance.curData.curPlayDate;
         // saveSlots[curSaveNum].itemInfoText0.text = DBManager.instance.curData.curHoneyAmount.ToString();
         // saveSlots[curSaveNum].itemInfoText1.text = string.Format("{0:N0}", 100*DBManager.instance.curData.curDirtAmount/DBManager.instance.maxDirtAmount) + "%";
-        
+
     }
     public void Load(int curLoadNum){
-        if(!DBManager.instance.CheckFileExist(curLoadNum)) return;
+        if(curLoadNum != -1 && !DBManager.instance.CheckFileExist(curLoadNum)) return;
 
         CloseAllPanels();
         CloseMenuPanel();

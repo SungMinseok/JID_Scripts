@@ -12,14 +12,17 @@ public class BodySoundScript : MonoBehaviour
         none
     }
     public BodyType bodyType;
-    public bool isNearPlayer;
+    [Header("Setting━━━━━━━━━━━━━━━━━━━━")]
     public bool alwaysOnPlay;
+    public float volumeMultiple = 1f;
     [Header("PlayLoopSoundInCollider━━━━━━━━━━━━━━━━━━━━")]
     public bool playLoopSound;
     public string playLoopSoundFileName;
     [Header("pushable━━━━━━━━━━━━━━━━━━━━")]
     //public bool isPushed;
     public MovingSound[] movingSounds;
+    [Header("Debug━━━━━━━━━━━━━━━━━━━━")]
+    public bool isNearPlayer;
     [System.Serializable]
     public class MovingSound{
         public string name;
@@ -71,7 +74,7 @@ public class BodySoundScript : MonoBehaviour
                 if(!alwaysOnPlay){
 
                     if(isNearPlayer && (!PlayerManager.instance.isPlayingMinigame && !PlayerManager.instance.isGameOver)){
-                        SoundManager.instance.PlaySound("AntWalk"+Random.Range(0,4));
+                        SoundManager.instance.PlaySound("AntWalk"+Random.Range(0,4),volumeMultiple);
 
                     }
                 }

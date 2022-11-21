@@ -103,6 +103,9 @@ public class DirtScript : MonoBehaviour
                         //DBManager.instance.curData.curHoneyAmount += innerHoneyAmount;
                     }
                 }
+                else if(bundleType == BundleType.Dirt){
+                    UIManager.instance.CompleteQuest(11);
+                }
 
                 if(isRecreatable){
                     StartCoroutine(RecreateCoroutine());

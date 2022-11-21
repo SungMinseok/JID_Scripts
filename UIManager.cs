@@ -70,6 +70,7 @@ public class UIManager : MonoBehaviour
     public Animator hud_broadcast;//hud_alert_item과 동일하나 통일을 위해 추가(일괄 변경예정) 221011
     public TextMeshProUGUI hud_broadcast_text;
     Coroutine broadcastCoroutine;
+    public GameObject hud_skip_btn;
     [Header("UI_Book")]
     public GameObject ui_book;
     public Image bookMainImage;
@@ -626,15 +627,20 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-    #region Tutorial
+#region @Tutorial
     public void WaitSkipTutorial(){
         canSkipTutorial = true;
 
     }
-    public void OpenTutorialUI(int tutorialNum)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tutorialNum"></param>
+    /// <param name="keyBlock">true시, 상호작용키로 못넘어감(퀘스트수락하는 버튼 터치해야되는 것들)</param>
+    public void OpenTutorialUI(int tutorialNum, bool keyBlock = false)
     {
         waitTutorial = true;
-        Invoke("WaitSkipTutorial",0.5f);
+        if(!keyBlock) Invoke("WaitSkipTutorial",0.5f);
         curTutorialID = tutorialNum;
         PlayerManager.instance.LockPlayer();
         SoundManager.instance.PlaySound("item_get");
@@ -714,7 +720,7 @@ public class UIManager : MonoBehaviour
     }
 
 
-    #endregion
+#endregion
 
     #region HUD
     public void SetHUD(bool active)
@@ -954,6 +960,7 @@ public class UIManager : MonoBehaviour
         int curSlotNum = curHudQuestSlotCount;
 
         Debug.Log("AcceptQuest | QuestID : " + questID);
+        SoundManager.instance.PlaySound("quest_accept",1.3f);
 
         //curQuestIdList.Add(questID);//슬롯 표시용
         DBManager.instance.curData.questStateList.Add(new QuestState(questID));
@@ -1044,10 +1051,19 @@ public class UIManager : MonoBehaviour
     public void CompleteQuest(int questID){
         if(!curQuestIdList.Contains(questID)) return;
 
+        var theDB = DBManager.instance;
+
         var tempID = DBManager.instance.curData.questStateList.FindIndex(x=>x.questID == questID);
         DBManager.instance.curData.questStateList[tempID].isCompleted = true;
 
         Debug.Log("CompleteQuest | QuestID : " + questID);
+        SoundManager.instance.PlaySound("quest_complete",0.6f);
+
+        //보상 꿀&아이템 없을경우, 그냥 바로 완료 처리
+        var curQuest = theDB.cache_questList.Find(x=>x.ID==questID);
+        if(curQuest.rewardHoneyAmount == 0 && curQuest.rewardItemList.Count==0){
+            DBManager.instance.curData.questStateList[tempID].gotReward = true;
+        }
 
         //221016 퀘스트 완료 시, 슬롯 스크롤 최상단으로
         ui_questSlotGrid.localPosition = Vector2.zero;

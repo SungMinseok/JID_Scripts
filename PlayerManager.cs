@@ -171,6 +171,7 @@ public class PlayerManager : CharacterScript
     public GameObject darkerVignette;
     public GameObject redVignette;
     public GameObject iceVignette;
+    public GameObject vignette_talkBox;
     public GameObject[] redEyes;
     WaitForSeconds wait1000ms = new WaitForSeconds(1);
     WaitForSeconds wait500ms = new WaitForSeconds(0.5f);
@@ -458,8 +459,8 @@ public class PlayerManager : CharacterScript
                 animator.SetBool("fall", false);
 
         }
-
-        if(talkCanvas.gameObject.activeSelf){
+        
+        if(talkCanvas.gameObject.activeSelf && !animator.GetBool("bed")){
             if(!onMonologue){
                 if(!DialogueManager.instance.canSkip2){
                     animator.SetBool("think", false);
@@ -1209,6 +1210,7 @@ public class PlayerManager : CharacterScript
 
         //darkerVignette.SetActive(true);
         UIManager.instance.SetHUD(false);
+        UIManager.instance.SetMovieEffectUI(true);
         SceneController.instance.SetCameraDefaultZoomIn();            
         //SceneController.instance.SetSomeConfiner(SceneController.instance.mapZoomBounds[DBManager.instance.curData.curMapNum]);
         SceneController.instance.SetSomeConfiner(null);
@@ -1287,5 +1289,14 @@ public class PlayerManager : CharacterScript
 
     }
 
-
+    public bool CheckPlayerDoSomething(){
+        if(PlayerManager.instance.isActing
+        ||PlayerManager.instance.isPlayingMinigame
+        ||PlayerManager.instance.isShopping){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
 }

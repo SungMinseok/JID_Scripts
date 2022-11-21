@@ -60,7 +60,8 @@ public class ItemScript : MonoBehaviour
             itemObject = this.transform;
         }
         else{
-            itemObject = transform.GetChild(0);
+            if(transform.childCount != 0)
+                itemObject = transform.GetChild(0);
         }
 
         if(GetComponent<Animator>()!=null)
@@ -211,6 +212,7 @@ public class ItemScript : MonoBehaviour
 
             PlayerManager.instance.isActing =false;  
             if(tutorialIds.Length == 0) PlayerManager.instance.SetLockPlayer(false);
+            if(itemID==21) UIManager.instance.AcceptQuest(11);
             
         }
 
@@ -223,6 +225,9 @@ public class ItemScript : MonoBehaviour
                 yield return new WaitUntil(()=>!UIManager.instance.waitTutorial);
                 //yield return wait100ms;
                 //yield return wait100ms;
+                if(tutorialIds[i]==0){
+                    UIManager.instance.AcceptQuest(12);
+                }
             }
         }
         

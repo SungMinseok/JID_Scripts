@@ -212,11 +212,76 @@ public class InventoryManager : MonoBehaviour
 
         //220903 미니맵 버튼 활성화
         if(ID==12) UIManager.instance.hud_sub_map.GetComponent<Button>().interactable = true;
+        //삽획득 시
+        //if(ID==21) UIManager.instance.AcceptQuest(11);
 
 
 
         RefreshInventory(curPage);
     }
+    /// <summary>
+    /// 0 광장의 버려진 출구지도
+/// 1 개미조종장치
+/// 2 개미탈
+/// 3 사과 조각
+/// 4 죽은척 물약
+/// 5 흙덩이
+/// 6 꽃핀
+/// 7 꿀방울
+/// 8 회복 물약
+/// 9 얼음 덩어리
+/// 10 로메슈제
+/// 11 마법의 콩젤리
+/// 12 지도
+/// 13 버섯곰팡이
+/// 14 연막탄
+/// 15 낡은 종이 뭉치
+/// 16 보라색 열매
+/// 17 여왕만세뱃지
+/// 18 무지개 개미옷
+/// 19 붉은 산딸기
+/// 20 비밀 쪽지
+/// 21 삽
+/// 22 장교개미의 전보
+/// 23 빨대
+/// 24 단단한 나무 개미옷
+/// 25 줄무늬 개미옷
+/// 26 곡괭이
+/// 27 권총
+/// 28 소총
+/// 29 죽은척 물약(사용안함)
+/// 30 총알
+/// 31 얼음 조각
+/// 32 쓸모없는 물약
+/// 33 장전된 권총
+/// 34 장전된 소총
+/// 35 하얀색 티셔츠
+/// 36 풀사다리
+/// 37 대왕일개미방 열쇠
+/// 38 의문의 가루가 담긴 병
+/// 39 거대 물약
+/// 40 호박 코스튬
+/// 41 한복 코스튬
+/// 42 여름 휴가 코스튬
+/// 43 주먹밥 코스튬
+/// 44 펭귄 코스튬
+/// 45 아이돌 코스튬
+/// 46 온갖 맛 나는 젤리
+/// 47 메론맛 젤리
+/// 48 반딧불이 알
+/// 49 오렌지맛 젤리
+/// 50 포도알맛 젤리
+/// 51 메롱맛 우유
+/// 52 슬롯 버튼(사용안함)
+/// 53 버섯곰팡이
+/// 54 버섯곰팡이
+/// 55 로메슈제 방울
+/// 56 버튼달린 개미탈
+/// 57 잠옷 모자(임시)
+/// 58 포스터
+    /// </summary>
+    /// <param name="ID"></param>
+    /// <param name="amount"></param>
     public void RemoveItem(int ID, int amount = 1){
         //DBManager.instance.curData.itemList.Remove(ID);
         var myItemList = DBManager.instance.curData.itemList;
@@ -435,7 +500,16 @@ public class InventoryManager : MonoBehaviour
         // }
         UseItem(curItem);
     }
-    public void UseItem(Item curItem){
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="curItem"></param>
+    /// <param name="mute">true시 장비 착용 효과음 off</param>
+    public void UseItemByID(int ID){
+        UseItem(DBManager.instance.cache_ItemDataList[ID]);
+    }
+    public void UseItem(Item curItem, bool mute = false){
         
         if(curItem.type==0){
             return;
@@ -448,7 +522,7 @@ public class InventoryManager : MonoBehaviour
             case 2 : 
             case 3 : 
                 PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
-                SoundManager.instance.PlaySound("item_use");
+                if(!mute) SoundManager.instance.PlaySound("item_use");
                 break;
             // case 3 : 
             //     PlayerManager.instance.SetEquipment(curItem.type, curItem.ID);
@@ -572,7 +646,8 @@ public class InventoryManager : MonoBehaviour
 
         PlayerManager.instance.LockPlayer();
         PlayerManager.instance.isActing = true;
-            //PlayerManager.instance.rb.AddForce(Vector2.zero);
+        UIManager.instance.SetHUD(false);
+        //PlayerManager.instance.rb.AddForce(Vector2.zero);
 
 
         Select tempSelect = new Select();
@@ -724,11 +799,36 @@ public class InventoryManager : MonoBehaviour
                 PlayerManager.instance.SetBodyColor("5AFF00",30f);
                 SoundManager.instance.PlaySound("item_use");
                 break;
+            case 55:
+                if(CheckHaveItem(55,3)){
+
+                tempDialogue.sentences = new string[1] { "1252" };
+                tempDialogue.isMonologue = true;
+                DialogueManager.instance.SetDialogue(tempDialogue, null);
+                yield return new WaitUntil(() => !PlayerManager.instance.isTalking);
+                tempSelect.answers = new string[2]{"201","202"};
+                SelectManager.instance.SetSelect(tempSelect,null);
+                Array.Clear(tempSelect.answers,0,tempSelect.answers.Length);
+                yield return new WaitUntil(()=>!PlayerManager.instance.isSelecting);
+                if (SelectManager.instance.GetSelect() == 0)
+                {
+                    RemoveItem(55,3);
+                    AddItem(10, 1);
+                    tempDialogue.sentences = new string[1] { "1253" };
+                    tempDialogue.isMonologue = true;
+                    DialogueManager.instance.SetDialogue(tempDialogue, null);
+                    yield return new WaitUntil(() => !PlayerManager.instance.isTalking);
+                }
+                }
+                break;
         }
         if(!PlayerManager.instance.watchingGameEnding && itemID != 48){
             PlayerManager.instance.UnlockPlayer();
 
         }
+
+        UIManager.instance.SetHUD(true);
+
         selectFlag = false;
     }
     public void CleanUpInventory(){
@@ -928,7 +1028,7 @@ public class InventoryManager : MonoBehaviour
             sentenceID = "18";
         }//<color=#FEDC2D>{0}</color>#D2C0A7
 
-        if(DBManager.instance.language == "kr") curItemName = GetCompleteWorld(curItemName);
+        //if(DBManager.instance.language == "kr") curItemName = GetCompleteWorld(curItemName);
 
 
         if(itemID != 999){

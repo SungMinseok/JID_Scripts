@@ -230,7 +230,10 @@ public class Minigame5Script : MonoBehaviour
     }
     void OnDisable(){
         MinigameManager.instance.ExitMinigame();
+        if(!PlayerManager.instance.isActing){
         PlayerManager.instance.UnlockPlayer();
+
+        }
         
         UIManager.instance.SetHUD(true);
         StopAllCoroutines();
