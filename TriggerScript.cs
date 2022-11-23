@@ -3611,6 +3611,7 @@ public class TriggerScript : MonoBehaviour
                     //프롤로그 생략
                     if (DBManager.instance.debug_passPrologue || DBManager.instance.curData.passPrologue)
                     {
+                        Debug.Log("프롤로그 무시");
                         SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
                         //PlayerManager.instance.MoveTo(objects[4]);
                         PlayerManager.instance.Look("right");
@@ -3620,6 +3621,7 @@ public class TriggerScript : MonoBehaviour
                     }
                     else
                     {
+                        Debug.Log("프롤로그 진행");
                         SceneController.instance.SetConfiner(25);
                         SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
                         if(DBManager.instance.localData.canSkipPrologue){

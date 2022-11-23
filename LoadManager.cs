@@ -81,11 +81,13 @@ public class LoadManager : MonoBehaviour
         ;
 
     }
-
+    /// <summary>
+    /// [Main 씬에서 Level 씬으로 진입]
+    /// </summary>
+    /// 
     public void MainToGame()
     {
         StartCoroutine(MainToGameCoroutine());
-//        Debug.Log("33");
     }
     IEnumerator MainToGameCoroutine(){
         lastLoadFileNum = -1;
@@ -121,7 +123,8 @@ public class LoadManager : MonoBehaviour
 
     }
     IEnumerator LoadCoroutine(string sceneName){
-        
+        Debug.Log("LoadCoroutine : " + sceneName);
+
         if(loadFader.color.a != 1){
             FadeOut();
             yield return wait1s;
@@ -235,48 +238,24 @@ public class LoadManager : MonoBehaviour
         }
 
 
-#region [ 게임 첫 시작 시 (Unused) ]
-
-        // if(!isLoadingInGame){
-        //     switch(nextScene){
-        //         case "Level2" :
-        //             DBManager.instance.curData = DBManager.instance.emptyData;
-
-        //             yield return wait1s;
-        //             SceneController.instance.SetFirstLoad();
-        //             break;
-        //     }
-
-        // }
-#endregion
-
 #region [ 인게임 로드 시 ]
 
         if(isLoadingInGame){
             isLoadingInGame = false;
             
-            //var tempData = DBManager.instance.curData;
-
-
             yield return wait1s;
-           // yield return waitPlayer;
-
-            //SceneController.instance.SetConfiner(tempData.curMapNum);
-            //StartCoroutine(SetCameraPos(tempData.curMapNum));
-            SceneController.instance.CameraView(PlayerManager.instance.transform);
-            SceneController.instance.SetPlayerPosition();
+            if(lastLoadFileNum != -1) SceneController.instance.CameraView(PlayerManager.instance.transform);
+            if(lastLoadFileNum != -1) SceneController.instance.SetPlayerPosition();//Load(-1)로 로드 시, 먹창으로 이동하는 것 방지
             SceneController.instance.SetPlayerEquipments();
             InventoryManager.instance.ResetInventory();
             SceneController.instance.SetConfiner(tempData.curMapNum,isDirect:true);
             SoundManager.instance.SoundOff();
-            //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
             Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
 
         }
         else if(isLoadingInGameToLastPoint){
             isLoadingInGameToLastPoint = false;
             
-            //var tempData = DBManager.instance.curData;
             yield return wait1s;
             if(lastLoadFileNum == -1){
 
@@ -286,9 +265,8 @@ public class LoadManager : MonoBehaviour
                 yield return new WaitUntil(()=>InventoryManager.instance);
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
-            SoundManager.instance.SoundOff();
+                SoundManager.instance.SoundOff();
                 Debug.Log("빈 파일 로드 완료");
-                // InventoryManager.instance.AddItem(DBManager.instance.localData.usedCouponRewardItemID);
             }
             else{
                     
@@ -298,7 +276,6 @@ public class LoadManager : MonoBehaviour
                 InventoryManager.instance.ResetInventory();
                 SceneController.instance.SetConfiner(tempData.curMapNum);
             SoundManager.instance.SoundOff();
-                //SoundManager.instance.SetBgmByMapNum(tempData.curMapNum);
                 Debug.Log(lastLoadFileNum + "번 파일 로드 완료");
                 Debug.Log("맵번호 : " + tempData.curMapNum);
             }
@@ -349,6 +326,14 @@ public class LoadManager : MonoBehaviour
         if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){
             PlayerManager.instance.canMove = true;
         }
+    }
+    public void SetDefault(){
+        SceneController.instance.CameraView(PlayerManager.instance.transform);
+        SceneController.instance.SetPlayerPosition();
+        SceneController.instance.SetPlayerEquipments();
+        InventoryManager.instance.ResetInventory();
+        SceneController.instance.SetConfiner(DBManager.instance.curData.curMapNum,isDirect:true);
+        SoundManager.instance.SoundOff();
     }
 
     public void ResetFader(float value){
