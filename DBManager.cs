@@ -593,7 +593,10 @@ public class DBManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-
+#if !UNITY_EDITOR
+        debug_passPrologue = false;
+        debug_passPrologue1 = false;
+#endif
 
         //Application.targetFrameRate = 60;
         //QualitySettings.vSyncCount = 0;

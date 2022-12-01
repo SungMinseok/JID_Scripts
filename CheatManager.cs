@@ -506,8 +506,15 @@ public class CheatManager : MonoBehaviour
                 case "resetprologue" :
                     DBManager.instance.localData.canSkipPrologue = false;
                     break;
-                    
-#region steam stats
+
+                case "opentuto" :
+                    if(temp[1]=="") return;
+
+                    UIManager.instance.OpenTutorialUI(int.Parse(temp[1]));
+
+                    break;
+
+                    #region steam stats
 #if !DISABLESTEAMWORKS
                     
                 case "getstat" :
@@ -555,7 +562,7 @@ public class CheatManager : MonoBehaviour
                     break;
 
 #endif
-#endregion
+                    #endregion
             }
 //EndingCollectionOver
 //DeleteSaveFile

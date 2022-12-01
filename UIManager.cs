@@ -83,7 +83,7 @@ public class UIManager : MonoBehaviour
     public bool waitTutorial;
     public int curTutorialID;
     public bool canSkipTutorial;//스킵용 딜레이
-    
+    public int indexOfItemList;
     [Header("UI_Screen")]
     public GameObject ui_screen;
     public Transform screenMother;
@@ -627,7 +627,7 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
-#region @Tutorial
+    #region @Tutorial
     public void WaitSkipTutorial(){
         canSkipTutorial = true;
 
@@ -640,6 +640,18 @@ public class UIManager : MonoBehaviour
     public void OpenTutorialUI(int tutorialNum, bool keyBlock = false)
     {
         waitTutorial = true;
+
+        switch (tutorialNum)
+        {
+            case 0:
+            case 4:
+            case 8:
+                keyBlock = true;
+                break;
+            default:
+                break;
+        }
+
         if(!keyBlock) Invoke("WaitSkipTutorial",0.5f);
         curTutorialID = tutorialNum;
         PlayerManager.instance.LockPlayer();
@@ -650,7 +662,7 @@ public class UIManager : MonoBehaviour
             tutorialSet.GetChild(i).gameObject.SetActive(false);
         }
 
-        int indexOfItemList = -1;//DBManager.instance.curData.itemList.FindIndex(x => x.itemID == 21);
+        indexOfItemList = -1;//DBManager.instance.curData.itemList.FindIndex(x => x.itemID == 21);
         bool needSetPos = false;
 
 
@@ -668,7 +680,9 @@ public class UIManager : MonoBehaviour
                 indexOfItemList = GetMyItemIndex(2);
                 needSetPos = true;
                 break;
+
         }
+        Debug.Log($"indexOfItemList : {indexOfItemList}");
 
 
         //if(tutorialNum == 3){
@@ -677,16 +691,16 @@ public class UIManager : MonoBehaviour
         if (needSetPos)
             {
 
-                var panelPos = tutorialSet.GetChild(tutorialNum).GetChild(0).localPosition;
+                var panelPos = tutorialSet.GetChild(tutorialNum).GetChild(1).localPosition;
                 Debug.Log(panelPos);
 
                 if (indexOfItemList != -1)
                 {
-                    tutorialSet.GetChild(tutorialNum).GetChild(0).localPosition = new Vector2(panelPos.x, 442.2f - indexOfItemList * 63.07f);
+                    tutorialSet.GetChild(tutorialNum).GetChild(1).localPosition = new Vector2(panelPos.x, 421.3f - indexOfItemList * 63.07f);
                 }
                 else
                 {
-                    tutorialSet.GetChild(tutorialNum).GetChild(0).localPosition = new Vector2(panelPos.x, 442.2f);
+                    tutorialSet.GetChild(tutorialNum).GetChild(0).localPosition = new Vector2(panelPos.x, 421.3f);
                 }
             }
 
@@ -702,6 +716,12 @@ public class UIManager : MonoBehaviour
         return DBManager.instance.curData.itemList.FindIndex(x => x.itemID == _itemID);
     }
 
+    public void UseItemInTutorial(int _itemID){
+        InventoryManager.instance.UseItemByID(_itemID);
+        Debug.Log($"UseItemInTutorial : {_itemID}");
+        CloseTutorial();
+        //waitTutorial = true;
+    }
     public void CloseTutorial()
     {
         waitTutorial = false;
@@ -719,61 +739,6 @@ public class UIManager : MonoBehaviour
 
     }
 
-
-#endregion
-
-    #region HUD
-    public void SetHUD(bool active)
-    {
-        //hud_state.SetActive(active);
-        // if(active){
-        //     hud_block.SetActive(false);
-        // }
-        // else{
-        //     hud_block.SetActive(true);
-        // }
-        
-        if(active){
-            hud_state.GetComponent<CanvasGroup>().alpha = 1;
-        }
-        else{
-            hud_state.GetComponent<CanvasGroup>().alpha = 0;
-
-        }
-        //hud_inventory.SetActive(active);
-        if(active){
-            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 1;
-        }
-        else{
-            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 0;
-
-        }
-
-        if (!active)
-        {
-            for (int i = 0; i < InventoryManager.instance.itemSlotScripts.Length; i++)
-            {
-                InventoryManager.instance.itemSlotScripts[i].itemSlot.itemDescriptionWindow.SetActive(false);
-            }
-        }
-    }
-    public void SetCollectionPage(bool active){
-        if(MenuManager.instance==null) return;
-
-        MenuManager.instance.SetCollectionPage(active);
-
-    }
-    public bool CheckCollectionOverListAllRecognized(){
-        if(DBManager.instance.localData.antCollectionOverList.Exists(x=>!x.isRecognized)
-        &&DBManager.instance.localData.endingCollectionOverList.Exists(x=>!x.isRecognized)
-        ){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-    #endregion
     //0 : 중앙 분홍 박스 내 노출, 1 : 아래 노출
     public void ShowKeyTutorial(string keyString,string argumentIndex ="", int boxType = 0){
         //Debug.Log("show");
@@ -820,6 +785,60 @@ public class UIManager : MonoBehaviour
         //tutorialBox.GetChild(0).gameObject.SetActive(false);
         tutorialBox_Right.GetChild(1).GetComponent<Animator>().SetBool("activate",false);
     }
+
+
+    #endregion
+
+    
+    #region HUD
+    public void SetHUD(bool active)
+    {
+        if(active){
+            hud_state.GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else{
+            hud_state.GetComponent<CanvasGroup>().alpha = 0;
+
+        }
+        //hud_inventory.SetActive(active);
+        if(active){
+            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 1;
+        }
+        else{
+            hud_inventory.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 0;
+
+        }
+
+        if (!active)
+        {
+            for (int i = 0; i < InventoryManager.instance.itemSlotScripts.Length; i++)
+            {
+                InventoryManager.instance.itemSlotScripts[i].itemSlot.itemDescriptionWindow.SetActive(false);
+            }
+        }
+    }
+    public void SetCollectionPage(bool active){
+        if(MenuManager.instance==null) return;
+
+        MenuManager.instance.SetCollectionPage(active);
+
+    }
+    public bool CheckCollectionOverListAllRecognized(){
+        if(DBManager.instance.localData.antCollectionOverList.Exists(x=>!x.isRecognized)
+        &&DBManager.instance.localData.endingCollectionOverList.Exists(x=>!x.isRecognized)
+        ){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+    #endregion
+
+    
+    #region @IceGauge
+    
+    
     public IEnumerator FillIceGaugeCoroutine(){
         ResetIceGauge();
         for(int i=0;i<iceGaugeMother.childCount;i++){
@@ -841,6 +860,8 @@ public class UIManager : MonoBehaviour
             iceGaugeMother.GetChild(i).gameObject.SetActive(false);
         }
     }
+    #endregion
+    
     public void OpenScreen(int screenNum){
         screenOn = true;
         for(int i=0;i<screenMother.childCount;i++){
@@ -1123,6 +1144,8 @@ public class UIManager : MonoBehaviour
 
 
 #endregion
+    
+#region @BrodcastMsg
     public void ActivateBroadcastMsg(float duration = 2f, string msg = "nullText", params string[] arguments){
         if(broadcastCoroutine!=null) StopCoroutine(broadcastCoroutine);
         broadcastCoroutine = StartCoroutine(BroadcastMsgCoroutine(duration, msg, arguments));
@@ -1142,4 +1165,7 @@ public class UIManager : MonoBehaviour
         hud_broadcast.SetTrigger("off");
 
     }
+#endregion
+
+
 }

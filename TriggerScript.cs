@@ -1386,6 +1386,9 @@ public class TriggerScript : MonoBehaviour
                             objects[14].GetChild(1).GetComponent<Animator>().SetBool("hang", false);
                             objects[14].gameObject.SetActive(true);
                             SoundManager.instance.PlaySound("water_pour");
+                            
+                            PlayerManager.instance.MoveTo(objects[17]);
+                            PlayerManager.instance.Look("right");
                             yield return wait2000ms;
                             FadeIn();
 
@@ -3708,6 +3711,7 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
+                
                 #region @109 프롤로그-침대눕기
                 case 109:
                     UIManager.instance.CompleteQuest(15);
@@ -3716,23 +3720,6 @@ public class TriggerScript : MonoBehaviour
                     yield return wait2000ms;
                     SetDialogue(dialogues[0]);
                     yield return waitTalking;
-                    //FadeOut();
-                    //yield return wait2000ms;
-
-                    //PlayerManager.instance.animator.SetBool("bed", false);
-                    // SceneController.instance.SetConfiner(0);
-                    // PlayerManager.instance.MoveTo(objects[0]);
-
-                    // InventoryManager.instance.UseItem(DBManager.instance.cache_ItemDataList[57], true);
-                    // SoundManager.instance.PlaySound("JellyVillage_door",2f);
-
-                    // yield return wait3000ms;
-                    // FadeIn();
-                    // PlayerManager.instance.vignette.SetActive(true);
-                    // PlayerManager.instance.vignette_talkBox.SetActive(true);
-                    // yield return wait500ms;
-                    // SetDialogue(dialogues[1]);
-                    // yield return waitTalking;
 
 
                     DBManager.instance.localData.canSkipPrologue = true;
@@ -3743,31 +3730,9 @@ public class TriggerScript : MonoBehaviour
                     yield return waitMoving;
 
 
-                    
-
-                    //
-                    // FadeOut();
-                    // yield return wait1000ms;
-                    // PlayerManager.instance.vignette_talkBox.SetActive(false);
-                    // FadeIn();
-                    // //일어나기
-                    // yield return wait1000ms;
-                    // PlayerManager.instance.animator.SetTrigger("wakeup");
-
-                    // yield return wait1000ms;
-                    // SetDialogue(dialogues[2]);
-                    // yield return waitTalking;
-                    // CameraView(objects[1], 0);
-                    // yield return wait2000ms;
-                    // CameraView(PlayerManager.instance.transform, 0);
-                    // yield return wait1000ms;
-                    // SetDialogue(dialogues[3]);
-                    // yield return waitTalking;
-
-                    // UIManager.instance.SetHUD(true);
-                    // UIManager.instance.SetOnlyHudBlock(false);
                     break;
                 #endregion
+                
                 #region @110 프롤로그-시작
                 case 110:
                     //스킵시 선처리
@@ -3790,7 +3755,7 @@ public class TriggerScript : MonoBehaviour
                     SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0;
                     SceneController.instance.virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0;
 
-                    PlayerManager.instance.transform.position = new Vector2(-104.00f, 14.94f);
+                    PlayerManager.instance.transform.position = new Vector2(-104.00f, 12.94f);
 
                     if (PlayerManager.instance.equipments_id[0] == 57)
                     {
@@ -4437,7 +4402,7 @@ public class TriggerScript : MonoBehaviour
                 if (location.selectPhase == -1)
                 {
                     UIManager.instance.AcceptQuest(1);//유치원으로 가자 퀘스트 획득
-                    UIManager.instance.AcceptQuest(13);//
+                    //UIManager.instance.AcceptQuest(13);//개미탈
                 }
                 break;
             case 11:
@@ -4477,8 +4442,14 @@ public class TriggerScript : MonoBehaviour
                     UIManager.instance.AcceptQuest(10);
                 break;
 
-            case 999:
             case 998:
+                if (LoadManager.instance.lastLoadFileNum != -1 &&LoadManager.instance.lastLoadFileNum != 99 )
+                {
+                    UIManager.instance.CompleteQuest(14);
+                }
+                break;
+            case 999:
+            //case 998:
                 if (LoadManager.instance.lastLoadFileNum != -1 &&LoadManager.instance.lastLoadFileNum != 99 )
                 {
                     UIManager.instance.CompleteQuest(14);

@@ -493,11 +493,19 @@ public class InventoryManager : MonoBehaviour
 
         Item curItem = DBManager.instance.cache_ItemDataList[DBManager.instance.curData.itemList[curSlotNum].itemID];
 
-        Debug.Log(curSlotNum + "번 슬롯 클릭, itemID : " + curItem.ID + ", name : " + DBManager.instance.cache_ItemDataList[curItem.ID].name);
+        //Debug.Log(curSlotNum + "번 슬롯 클릭, itemID : " + curItem.ID + ", name : " + DBManager.instance.cache_ItemDataList[curItem.ID].name);
+        Debug.Log($"{curSlotNum}번 슬롯 클릭, itemID : {curItem.ID} , name : {DBManager.instance.cache_ItemDataList[curItem.ID].name}");
 
         // if(curItem.itemType != 0 || curItem.itemType != 4){
         //     itemSlot[slotNum].gameObject.SetActive(!itemSlot[slotNum].gameObject.activeSelf);
         // }
+
+        //Key 사용 시
+        if(UIManager.instance.waitTutorial && UIManager.instance.indexOfItemList == slotNum){
+            UIManager.instance.CloseTutorial();
+        }
+
+
         UseItem(curItem);
     }
 

@@ -49,8 +49,12 @@ public class HunterManager : MonoBehaviour
     void CheckSpawnCondition(){
         var theDB = DBManager.instance;
 
+
+//헌터 출몰 Conditions: 
         if(!PlayerManager.instance.CheckEquipments(0,spawnCondition_itemIDList)
         &&DBManager.instance.CheckTrigOver(spawnCondition_trigNum)
+        &&!PlayerManager.instance.isActing
+        &&!PlayerManager.instance.isCaught //221129 잡혔을 때, 타이머 중지 추가
         
         ){
             if(timerCoroutine == null)
