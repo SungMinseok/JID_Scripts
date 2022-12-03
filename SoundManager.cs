@@ -161,6 +161,7 @@ public class SoundManager : MonoBehaviour
         
     }
     public void SetBgmByMapNum(int mapNum){
+        Debug.Log($"SetBgmByMapNum : {mapNum}");
         string soundFileName = "";
         switch(mapNum){
             case 6:
@@ -184,7 +185,7 @@ public class SoundManager : MonoBehaviour
                 soundFileName = DBManager.instance.bgmName0;//"juicy drug";
                 break;
         }
-        Debug.Log("SetBgmByMapNum : "+ soundFileName);
+        //Debug.Log("SetBgmByMapNum : "+ soundFileName);
         
         ChangeBgm(soundFileName);
     }

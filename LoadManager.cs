@@ -325,6 +325,8 @@ public class LoadManager : MonoBehaviour
 
         if(PlayerManager.instance!=null && !PlayerManager.instance.isActing){
             PlayerManager.instance.canMove = true;
+            SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
+
         }
     }
     public void SetDefault(){
