@@ -634,6 +634,13 @@ public class DBManager : MonoBehaviour
 
         ApplyItemInfo();
         ApplyCollectionInfo();
+        ApplyQuestInfo();
+        UIManager.instance.SetQuestSlotGrid();
+
+
+
+
+        
         MenuManager.instance.ResetSaveSlots();
         MenuManager.instance.ResetLoadSlots();
         //ApplyStoryInfo();
