@@ -4288,17 +4288,24 @@ public class TriggerScript : MonoBehaviour
 
                 #region @209 거대물약제조
                 case 209:
+                    if(InventoryManager.instance.CheckHaveItem(38)){
 
-                    SetDialogue(dialogues[0]);
-                    yield return waitTalking;
-                    SetSelect(selects[0]);
-                    yield return waitSelecting;
-                    if (GetSelect() == 1)
-                    {
-
-                        InventoryManager.instance.RemoveItem(38);
-                        InventoryManager.instance.AddItem(39, activateDialogue: true);
+                        SetDialogue(dialogues[0]);
+                        yield return waitTalking;
+                        SetSelect(selects[0]);
+                        yield return waitSelecting;
+                        if (GetSelect() == 1)
+                        {
+                            InventoryManager.instance.RemoveItem(38);
+                            InventoryManager.instance.AddItem(39, activateDialogue: true);
+                        }
                     }
+                    else{
+                        
+                        SetDialogue(dialogues[1]);
+                        yield return waitTalking;
+                    }
+
                     break;
                 #endregion
 
