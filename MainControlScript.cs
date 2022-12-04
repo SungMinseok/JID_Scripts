@@ -102,7 +102,7 @@ public class MainControlScript : MonoBehaviour
         //안내화면 적용 221128
         subSplash.SetActive(true);
         LoadManager.instance.FadeIn();
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(9.5f);
         LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1f);
         subSplash.SetActive(false);
