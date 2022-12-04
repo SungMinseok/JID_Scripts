@@ -3797,6 +3797,7 @@ public class TriggerScript : MonoBehaviour
                     UIManager.instance.SetMovieEffectUI(false);
                     SoundManager.instance.SetBgmByMapNum(DBManager.instance.curData.curMapNum);
 
+                    SceneController.instance.SetCameraDefaultZoomOut();
                     DBManager.instance.curData.passPrologue = true;
                     break;
                 #endregion
