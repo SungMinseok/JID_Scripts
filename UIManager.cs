@@ -1113,6 +1113,7 @@ public class UIManager : MonoBehaviour
 
         }
         Debug.Log("GetRewardCompletedQuest | QuestID : " + curQuestIdList[slotNum]);
+        SoundManager.instance.PlaySound("quest_reward",2f);
         //questSlots[curQuestIdList.Count - 1].gameObject.SetActive(false);
 
         SortQuestStateList();
