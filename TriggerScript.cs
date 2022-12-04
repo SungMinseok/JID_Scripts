@@ -3771,7 +3771,8 @@ public class TriggerScript : MonoBehaviour
                     SetDialogue(dialogues[1]);
                     yield return waitTalking;
                     FadeOut();
-                    yield return wait3500ms;
+                    yield return wait500ms;
+                    yield return wait3000ms;
                     PlayerManager.instance.vignette_talkBox.SetActive(false);
                     FadeIn();
                     UIManager.instance.SetMovieEffectUI(true);
