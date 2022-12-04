@@ -161,7 +161,8 @@ public class MenuManager : MonoBehaviour
         string[] verStr0 = Application.version.Split('-');
         string[] verStr1 = verStr0[0].Split('.');
 
-        Debug.Log("454545 : " + int.Parse(verStr1[0] + verStr1[1] + verStr1[2]));
+        //Debug.Log("454545 : " + int.Parse(verStr1[0] + verStr1[1] + verStr1[2]));
+        Debug.Log($"buildVersion : {verStr1[0]}.{verStr1[1]}.{verStr1[2]}");
 
         fonts = new Font[2];
         fonts[0] = Resources.Load<Font>("Cafe24Ssurround");

@@ -96,7 +96,7 @@ public class VideoManager : MonoBehaviour
         RenderTexture.active = rt;
     }
     public string GetPlayingVideoName(){
-        Debug.Log(videoPlayer.clip.ToString());
+//        Debug.Log(videoPlayer.clip.ToString());
         return videoPlayer.clip.ToString();
     }
     public void SkipPlayingVideo(){

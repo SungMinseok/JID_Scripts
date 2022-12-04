@@ -54,7 +54,7 @@ public class SoundManager : MonoBehaviour
 #endif
     }
     public void GetAudioSources(){
-        Debug.Log("Getaudiosource");
+//        Debug.Log("Getaudiosource");
 
         if(audioSources!=null) Array.Clear(audioSources,0,audioSources.Length);
 

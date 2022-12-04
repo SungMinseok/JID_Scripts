@@ -635,7 +635,7 @@ public class DBManager : MonoBehaviour
         ApplyItemInfo();
         ApplyCollectionInfo();
         ApplyQuestInfo();
-        UIManager.instance.SetQuestSlotGrid();
+        if(UIManager.instance != null) UIManager.instance.SetQuestSlotGrid();
 
 
 
