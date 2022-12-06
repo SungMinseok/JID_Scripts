@@ -1230,7 +1230,7 @@ public class PlayerManager : CharacterScript
 
         hunter.transform.localPosition = startingPos;
         hunter.gameObject.SetActive(true);
-        SetTempMainGround(true);
+        //SetTempMainGround(true);
         DialogueManager.instance.SetDialogue(tempDialogue[0]);
 
         float elapsedTime = 0;
