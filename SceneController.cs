@@ -250,7 +250,9 @@ public class SceneController : MonoBehaviour
         switch(mapNum){
             case 4 :
                 if(mapOverList[mapOverList.Count-1] == 5 
-                && !DBManager.instance.CheckMapOver(6)){
+                && !DBManager.instance.CheckMapOver(6)
+                && !DBManager.instance.CheckTrigOver(11)
+                ){
                     UIManager.instance.AcceptQuest(4);
                 }
                 break;
