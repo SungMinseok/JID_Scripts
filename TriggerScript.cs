@@ -2036,7 +2036,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                #region 30  병원 입장여부 체크
+                #region @30 병원 입장여부 체크
                 case 30:
 
                     if (objects[0].GetComponent<Location>().isLocked)
@@ -2136,7 +2136,6 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                //물약제조 ( 미니게임 3 )
                 #region @32 물약제조 ( 미니게임 3 )
                 case 32:
                     if (location.selectPhase == 0)
@@ -2158,8 +2157,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                //지네상점, 쥐며느리상점
-                #region @33, @34
+                #region @33, @34 지네상점, 쥐며느리상점
                 case 33:
                 case 34:
                     //CameraView(dialogues[0].talker);
@@ -2233,6 +2231,7 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
+                
                 #region @36 거미상점
                 case 36:
 
@@ -2260,8 +2259,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                //연못앞
-                #region 37
+                #region @37 연못앞
                 case 37:
 
                     //CameraView(dialogues[0].talker);
@@ -2293,9 +2291,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-
-                //연못앞
-                #region 38
+                #region @38 연못앞
                 case 38:
 
                     //CameraView(dialogues[0].talker);
@@ -2306,8 +2302,8 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
-                //히든월드 입장
-                #region @39
+                
+                #region @39 히든월드 입장
                 case 39:
                     objects[0].GetComponent<BoxCollider2D>().enabled = true;
                     objects[1].GetComponent<Location>().isLocked = true;
@@ -2576,7 +2572,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-#if demo
+#if demo //데모 전용 트리거
 
                 #region @45 광장 출입 불가(데모)
             case 45 :
@@ -3218,6 +3214,7 @@ public class TriggerScript : MonoBehaviour
                     yield return waitTalking;
                     break;
                 #endregion
+                
                 #region @69 냉동굴 게이지 ON
                 case 69:
 
@@ -3275,6 +3272,7 @@ public class TriggerScript : MonoBehaviour
                     yield return new WaitUntil(() => !UIManager.instance.screenOn);
                     break;
                 #endregion
+                
                 #region @73 미친수개미 종료후 선택
                 case 73:
 
@@ -3300,7 +3298,6 @@ public class TriggerScript : MonoBehaviour
                     }
                     break;
                 #endregion
-
 
                 #region @76 광장 갑옷 앞 글 읽기
                 case 76:
@@ -3539,12 +3536,14 @@ public class TriggerScript : MonoBehaviour
                     DBManager.instance.AntCollectionOver(10);
                     break;
                 #endregion
+                
                 #region @86 유모개미 발견
                 case 86:
 
                     DBManager.instance.AntCollectionOver(13);
                     break;
                 #endregion
+                
                 #region @n88 반딧불이 발견
                 case 88:
                     PlayerManager.instance.LockPlayer();
@@ -3562,6 +3561,7 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
+                
                 #region @n89 공주개미 엿듣기
                 case 89:
                     SetSelect(selects[0]);
@@ -3580,6 +3580,7 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
+                
                 #region @90 공주개미 재배치
                 case 90:
                     objects[0].transform.position = objects[1].transform.position;
@@ -3589,6 +3590,7 @@ public class TriggerScript : MonoBehaviour
 
                     break;
                 #endregion
+                
                 #region @91 광장 노개미 (수레개미 선택 후)
                 case 91:
 
@@ -3601,6 +3603,7 @@ public class TriggerScript : MonoBehaviour
                     }
                     break;
                 #endregion
+                
                 #region @93 제작대 레시피
                 case 93:
 
@@ -3996,8 +3999,8 @@ public class TriggerScript : MonoBehaviour
                     yield return wait1000ms;
                     break;
                 #endregion
-                //[엔딩3 : 개미굴에서 젤리난다.]
-                #region @n203
+                
+                #region @203 [엔딩3 : 개미굴에서 젤리난다.]
                 case 203:
                     UIManager.instance.SetMovieEffectUI(true);
                     DBManager.instance.AntCollectionOver(17);
@@ -4021,7 +4024,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                #region @n204 [엔딩4 : 살육의밤]
+                #region @204 [엔딩4 : 살육의밤]
                 case 204:
                     UIManager.instance.SetMovieEffectUI(true);
                     DBManager.instance.AntCollectionOver(17);
@@ -4056,8 +4059,8 @@ public class TriggerScript : MonoBehaviour
                     yield return wait1000ms;
                     break;
                 #endregion
-                //
-                #region @n205 [엔딩5 : 꼭두각시]
+                
+                #region @205 [엔딩5 : 꼭두각시]
                 case 205:
                     UIManager.instance.SetMovieEffectUI(true);
                     DBManager.instance.AntCollectionOver(17);
@@ -4113,8 +4116,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-
-                #region @206 [엔딩6-친구와 함께라면]
+                #region @206 [엔딩6 : 친구와 함께라면]
                 case 206:
                     UIManager.instance.SetMovieEffectUI(true);
 
@@ -4169,7 +4171,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                #region @207 [엔딩7 - 여행가]
+                #region @207 [엔딩7 : 여행가]
                 case 207:
 
                     UIManager.instance.SetMovieEffectUI(true);
@@ -4216,7 +4218,7 @@ public class TriggerScript : MonoBehaviour
                     break;
                 #endregion
 
-                #region @208 [엔딩8 - 산제물]
+                #region @208 [엔딩8 : 산제물]
                 case 208:
                     UIManager.instance.SetMovieEffectUI(true);
                     PlayerManager.instance.Look("right");
