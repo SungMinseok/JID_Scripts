@@ -469,6 +469,16 @@ public class InventoryManager : MonoBehaviour
             return false;
         }
     }
+    public int GetItemAmount(int itemID){
+        var tempItem = DBManager.instance.curData.itemList.Find(x => x.itemID == itemID);
+
+        if(tempItem != null){
+            return tempItem.itemAmount;
+        }
+        else{
+            return 0;
+        }
+    }
 
     public void RefreshInventory(int pageNum){
         //var theUI = UIManager.instance;

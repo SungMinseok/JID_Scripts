@@ -81,7 +81,7 @@ public class DBManager : MonoBehaviour
 
 
 
-
+    //@DATA
     [System.Serializable]
     public class Data{
         //public List<int> endingCollectionOverList = new List<int>();
@@ -118,6 +118,7 @@ public class DBManager : MonoBehaviour
         //public Dictionary<int,object> questStateDic;//221008
         [Header("Contents ━━━━━━━━━━━")]
         public int roulettePlayCount;
+        //public int smallRomeActivateCount;
 
 
         //public Vector2 screenSize;

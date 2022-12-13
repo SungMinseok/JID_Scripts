@@ -51,15 +51,28 @@ public class SubGameScript : MonoBehaviour
     }
     void Start(){
         //waitAphidCreationCycle = new WaitForSeconds(aphidCreationCycle);
+        if(DBManager.instance != null){
+            if(DBManager.instance.CheckTrigOver(22)||DBManager.instance.CheckTrigOver(27)){
+                int tempCount = 3 - InventoryManager.instance.GetItemAmount(55);
+                if(tempCount>0) CreateDrops(tempCount);
+            }
+        
+        }
     }
     
     void ResetGameSettings(){
 
     }
 
-    public void CreateDrops(){
-        foreach(GameObject a in lomeDrops){
-            a.SetActive(true);
+    public void CreateDrops(int dropCount = 3){
+        // foreach(GameObject a in lomeDrops){
+        //     DBManager.instance.curData.smallRomeActivateCount++;
+        //     a.SetActive(true);
+        // }
+        for (int i = 0; i < dropCount;i++){
+            lomeDrops[i].SetActive(true);
+            //DBManager.instance.curData.smallRomeActivateCount = dropCount;
+
         }
     }
 
