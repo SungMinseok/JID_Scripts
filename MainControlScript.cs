@@ -67,7 +67,7 @@ public class MainControlScript : MonoBehaviour
 
         MenuManager.instance.SetResolutionByValue(DBManager.instance.localData.resolutionValue);
         MenuManager.instance.SetFrameRateByValue(DBManager.instance.localData.frameRateValue);
-#if !UNITY_EDITOR
+//#if !UNITY_EDITOR
         if(!LoadManager.instance.checkFirstRun){
             LoadManager.instance.checkFirstRun = true;
             splashFlag = true;
@@ -78,7 +78,7 @@ public class MainControlScript : MonoBehaviour
             VideoManager.instance.PlayVideo(videoClips[0], volume : 0.5f);
             yield return new WaitUntil(()=>!VideoManager.instance.isPlayingVideo);
         }
-#endif
+//#endif
 
         SoundManager.instance.ChangeBgm("jelly in the dark");
         mainBtns.SetActive(true);
@@ -102,7 +102,11 @@ public class MainControlScript : MonoBehaviour
         //안내화면 적용 221128
         subSplash.SetActive(true);
         LoadManager.instance.FadeIn();
+#if UNITY_EDITOR
+        yield return new WaitForSeconds(0.5f);
+#else
         yield return new WaitForSeconds(9.5f);
+#endif
         LoadManager.instance.FadeOut();
         yield return new WaitForSeconds(1f);
         subSplash.SetActive(false);
@@ -116,7 +120,9 @@ public class MainControlScript : MonoBehaviour
 
     public void PushStartBtn()
     {
-        //LoadManager.instance.loadFader.gameObject.SetActive(true);
+        LoadManager.instance.loadFader.gameObject.SetActive(true);
+        Color tempColor = LoadManager.instance.loadFader.color;
+        LoadManager.instance.loadFader.color = new Color(tempColor.r, tempColor.g, tempColor.b, 0);
         LoadManager.instance.MainToGame();
     }
     public void PushGameExitBtn()

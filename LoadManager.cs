@@ -346,7 +346,7 @@ public class LoadManager : MonoBehaviour
     public void FadeOut(){
         //이거 왜넣었는지 확인 필요 221128 [cid-1195]
         if(loadFader.color.a == 1){
-            //return;
+            return;
         }
 
         loadFader.gameObject.SetActive(true);
