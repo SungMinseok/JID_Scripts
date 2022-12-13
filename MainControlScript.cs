@@ -116,13 +116,13 @@ public class MainControlScript : MonoBehaviour
         LoadManager.instance.loadFader.gameObject.SetActive(false);
         splashFlag = false;
 
+        Color tempColor = LoadManager.instance.loadFader.color;
+        LoadManager.instance.loadFader.color = new Color(tempColor.r, tempColor.g, tempColor.b, 0);
     }
 
     public void PushStartBtn()
     {
-        LoadManager.instance.loadFader.gameObject.SetActive(true);
-        Color tempColor = LoadManager.instance.loadFader.color;
-        LoadManager.instance.loadFader.color = new Color(tempColor.r, tempColor.g, tempColor.b, 0);
+        //LoadManager.instance.loadFader.gameObject.SetActive(true);
         LoadManager.instance.MainToGame();
     }
     public void PushGameExitBtn()
