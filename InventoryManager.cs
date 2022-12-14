@@ -759,6 +759,8 @@ public class InventoryManager : MonoBehaviour
         toggleBtn.interactable = true;
     }
     public void AddDirt(float dirtAmount){
+        PlayerManager.instance.PutDirtEffect();
+
         DBManager.instance.curData.curDirtAmount+=dirtAmount;
         if(DBManager.instance.curData.curDirtAmount>DBManager.instance.maxDirtAmount){
             DBManager.instance.curData.curDirtAmount=DBManager.instance.maxDirtAmount;

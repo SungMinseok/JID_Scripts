@@ -188,6 +188,7 @@ public class PlayerManager : CharacterScript
     WaitForSecondsRealtime waitForSecondsRealtime ;
     [Header("ETC────────────────────────────")]
     public GameObject tempMainGround;
+    public ParticleSystem[] dirtEffects;
     void Awake()
     {
         //Application.targetFrameRate = 120;
@@ -1297,6 +1298,20 @@ public class PlayerManager : CharacterScript
         }
         else{
             return false;
+        }
+    }
+
+    public void PutDirtEffect(){
+        for (int i = 0; i < dirtEffects.Length;i++){
+            if (dirtEffects[i].isPlaying)
+            {
+                continue;
+            }
+            else
+            {
+                dirtEffects[i].Play();
+                break;
+            }
         }
     }
 }
