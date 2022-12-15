@@ -225,6 +225,7 @@ public class Minigame4Script : MonoBehaviour
             //     yield return popUpOkayCheck;
             // }
             
+            SoundManager.instance.PlaySound("aphidgame_endwhistle");
 
             resultBoardLeftScoreText.text = setScore_ant.ToString();
             resultBoardRightScoreText.text = setScore_lucky.ToString();

@@ -610,7 +610,7 @@ public class DBManager : MonoBehaviour
         //dataDirectory = "/" + buildVersion + "_" + buildNum;
         dataDirectory = "";
 #else
-        buildVersion = "";
+        //buildVersion = "";
 #endif
 
 
