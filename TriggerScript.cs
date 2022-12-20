@@ -827,6 +827,7 @@ public class TriggerScript : MonoBehaviour
                 case 6:
 
                     DBManager.instance.AntCollectionOver(2);
+#if !UNITY_EDITOR
                     if (location.selectPhase == 0)
                     {
                         location.selectPhase = 1;
@@ -935,6 +936,9 @@ public class TriggerScript : MonoBehaviour
                             yield return waitTalking;
                         }
                     }
+#else
+                    location.selectPhase = -1;
+#endif
                     break;
                 #endregion
 
@@ -4384,7 +4388,7 @@ public class TriggerScript : MonoBehaviour
             case 6:
                 if (location.selectPhase == -1)
                 {
-
+                    PlayerManager.instance.isActing = false;
                     UIManager.instance.OpenTutorialUI(4);//노개미와 대화 후 개미탈 획득 > 개미탈 착용 튜토리얼
                     yield return new WaitUntil(() => !UIManager.instance.waitTutorial);
                 }

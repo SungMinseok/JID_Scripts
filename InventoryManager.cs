@@ -637,7 +637,7 @@ public class InventoryManager : MonoBehaviour
         //     itemSlot[slotNum].gameObject.SetActive(!itemSlot[slotNum].gameObject.activeSelf);
         // }
 
-        //Key 사용 시
+        //키보드의 Key 사용 시 튜토리얼 종료
         if(UIManager.instance.waitTutorial && UIManager.instance.indexOfItemList == slotNum){
             UIManager.instance.CloseTutorial();
         }
