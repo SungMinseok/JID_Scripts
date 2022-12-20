@@ -4420,6 +4420,7 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.CompleteQuest(4);
                 break;
             case 18:
+                UIManager.instance.CompleteQuest(4);
                 UIManager.instance.AcceptQuest(5);
                 break;
             case 49:
