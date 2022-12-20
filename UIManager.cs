@@ -975,6 +975,29 @@ public class UIManager : MonoBehaviour
     
 
 #region @Quest
+    /// <summary>
+    /// 0 테스트용 퀘스트
+/// 1 유치원 가기
+/// 2 광장 가기
+/// 3 야시장 가기
+/// 4 수레 앞 개미에게 말 걸기
+/// 5 버섯 농장 가기
+/// 6 광장 둘러보기 ({0}/{1})
+/// 7 농장 모두 방문하기 ({0}/{1})
+/// 8 대왕 일개미 방 가기
+/// 9 식당 가기
+/// 10 나가는 길 가기
+/// 11 흙더미 파기
+/// 12 흙덩이 사용 ({0}/{1})
+/// 13 개미탈 착용
+/// 14 흰개미를 통해 게임 저장
+/// 15 침대로 가기
+/// 16 옷걸이의 모자를 쓰기
+    /// </summary>
+    /// <param name="questID">
+    /// </param>
+    /// 
+
     public void AcceptQuest(int questID){
         if(DBManager.instance.curData.questStateList.Exists(x=>x.questID == questID)) return;
 

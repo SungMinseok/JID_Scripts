@@ -4423,16 +4423,19 @@ public class TriggerScript : MonoBehaviour
                 UIManager.instance.AcceptQuest(5);
                 break;
             case 49:
-                if (!DBManager.instance.CheckMapOver(8))
+                if (SelectManager.instance.lastSelectedNum == 0)
                 {
-                    UIManager.instance.AcceptQuest(2);
+                    UIManager.instance.AcceptQuest(3);
                 }
                 break;
             case 54:
                 UIManager.instance.AcceptQuest(14);
                 break;
             case 63:
-                UIManager.instance.AcceptQuest(3);
+                if (!DBManager.instance.CheckMapOver(8))
+                {
+                    UIManager.instance.AcceptQuest(2);
+                }
                 break;
             // case 59:
             //     if(!DBManager.instance.CheckMapOver(13)

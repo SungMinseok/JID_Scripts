@@ -1242,7 +1242,7 @@ public class PlayerManager : CharacterScript
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-
+        hunter.GetComponent<Rigidbody2D>().gravityScale = 0f;
         hunter.animator.SetTrigger("land");
         yield return waitTalking;
         
