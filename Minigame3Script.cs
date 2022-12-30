@@ -140,7 +140,7 @@ public class Minigame3Script : MonoBehaviour
         InventoryManager.instance.RemoveItem(53);
         InventoryManager.instance.RemoveItem(54);
 
-        trigLocation.selectPhase = 1;
+        //trigLocation.selectPhase = 1;
     }
     public void OpenNote(){
         notePage.SetActive(true);
