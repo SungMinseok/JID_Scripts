@@ -268,7 +268,7 @@ public class ShopManager : MonoBehaviour
                 lastBuyItemIndex = curShopSales[slotNum].itemID;
 
                 DBManager.instance.ItemPurchaseOver(curShopSales[slotNum].itemID);
-                DBManager.instance.ItemPurchaseOver1(curShopSales[slotNum].itemID);
+                //DBManager.instance.ItemPurchaseOver1(curShopSales[slotNum].itemID);
                 
                 string[] tempArg = new string[1]{
                     shopSlots[slotNum].itemNameText.text

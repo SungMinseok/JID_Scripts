@@ -206,8 +206,8 @@ public class Minigame5Script : MonoBehaviour
         }
         else if(SelectManager.instance.GetSelect()==1){
             if(isSuccessed){
-                DBManager.instance.curData.curHoneyAmount += int.Parse(nextHoneyText.text);
-                
+                //DBManager.instance.curData.curHoneyAmount += int.Parse(nextHoneyText.text);
+                InventoryManager.instance.AddHoney(int.Parse(nextHoneyText.text));
             }
             
            

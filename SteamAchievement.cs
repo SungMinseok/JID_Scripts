@@ -34,7 +34,10 @@ public class SteamAchievement : MonoBehaviour
 
     }
     public void ApplyAchievements(int num){
-        if(!SteamManager.Initialized) { return ; }
+        if(!SteamManager.Initialized) {
+            Debug.Log("steam is not initialized but you just get achievement " + num);
+            return ; 
+        }
 
 #if !DISABLESTEAMWORKS
         //TestSteamAchievement(num);
