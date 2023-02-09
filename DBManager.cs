@@ -171,6 +171,7 @@ public class DBManager : MonoBehaviour
         public int deathCount_noDirt;//흙고갈 죽음
         public int gameCount_success_0;//미니게임0 성공횟수(종이오리기)
         public List<int> itemPurchaseList;
+        public List<int> itemPurchaseList1 = new List<int>();//230210 쇼퍼홀릭 안되는사람있어서 추가
     }
     
 #region Non local data
@@ -339,6 +340,7 @@ public class DBManager : MonoBehaviour
         localData.antCollectionOverList.Clear();
         localData.itemCollectionOverList.Clear();
         localData.itemPurchaseList.Clear();
+        localData.itemPurchaseList1.Clear();
 
         BinaryFormatter bf = new BinaryFormatter();
         FileInfo fileCheck = new FileInfo(Application.persistentDataPath + dataDirectory + "/LocalDataFile.dat");
@@ -359,6 +361,7 @@ public class DBManager : MonoBehaviour
                 localData.itemCollectionOverList = new List<int>();
 
             if(localData.itemPurchaseList == null) localData.itemPurchaseList = new List<int>();
+            if(localData.itemPurchaseList1 == null) localData.itemPurchaseList1 = new List<int>();
 
             // if(localData.jumpKey==KeyCode.None){
             //     localData.jumpKey = KeyCode.Space;
@@ -954,6 +957,13 @@ public class DBManager : MonoBehaviour
                 SteamAchievement.instance.ApplyAchievements(4);
 
             }
+        }
+    }
+    public void ItemPurchaseOver1(int _id){
+        localData.itemPurchaseList1.Add(_id);
+        localData.itemPurchaseList1 = localData.itemPurchaseList1.Distinct().ToList();
+        if(localData.itemPurchaseList1.Count >= 9){
+            SteamAchievement.instance.ApplyAchievements(4);
         }
     }
     public bool CheckItemPurchaseOver(int _id){
