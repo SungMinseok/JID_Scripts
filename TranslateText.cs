@@ -17,6 +17,9 @@ public class TranslateText : MonoBehaviour
     public string keyMap;
     [Header("default")]
     public bool unused;
+    [Header("Options")]
+    public bool isEndingGuideMapName;
+    public bool isEndingGuideEndingName;
 
     // Start is called before the first frame update
     void Awake(){
@@ -34,6 +37,16 @@ public class TranslateText : MonoBehaviour
             ApplyTranslation();
             MenuManager.instance.ApplyFont(curText);
             
+        }
+
+        
+        if(isEndingGuideMapName){
+            var mother = GetComponentInParent<EndingGuideSlot>();
+            key = mother.endingMapID;
+        }
+        else if(isEndingGuideEndingName){
+            var mother = GetComponentInParent<EndingGuideSlot>();
+            key = mother.endingNameID;
         }
 
     }

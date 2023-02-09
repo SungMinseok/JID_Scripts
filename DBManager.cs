@@ -516,6 +516,22 @@ public class DBManager : MonoBehaviour
         }
         return localData.endingCollectionOverList.FindIndex(x => x.ID == collectionNum);
     }
+    /// <summary>
+    /// 트루엔딩 달성 여부 확인
+    /// </summary>
+    /// <param name="_trueID"></param>
+    /// <returns></returns>
+    public bool GetStateTrueEndingCollection(int _trueID){
+        var endingID = cache_EndingCollectionDataList.Find(x => x.trueID == _trueID).ID;
+
+        if(localData.endingCollectionOverList.Any(x=>x.ID == endingID)){
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }
     public void ResetEndingCollection(){
         localData.endingCollectionOverList.Clear();
         CallLocalDataSave();
