@@ -296,6 +296,8 @@ public class ShopManager : MonoBehaviour
                 InventoryManager.instance.RemoveItem(tempItemID);
                 InventoryManager.instance.AddItem(curShopSales[slotNum].itemID,curShopSales[slotNum].itemAmount);
                 lastBuyItemIndex = curShopSales[slotNum].itemID;
+                
+                DBManager.instance.ItemPurchaseOver(curShopSales[slotNum].itemID);
 
                 string[] tempArg = new string[1]{
                     //DBManager.instance.cache_ItemDataList[lastBuyItemIndex].name.ToString(),
